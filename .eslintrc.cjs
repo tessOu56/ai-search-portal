@@ -1,6 +1,11 @@
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
-  extends: ["eslint-config-remix"],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+  ],
+  parser: "@typescript-eslint/parser",
+  plugins: ["@typescript-eslint"],
   rules: {
     "@typescript-eslint/no-unused-vars": [
       "warn",
