@@ -21,3 +21,11 @@ node_modules/
 *.swo
 
 .vercel
+
+# Linting and formatting
+.eslintcache
+.prettiercache
+node_modules/.cache/
+
+# Husky
+.husky/_
