@@ -1,0 +1,4 @@
+# Optional: Add commit message validation here
+# For example, enforce conventional commits:
+# npx --no -- commitlint --edit "$1"
+

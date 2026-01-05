@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+build/
+dist/
+.cache/
+.vercel/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Generated files
+*.min.js
+*.min.css
+
+# Config files that shouldn't be formatted
+package.json
+tsconfig.json
+remix.config.js
+vite.config.ts
+tailwind.config.ts
+postcss.config.js
+
