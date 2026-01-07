@@ -1,13 +1,8 @@
-import { getRecipesByDishId } from "~/features/recipe/recipe.server";
-import { getVendorsByDishId } from "~/features/vendor/vendor.server";
-
-/**
- * Dish 統計資訊
- */
-export interface DishStats {
-  recipeCount: number;
-  vendorCount: number;
-}
+import type { DishStats } from "~/shared/types/dish-stats.types";
+import {
+  getRecipesByDishId,
+  getVendorsByDishId,
+} from "~/shared/services/domain.server";
 
 /**
  * 獲取 Dish 的關聯統計
@@ -27,4 +22,5 @@ export async function getDishStats(dishId: string): Promise<DishStats> {
     vendorCount: vendors.length,
   };
 }
+
 

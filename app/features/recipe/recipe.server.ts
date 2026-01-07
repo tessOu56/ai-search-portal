@@ -2,21 +2,13 @@ import type {
   Recipe,
   CreateRecipeInput,
   UpdateRecipeInput,
-  RecipeStep,
 } from "./recipe.types";
-import { getDish } from "~/features/dish/dish.server";
+import { getDishById } from "~/shared/services/domain.server";
 import { calculateNutrition } from "~/services/nutrition.server";
+import { notFound, validationError } from "~/shared/utils/errors";
 
 // 模擬資料庫（使用記憶體 Map）
 const recipesMap = new Map<string, Recipe>();
-
-/**
- * 驗證 dishId 是否存在
- */
-async function validateDishId(dishId: string): Promise<boolean> {
-  const dish = await getDish(dishId);
-  return dish !== null;
-}
 
 /**
  * 獲取所有 Recipe
@@ -68,17 +60,13 @@ export async function searchRecipes(query: string): Promise<Recipe[]> {
 export async function createRecipe(input: CreateRecipeInput): Promise<Recipe> {
   // 驗證 dishId 必填且存在
   if (!input.dishId) {
-    throw new Error("dishId is required");
+    throw validationError("dishId is required");
   }
 
-  const dishExists = await validateDishId(input.dishId);
-  if (!dishExists) {
-    throw new Error(`Dish with id ${input.dishId} not found`);
-  }
-
-  const dish = await getDish(input.dishId);
+  // 直接獲取 dish，避免重複查詢
+  const dish = await getDishById(input.dishId);
   if (!dish) {
-    throw new Error(`Dish with id ${input.dishId} not found`);
+    throw notFound("Dish", input.dishId);
   }
 
   const now = new Date();
@@ -131,18 +119,11 @@ export async function updateRecipe(
     return null;
   }
 
-  // 如果 dishId 有變更，需要驗證新的 dishId
-  if (input.dishId && input.dishId !== recipe.dishId) {
-    const dishExists = await validateDishId(input.dishId);
-    if (!dishExists) {
-      throw new Error(`Dish with id ${input.dishId} not found`);
-    }
-  }
-
+  // 如果 dishId 有變更，需要獲取新的 dish
   const dishId = input.dishId || recipe.dishId;
-  const dish = await getDish(dishId);
+  const dish = await getDishById(dishId);
   if (!dish) {
-    throw new Error(`Dish with id ${dishId} not found`);
+    throw notFound("Dish", dishId);
   }
 
   const ingredients = input.ingredients || recipe.ingredients;
@@ -174,4 +155,5 @@ export async function updateRecipe(
 export async function deleteRecipe(id: string): Promise<boolean> {
   return recipesMap.delete(id);
 }
+
 
