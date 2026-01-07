@@ -5,7 +5,7 @@ import type {
   IngredientUsage,
 } from "./dish.types";
 import { calculateNutrition, aggregateProperties } from "~/services/nutrition.server";
-import { getIngredient } from "~/features/ingredient/ingredient.server";
+import { getIngredientById } from "~/shared/services/domain.server";
 
 // 模擬資料庫（使用記憶體 Map）
 const dishesMap = new Map<string, Dish>();
@@ -18,7 +18,7 @@ async function enrichIngredientUsages(
 ): Promise<IngredientUsage[]> {
   return Promise.all(
     usages.map(async (usage) => {
-      const ingredient = await getIngredient(usage.ingredientId);
+      const ingredient = await getIngredientById(usage.ingredientId);
       return {
         ...usage,
         ingredientName: ingredient?.name || usage.ingredientName || "未知原料",
@@ -148,4 +148,5 @@ export async function updateDish(
 export async function deleteDish(id: string): Promise<boolean> {
   return dishesMap.delete(id);
 }
+
 

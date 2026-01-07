@@ -5,19 +5,12 @@ import type {
   DishVendor,
   CreateDishVendorInput,
 } from "./vendor.types";
-import { getDish } from "~/features/dish/dish.server";
+import { getDishById } from "~/shared/services/domain.server";
+import { notFound } from "~/shared/utils/errors";
 
 // 模擬資料庫（使用記憶體 Map）
 const vendorsMap = new Map<string, Vendor>();
 const dishVendorsMap = new Map<string, DishVendor[]>(); // dishId -> DishVendor[]
-
-/**
- * 驗證 dishId 是否存在
- */
-async function validateDishId(dishId: string): Promise<boolean> {
-  const dish = await getDish(dishId);
-  return dish !== null;
-}
 
 /**
  * 獲取所有 Vendor
@@ -138,20 +131,18 @@ export async function deleteVendor(id: string): Promise<boolean> {
 export async function createDishVendor(
   input: CreateDishVendorInput
 ): Promise<DishVendor> {
-  // 驗證 dishId 和 vendorId 是否存在
-  const dishExists = await validateDishId(input.dishId);
-  if (!dishExists) {
-    throw new Error(`Dish with id ${input.dishId} not found`);
-  }
+  // 驗證 dishId 和 vendorId 是否存在（並行查詢以提高效能）
+  const [dish, vendor] = await Promise.all([
+    getDishById(input.dishId),
+    getVendor(input.vendorId),
+  ]);
 
-  const vendor = await getVendor(input.vendorId);
-  if (!vendor) {
-    throw new Error(`Vendor with id ${input.vendorId} not found`);
-  }
-
-  const dish = await getDish(input.dishId);
   if (!dish) {
-    throw new Error(`Dish with id ${input.dishId} not found`);
+    throw notFound("Dish", input.dishId);
+  }
+
+  if (!vendor) {
+    throw notFound("Vendor", input.vendorId);
   }
 
   const dishVendor: DishVendor = {
@@ -196,4 +187,5 @@ export async function deleteDishVendor(
   dishVendorsMap.set(dishId, filtered);
   return filtered.length < dishVendors.length;
 }
+
 
