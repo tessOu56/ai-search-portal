@@ -1,15 +1,5 @@
+import type { IngredientUsage } from "~/shared/types/ingredient-usage.types";
 import type { NutritionInfo } from "~/shared/types/nutrition.types";
-
-/**
- * IngredientUsage - 原料使用資訊
- * 用於 Dish 和 Recipe 中記錄原料的用量
- */
-export interface IngredientUsage {
-  ingredientId: string;
-  ingredientName: string; // 快取，避免頻繁 join
-  amount: number; // 用量
-  unit: string; // 單位
-}
 
 /**
  * Dish（食物）- 核心實體
@@ -63,4 +53,3 @@ export interface UpdateDishInput {
   properties?: string[];
   servings?: number;
 }
-
