@@ -1,6 +1,6 @@
-import type { IngredientUsage } from "~/features/dish/dish.types";
+import { getIngredientById } from "~/shared/services/domain.server";
+import type { IngredientUsage } from "~/shared/types/ingredient-usage.types";
 import type { NutritionInfo } from "~/shared/types/nutrition.types";
-import { getIngredient } from "~/features/ingredient/ingredient.server";
 
 /**
  * 基於原料組合計算營養資訊
@@ -18,7 +18,7 @@ export async function calculateNutrition(
 
   // 遍歷每個原料，計算總營養
   for (const usage of ingredients) {
-    const ingredient = await getIngredient(usage.ingredientId);
+    const ingredient = await getIngredientById(usage.ingredientId);
     if (!ingredient) {
       continue; // 如果原料不存在，跳過
     }
@@ -55,8 +55,8 @@ export async function aggregateProperties(
 
   // 遍歷每個原料，收集功效屬性
   for (const usage of ingredients) {
-    const ingredient = await getIngredient(usage.ingredientId);
-    if (!ingredient || !ingredient.properties) {
+    const ingredient = await getIngredientById(usage.ingredientId);
+    if (!ingredient?.properties) {
       continue;
     }
 
@@ -66,4 +66,3 @@ export async function aggregateProperties(
 
   return Array.from(propertiesSet).sort(); // 排序後返回陣列
 }
-

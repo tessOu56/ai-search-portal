@@ -1,5 +1,5 @@
+import type { IngredientUsage } from "~/shared/types/ingredient-usage.types";
 import type { NutritionInfo } from "~/shared/types/nutrition.types";
-import type { IngredientUsage } from "~/features/dish/dish.types";
 
 /**
  * RecipeStep - 食譜步驟
@@ -75,4 +75,3 @@ export interface UpdateRecipeInput {
   difficulty?: string;
   servings?: number;
 }
-
