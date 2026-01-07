@@ -1,0 +1,64 @@
+name: Lint and Type Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+# 確保 lint 失敗時，GitHub Merge 按鈕會變灰
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  lint:
+    name: ESLint Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint (strict)
+        run: npm run lint:strict
+        continue-on-error: false
+
+      - name: Annotate ESLint Results
+        uses: vishal-vsheth/eslint-action@v1
+        # 讓 ESLint 錯誤直接顯示在 GitHub PR 的 Files Changed 分頁中
+
+      - name: Run TypeScript type check
+        run: npm run typecheck
+        continue-on-error: false
+
+  knip:
+    name: Unused Code Check
+    runs-on: ubuntu-latest
+    # 修正：Knip 先不擋 PR，等誤報收斂後再改成 continue-on-error: false
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Knip
+        run: npm run knip
+        # 先設為可選，等誤報調整後再改為必過
+
