@@ -6,49 +6,64 @@ module.exports = {
     node: true,
     es2022: true,
   },
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-type-checked",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended",
-    "plugin:jsx-a11y/recommended",
-    "plugin:import/recommended",
-    "plugin:import/typescript",
-    "prettier", // Must be last to override other configs
-  ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    ecmaVersion: 2022,
+    ecmaVersion: "latest",
     sourceType: "module",
     ecmaFeatures: {
       jsx: true,
     },
-    project: "./tsconfig.json",
+    // 關鍵：使用獨立的 tsconfig.eslint.json
+    project: ["./tsconfig.eslint.json"],
+    tsconfigRootDir: __dirname,
   },
+  extends: [
+    "@remix-run/eslint-config",                      // Remix 官方配置（已包含 react, jsx-a11y）
+    "@remix-run/eslint-config/node",                 // Node.js 環境配置
+    "plugin:@typescript-eslint/recommended-type-checked",  // 強化版型別檢查（需要 project）
+    "plugin:tailwindcss/recommended",                // Tailwind CSS 規則
+    "prettier",                                      // 必須放在最後
+    // 注意：stylistic-type-checked 暫時移除，因為與 @remix-run/eslint-config 內部版本衝突
+    // 如果未來需要，可以使用 package.json overrides 統一 @typescript-eslint 版本
+  ],
   plugins: [
-    "@typescript-eslint",
-    "react",
-    "react-hooks",
-    "jsx-a11y",
-    "import",
+    // @typescript-eslint 和 react-hooks 已經在 @remix-run/eslint-config 中
+    "simple-import-sort",
+    "tailwindcss",
   ],
   settings: {
     react: {
       version: "detect",
     },
-    "import/resolver": {
-      typescript: {
-        alwaysTryTypes: true,
-        project: "./tsconfig.json",
-      },
-      node: {
-        extensions: [".js", ".jsx", ".ts", ".tsx"],
-      },
+    // Tailwind CSS 完整設定
+    tailwindcss: {
+      callees: ["classnames", "clsx", "ctl", "cn"],  // 支援常用的 class 合併函數
+      config: "tailwind.config.ts",
+      cssFiles: ["**/*.css", "!**/node_modules/**"],
+      removeDuplicates: true,
+      whitelist: [],  // 如果有自定義 class 前綴，在此加入
     },
   },
   rules: {
-    // TypeScript rules
+    // ===== Import 排序（取代 import/order）=====
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    // 關閉衝突的規則
+    "import/order": "off",          // 必須關閉（與 simple-import-sort 衝突）
+    "sort-imports": "off",          // ESLint core rule，避免重複排序邏輯
+    
+    // ===== 型別安全（全域 warn，在 overrides 中對 app/**/* 設 error）=====
+    "@typescript-eslint/no-explicit-any": "warn",  // 全域先設為 warn
+    
+    // Remix 特定：避免忘記 await 非同步 actions/loaders
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/await-thenable": "error",
+    "@typescript-eslint/no-misused-promises": "error",
+    
+    // React Hooks：確保 Remix 的 dependency array 語法正確
+    "react-hooks/exhaustive-deps": "warn",
+    
+    // 保留現有的其他規則
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
@@ -58,20 +73,16 @@ module.exports = {
     ],
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-non-null-assertion": "warn",
     "@typescript-eslint/prefer-nullish-coalescing": "warn",
     "@typescript-eslint/prefer-optional-chain": "warn",
     "@typescript-eslint/no-unnecessary-condition": "warn",
-    "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/await-thenable": "error",
-    "@typescript-eslint/no-misused-promises": "error",
-
-    // React rules
-    "react/react-in-jsx-scope": "off", // Not needed in React 17+
-    "react/prop-types": "off", // Using TypeScript for prop validation
+    
+    // React rules（這些可能會被 @remix-run/eslint-config 覆蓋，但保留以防萬一）
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
     "react/display-name": "off",
-    "react/jsx-uses-react": "off", // Not needed in React 17+
+    "react/jsx-uses-react": "off",
     "react/jsx-uses-vars": "error",
     "react/jsx-key": "error",
     "react/jsx-no-duplicate-props": "error",
@@ -83,41 +94,10 @@ module.exports = {
     "react/no-direct-mutation-state": "error",
     "react/no-unknown-property": "error",
     "react/self-closing-comp": "warn",
-
+    
     // React Hooks rules
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
-
-    // Import rules
-    "import/order": [
-      "warn",
-      {
-        groups: [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index",
-        ],
-        "newlines-between": "always",
-        alphabetize: {
-          order: "asc",
-          caseInsensitive: true,
-        },
-        pathGroups: [
-          {
-            pattern: "~/**",
-            group: "internal",
-            position: "before",
-          },
-        ],
-      },
-    ],
-    "import/no-unresolved": "error",
-    "import/no-duplicates": "error",
-    "import/no-unused-modules": "off", // Can be slow
-
+    
     // General rules
     "no-console": ["warn", { allow: ["warn", "error"] }],
     "no-debugger": "error",
@@ -128,15 +108,49 @@ module.exports = {
     "prefer-arrow-callback": "warn",
     "prefer-template": "warn",
   },
+  // 分階段落地 no-explicit-any 的 overrides（真正分階段）
+  overrides: [
+    // 階段 1：核心程式碼嚴格執行 error
+    {
+      files: ["app/**/*.{ts,tsx}"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "error",  // 核心程式碼強制 error
+      },
+    },
+    // 階段 2：測試檔案維持 warn（可選）
+    {
+      files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "warn",  // 測試先 warning
+      },
+    },
+    // 階段 3：配置檔案允許使用（但不會被 ignore）
+    {
+      files: ["*.config.{js,ts,cjs}", "**/*.config.{js,ts,cjs}"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "off",  // 配置檔案允許 any
+        "@typescript-eslint/no-var-requires": "off",  // 配置檔案可能使用 require
+      },
+    },
+    // 階段 4：scripts 目錄維持 warn（如果有）
+    {
+      files: ["scripts/**/*.{ts,js}"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "warn",
+      },
+    },
+  ],
+  // 簡化 ignore：只使用 ignorePatterns，移除 --ignore-path .gitignore
   ignorePatterns: [
     "node_modules/",
     "build/",
     ".cache/",
-    "*.config.js",
-    "*.config.cjs",
-    "*.config.ts",
-    "public/",
+    "public/build/",
     ".vercel/",
+    "dist/",
+    "*.min.js",
+    "*.min.css",
+    "*.d.ts",  // 已生成的型別定義檔案
+    // 注意：*.config.* 不再 ignore，改用 overrides 放寬規則
   ],
 };
-
