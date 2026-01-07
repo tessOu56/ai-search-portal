@@ -1,0 +1,10 @@
+node_modules/
+build/
+.cache/
+public/build/
+.vercel/
+dist/
+*.min.js
+*.min.css
+*.d.ts
+

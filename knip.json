@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": [
+    "app/entry.client.tsx",
+    "app/entry.server.tsx",
+    "app/routes/**/*.tsx",
+    "app/routes/**/*.ts"
+  ],
+  "project": ["app/**/*.{ts,tsx}"],
+  "ignore": [
+    "build/**",
+    ".cache/**",
+    "node_modules/**",
+    "public/**"
+  ],
+  "ignoreDependencies": [],
+  "ignoreExportsUsedInFile": true
+}
+
