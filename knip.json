@@ -1,19 +1,31 @@
 {
   "$schema": "https://unpkg.com/knip@latest/schema.json",
   "entry": [
-    "app/entry.client.tsx",
-    "app/entry.server.tsx",
     "app/routes/**/*.tsx",
-    "app/routes/**/*.ts"
+    "app/routes/**/*.ts",
+    "app/**/*.server.ts",
+    "app/shared/**/*.{ts,tsx}"
   ],
   "project": ["app/**/*.{ts,tsx}"],
-  "ignore": [
-    "build/**",
-    ".cache/**",
-    "node_modules/**",
-    "public/**"
+  "ignore": ["build/**", ".cache/**", "node_modules/**", "public/**"],
+  "ignoreDependencies": [
+    "isbot",
+    "lucide-react",
+    "@testing-library/react",
+    "@testing-library/user-event",
+    "eslint-import-resolver-typescript",
+    "eslint-plugin-import",
+    "eslint-plugin-jsx-a11y",
+    "eslint-plugin-react",
+    "eslint-plugin-react-hooks"
   ],
-  "ignoreDependencies": [],
-  "ignoreExportsUsedInFile": true
+  "ignoreExportsUsedInFile": true,
+  "ignoreFiles": [
+    "app/features/**/*.hooks.ts",
+    "app/components/ui/Callout.tsx",
+    "app/components/ui/Input.tsx"
+  ],
+  "ignoreIssues": {
+    "app/shared/release-notes.server.ts": ["exports"]
+  }
 }
-
