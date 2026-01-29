@@ -1,35 +1,37 @@
 /**
  * Domain Service Layer
- * 
+ *
  * 提供跨 feature 查詢的中介層，避免 features 之間直接依賴。
- * 
+ *
  * 這是唯一允許直接調用多個 feature server 的地方。
  * 所有 features 都應該通過此層進行跨 feature 通信。
  */
 
-import type { Dish } from "~/features/dish/dish.types";
-import type { Ingredient } from "~/features/ingredient/ingredient.types";
-import type { Recipe } from "~/features/recipe/recipe.types";
-import type { Vendor } from "~/features/vendor/vendor.types";
 import { getDish } from "~/features/dish/dish.server";
+import type { Dish } from "~/features/dish/dish.types";
 import { getIngredient } from "~/features/ingredient/ingredient.server";
+import type { Ingredient } from "~/features/ingredient/ingredient.types";
 import { getRecipesByDishId as getRecipesByDishIdFromRecipe } from "~/features/recipe/recipe.server";
+import type { Recipe } from "~/features/recipe/recipe.types";
 import { getVendorsByDishId as getVendorsByDishIdFromVendor } from "~/features/vendor/vendor.server";
+import type { Vendor } from "~/features/vendor/vendor.types";
 
 /**
  * 根據 ID 獲取 Dish
  * 封裝 dish feature 的查詢，提供統一的 shared 介面
  */
 export async function getDishById(id: string): Promise<Dish | null> {
-  return getDish(id);
+  return await Promise.resolve(getDish(id));
 }
 
 /**
  * 根據 ID 獲取 Ingredient
  * 封裝 ingredient feature 的查詢，提供統一的 shared 介面
  */
-export async function getIngredientById(id: string): Promise<Ingredient | null> {
-  return getIngredient(id);
+export async function getIngredientById(
+  id: string
+): Promise<Ingredient | null> {
+  return await Promise.resolve(getIngredient(id));
 }
 
 /**
@@ -37,7 +39,7 @@ export async function getIngredientById(id: string): Promise<Ingredient | null> 
  * 封裝 recipe feature 的查詢，提供統一的 shared 介面
  */
 export async function getRecipesByDishId(dishId: string): Promise<Recipe[]> {
-  return getRecipesByDishIdFromRecipe(dishId);
+  return await Promise.resolve(getRecipesByDishIdFromRecipe(dishId));
 }
 
 /**
@@ -45,7 +47,7 @@ export async function getRecipesByDishId(dishId: string): Promise<Recipe[]> {
  * 封裝 vendor feature 的查詢，提供統一的 shared 介面
  */
 export async function getVendorsByDishId(dishId: string): Promise<Vendor[]> {
-  return getVendorsByDishIdFromVendor(dishId);
+  return await Promise.resolve(getVendorsByDishIdFromVendor(dishId));
 }
 
 /**
@@ -56,4 +58,3 @@ export async function validateDishId(dishId: string): Promise<boolean> {
   const dish = await getDishById(dishId);
   return dish !== null;
 }
-

@@ -27,11 +27,11 @@ export async function calculateNutrition(
     const nutrition = ingredient.nutritionPerUnit;
     const multiplier = usage.amount; // 用量倍數
 
-    totalCalories += (nutrition.calories || 0) * multiplier;
-    totalProtein += (nutrition.protein || 0) * multiplier;
-    totalFat += (nutrition.fat || 0) * multiplier;
-    totalCarbs += (nutrition.carbs || 0) * multiplier;
-    totalFiber += (nutrition.fiber || 0) * multiplier;
+    totalCalories += nutrition.calories * multiplier;
+    totalProtein += (nutrition.protein ?? 0) * multiplier;
+    totalFat += (nutrition.fat ?? 0) * multiplier;
+    totalCarbs += (nutrition.carbs ?? 0) * multiplier;
+    totalFiber += (nutrition.fiber ?? 0) * multiplier;
   }
 
   return {
@@ -61,8 +61,8 @@ export async function aggregateProperties(
     }
 
     // 將原料的功效加入集合（自動去重）
-    ingredient.properties.forEach((prop) => propertiesSet.add(prop));
+    for (const prop of ingredient.properties) propertiesSet.add(prop);
   }
 
-  return Array.from(propertiesSet).sort(); // 排序後返回陣列
+  return [...propertiesSet].sort(); // 排序後返回陣列
 }

@@ -1,8 +1,9 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
+
 import type {
-  Ingredient,
   CreateIngredientInput,
+  Ingredient,
   UpdateIngredientInput,
 } from "./ingredient.types";
 
@@ -40,7 +41,7 @@ export function useIngredients() {
   const fetcher = useFetcher<{ ingredients: Ingredient[] }>();
 
   const ingredients = useMemo(() => {
-    return fetcher.data?.ingredients || [];
+    return fetcher.data?.ingredients ?? [];
   }, [fetcher.data]);
 
   const isLoading = fetcher.state === "loading";
@@ -58,11 +59,15 @@ export function useIngredients() {
  * 建立 Ingredient 的 Hook
  */
 export function useCreateIngredient() {
-  const fetcher = useFetcher<{ ingredient: Ingredient | null; error?: string }>();
+  const fetcher = useFetcher<{
+    ingredient: Ingredient | null;
+    error?: string;
+  }>();
 
   const createIngredient = (input: CreateIngredientInput) => {
     fetcher.submit(
-      { ...input },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      { ...input } as any,
       {
         method: "POST",
         action: "/api/ingredients",
@@ -73,7 +78,7 @@ export function useCreateIngredient() {
   return {
     createIngredient,
     isLoading: fetcher.state === "submitting",
-    ingredient: fetcher.data?.ingredient || null,
+    ingredient: fetcher.data?.ingredient ?? null,
     error: fetcher.data?.error,
   };
 }
@@ -82,11 +87,15 @@ export function useCreateIngredient() {
  * 更新 Ingredient 的 Hook
  */
 export function useUpdateIngredient() {
-  const fetcher = useFetcher<{ ingredient: Ingredient | null; error?: string }>();
+  const fetcher = useFetcher<{
+    ingredient: Ingredient | null;
+    error?: string;
+  }>();
 
   const updateIngredient = (id: string, input: UpdateIngredientInput) => {
     fetcher.submit(
-      { ...input },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      { ...input } as any,
       {
         method: "PATCH",
         action: `/api/ingredients/${id}`,
@@ -97,7 +106,7 @@ export function useUpdateIngredient() {
   return {
     updateIngredient,
     isLoading: fetcher.state === "submitting",
-    ingredient: fetcher.data?.ingredient || null,
+    ingredient: fetcher.data?.ingredient ?? null,
     error: fetcher.data?.error,
   };
 }
@@ -121,9 +130,7 @@ export function useDeleteIngredient() {
   return {
     deleteIngredient,
     isLoading: fetcher.state === "submitting",
-    success: fetcher.data?.success || false,
+    success: fetcher.data?.success ?? false,
     error: fetcher.data?.error,
   };
 }
-
-

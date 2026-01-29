@@ -1,11 +1,11 @@
-import type {
-  Dish,
-  CreateDishInput,
-  UpdateDishInput,
-  IngredientUsage,
-} from "./dish.types";
-import { calculateNutrition, aggregateProperties } from "~/services/nutrition.server";
+import {
+  aggregateProperties,
+  calculateNutrition,
+} from "~/services/nutrition.server";
 import { getIngredientById } from "~/shared/services/domain.server";
+import type { IngredientUsage } from "~/shared/types/ingredient-usage.types";
+
+import type { CreateDishInput, Dish, UpdateDishInput } from "./dish.types";
 
 // 模擬資料庫（使用記憶體 Map）
 const dishesMap = new Map<string, Dish>();
@@ -17,11 +17,11 @@ async function enrichIngredientUsages(
   usages: IngredientUsage[]
 ): Promise<IngredientUsage[]> {
   return Promise.all(
-    usages.map(async (usage) => {
+    usages.map(async (usage: IngredientUsage) => {
       const ingredient = await getIngredientById(usage.ingredientId);
       return {
         ...usage,
-        ingredientName: ingredient?.name || usage.ingredientName || "未知原料",
+        ingredientName: ingredient?.name ?? usage.ingredientName,
       };
     })
   );
@@ -30,35 +30,35 @@ async function enrichIngredientUsages(
 /**
  * 獲取所有 Dish
  */
-export async function getAllDishes(): Promise<Dish[]> {
-  return Array.from(dishesMap.values());
+export function getAllDishes(): Dish[] {
+  return [...dishesMap.values()];
 }
 
 /**
  * 根據 ID 獲取 Dish
  */
-export async function getDish(id: string): Promise<Dish | null> {
-  return dishesMap.get(id) || null;
+export function getDish(id: string): Dish | null {
+  return dishesMap.get(id) ?? null;
 }
 
 /**
  * 根據地區獲取 Dish
  */
-export async function getDishesByRegion(region: string): Promise<Dish[]> {
-  const allDishes = await getAllDishes();
+export function getDishesByRegion(region: string): Dish[] {
+  const allDishes = getAllDishes();
   return allDishes.filter((dish) => dish.region === region);
 }
 
 /**
  * 搜尋 Dish
  */
-export async function searchDishes(query: string): Promise<Dish[]> {
-  const allDishes = await getAllDishes();
+export function searchDishes(query: string): Dish[] {
+  const allDishes = getAllDishes();
   const lowerQuery = query.toLowerCase();
   return allDishes.filter(
     (dish) =>
       dish.name.toLowerCase().includes(lowerQuery) ||
-      dish.description?.toLowerCase().includes(lowerQuery) ||
+      (dish.description?.toLowerCase().includes(lowerQuery) ?? false) ||
       dish.properties.some((prop) => prop.toLowerCase().includes(lowerQuery))
   );
 }
@@ -68,10 +68,12 @@ export async function searchDishes(query: string): Promise<Dish[]> {
  */
 export async function createDish(input: CreateDishInput): Promise<Dish> {
   const now = new Date();
-  const id = `dish_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const id = `dish_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
   // 補全 ingredientName
-  const enrichedIngredients = await enrichIngredientUsages(input.ingredients);
+  const enrichedIngredients: IngredientUsage[] = await enrichIngredientUsages(
+    input.ingredients
+  );
 
   // 計算營養資訊
   const calculatedNutrition = await calculateNutrition(enrichedIngredients);
@@ -106,21 +108,21 @@ export async function updateDish(
   id: string,
   input: UpdateDishInput
 ): Promise<Dish | null> {
-  const dish = await getDish(id);
+  const dish = getDish(id);
   if (!dish) {
     return null;
   }
 
-  const ingredients = input.ingredients || dish.ingredients;
-  const enrichedIngredients = await enrichIngredientUsages(ingredients);
+  const ingredients: IngredientUsage[] = input.ingredients ?? dish.ingredients;
+  const enrichedIngredients: IngredientUsage[] =
+    await enrichIngredientUsages(ingredients);
 
   // 如果 ingredients 有變更，重新計算營養和功效
   const needsRecalculation =
-    input.ingredients !== undefined ||
-    input.properties === undefined; // 如果沒有明確指定 properties，則重新聚合
+    input.ingredients !== undefined || input.properties === undefined; // 如果沒有明確指定 properties，則重新聚合
 
   let calculatedNutrition = dish.calculatedNutrition;
-  let properties = input.properties || dish.properties;
+  let properties = input.properties ?? dish.properties;
 
   if (needsRecalculation) {
     calculatedNutrition = await calculateNutrition(enrichedIngredients);
@@ -145,8 +147,6 @@ export async function updateDish(
 /**
  * 刪除 Dish
  */
-export async function deleteDish(id: string): Promise<boolean> {
+export function deleteDish(id: string): boolean {
   return dishesMap.delete(id);
 }
-
-

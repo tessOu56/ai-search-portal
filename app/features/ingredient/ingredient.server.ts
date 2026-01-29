@@ -1,6 +1,6 @@
 import type {
-  Ingredient,
   CreateIngredientInput,
+  Ingredient,
   UpdateIngredientInput,
 } from "./ingredient.types";
 
@@ -10,24 +10,22 @@ const ingredientsMap = new Map<string, Ingredient>();
 /**
  * 獲取所有 Ingredient
  */
-export async function getAllIngredients(): Promise<Ingredient[]> {
-  return Array.from(ingredientsMap.values());
+export function getAllIngredients(): Ingredient[] {
+  return [...ingredientsMap.values()];
 }
 
 /**
  * 根據 ID 獲取 Ingredient
  */
-export async function getIngredient(id: string): Promise<Ingredient | null> {
-  return ingredientsMap.get(id) || null;
+export function getIngredient(id: string): Ingredient | null {
+  return ingredientsMap.get(id) ?? null;
 }
 
 /**
  * 根據名稱搜尋 Ingredient
  */
-export async function searchIngredients(
-  query: string
-): Promise<Ingredient[]> {
-  const allIngredients = await getAllIngredients();
+export function searchIngredients(query: string): Ingredient[] {
+  const allIngredients = getAllIngredients();
   const lowerQuery = query.toLowerCase();
   return allIngredients.filter(
     (ingredient) =>
@@ -39,11 +37,9 @@ export async function searchIngredients(
 /**
  * 建立新的 Ingredient
  */
-export async function createIngredient(
-  input: CreateIngredientInput
-): Promise<Ingredient> {
+export function createIngredient(input: CreateIngredientInput): Ingredient {
   const now = new Date();
-  const id = `ingredient_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const id = `ingredient_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
   const ingredient: Ingredient = {
     id,
@@ -51,7 +47,7 @@ export async function createIngredient(
     category: input.category,
     unit: input.unit,
     nutritionPerUnit: input.nutritionPerUnit,
-    properties: input.properties || [],
+    properties: input.properties ?? [],
     region: input.region,
     createdAt: now,
     updatedAt: now,
@@ -64,11 +60,11 @@ export async function createIngredient(
 /**
  * 更新 Ingredient
  */
-export async function updateIngredient(
+export function updateIngredient(
   id: string,
   input: UpdateIngredientInput
-): Promise<Ingredient | null> {
-  const ingredient = await getIngredient(id);
+): Ingredient | null {
+  const ingredient = getIngredient(id);
   if (!ingredient) {
     return null;
   }
@@ -86,8 +82,6 @@ export async function updateIngredient(
 /**
  * 刪除 Ingredient
  */
-export async function deleteIngredient(id: string): Promise<boolean> {
+export function deleteIngredient(id: string): boolean {
   return ingredientsMap.delete(id);
 }
-
-

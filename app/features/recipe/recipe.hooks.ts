@@ -1,8 +1,9 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
+
 import type {
-  Recipe,
   CreateRecipeInput,
+  Recipe,
   UpdateRecipeInput,
 } from "./recipe.types";
 
@@ -39,7 +40,7 @@ export function useRecipes() {
   const fetcher = useFetcher<{ recipes: Recipe[] }>();
 
   const recipes = useMemo(() => {
-    return fetcher.data?.recipes || [];
+    return fetcher.data?.recipes ?? [];
   }, [fetcher.data]);
 
   const isLoading = fetcher.state === "loading";
@@ -60,7 +61,7 @@ export function useRecipesByDishId(dishId: string | null) {
   const fetcher = useFetcher<{ recipes: Recipe[] }>();
 
   const recipes = useMemo(() => {
-    return fetcher.data?.recipes || [];
+    return fetcher.data?.recipes ?? [];
   }, [fetcher.data]);
 
   const isLoading = fetcher.state === "loading";
@@ -86,7 +87,8 @@ export function useCreateRecipe() {
 
   const createRecipe = (input: CreateRecipeInput) => {
     fetcher.submit(
-      { ...input },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      { ...input } as any,
       {
         method: "POST",
         action: "/api/recipes",
@@ -97,7 +99,7 @@ export function useCreateRecipe() {
   return {
     createRecipe,
     isLoading: fetcher.state === "submitting",
-    recipe: fetcher.data?.recipe || null,
+    recipe: fetcher.data?.recipe ?? null,
     error: fetcher.data?.error,
   };
 }
@@ -110,7 +112,8 @@ export function useUpdateRecipe() {
 
   const updateRecipe = (id: string, input: UpdateRecipeInput) => {
     fetcher.submit(
-      { ...input },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      { ...input } as any,
       {
         method: "PATCH",
         action: `/api/recipes/${id}`,
@@ -121,7 +124,7 @@ export function useUpdateRecipe() {
   return {
     updateRecipe,
     isLoading: fetcher.state === "submitting",
-    recipe: fetcher.data?.recipe || null,
+    recipe: fetcher.data?.recipe ?? null,
     error: fetcher.data?.error,
   };
 }
@@ -145,9 +148,7 @@ export function useDeleteRecipe() {
   return {
     deleteRecipe,
     isLoading: fetcher.state === "submitting",
-    success: fetcher.data?.success || false,
+    success: fetcher.data?.success ?? false,
     error: fetcher.data?.error,
   };
 }
-
-
