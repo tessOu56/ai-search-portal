@@ -32,8 +32,8 @@ jobs:
         run: npm run lint:filenames
         continue-on-error: false
 
-      - name: Run ESLint (strict)
-        run: npm run lint:strict
+      - name: Run ESLint (strict) with PR annotations
+        run: npx eslint --max-warnings=0 --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives . -f gha
         continue-on-error: false
 
       - name: Generate ESLint complexity report
@@ -46,10 +46,6 @@ jobs:
         with:
           name: eslint-report
           path: reports/eslint-report.json
-
-      - name: Annotate ESLint Results
-        uses: vishal-vsheth/eslint-action@v1
-        # 讓 ESLint 錯誤直接顯示在 GitHub PR 的 Files Changed 分頁中
 
       - name: Run TypeScript type check
         run: npm run typecheck

@@ -1,6 +1,6 @@
 # 注意：本專案正式部署為 Vercel（見 vercel.json）。
-# 此 workflow 為 GitHub Pages 部署；若僅使用 Vercel，可改為「建置驗證」或停用。
-name: Deploy to GitHub Pages
+# 此 workflow 僅做建置驗證（push 到 main 時跑 build）；不部署 GitHub Pages。
+name: Build (main)
 
 on:
   push:
@@ -8,13 +8,8 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 concurrency:
-  group: "pages"
+  group: build-main-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -29,9 +24,6 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
 
       - name: Install dependencies
         run: npm ci
@@ -48,21 +40,5 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./build/client
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
 
 
