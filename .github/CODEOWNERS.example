@@ -1,0 +1,10 @@
+# 複製為 CODEOWNERS 並填入 GitHub 帳號，PR 會自動請求對應人員 Review
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# 預設負責人（可改為團隊帳號或個人）
+# * @your-org/team-name
+
+# 目錄負責人（可選）
+# /app/features/ @your-org/backend-team
+# /app/components/ @your-org/frontend-team
+# /docs/ @your-org/docs-team

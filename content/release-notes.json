@@ -1,0 +1,14 @@
+[
+  {
+    "version": "1.0.0",
+    "date": "2025-01-26",
+    "summary": "首次正式版。提供 AI 搜尋入口、LUI 引導、多語系（繁中/英文）與無障礙支援（Skip link、aria）。",
+    "highlights": [
+      "AI 搜尋與 LUI 即時回覆（SSE）",
+      "繁中/英文語系切換",
+      "Skip link 與表單/按鈕無障礙標註",
+      "版號顯示於 footer"
+    ],
+    "commits": []
+  }
+]

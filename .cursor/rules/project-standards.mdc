@@ -1,0 +1,33 @@
+---
+description: Project-wide collaboration and coding standards
+alwaysApply: true
+---
+
+# AI Search Portal Standards
+
+## Workflow
+- Run `npm run lint`, `npm run typecheck`, `npm run test` before PR.
+- Use `npm run changeset` for user-facing changes.
+
+## Architecture
+- Feature code in `app/features/*` (hooks/server/types).
+- Shared code in `app/shared/*`, app services in `app/services/*`.
+- Routes in `app/routes/*` only coordinate UI + data flow.
+
+## File and folder naming (mandatory)
+- **Folders** under `app/` (except under `app/routes`): **lowercase only**, no hyphen/underscore (e.g. `chat`, `ui`, `errorboundary`). Do **not** use `error-boundary` or `errorBoundary`.
+- **Component files** under `app/components/**/*.tsx`: **PascalCase** filename (e.g. `ErrorBoundaryFallback.tsx`, `ChatInterface.tsx`). Barrel files: `index.ts` is allowed.
+- Naming is enforced by `npm run lint:filenames` in CI and pre-commit. When creating or renaming files/folders, follow these rules so the check passes. See `docs/CONVENTIONS.md` for full rules.
+
+## Coding Standards
+- Avoid `any` and unsafe casts; fix or narrow types.
+- Keep imports sorted (ESLint handles this).
+- Use `??` when values can be nullish.
+- Remove unused imports/vars.
+
+## Testing
+- Vitest + Testing Library for unit/UI tests.
+- MSW handlers in `app/test/handlers.ts`; keep network isolated.
+
+## Commits
+- Conventional Commits required (commitlint enforces).

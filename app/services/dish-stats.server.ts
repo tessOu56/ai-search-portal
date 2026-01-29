@@ -1,8 +1,8 @@
-import type { DishStats } from "~/shared/types/dish-stats.types";
 import {
   getRecipesByDishId,
   getVendorsByDishId,
 } from "~/shared/services/domain.server";
+import type { DishStats } from "~/shared/types/dish-stats.types";
 
 /**
  * 獲取 Dish 的關聯統計
@@ -22,5 +22,3 @@ export async function getDishStats(dishId: string): Promise<DishStats> {
     vendorCount: vendors.length,
   };
 }
-
-

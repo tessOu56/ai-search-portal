@@ -1,11 +1,12 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
+
 import type {
-  Vendor,
-  CreateVendorInput,
-  UpdateVendorInput,
-  DishVendor,
   CreateDishVendorInput,
+  CreateVendorInput,
+  DishVendor,
+  UpdateVendorInput,
+  Vendor,
 } from "./vendor.types";
 
 /**
@@ -41,7 +42,7 @@ export function useVendors() {
   const fetcher = useFetcher<{ vendors: Vendor[] }>();
 
   const vendors = useMemo(() => {
-    return fetcher.data?.vendors || [];
+    return fetcher.data?.vendors ?? [];
   }, [fetcher.data]);
 
   const isLoading = fetcher.state === "loading";
@@ -62,7 +63,7 @@ export function useVendorsByDishId(dishId: string | null) {
   const fetcher = useFetcher<{ vendors: Vendor[] }>();
 
   const vendors = useMemo(() => {
-    return fetcher.data?.vendors || [];
+    return fetcher.data?.vendors ?? [];
   }, [fetcher.data]);
 
   const isLoading = fetcher.state === "loading";
@@ -88,7 +89,8 @@ export function useCreateVendor() {
 
   const createVendor = (input: CreateVendorInput) => {
     fetcher.submit(
-      { ...input },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      { ...input } as any,
       {
         method: "POST",
         action: "/api/vendors",
@@ -99,7 +101,7 @@ export function useCreateVendor() {
   return {
     createVendor,
     isLoading: fetcher.state === "submitting",
-    vendor: fetcher.data?.vendor || null,
+    vendor: fetcher.data?.vendor ?? null,
     error: fetcher.data?.error,
   };
 }
@@ -112,7 +114,8 @@ export function useUpdateVendor() {
 
   const updateVendor = (id: string, input: UpdateVendorInput) => {
     fetcher.submit(
-      { ...input },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      { ...input } as any,
       {
         method: "PATCH",
         action: `/api/vendors/${id}`,
@@ -123,7 +126,7 @@ export function useUpdateVendor() {
   return {
     updateVendor,
     isLoading: fetcher.state === "submitting",
-    vendor: fetcher.data?.vendor || null,
+    vendor: fetcher.data?.vendor ?? null,
     error: fetcher.data?.error,
   };
 }
@@ -147,7 +150,7 @@ export function useDeleteVendor() {
   return {
     deleteVendor,
     isLoading: fetcher.state === "submitting",
-    success: fetcher.data?.success || false,
+    success: fetcher.data?.success ?? false,
     error: fetcher.data?.error,
   };
 }
@@ -156,11 +159,15 @@ export function useDeleteVendor() {
  * 建立 Dish 與 Vendor 關聯的 Hook
  */
 export function useCreateDishVendor() {
-  const fetcher = useFetcher<{ dishVendor: DishVendor | null; error?: string }>();
+  const fetcher = useFetcher<{
+    dishVendor: DishVendor | null;
+    error?: string;
+  }>();
 
   const createDishVendor = (input: CreateDishVendorInput) => {
     fetcher.submit(
-      { ...input },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      { ...input } as any,
       {
         method: "POST",
         action: "/api/dish-vendors",
@@ -171,9 +178,7 @@ export function useCreateDishVendor() {
   return {
     createDishVendor,
     isLoading: fetcher.state === "submitting",
-    dishVendor: fetcher.data?.dishVendor || null,
+    dishVendor: fetcher.data?.dishVendor ?? null,
     error: fetcher.data?.error,
   };
 }
-
-

@@ -1,3 +1,5 @@
+# 注意：本專案正式部署為 Vercel（見 vercel.json）。
+# 此 workflow 為 GitHub Pages 部署；若僅使用 Vercel，可改為「建置驗證」或停用。
 name: Deploy to GitHub Pages
 
 on:

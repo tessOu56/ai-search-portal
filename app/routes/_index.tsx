@@ -1,186 +1,235 @@
-import type { MetaFunction, ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useActionData, useNavigation, Form } from "@remix-run/react";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import {
+  Form,
+  isRouteErrorResponse,
+  Link,
+  useRouteError,
+  useRouteLoaderData,
+} from "@remix-run/react";
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "AI 搜尋入口" },
-    { name: "description", content: "智能 AI 搜尋平台" },
+import { ChatInterface } from "~/components/chat/ChatInterface";
+import { ErrorBoundaryFallback } from "~/components/errorboundary";
+import { Badge } from "~/components/ui/Badge";
+import { Button } from "~/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/Card";
+import { Container } from "~/components/ui/Container";
+import { getLocale, getTranslations } from "~/shared/i18n";
+import { useI18n } from "~/shared/i18n/context";
+import { t } from "~/shared/i18n/server";
+import {
+  buildJsonLdWebPage,
+  buildJsonLdWebSite,
+  buildSeoMeta,
+  getCanonicalUrl,
+  getOrigin,
+} from "~/shared/seo.server";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const locale = await getLocale(request);
+  const translations = getTranslations(locale);
+  const origin = getOrigin(request);
+  const canonical = getCanonicalUrl(request);
+  const title = t(translations, "app.title");
+  const description = t(translations, "app.description");
+  const ogLocale = locale.replace("-", "_");
+  const image = `${origin}/og-image.png`;
+  const structuredData = [
+    buildJsonLdWebSite(origin, title, description),
+    buildJsonLdWebPage(canonical, title, description, { inLanguage: locale }),
   ];
+  return {
+    title,
+    description,
+    canonical,
+    image,
+    locale: ogLocale,
+    structuredData,
+  };
 };
 
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const query = formData.get("query") as string;
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  const title = (data?.title as string) ?? "AI 搜尋入口";
+  const description = (data?.description as string) ?? "智能 AI 搜尋平台";
+  const canonical = (data?.canonical as string) ?? "";
+  const image = (data?.image as string) ?? "";
+  const locale = (data?.locale as string) ?? "zh_TW";
+  const structuredData =
+    (data?.structuredData as Record<string, unknown>[]) ?? [];
+  const metaTags = buildSeoMeta({
+    title,
+    description,
+    canonical,
+    image: image || undefined,
+    locale,
+    type: "website",
+  });
+  const jsonLdTags = structuredData.map((obj) => ({ "script:ld+json": obj }));
+  return [...metaTags, ...jsonLdTags];
+};
 
-  if (!query || query.trim().length === 0) {
-    return json({ error: "請輸入搜尋關鍵字" }, { status: 400 });
-  }
-
-  // 模擬 AI 搜尋 API 呼叫
-  // 在實際應用中，這裡會呼叫真實的 AI API (如 OpenAI, Anthropic 等)
-  try {
-    // 模擬延遲
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // 模擬搜尋結果
-    const results = [
-      {
-        title: `關於「${query}」的搜尋結果 1`,
-        snippet: `這是關於「${query}」的詳細資訊。AI 搜尋引擎已經為您找到了相關內容。`,
-        url: "#",
-      },
-      {
-        title: `「${query}」相關資訊`,
-        snippet: `更多關於「${query}」的內容和資源。這些結果經過 AI 智能分析。`,
-        url: "#",
-      },
-      {
-        title: `${query} - 深入解析`,
-        snippet: `深入瞭解「${query}」的各個面向。AI 已為您整理最相關的資訊。`,
-        url: "#",
-      },
-    ];
-
-    return json({ results, query });
-  } catch (error) {
-    return json(
-      { error: "搜尋時發生錯誤，請稍後再試" },
-      { status: 500 }
-    );
-  }
-}
+const STEPS = [
+  { titleKey: "home.step.intent", descKey: "home.step.intent.desc" },
+  { titleKey: "home.step.conclusion", descKey: "home.step.conclusion.desc" },
+  { titleKey: "home.step.sources", descKey: "home.step.sources.desc" },
+  { titleKey: "home.step.next", descKey: "home.step.next.desc" },
+] as const;
 
 export default function Index() {
-  const actionData = useActionData<typeof action>();
-  const navigation = useNavigation();
-  const isSearching = navigation.state === "submitting";
+  const { t } = useI18n();
+  const root = useRouteLoaderData("root") as
+    | { locale: string; version: string; translations: Record<string, string> }
+    | undefined;
+  const locale = root?.locale ?? "zh-TW";
+  const version = root?.version ?? "0.0.0";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50">
-      <div className="container mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-primary-700 mb-4">
-            AI 搜尋入口
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-background to-brand-50">
+      <Container className="py-16">
+        <div className="mb-12 text-center">
+          <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+            <Badge>{t("home.badge.trusted")}</Badge>
+            <Badge variant="secondary">{t("home.badge.lui")}</Badge>
+            <Badge variant="secondary">{t("home.badge.tech")}</Badge>
+          </div>
+          <h1 className="mb-4 text-5xl font-bold text-foreground">
+            {t("home.title")}
           </h1>
-          <p className="text-xl text-gray-600">
-            智能搜尋，快速找到您需要的資訊
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+            {t("home.tagline")}
           </p>
         </div>
 
-        {/* Search Form */}
-        <div className="max-w-3xl mx-auto mb-12">
-          <Form method="post" className="space-y-4">
-            <div className="relative">
-              <input
-                type="text"
-                name="query"
-                placeholder="輸入您的搜尋關鍵字..."
-                className="w-full px-6 py-4 text-lg border-2 border-primary-200 rounded-full focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all shadow-lg"
-                required
-                disabled={isSearching}
-              />
-              <button
-                type="submit"
-                disabled={isSearching}
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-8 py-3 bg-primary-600 text-white rounded-full hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium shadow-md"
-              >
-                {isSearching ? "搜尋中..." : "搜尋"}
-              </button>
-            </div>
-          </Form>
+        <div className="mb-12">
+          <ChatInterface />
         </div>
 
-        {/* Error Message */}
-        {actionData?.error && (
-          <div className="max-w-3xl mx-auto mb-8">
-            <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg">
-              {actionData.error}
-            </div>
-          </div>
-        )}
-
-        {/* Search Results */}
-        {actionData?.results && (
-          <div className="max-w-3xl mx-auto">
-            <div className="mb-6">
-              <p className="text-gray-600">
-                找到 <span className="font-semibold text-primary-700">{actionData.results.length}</span> 筆關於「
-                <span className="font-semibold">{actionData.query}</span>」的結果
-              </p>
-            </div>
-            <div className="space-y-4">
-              {actionData.results.map((result, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-100"
-                >
-                  <h3 className="text-xl font-semibold text-primary-700 mb-2">
-                    {result.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4">{result.snippet}</p>
-                  <a
-                    href={result.url}
-                    className="text-primary-600 hover:text-primary-700 font-medium inline-flex items-center gap-2"
-                  >
-                    查看詳情
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </a>
-                </div>
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("home.section.how.title")}</CardTitle>
+              <CardDescription>{t("home.section.how.desc")}</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 sm:grid-cols-2">
+              {STEPS.map((step) => (
+                <Card key={step.titleKey} className="border-primary/20">
+                  <CardHeader>
+                    <CardTitle className="text-base text-primary">
+                      {t(step.titleKey)}
+                    </CardTitle>
+                    <CardDescription>{t(step.descKey)}</CardDescription>
+                  </CardHeader>
+                </Card>
               ))}
-            </div>
-          </div>
-        )}
+            </CardContent>
+          </Card>
 
-        {/* Empty State */}
-        {!actionData && !isSearching && (
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-white rounded-lg shadow-md p-12 border border-gray-100">
-              <svg
-                className="w-24 h-24 mx-auto text-primary-300 mb-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("home.section.trust.title")}</CardTitle>
+              <CardDescription>{t("home.section.trust.desc")}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <div className="flex items-start gap-3">
+                <span
+                  className="mt-1 size-2 rounded-full bg-primary"
+                  aria-hidden
                 />
-              </svg>
-              <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-                開始您的搜尋
-              </h2>
-              <p className="text-gray-500">
-                在上方輸入關鍵字，讓 AI 為您找到最相關的資訊
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <footer className="mt-16 py-8 border-t border-gray-200">
-        <div className="container mx-auto px-4 text-center text-gray-500">
-          <p>© 2024 AI 搜尋入口 - Powered by Remix</p>
+                <p>{t("home.trust.1")}</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span
+                  className="mt-1 size-2 rounded-full bg-primary"
+                  aria-hidden
+                />
+                <p>{t("home.trust.2")}</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span
+                  className="mt-1 size-2 rounded-full bg-primary"
+                  aria-hidden
+                />
+                <p>{t("home.trust.3")}</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
+      </Container>
+
+      <footer className="mt-16 border-t border-border py-8" role="contentinfo">
+        <Container className="flex flex-wrap items-center justify-center gap-4 text-center text-sm text-muted-foreground">
+          <p>{t("footer.copyright")}</p>
+          <p>
+            <Link
+              to="/release-notes"
+              className="text-primary hover:underline"
+              title={t("release-notes.footer.link")}
+            >
+              {t("footer.version", { version })}
+            </Link>
+          </p>
+          <Form
+            method="post"
+            action="/api/locale"
+            className="flex items-center gap-2"
+          >
+            <input type="hidden" name="next" value="/" />
+            <span className="sr-only">{t("locale.switch")}</span>
+            <select
+              name="locale"
+              defaultValue={locale}
+              onChange={(e) => e.currentTarget.form?.requestSubmit()}
+              className="rounded border border-border bg-background px-2 py-1 text-foreground"
+              aria-label={t("locale.switch")}
+            >
+              <option value="zh-TW">{t("locale.zh-TW")}</option>
+              <option value="en">{t("locale.en")}</option>
+            </select>
+          </Form>
+        </Container>
       </footer>
     </div>
   );
 }
 
+export function ErrorBoundary() {
+  const error = useRouteError();
 
+  if (isRouteErrorResponse(error)) {
+    return (
+      <ErrorBoundaryFallback
+        title={error.status === 404 ? "找不到頁面" : "發生錯誤"}
+        message={
+          error.status === 404
+            ? "您要前往的頁面不存在。"
+            : ((error.data &&
+              typeof (error.data as { message?: unknown }).message === "string"
+                ? (error.data as { message: string }).message
+                : null) ??
+              error.statusText ??
+              "請稍後再試。")
+        }
+        statusCode={error.status}
+      >
+        <Button asChild>
+          <Link to="/">返回首頁</Link>
+        </Button>
+      </ErrorBoundaryFallback>
+    );
+  }
+
+  const message =
+    error instanceof Error ? error.message : "發生未預期的錯誤，請稍後再試。";
+  return (
+    <ErrorBoundaryFallback title="出了點問題" message={message}>
+      <Button asChild>
+        <Link to="/">返回首頁</Link>
+      </Button>
+    </ErrorBoundaryFallback>
+  );
+}

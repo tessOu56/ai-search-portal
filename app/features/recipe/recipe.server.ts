@@ -1,11 +1,12 @@
+import { calculateNutrition } from "~/services/nutrition.server";
+import { getDishById } from "~/shared/services/domain.server";
+import { notFound, validationError } from "~/shared/utils/errors";
+
 import type {
-  Recipe,
   CreateRecipeInput,
+  Recipe,
   UpdateRecipeInput,
 } from "./recipe.types";
-import { getDishById } from "~/shared/services/domain.server";
-import { calculateNutrition } from "~/services/nutrition.server";
-import { notFound, validationError } from "~/shared/utils/errors";
 
 // 模擬資料庫（使用記憶體 Map）
 const recipesMap = new Map<string, Recipe>();
@@ -13,43 +14,43 @@ const recipesMap = new Map<string, Recipe>();
 /**
  * 獲取所有 Recipe
  */
-export async function getAllRecipes(): Promise<Recipe[]> {
-  return Array.from(recipesMap.values());
+export function getAllRecipes(): Recipe[] {
+  return [...recipesMap.values()];
 }
 
 /**
  * 根據 ID 獲取 Recipe
  */
-export async function getRecipe(id: string): Promise<Recipe | null> {
-  return recipesMap.get(id) || null;
+export function getRecipe(id: string): Recipe | null {
+  return recipesMap.get(id) ?? null;
 }
 
 /**
  * 根據 dishId 獲取所有相關的 Recipe
  */
-export async function getRecipesByDishId(dishId: string): Promise<Recipe[]> {
-  const allRecipes = await getAllRecipes();
+export function getRecipesByDishId(dishId: string): Recipe[] {
+  const allRecipes = getAllRecipes();
   return allRecipes.filter((recipe) => recipe.dishId === dishId);
 }
 
 /**
  * 根據地區獲取 Recipe
  */
-export async function getRecipesByRegion(region: string): Promise<Recipe[]> {
-  const allRecipes = await getAllRecipes();
+export function getRecipesByRegion(region: string): Recipe[] {
+  const allRecipes = getAllRecipes();
   return allRecipes.filter((recipe) => recipe.region === region);
 }
 
 /**
  * 搜尋 Recipe
  */
-export async function searchRecipes(query: string): Promise<Recipe[]> {
-  const allRecipes = await getAllRecipes();
+export function searchRecipes(query: string): Recipe[] {
+  const allRecipes = getAllRecipes();
   const lowerQuery = query.toLowerCase();
   return allRecipes.filter(
     (recipe) =>
       recipe.title.toLowerCase().includes(lowerQuery) ||
-      recipe.description?.toLowerCase().includes(lowerQuery) ||
+      (recipe.description?.toLowerCase().includes(lowerQuery) ?? false) ||
       recipe.dishName.toLowerCase().includes(lowerQuery)
   );
 }
@@ -70,10 +71,10 @@ export async function createRecipe(input: CreateRecipeInput): Promise<Recipe> {
   }
 
   const now = new Date();
-  const id = `recipe_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const id = `recipe_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
   // 使用 Dish 的 ingredients 或提供的 ingredients
-  const ingredients = input.ingredients || dish.ingredients;
+  const ingredients = input.ingredients ?? dish.ingredients;
 
   // 優先使用 Dish 的營養資訊，但如果 ingredients 不同則重新計算
   let calculatedNutrition = dish.calculatedNutrition;
@@ -114,19 +115,19 @@ export async function updateRecipe(
   id: string,
   input: UpdateRecipeInput
 ): Promise<Recipe | null> {
-  const recipe = await getRecipe(id);
+  const recipe = getRecipe(id);
   if (!recipe) {
     return null;
   }
 
   // 如果 dishId 有變更，需要獲取新的 dish
-  const dishId = input.dishId || recipe.dishId;
+  const dishId = input.dishId ?? recipe.dishId;
   const dish = await getDishById(dishId);
   if (!dish) {
     throw notFound("Dish", dishId);
   }
 
-  const ingredients = input.ingredients || recipe.ingredients;
+  const ingredients = input.ingredients ?? recipe.ingredients;
 
   // 如果 ingredients 有變更，重新計算營養
   let calculatedNutrition = recipe.calculatedNutrition;
@@ -152,8 +153,6 @@ export async function updateRecipe(
 /**
  * 刪除 Recipe
  */
-export async function deleteRecipe(id: string): Promise<boolean> {
+export function deleteRecipe(id: string): boolean {
   return recipesMap.delete(id);
 }
-
-

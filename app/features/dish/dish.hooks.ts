@@ -1,6 +1,7 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
-import type { Dish, CreateDishInput, UpdateDishInput } from "./dish.types";
+
+import type { CreateDishInput, Dish, UpdateDishInput } from "./dish.types";
 
 /**
  * 使用 Dish 資料的 Hook
@@ -35,7 +36,7 @@ export function useDishes() {
   const fetcher = useFetcher<{ dishes: Dish[] }>();
 
   const dishes = useMemo(() => {
-    return fetcher.data?.dishes || [];
+    return fetcher.data?.dishes ?? [];
   }, [fetcher.data]);
 
   const isLoading = fetcher.state === "loading";
@@ -56,8 +57,10 @@ export function useCreateDish() {
   const fetcher = useFetcher<{ dish: Dish | null; error?: string }>();
 
   const createDish = (input: CreateDishInput) => {
+    // SubmitTarget (object payload) not exported from react-router-dom
     fetcher.submit(
-      { ...input },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      { ...input } as any,
       {
         method: "POST",
         action: "/api/dishes",
@@ -68,7 +71,7 @@ export function useCreateDish() {
   return {
     createDish,
     isLoading: fetcher.state === "submitting",
-    dish: fetcher.data?.dish || null,
+    dish: fetcher.data?.dish ?? null,
     error: fetcher.data?.error,
   };
 }
@@ -81,7 +84,8 @@ export function useUpdateDish() {
 
   const updateDish = (id: string, input: UpdateDishInput) => {
     fetcher.submit(
-      { ...input },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      { ...input } as any,
       {
         method: "PATCH",
         action: `/api/dishes/${id}`,
@@ -92,7 +96,7 @@ export function useUpdateDish() {
   return {
     updateDish,
     isLoading: fetcher.state === "submitting",
-    dish: fetcher.data?.dish || null,
+    dish: fetcher.data?.dish ?? null,
     error: fetcher.data?.error,
   };
 }
@@ -116,7 +120,7 @@ export function useDeleteDish() {
   return {
     deleteDish,
     isLoading: fetcher.state === "submitting",
-    success: fetcher.data?.success || false,
+    success: fetcher.data?.success ?? false,
     error: fetcher.data?.error,
   };
 }
@@ -132,7 +136,7 @@ export function useSearchDishes() {
   };
 
   const dishes = useMemo(() => {
-    return fetcher.data?.dishes || [];
+    return fetcher.data?.dishes ?? [];
   }, [fetcher.data]);
 
   return {
@@ -141,5 +145,3 @@ export function useSearchDishes() {
     searchDishes,
   };
 }
-
-
