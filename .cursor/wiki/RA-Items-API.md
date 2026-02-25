@@ -1,0 +1,47 @@
+# RA-Items-API
+
+本文件描述「通用 CRUD 範例」Items API 的現況規格：用途、資料模型、端點行為。
+
+---
+
+## 用途
+
+- 示範 Remix Resource Route 的 GET/POST/PUT/PATCH/DELETE。
+- 提供與後端無關的**最小可測 API**，供整合測試或前端串接練習。
+- 非領域核心；領域模型以 **RA-領域模型-食物與食譜** 為準。
+
+---
+
+## 資料模型：MockItem
+
+| 欄位        | 型別           | 說明                     |
+| ----------- | -------------- | ------------------------ |
+| id          | string         | 由 server 產生，遞增數字 |
+| name        | string         | 必填                     |
+| description | string \| null | 選填                     |
+| createdAt   | string         | ISO 8601                 |
+| updatedAt   | string         | ISO 8601                 |
+
+- 型別與 CRUD 實作：`app/services/mock-items.server.ts`
+- 儲存：**in-memory 陣列**，重啟清空；預設種子兩筆（alpha, beta）。
+
+---
+
+## 端點行為
+
+| 方法        | 路徑               | 說明                                                                                           |
+| ----------- | ------------------ | ---------------------------------------------------------------------------------------------- |
+| GET         | /api/items         | 回傳 `{ data: MockItem[] }`                                                                    |
+| POST        | /api/items         | Body: `{ name: string, description?: string }`；回傳 201 `{ data: MockItem }`；name 必填、非空 |
+| GET         | /api/items/:itemId | 回傳 `{ data: MockItem }`；無則 404                                                            |
+| PUT / PATCH | /api/items/:itemId | Body: `{ name?: string, description?: string }`；至少一欄；回傳 `{ data: MockItem }`；無則 404 |
+| DELETE      | /api/items/:itemId | 回傳 `{ data: MockItem }`（已刪除的那筆）；無則 404                                            |
+
+- 錯誤：400（缺參/格式）、404（Item not found）、405（Method not allowed），body 為 `{ error: string }`。
+
+---
+
+## 檔案對應
+
+- 路由：`app/routes/api.items.ts`（list, create）、`app/routes/api.items.$itemId.ts`（get, update, delete）
+- 服務：`app/services/mock-items.server.ts`（listMockItems, getMockItem, createMockItem, updateMockItem, deleteMockItem）

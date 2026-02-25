@@ -1,0 +1,31 @@
+---
+description: Large-scale collaboration structure and portal role (info-systems skeleton)
+alwaysApply: true
+---
+
+# Collaboration & Portal Role
+
+## Reference: able_portal
+This project aligns with the **able_portal** reference (sibling repo: `able_portal`, underscore not dash). When extending conventions or tooling, prefer consistency with able_portal:
+- **.cursor/wiki**: SOP-* (standards), Ref-* (architecture/overview), RA-* (requirements), Auto-* (format, extensions, CI).
+- **.vscode**: format on save, Prettier as default formatter, ESLint on save; extensions for ESLint, Prettier, Vitest, GitLens, Tailwind, Path IntelliSense, Auto Close/Rename Tag, etc.
+- **Architecture**: features in `app/features/*`; shared/cross-module in shared layer; routes thin. (able_portal also has legacy `app/module/` and uses `app/store/`, `app/lib/`, `app/mocks/`; ai-search-portal uses `app/shared/*`, `app/services/*` and MSW in `app/test/`.)
+
+## Portal Role
+This app is the **skeleton/portal** that aggregates and organizes multiple information systems. New features and routes are modular entry points; shared logic in `app/shared/*`, app-level integration in `app/services/*`. Keep routes thin—coordinate UI and data only.
+
+## Directory & Data Flow
+- **Features** (`app/features/*`): `*.hooks.ts`, `*.server.ts`, `*.types.ts`. UI calls hooks; hooks use loaders/actions; server logic in `*.server.ts`.
+- **Shared** (`app/shared/*`): services, types, utils. Cross-module coordination via `app/shared/services`.
+- **App services** (`app/services/*`): integration and computation. Routes in `app/routes/*` do not contain business logic.
+
+## Quality & CI
+- Before PR: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run lint:filenames`.
+- CI: lint:filenames, ESLint strict, typecheck, test; Knip optional until tuned.
+- User-facing changes: `npm run changeset`. Commits: Conventional Commits (commitlint).
+
+## Workspace Alignment
+- **.vscode**: `settings.json` enforces format on save, ESLint, Prettier, Tailwind, non-relative TS imports. `extensions.json` recommends the stack in `docs/VSCODE.md` (ESLint, Prettier, Tailwind, Vitest, GitLens, TypeScript Hero, Path Intellisense, Project Manager, etc.) for large-scale collaboration.
+- **Docs**: `docs/ARCHITECTURE.md`, `docs/DEVELOPMENT.md`, `docs/CONVENTIONS.md` are the source of truth for structure and workflow.
+- **Domain knowledge (RA-)**: `.cursor/wiki/` contains RA-* (requirements/domain) and Ref-* (overview) docs; see `Ref-Wiki-檔名前綴規則.md` and **RA-Mock-Data-與最小維護** for mock/seed strategy.
+- **Data-test-driven (大型協作)**：Spec → Contract → Mock → Test → UI. Schema 用 Zod（`app/shared/contracts/`）；所有 API 必有 MSW handler，回傳經 schema parse；禁止 component 內直接 fetch；CI 跑 `lint:handlers`. Mock Dataset 可版本化（`app/test/datasets/v1|v2`）以可回溯、可重現。見 **Ref-資料治理與前端對等**、**Ref-Mock-Dataset-版本化**. See `.cursor/rules/data-test-driven.mdc`, **SOP-資料測試導向開發-制度**, **Ref-Contract-與-Schema-規範**, **app/shared/api/README.md**.

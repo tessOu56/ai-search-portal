@@ -5,6 +5,8 @@ alwaysApply: true
 
 # AI Search Portal Standards
 
+This portal is the **skeleton for aggregating and organizing information systems**. Feature and route design should stay modular and thin. See `collaboration-architecture.mdc` for directory, data flow, and CI alignment. Conventions and tooling align with the **able_portal** reference project (sibling repo `able_portal`); for naming/coding details beyond this file, see able_portal `.cursor/wiki/SOP-Naming-Writing-Guidelines.md` and related SOP/Ref docs.
+
 ## Workflow
 - Run `npm run lint`, `npm run typecheck`, `npm run test` before PR.
 - Use `npm run changeset` for user-facing changes.
@@ -28,6 +30,9 @@ alwaysApply: true
 ## Testing
 - Vitest + Testing Library for unit/UI tests.
 - MSW handlers in `app/test/handlers.ts`; keep network isolated.
+
+## Dependencies
+- Baseline: React 18. When adding or upgrading packages, check peer/react support and update **.cursor/wiki/Ref-套件與-React-支援度.md**. Run `npm ls react react-dom` to catch peer conflicts before PR.
 
 ## Commits
 - Conventional Commits required (commitlint enforces).
