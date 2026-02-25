@@ -18,6 +18,8 @@
 
 ## Ref 文件一覽
 
+- **Ref-乾淨架構與業務規格中樞**：業務規格（RA-\*）為專案中樞、乾淨架構層級對應、Spec→Contract→Mock→Test→UI
+- **Ref-Design-System-與半自動化-UI**：Design system 分層、半自動化策略、與乾淨架構的關係
 - **Ref-API-與-Handler-對照**：API 路徑與 MSW handler 對照表，新增 API 時同步維護
 - **Ref-Contract-與-Schema-規範**：Zod 契約位置、命名、使用處、template、OpenAPI 關係
 - **Ref-資料流與-Data-Driven-架構**：請求與契約資料流圖、角色對應

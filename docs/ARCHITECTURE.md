@@ -2,6 +2,16 @@
 
 這份文件聚焦於「大型協作」所需的結構與流程。
 
+專案朝向 **兩個方向** 對齊：
+
+1. **乾淨架構（業務規格做專案中樞）**  
+   以 `.cursor/wiki/` 內 **RA-\*** 為業務規格中樞；功能與資料流可追溯到規格，依賴由外而內。  
+   見 **.cursor/wiki/Ref-乾淨架構與業務規格中樞.md**。
+
+2. **半自動化 UI / Design System**  
+   逐漸建立 design system（tokens、core 元件、使用規範），以單一來源與半自動化維持 UI 一致性。  
+   見 **.cursor/wiki/Ref-Design-System-與半自動化-UI.md**、**docs/DESIGN_SYSTEM.md**。
+
 ## Tech Stack
 
 - Remix v2 + React 18
