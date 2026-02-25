@@ -12,6 +12,7 @@ This portal is the **skeleton for aggregating and organizing information systems
 - Use `npm run changeset` for user-facing changes.
 
 ## Architecture
+- **Two pillars**：Clean architecture with RA-* as spec hub (see Ref-乾淨架構與業務規格中樞); semi-automated UI via design system (see Ref-Design-System-與半自動化-UI, docs/DESIGN_SYSTEM.md).
 - Feature code in `app/features/*` (hooks/server/types).
 - Shared code in `app/shared/*`, app services in `app/services/*`.
 - Routes in `app/routes/*` only coordinate UI + data flow.

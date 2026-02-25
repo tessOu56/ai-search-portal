@@ -14,6 +14,10 @@ This project aligns with the **able_portal** reference (sibling repo: `able_port
 ## Portal Role
 This app is the **skeleton/portal** that aggregates and organizes multiple information systems. New features and routes are modular entry points; shared logic in `app/shared/*`, app-level integration in `app/services/*`. Keep routes thin—coordinate UI and data only.
 
+## Two Strategic Directions
+- **Clean Architecture (business spec as hub)**：RA-* in `.cursor/wiki/` is the project hub; all features trace to specs; dependency inward. See **Ref-乾淨架構與業務規格中樞**.
+- **Semi-automated UI / Design System**：Single source for tokens and components; gradually build design system; see **Ref-Design-System-與半自動化-UI** and `docs/DESIGN_SYSTEM.md`.
+
 ## Directory & Data Flow
 - **Features** (`app/features/*`): `*.hooks.ts`, `*.server.ts`, `*.types.ts`. UI calls hooks; hooks use loaders/actions; server logic in `*.server.ts`.
 - **Shared** (`app/shared/*`): services, types, utils. Cross-module coordination via `app/shared/services`.

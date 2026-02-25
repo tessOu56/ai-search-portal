@@ -1,6 +1,6 @@
 ## Design System
 
-這份設計系統文件用來維持 UI 一致性與可維護性。
+這份設計系統文件用來維持 UI 一致性與可維護性；專案朝向 **半自動化 UI** 逐漸建立 design system（見 .cursor/wiki/Ref-Design-System-與半自動化-UI.md）。
 本專案採用 shadcn/ui 作為元件基礎，確保可維護且可客製。
 
 ## Design Tokens
