@@ -17,6 +17,7 @@ import {
 } from "@remix-run/react";
 
 import { ErrorBoundaryFallback } from "~/components/errorboundary";
+import { ensureSeeded } from "~/services/seed.server";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
 
@@ -34,6 +35,7 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  await ensureSeeded();
   const locale = await getLocale(request);
   const translations = getTranslations(locale);
   let version = "0.0.0";

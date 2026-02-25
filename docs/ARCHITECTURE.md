@@ -10,6 +10,8 @@
 - Tailwind CSS
 - Node.js >= 20
 
+套件與 React 支援度對照見 **.cursor/wiki/Ref-套件與-React-支援度.md**；新增或升級依賴時請維護該表並確認 React 相容性。
+
 ## Directory Structure
 
 - `app/features/*`
