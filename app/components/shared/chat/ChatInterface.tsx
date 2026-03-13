@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 
-import { ChatBubble } from "~/components/lui/ChatBubble";
+import { ChatBubble } from "~/components/shared/lui/ChatBubble";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/Alert";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
 import { ScrollArea } from "~/components/ui/ScrollArea";
 import { Textarea } from "~/components/ui/Textarea";
+import { apiChatQuery } from "~/shared/api/paths";
 import { useI18n } from "~/shared/i18n/context";
 
 type Message = {
@@ -22,6 +23,7 @@ type LuiMeta = {
   nextSteps?: string[];
 };
 
+// TODO(CR-005): add SSE meta/final comment or schema
 function parseMetaEvent(data: string) {
   const parsed: unknown = JSON.parse(data);
   if (!parsed || typeof parsed !== "object") return null;
@@ -95,7 +97,7 @@ export function ChatInterface() {
     setMeta({});
     setIsStreaming(true);
 
-    const stream = new EventSource(`/api/chat?q=${encodeURIComponent(query)}`);
+    const stream = new EventSource(apiChatQuery(query));
     streamRef.current = stream;
 
     stream.addEventListener("meta", (event) => {

@@ -16,7 +16,7 @@ import {
   useRouteLoaderData,
 } from "@remix-run/react";
 
-import { ErrorBoundaryFallback } from "~/components/errorboundary";
+import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { ensureSeeded } from "~/services/seed.server";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
@@ -105,6 +105,7 @@ export function ErrorBoundary() {
   if (isRouteErrorResponse(error)) {
     const title =
       error.status === 404 ? "找不到頁面" : `發生錯誤 (${error.status})`;
+    // TODO(CR-001): normalize error message mapping
     const dataMessage =
       error.data &&
       typeof (error.data as { message?: unknown }).message === "string"

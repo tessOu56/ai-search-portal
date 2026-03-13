@@ -1,6 +1,6 @@
 /**
  * 領域種子資料：僅在 Map 為空時執行一次，供最小維護開發與展示用。
- * 詳見 .cursor/wiki/RA-Mock-Data-與最小維護.md
+ * 詳見 docs/product/mock-data.md
  */
 
 import { createDish } from "~/features/dish/dish.server";

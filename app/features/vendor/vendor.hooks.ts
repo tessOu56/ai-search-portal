@@ -1,6 +1,14 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
 
+import {
+  API_DISH_VENDORS,
+  API_VENDORS,
+  apiDishVendors,
+  apiVendor,
+} from "~/shared/api/paths";
+import { submitFormPayload } from "~/shared/api/submitPayload";
+
 import type {
   CreateDishVendorInput,
   CreateVendorInput,
@@ -29,7 +37,7 @@ export function useVendor(id: string | null) {
     isLoading,
     refetch: () => {
       if (id) {
-        fetcher.load(`/api/vendors/${id}`);
+        fetcher.load(apiVendor(id));
       }
     },
   };
@@ -51,7 +59,7 @@ export function useVendors() {
     vendors,
     isLoading,
     refetch: () => {
-      fetcher.load("/api/vendors");
+      fetcher.load(API_VENDORS);
     },
   };
 }
@@ -70,7 +78,7 @@ export function useVendorsByDishId(dishId: string | null) {
 
   const refetch = () => {
     if (dishId) {
-      fetcher.load(`/api/dishes/${dishId}/vendors`);
+      fetcher.load(apiDishVendors(dishId));
     }
   };
 
@@ -88,14 +96,7 @@ export function useCreateVendor() {
   const fetcher = useFetcher<{ vendor: Vendor | null; error?: string }>();
 
   const createVendor = (input: CreateVendorInput) => {
-    fetcher.submit(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      { ...input } as any,
-      {
-        method: "POST",
-        action: "/api/vendors",
-      }
-    );
+    submitFormPayload(fetcher, { ...input }, { method: "POST", action: API_VENDORS });
   };
 
   return {
@@ -113,14 +114,7 @@ export function useUpdateVendor() {
   const fetcher = useFetcher<{ vendor: Vendor | null; error?: string }>();
 
   const updateVendor = (id: string, input: UpdateVendorInput) => {
-    fetcher.submit(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      { ...input } as any,
-      {
-        method: "PATCH",
-        action: `/api/vendors/${id}`,
-      }
-    );
+    submitFormPayload(fetcher, { ...input }, { method: "PATCH", action: apiVendor(id) });
   };
 
   return {
@@ -138,11 +132,12 @@ export function useDeleteVendor() {
   const fetcher = useFetcher<{ success: boolean; error?: string }>();
 
   const deleteVendor = (id: string) => {
+    // TODO(CR-004): use submitFormPayload for DELETE
     fetcher.submit(
       {},
       {
         method: "DELETE",
-        action: `/api/vendors/${id}`,
+        action: apiVendor(id),
       }
     );
   };
@@ -165,14 +160,7 @@ export function useCreateDishVendor() {
   }>();
 
   const createDishVendor = (input: CreateDishVendorInput) => {
-    fetcher.submit(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      { ...input } as any,
-      {
-        method: "POST",
-        action: "/api/dish-vendors",
-      }
-    );
+    submitFormPayload(fetcher, { ...input }, { method: "POST", action: API_DISH_VENDORS });
   };
 
   return {

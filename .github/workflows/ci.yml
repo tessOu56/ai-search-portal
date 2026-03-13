@@ -1,0 +1,94 @@
+# CI：build / test / lint 皆通過才放行；失敗時產出說明報告並上傳 Artifacts
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    name: Build, Test, Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare reports directory
+        run: mkdir -p reports
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test
+        env:
+          CI: true
+
+      - name: Publish Test Results (JUnit)
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Vitest Results
+          path: reports/junit.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: ESLint report (for failure summary)
+        run: npm run lint:report
+        continue-on-error: true
+
+      - name: Lint & typecheck
+        run: |
+          npm run lint:filenames
+          npm run lint:handlers
+          npx eslint --max-warnings=0 --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives . -f gha
+          npm run typecheck
+
+      - name: Code review TODO list
+        run: npm run code-review:list
+        continue-on-error: true
+
+      - name: Generate CI failure report
+        if: failure()
+        run: |
+          node scripts/ci-failure-report.mjs > reports/ci-failure-summary.md 2>&1 || true
+          if [ -f reports/ci-failure-summary.md ]; then
+            echo "## CI 失敗說明" >> "$GITHUB_STEP_SUMMARY"
+            cat reports/ci-failure-summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-reports
+          path: reports/
+          retention-days: 7
+
+  knip:
+    name: Unused Code Check (optional)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run knip

@@ -1,6 +1,13 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
 
+import {
+  API_RECIPES,
+  apiDishRecipes,
+  apiRecipe,
+} from "~/shared/api/paths";
+import { submitFormPayload } from "~/shared/api/submitPayload";
+
 import type {
   CreateRecipeInput,
   Recipe,
@@ -27,7 +34,7 @@ export function useRecipe(id: string | null) {
     isLoading,
     refetch: () => {
       if (id) {
-        fetcher.load(`/api/recipes/${id}`);
+        fetcher.load(apiRecipe(id));
       }
     },
   };
@@ -49,7 +56,7 @@ export function useRecipes() {
     recipes,
     isLoading,
     refetch: () => {
-      fetcher.load("/api/recipes");
+      fetcher.load(API_RECIPES);
     },
   };
 }
@@ -68,7 +75,7 @@ export function useRecipesByDishId(dishId: string | null) {
 
   const refetch = () => {
     if (dishId) {
-      fetcher.load(`/api/dishes/${dishId}/recipes`);
+      fetcher.load(apiDishRecipes(dishId));
     }
   };
 
@@ -86,14 +93,7 @@ export function useCreateRecipe() {
   const fetcher = useFetcher<{ recipe: Recipe | null; error?: string }>();
 
   const createRecipe = (input: CreateRecipeInput) => {
-    fetcher.submit(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      { ...input } as any,
-      {
-        method: "POST",
-        action: "/api/recipes",
-      }
-    );
+    submitFormPayload(fetcher, { ...input }, { method: "POST", action: API_RECIPES });
   };
 
   return {
@@ -111,14 +111,7 @@ export function useUpdateRecipe() {
   const fetcher = useFetcher<{ recipe: Recipe | null; error?: string }>();
 
   const updateRecipe = (id: string, input: UpdateRecipeInput) => {
-    fetcher.submit(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      { ...input } as any,
-      {
-        method: "PATCH",
-        action: `/api/recipes/${id}`,
-      }
-    );
+    submitFormPayload(fetcher, { ...input }, { method: "PATCH", action: apiRecipe(id) });
   };
 
   return {
@@ -136,11 +129,12 @@ export function useDeleteRecipe() {
   const fetcher = useFetcher<{ success: boolean; error?: string }>();
 
   const deleteRecipe = (id: string) => {
+    // TODO(CR-004): use submitFormPayload for DELETE
     fetcher.submit(
       {},
       {
         method: "DELETE",
-        action: `/api/recipes/${id}`,
+        action: apiRecipe(id),
       }
     );
   };

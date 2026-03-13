@@ -40,6 +40,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  // TODO(CR-002): use SeoLoaderData to remove as assertions
   const title = (data?.title as string) ?? "版本說明";
   const description = (data?.description as string) ?? "各版本更新摘要。";
   const canonical = (data?.canonical as string) ?? "";
