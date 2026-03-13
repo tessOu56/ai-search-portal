@@ -96,7 +96,11 @@ export function useCreateVendor() {
   const fetcher = useFetcher<{ vendor: Vendor | null; error?: string }>();
 
   const createVendor = (input: CreateVendorInput) => {
-    submitFormPayload(fetcher, { ...input }, { method: "POST", action: API_VENDORS });
+    submitFormPayload(
+      fetcher,
+      { ...input },
+      { method: "POST", action: API_VENDORS }
+    );
   };
 
   return {
@@ -114,7 +118,11 @@ export function useUpdateVendor() {
   const fetcher = useFetcher<{ vendor: Vendor | null; error?: string }>();
 
   const updateVendor = (id: string, input: UpdateVendorInput) => {
-    submitFormPayload(fetcher, { ...input }, { method: "PATCH", action: apiVendor(id) });
+    submitFormPayload(
+      fetcher,
+      { ...input },
+      { method: "PATCH", action: apiVendor(id) }
+    );
   };
 
   return {
@@ -160,7 +168,11 @@ export function useCreateDishVendor() {
   }>();
 
   const createDishVendor = (input: CreateDishVendorInput) => {
-    submitFormPayload(fetcher, { ...input }, { method: "POST", action: API_DISH_VENDORS });
+    submitFormPayload(
+      fetcher,
+      { ...input },
+      { method: "POST", action: API_DISH_VENDORS }
+    );
   };
 
   return {
