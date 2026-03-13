@@ -7,8 +7,8 @@ import {
   useRouteLoaderData,
 } from "@remix-run/react";
 
-import { ChatInterface } from "~/components/chat/ChatInterface";
-import { ErrorBoundaryFallback } from "~/components/errorboundary";
+import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
+import { ChatInterface } from "~/components/shared/chat/ChatInterface";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
 import {
@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from "~/components/ui/Card";
 import { Container } from "~/components/ui/Container";
+import { API_LOCALE } from "~/shared/api/paths";
 import { getLocale, getTranslations } from "~/shared/i18n";
 import { useI18n } from "~/shared/i18n/context";
 import { t } from "~/shared/i18n/server";
@@ -54,6 +55,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  // TODO(CR-002): use SeoLoaderData to remove as assertions
   const title = (data?.title as string) ?? "AI 搜尋入口";
   const description = (data?.description as string) ?? "智能 AI 搜尋平台";
   const canonical = (data?.canonical as string) ?? "";
@@ -175,7 +177,7 @@ export default function Index() {
           </p>
           <Form
             method="post"
-            action="/api/locale"
+            action={API_LOCALE}
             className="flex items-center gap-2"
           >
             <input type="hidden" name="next" value="/" />
@@ -201,6 +203,7 @@ export function ErrorBoundary() {
   const error = useRouteError();
 
   if (isRouteErrorResponse(error)) {
+    // TODO(CR-001): normalize error message mapping
     return (
       <ErrorBoundaryFallback
         title={error.status === 404 ? "找不到頁面" : "發生錯誤"}

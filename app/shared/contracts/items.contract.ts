@@ -1,7 +1,7 @@
 /**
  * Items API 契約：request/response 的 runtime schema（Zod）。
  * Handler 與 route 回傳前應以對應 schema parse，確保 mock 與 production 一致。
- * 見 .cursor/wiki/Ref-Contract-與-Schema-規範.md
+ * 見 specs/api/contract-schema.md
  */
 
 import { z } from "zod";

@@ -1,6 +1,13 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
 
+import {
+  API_DISHES,
+  apiDish,
+  apiDishSearch,
+} from "~/shared/api/paths";
+import { submitFormPayload } from "~/shared/api/submitPayload";
+
 import type { CreateDishInput, Dish, UpdateDishInput } from "./dish.types";
 
 /**
@@ -23,7 +30,7 @@ export function useDish(id: string | null) {
     isLoading,
     refetch: () => {
       if (id) {
-        fetcher.load(`/api/dishes/${id}`);
+        fetcher.load(apiDish(id));
       }
     },
   };
@@ -45,7 +52,7 @@ export function useDishes() {
     dishes,
     isLoading,
     refetch: () => {
-      fetcher.load("/api/dishes");
+      fetcher.load(API_DISHES);
     },
   };
 }
@@ -57,15 +64,7 @@ export function useCreateDish() {
   const fetcher = useFetcher<{ dish: Dish | null; error?: string }>();
 
   const createDish = (input: CreateDishInput) => {
-    // SubmitTarget (object payload) not exported from react-router-dom
-    fetcher.submit(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      { ...input } as any,
-      {
-        method: "POST",
-        action: "/api/dishes",
-      }
-    );
+    submitFormPayload(fetcher, { ...input }, { method: "POST", action: API_DISHES });
   };
 
   return {
@@ -83,14 +82,7 @@ export function useUpdateDish() {
   const fetcher = useFetcher<{ dish: Dish | null; error?: string }>();
 
   const updateDish = (id: string, input: UpdateDishInput) => {
-    fetcher.submit(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      { ...input } as any,
-      {
-        method: "PATCH",
-        action: `/api/dishes/${id}`,
-      }
-    );
+    submitFormPayload(fetcher, { ...input }, { method: "PATCH", action: apiDish(id) });
   };
 
   return {
@@ -108,11 +100,12 @@ export function useDeleteDish() {
   const fetcher = useFetcher<{ success: boolean; error?: string }>();
 
   const deleteDish = (id: string) => {
+    // TODO(CR-004): use submitFormPayload for DELETE
     fetcher.submit(
       {},
       {
         method: "DELETE",
-        action: `/api/dishes/${id}`,
+        action: apiDish(id),
       }
     );
   };
@@ -132,7 +125,7 @@ export function useSearchDishes() {
   const fetcher = useFetcher<{ dishes: Dish[] }>();
 
   const searchDishes = (query: string) => {
-    fetcher.load(`/api/dishes/search?q=${encodeURIComponent(query)}`);
+    fetcher.load(apiDishSearch(query));
   };
 
   const dishes = useMemo(() => {

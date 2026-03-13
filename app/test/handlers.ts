@@ -1,6 +1,6 @@
 /**
  * MSW handlers — 所有 API 都需在此（或合併進來的模組）註冊對應 handler。
- * 見 .cursor/wiki/SOP-資料測試導向開發.md、Ref-API-與-Handler-對照.md
+ * 見 docs/conventions/data-test-driven.md、specs/api/handler-mapping.md
  */
 
 import { http, HttpResponse } from "msw";
@@ -72,6 +72,7 @@ export const itemsHandlers = [
     return HttpResponse.json(body, { status: 201 });
   }),
 
+  // TODO(CR-003): share PUT/PATCH logic via handleItemUpdate
   http.put(ITEMS_BY_ID_PATH, async ({ params, request }) => {
     const item = itemsFixture.find((i) => i.id === params.itemId);
     if (!item) {

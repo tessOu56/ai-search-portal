@@ -1,6 +1,12 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
 
+import {
+  API_INGREDIENTS,
+  apiIngredient,
+} from "~/shared/api/paths";
+import { submitFormPayload } from "~/shared/api/submitPayload";
+
 import type {
   CreateIngredientInput,
   Ingredient,
@@ -28,7 +34,7 @@ export function useIngredient(id: string | null) {
     isLoading,
     refetch: () => {
       if (id) {
-        fetcher.load(`/api/ingredients/${id}`);
+        fetcher.load(apiIngredient(id));
       }
     },
   };
@@ -50,7 +56,7 @@ export function useIngredients() {
     ingredients,
     isLoading,
     refetch: () => {
-      fetcher.load("/api/ingredients");
+      fetcher.load(API_INGREDIENTS);
     },
   };
 }
@@ -65,14 +71,7 @@ export function useCreateIngredient() {
   }>();
 
   const createIngredient = (input: CreateIngredientInput) => {
-    fetcher.submit(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      { ...input } as any,
-      {
-        method: "POST",
-        action: "/api/ingredients",
-      }
-    );
+    submitFormPayload(fetcher, { ...input }, { method: "POST", action: API_INGREDIENTS });
   };
 
   return {
@@ -93,14 +92,7 @@ export function useUpdateIngredient() {
   }>();
 
   const updateIngredient = (id: string, input: UpdateIngredientInput) => {
-    fetcher.submit(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      { ...input } as any,
-      {
-        method: "PATCH",
-        action: `/api/ingredients/${id}`,
-      }
-    );
+    submitFormPayload(fetcher, { ...input }, { method: "PATCH", action: apiIngredient(id) });
   };
 
   return {
@@ -118,11 +110,12 @@ export function useDeleteIngredient() {
   const fetcher = useFetcher<{ success: boolean; error?: string }>();
 
   const deleteIngredient = (id: string) => {
+    // TODO(CR-004): use submitFormPayload for DELETE
     fetcher.submit(
       {},
       {
         method: "DELETE",
-        action: `/api/ingredients/${id}`,
+        action: apiIngredient(id),
       }
     );
   };
