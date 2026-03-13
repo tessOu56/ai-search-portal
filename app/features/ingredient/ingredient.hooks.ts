@@ -1,10 +1,7 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
 
-import {
-  API_INGREDIENTS,
-  apiIngredient,
-} from "~/shared/api/paths";
+import { API_INGREDIENTS, apiIngredient } from "~/shared/api/paths";
 import { submitFormPayload } from "~/shared/api/submitPayload";
 
 import type {
@@ -71,7 +68,11 @@ export function useCreateIngredient() {
   }>();
 
   const createIngredient = (input: CreateIngredientInput) => {
-    submitFormPayload(fetcher, { ...input }, { method: "POST", action: API_INGREDIENTS });
+    submitFormPayload(
+      fetcher,
+      { ...input },
+      { method: "POST", action: API_INGREDIENTS }
+    );
   };
 
   return {
@@ -92,7 +93,11 @@ export function useUpdateIngredient() {
   }>();
 
   const updateIngredient = (id: string, input: UpdateIngredientInput) => {
-    submitFormPayload(fetcher, { ...input }, { method: "PATCH", action: apiIngredient(id) });
+    submitFormPayload(
+      fetcher,
+      { ...input },
+      { method: "PATCH", action: apiIngredient(id) }
+    );
   };
 
   return {

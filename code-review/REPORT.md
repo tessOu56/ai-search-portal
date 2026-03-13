@@ -85,4 +85,4 @@
 
 ## 4. 規格文件整理建議
 
-見 [docs/code-review-report.md](../docs/code-review-report.md) §4。當期報告與議題以本目錄 `issues.md` 為準。
+規格文件與審查對照見 [docs/code-review-spec.md](../docs/code-review-spec.md) §3。當期報告與議題以本目錄 `issues.md` 為準。

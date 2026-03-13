@@ -1,11 +1,7 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
 
-import {
-  API_RECIPES,
-  apiDishRecipes,
-  apiRecipe,
-} from "~/shared/api/paths";
+import { API_RECIPES, apiDishRecipes, apiRecipe } from "~/shared/api/paths";
 import { submitFormPayload } from "~/shared/api/submitPayload";
 
 import type {
@@ -93,7 +89,11 @@ export function useCreateRecipe() {
   const fetcher = useFetcher<{ recipe: Recipe | null; error?: string }>();
 
   const createRecipe = (input: CreateRecipeInput) => {
-    submitFormPayload(fetcher, { ...input }, { method: "POST", action: API_RECIPES });
+    submitFormPayload(
+      fetcher,
+      { ...input },
+      { method: "POST", action: API_RECIPES }
+    );
   };
 
   return {
@@ -111,7 +111,11 @@ export function useUpdateRecipe() {
   const fetcher = useFetcher<{ recipe: Recipe | null; error?: string }>();
 
   const updateRecipe = (id: string, input: UpdateRecipeInput) => {
-    submitFormPayload(fetcher, { ...input }, { method: "PATCH", action: apiRecipe(id) });
+    submitFormPayload(
+      fetcher,
+      { ...input },
+      { method: "PATCH", action: apiRecipe(id) }
+    );
   };
 
   return {

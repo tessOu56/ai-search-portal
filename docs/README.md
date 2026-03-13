@@ -65,6 +65,6 @@
 - **DEVELOPMENT.md** — 開發流程入口，詳見 runbooks/ 【entry／1】
 - **DESIGN_SYSTEM.md** — Design tokens、Core components、Usage guidelines 【reference／2】
 - **code-review-spec.md** — Code Review 規範（每階段工作後保持規格與現況一致；供 AI 與開發者） 【spec／1】
-- **code-review-report.md** — Code Review 報告範例（Clean Code、註解、規格對齊之審查結果與待辦） 【report／3】
+- **code-review-report.md** — Code Review 報告入口（當期報告與議題見 [code-review/](../code-review/README.md)） 【entry／3】
 - **當期報告與議題**：根目錄 [code-review/](../code-review/README.md)（REPORT.md、issues.md、`npm run code-review:list`）
 - **audit-report.md** — 專案盤查報告（依 code-review-spec 與現況盤查結果與待改進項） 【report／3】

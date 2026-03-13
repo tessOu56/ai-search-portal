@@ -81,9 +81,9 @@ describe("createItemRequestSchema", () => {
   });
 
   it("rejects empty name", () => {
-    expect(
-      createItemRequestSchema.safeParse({ name: "" })
-    ).toMatchObject({ success: false });
+    expect(createItemRequestSchema.safeParse({ name: "" })).toMatchObject({
+      success: false,
+    });
   });
 
   it("accepts description optional", () => {

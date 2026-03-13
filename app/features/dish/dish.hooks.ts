@@ -1,11 +1,7 @@
 import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
 
-import {
-  API_DISHES,
-  apiDish,
-  apiDishSearch,
-} from "~/shared/api/paths";
+import { API_DISHES, apiDish, apiDishSearch } from "~/shared/api/paths";
 import { submitFormPayload } from "~/shared/api/submitPayload";
 
 import type { CreateDishInput, Dish, UpdateDishInput } from "./dish.types";
@@ -64,7 +60,11 @@ export function useCreateDish() {
   const fetcher = useFetcher<{ dish: Dish | null; error?: string }>();
 
   const createDish = (input: CreateDishInput) => {
-    submitFormPayload(fetcher, { ...input }, { method: "POST", action: API_DISHES });
+    submitFormPayload(
+      fetcher,
+      { ...input },
+      { method: "POST", action: API_DISHES }
+    );
   };
 
   return {
@@ -82,7 +82,11 @@ export function useUpdateDish() {
   const fetcher = useFetcher<{ dish: Dish | null; error?: string }>();
 
   const updateDish = (id: string, input: UpdateDishInput) => {
-    submitFormPayload(fetcher, { ...input }, { method: "PATCH", action: apiDish(id) });
+    submitFormPayload(
+      fetcher,
+      { ...input },
+      { method: "PATCH", action: apiDish(id) }
+    );
   };
 
   return {
