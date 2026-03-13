@@ -5,14 +5,17 @@ alwaysApply: true
 
 # AI Search Portal Standards
 
-This portal is the **skeleton for aggregating and organizing information systems**. Feature and route design should stay modular and thin. See `collaboration-architecture.mdc` for directory, data flow, and CI alignment. Conventions and tooling align with the **able_portal** reference project (sibling repo `able_portal`); for naming/coding details beyond this file, see able_portal `.cursor/wiki/SOP-Naming-Writing-Guidelines.md` and related SOP/Ref docs.
+**Tool adapter**: Project truth and agent capabilities live in [AGENTS.md](../../AGENTS.md) and [AGENT_CAPABILITIES.md](../../AGENT_CAPABILITIES.md). This file extends those canonical sources; it must not override them. Keep in sync with AGENTS.md.
+
+This portal is the **skeleton for aggregating and organizing information systems**. Feature and route design should stay modular and thin. See `collaboration-architecture.mdc` for directory, data flow, and CI alignment. Conventions: `docs/conventions/`, `docs/README.md`.
 
 ## Workflow
 - Run `npm run lint`, `npm run typecheck`, `npm run test` before PR.
 - Use `npm run changeset` for user-facing changes.
 
 ## Architecture
-- **Two pillars**：Clean architecture with RA-* as spec hub (see Ref-乾淨架構與業務規格中樞); semi-automated UI via design system (see Ref-Design-System-與半自動化-UI, docs/DESIGN_SYSTEM.md).
+- **Two pillars**：Clean architecture with docs/product as spec hub (`docs/architecture/clean-architecture.md`); semi-automated UI via design system (`docs/architecture/design-system.md`, `docs/DESIGN_SYSTEM.md`).
+- **Five layers**（`docs/architecture/repo-layers.md`）：**app** (shell: routes, root, entry) → **features** → **components** (ui/shared/app) → **services** (`app/services/*`, `app/shared/*`) → **infra** (optional). Features must not depend on other features; components must not depend on features.
 - Feature code in `app/features/*` (hooks/server/types).
 - Shared code in `app/shared/*`, app services in `app/services/*`.
 - Routes in `app/routes/*` only coordinate UI + data flow.
@@ -20,7 +23,7 @@ This portal is the **skeleton for aggregating and organizing information systems
 ## File and folder naming (mandatory)
 - **Folders** under `app/` (except under `app/routes`): **lowercase only**, no hyphen/underscore (e.g. `chat`, `ui`, `errorboundary`). Do **not** use `error-boundary` or `errorBoundary`.
 - **Component files** under `app/components/**/*.tsx`: **PascalCase** filename (e.g. `ErrorBoundaryFallback.tsx`, `ChatInterface.tsx`). Barrel files: `index.ts` is allowed.
-- Naming is enforced by `npm run lint:filenames` in CI and pre-commit. When creating or renaming files/folders, follow these rules so the check passes. See `docs/CONVENTIONS.md` for full rules.
+- Naming is enforced by `npm run lint:filenames` in CI and pre-commit. When creating or renaming files/folders, follow these rules so the check passes. See `docs/CONVENTIONS.md` and `docs/conventions/coding-conventions.md` for full rules.
 
 ## Coding Standards
 - Avoid `any` and unsafe casts; fix or narrow types.
@@ -33,7 +36,7 @@ This portal is the **skeleton for aggregating and organizing information systems
 - MSW handlers in `app/test/handlers.ts`; keep network isolated.
 
 ## Dependencies
-- Baseline: React 18. When adding or upgrading packages, check peer/react support and update **.cursor/wiki/Ref-套件與-React-支援度.md**. Run `npm ls react react-dom` to catch peer conflicts before PR.
+- Baseline: React 18. When adding or upgrading packages, check peer/react support and update `docs/conventions/packages-react.md`. Run `npm ls react react-dom` to catch peer conflicts before PR.
 
 ## Commits
-- Conventional Commits required (commitlint enforces).
+- Conventional Commits required (commitlint enforces). When deleting tracked files, use `git rm <path>` to preserve history; see `docs/conventions/git-version-control.md`.

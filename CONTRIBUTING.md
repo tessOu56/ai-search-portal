@@ -19,15 +19,16 @@ npm run dev
 ## Quality Checks
 
 ```bash
-npm run lint:ci          # 含 lint:filenames、lint、typecheck
-npm run test
+npm run build            # 建置
+npm run test             # 單元／整合測試
+npm run lint:ci          # 含 lint:filenames、lint:handlers、ESLint、typecheck
 npm run format:check
 npm run knip
 ```
 
 ## Commit Message
 
-採用 Conventional Commits（已強制）：
+採用 Conventional Commits（已強制）。刪除檔案時請用 `git rm <path>` 以保留操作紀錄，詳見 [docs/conventions/git-version-control.md](docs/conventions/git-version-control.md)。整體 agent 流程見根目錄 [AGENTS.md](AGENTS.md)。
 
 - `feat:` 新功能
 - `fix:` 修正 bug

@@ -22,6 +22,9 @@ node_modules/
 
 .vercel
 
+# CI reports (generated in CI, do not commit)
+reports/
+
 # Linting and formatting
 .eslintcache
 .prettiercache

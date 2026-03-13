@@ -21,6 +21,8 @@
 
 完整架構與協作規範請見 `docs/ARCHITECTURE.md`、`docs/DESIGN_SYSTEM.md` 與 `CONTRIBUTING.md`。
 
+**架構範本與可套用性**：本專案之 specs/docs、AGENTS.md、AGENT_CAPABILITIES.md 分層、契約與依賴規則、tool adapter 設計，可作為它專案之參考或複用；詳細對應見 [docs/README.md](docs/README.md)、[AGENTS.md](AGENTS.md)、[AGENT_CAPABILITIES.md](AGENT_CAPABILITIES.md)。每階段工作後保持規格與現況一致請依 [docs/code-review-spec.md](docs/code-review-spec.md)（Code Review 規範）。
+
 ## 開發
 
 ```bash

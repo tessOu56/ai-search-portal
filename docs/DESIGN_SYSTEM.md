@@ -1,6 +1,8 @@
-## Design System
+# Design System
 
-這份設計系統文件用來維持 UI 一致性與可維護性；專案朝向 **半自動化 UI** 逐漸建立 design system（見 .cursor/wiki/Ref-Design-System-與半自動化-UI.md）。
+**類型**：reference | **權重**：2
+
+這份設計系統文件用來維持 UI 一致性與可維護性；專案朝向 **半自動化 UI** 逐漸建立 design system（見 [docs/architecture/design-system.md](architecture/design-system.md)）。
 本專案採用 shadcn/ui 作為元件基礎，確保可維護且可客製。
 
 ## Design Tokens
@@ -22,8 +24,9 @@
 ## Component Layers
 
 - `app/components/ui/*`: 最小顆粒的設計系統元件（以 cva 定義 variants）
-- `app/components/lui/*`: LUI 專用語義元件（例如 `ChatBubble`）
-- `app/components/chat/*`: 複合元件（組合 UI + LUI 元件）
+- `app/components/shared/lui/*`: LUI 專用語義元件（例如 `ChatBubble`）
+- `app/components/shared/chat/*`: 複合元件（組合 UI + LUI 元件）
+- `app/components/app/*`: 應用基礎元件（例如 ErrorBoundary）
 
 ## Usage Guidelines
 
