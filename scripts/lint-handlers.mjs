@@ -2,7 +2,7 @@
 /**
  * 檢查：每個 app/routes/api.* 路徑是否有對應的 MSW handler。
  * 規則：api.<name>.ts / api.<name>.$param.ts 等 → 至少有一個 handler 的 path 以 /api/<name> 開頭。
- * 見 .cursor/wiki/SOP-資料測試導向開發-制度.md
+ * 見 docs/conventions/data-test-driven.md
  * Exit code: 0 if OK, 1 if missing handler.
  */
 
@@ -72,7 +72,7 @@ for (const prefix of requiredPrefixes) {
 
 if (missing.length > 0) {
   console.error("lint-handlers: API route(s) without MSW handler:", missing.join(", "));
-  console.error("Add handlers in app/test/handlers.ts for these paths. See .cursor/wiki/SOP-資料測試導向開發-制度.md");
+  console.error("Add handlers in app/test/handlers.ts for these paths. See docs/conventions/data-test-driven.md");
   process.exit(1);
 }
 

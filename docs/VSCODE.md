@@ -1,5 +1,7 @@
 # VS Code / Cursor 擴充推薦
 
+**類型**：reference | **權重**：3
+
 本專案以 **Remix + React + TypeScript + Git flow** 為前提，偏向「實務穩定、低心智負擔」的擴充清單。  
 Clone 後開啟專案時，VS Code / Cursor 會提示「此工作區有擴充推薦」；可**全部安裝**或依下方分類自行挑選。  
 `extensions.json` 只放「第一層 + 第二層」必裝項，其他建議見本文件。

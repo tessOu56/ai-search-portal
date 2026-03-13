@@ -13,15 +13,15 @@ alwaysApply: true
 5. **UI** — 僅透過 useFetcher 或 shared api 打契約路徑，禁止 component 內直接 fetch 硬編碼 URL。
 
 ## 強制規則
-- **Schema 可驗證**：使用 Zod，禁止僅依 TypeScript 型別。見 `.cursor/wiki/Ref-Contract-與-Schema-規範.md`。
-- **Handler = Contract**：每個 API 必有 MSW handler；handler 產出須經 schema parse。見 `Ref-API-與-Handler-對照`。
+- **Schema 可驗證**：使用 Zod，禁止僅依 TypeScript 型別。見 `specs/api/contract-schema.md`。
+- **Handler = Contract**：每個 API 必有 MSW handler；handler 產出須經 schema parse。見 `specs/api/handler-mapping.md`。
 - **API 走約定路徑**：禁止在 component 內直接 `fetch(url)`；用 useFetcher 或 `app/shared/api`。見 `app/shared/api/README.md`。
 - **CI**：`npm run lint:handlers` 檢查 api route 是否有對應 handler；未通過則 PR 失敗。
 
 ## 適用範圍
 - 新增／變更「對外 API」→ 必須走完整流程。
 - 僅改 UI 樣式／文案、不碰 API → 不需 Contract/Mock。
-- 見 `.cursor/wiki/SOP-資料測試導向開發-制度.md` 完整制度與漂移策略。
+- 見 `docs/conventions/data-test-driven.md` 完整制度與漂移策略。
 
 ## 資料治理與 Mock 版本
-- 前端對等「可治理資料層」：Contract-first、MSW 即規格、Mock Dataset 版本化（可回溯、可重現）。見 **Ref-資料治理與前端對等**、**Ref-Mock-Dataset-版本化**。優化順序：先 contract + service + CI，再視需求加 query cache / BFF。
+- 前端對等「可治理資料層」：Contract-first、MSW 即規格、Mock Dataset 版本化（可回溯、可重現）。見 `docs/architecture/data-governance.md`、`docs/conventions/mock-dataset-versioning.md`。優化順序：先 contract + service + CI，再視需求加 query cache / BFF。
