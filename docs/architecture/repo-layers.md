@@ -8,13 +8,13 @@
 
 ## 1. 五層概覽
 
-| Layer       | 責任                     | 本專案對應目錄                         |
-| ----------- | ------------------------ | -------------------------------------- |
-| **app**     | application shell        | `app/routes`、`app/root.tsx`、`app/entry.*`、layout/providers |
-| **features**| product features         | `app/features/*`                       |
-| **components** | reusable UI           | `app/components/*`（ui / shared / app 子層） |
-| **services**| API / domain access      | `app/services/*`、`app/shared/*`（contracts, api, types, utils, services） |
-| **infra**   | technical infrastructure | `app/infra/*`（可選，見下文）          |
+| Layer          | 責任                     | 本專案對應目錄                                                             |
+| -------------- | ------------------------ | -------------------------------------------------------------------------- |
+| **app**        | application shell        | `app/routes`、`app/root.tsx`、`app/entry.*`、layout/providers              |
+| **features**   | product features         | `app/features/*`                                                           |
+| **components** | reusable UI              | `app/components/*`（ui / shared / app 子層）                               |
+| **services**   | API / domain access      | `app/services/*`、`app/shared/*`（contracts, api, types, utils, services） |
+| **infra**      | technical infrastructure | `app/infra/*`（可選，見下文）                                              |
 
 ---
 
@@ -54,11 +54,12 @@
 
 **責任**：跨 feature 的 UI 組件。
 
-| 子層    | 說明                           | 本專案對應                     |
-| ------- | ------------------------------ | ------------------------------ |
-| **ui**  | primitive components           | `app/components/ui/*`          |
-| **shared** | reusable interaction components | `app/components/shared/chat`、`app/components/shared/lui` 等 |
-| **app** | application infrastructure UI  | `app/components/app/errorboundary` 等 |
+| 子層       | 說明                                               | 本專案對應                                                   |
+| ---------- | -------------------------------------------------- | ------------------------------------------------------------ |
+| **ui**     | primitive components（骨架，不隨 kit 換）          | `app/components/ui/*`                                        |
+| **theme**  | 可選；可隨 UI kit 替換的 kit 表面（wrapper／擴充） | `app/components/theme/*`                                     |
+| **shared** | reusable interaction components                    | `app/components/shared/chat`、`app/components/shared/lui` 等 |
+| **app**    | application infrastructure UI                      | `app/components/app/errorboundary` 等                        |
 
 ---
 
@@ -120,9 +121,9 @@ services     → infra（若有）
 feature 內頁面或 hook：
 
 ```ts
-import { Button } from '~/components/ui/Button'
-import { ProductCard } from '~/components/shared/...'  // 若有 shared 元件
-import { fetchDataset } from '~/services/...'          // 或透過 shared/api、useFetcher
+import { Button } from "~/components/ui/Button";
+import { ProductCard } from "~/components/shared/..."; // 若有 shared 元件
+import { fetchDataset } from "~/services/..."; // 或透過 shared/api、useFetcher
 ```
 
 ---

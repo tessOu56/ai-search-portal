@@ -18,13 +18,13 @@
 
 程式碼依 **app / features / components / services / infra** 五層分層，方便區分「產品功能」與「平台能力」；依賴方向與禁止規則見 [repo-layers](repo-layers.md)。
 
-| 層級 | 責任 | 本專案目錄 |
-|------|------|------------|
-| **app** | application shell（routing、layout、bootstrap） | `app/routes`、`app/root.tsx`、`app/entry.*` |
-| **features** | product features（domain boundary） | `app/features/*` |
-| **components** | reusable UI（ui / shared / app 子層） | `app/components/*` |
-| **services** | API / domain access | `app/services/*`、`app/shared/*` |
-| **infra** | 技術基礎設施（可選） | `app/infra/*`（視需求擴充） |
+| 層級           | 責任                                            | 本專案目錄                                  |
+| -------------- | ----------------------------------------------- | ------------------------------------------- |
+| **app**        | application shell（routing、layout、bootstrap） | `app/routes`、`app/root.tsx`、`app/entry.*` |
+| **features**   | product features（domain boundary）             | `app/features/*`                            |
+| **components** | reusable UI（ui / shared / app 子層）           | `app/components/*`                          |
+| **services**   | API / domain access                             | `app/services/*`、`app/shared/*`            |
+| **infra**      | 技術基礎設施（可選）                            | `app/infra/*`（視需求擴充）                 |
 
 ## Tech Stack
 

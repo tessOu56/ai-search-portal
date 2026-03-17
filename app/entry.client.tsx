@@ -10,5 +10,3 @@ startTransition(() => {
     </StrictMode>
   );
 });
-
-

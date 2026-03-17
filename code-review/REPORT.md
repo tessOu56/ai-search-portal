@@ -8,78 +8,58 @@
 
 ## 1. 審查清單摘要（code-review-spec）
 
-| 區塊             | 結果 | 備註                                                                                   |
-| ---------------- | ---- | -------------------------------------------------------------------------------------- |
-| 2.1 分層與依賴   | ✅   | routes 薄層、API 路徑來自 paths.ts、無 component 內直接 fetch(url)                     |
-| 2.2 契約與 API   | ✅   | 契約在 shared/contracts、paths.ts 單一來源、handler-mapping 與 handlers 對齊 Items API |
-| 2.3 型別與安全   | ⚠️   | 僅 submitPayload 內集中 `as any` 並註解，符合；其餘見「待辦」                          |
-| 2.4 命名與慣例   | ✅   | 資料夾小寫、元件 PascalCase、lint:filenames 適用                                       |
-| 2.5 文件與規格   | ✅   | docs 一覽正確、無殘留 .cursor/wiki 連結                                                |
-| 2.6 架構可套用性 | ✅   | README / AGENTS.md / tool adapter 對齊                                                 |
+| 區塊             | 結果 | 備註                                                                                       |
+| ---------------- | ---- | ------------------------------------------------------------------------------------------ |
+| 2.1 分層與依賴   | ✅   | routes 薄層、API 路徑來自 paths.ts、無 component 內直接 fetch(url)                         |
+| 2.2 契約與 API   | ✅   | 契約在 shared/contracts、paths.ts 單一來源、handler-mapping 與 handlers 對齊 Items API     |
+| 2.3 型別與安全   | ✅   | 僅 submitPayload 內集中 `as any` 並註解；CR-001～CR-005 已關閉，meta 改為 getSeoFromLoader |
+| 2.4 命名與慣例   | ✅   | 資料夾小寫、元件 PascalCase、lint:filenames 適用                                           |
+| 2.5 文件與規格   | ✅   | docs 一覽正確、無殘留 .cursor/wiki 連結                                                    |
+| 2.6 架構可套用性 | ✅   | README / AGENTS.md / tool adapter 對齊                                                     |
 
 ---
 
-## 2. Clean Code 待辦
+## 2. Clean Code 待辦（CR-001～CR-005 已關閉）
 
-### §2.1 重複的 Error 訊息萃取（建議抽共用）
+### §2.1 重複的 Error 訊息萃取 — **已關閉 (CR-001)**
 
-**Issue: CR-001**
-
-**位置**：`app/root.tsx`、`app/routes/_index.tsx` 的 ErrorBoundary。
-
-**建議**：在 `app/shared/` 新增 helper（如 `getRouteErrorMessage(error: unknown): string | null`），或共用型別 + type guard，減少重複與型別斷言。
+**實作**：`app/shared/utils/errors.ts` 新增 `getRouteErrorDisplay(error)`，root 與 \_index ErrorBoundary 共用。
 
 ---
 
-### §2.2 Meta 的型別斷言過多
+### §2.2 Meta 的型別斷言過多 — **已關閉 (CR-002)**
 
-**Issue: CR-002**
-
-**位置**：`_index.tsx`、`release-notes._index.tsx`、`release-notes.$version.tsx` 的 `meta: MetaFunction<typeof loader>`。
-
-**建議**：定義共用型別（如 `SeoLoaderData`），在 loader 回傳時使用，讓 meta 內不需 `as`。
+**實作**：`app/shared/seo.server.ts` 定義 `SeoLoaderData` 與 `getSeoFromLoader(data, defaults)`，三處 meta 改用，無 `as`。
 
 ---
 
-### §2.3 handlers.ts 中 PUT / PATCH 重複邏輯
+### §2.3 handlers.ts 中 PUT / PATCH 重複邏輯 — **已關閉 (CR-003)**
 
-**Issue: CR-003**
-
-**位置**：`app/test/handlers.ts`。
-
-**建議**：抽出共用函式（如 `handleItemUpdate`），PUT/PATCH 共用以符合 DRY。
+**實作**：抽出 `handleItemUpdate(params, request)`，PUT/PATCH 共用。
 
 ---
 
-### §2.4 DELETE 是否一律經 submitFormPayload
+### §2.4 DELETE 一律經 submitFormPayload — **已關閉 (CR-004)**
 
-**Issue: CR-004**
-
-**位置**：`app/features/dish/dish.hooks.ts` 及 ingredient、recipe、vendor 的 delete hook。
-
-**建議**：改為 `submitFormPayload(fetcher, {}, { method: "DELETE", action: ... })`，或於 data-test-driven / code-review-spec 註明例外。
+**實作**：dish、ingredient、recipe、vendor 的 delete hook 皆改為 `submitFormPayload(fetcher, {}, { method: "DELETE", action: ... })`。
 
 ---
 
-### §2.5 ChatInterface 的 SSE 事件解析
+### §2.5 ChatInterface 的 SSE 事件解析 — **已關閉 (CR-005)**
 
-**Issue: CR-005**
-
-**位置**：`app/components/shared/chat/ChatInterface.tsx` 的 `parseMetaEvent` / `parseFinalEvent`。
-
-**建議**：函式上方加註解說明「SSE meta/final 事件格式目前無契約，採手動驗證」；日後若有契約可改為 schema.parse。
+**實作**：`parseMetaEvent` / `parseFinalEvent` 上方加 JSDoc，說明格式目前無契約、採手動驗證。
 
 ---
 
-## 3. 註解建議
+## 3. 註解建議（已補齊）
 
-| 位置                                                         | 建議                                                                                  |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| `app/routes/_index.tsx`                                      | 常數 `STEPS` 可加註「首頁步驟說明順序，與 i18n key 對應」。                           |
-| `app/root.tsx`                                               | 讀取 version 的 `try/catch` 可註「package.json 讀取失敗時使用預設版號，不中斷啟動」。 |
-| `app/components/app/errorboundary/ErrorBoundaryFallback.tsx` | 檔頭加一句：「用於 route 與 root ErrorBoundary 的 fallback UI」。                     |
-| `app/test/handlers.ts`                                       | PUT/PATCH 區塊可註「與 PATCH 共用更新邏輯，可抽出共用函式」。                         |
-| `release-notes.$version.tsx`                                 | loader 回傳的 `structuredData` 可註「JSON-LD 結構化資料，供 meta 使用」。             |
+| 位置                                                         | 狀態                                                             |
+| ------------------------------------------------------------ | ---------------------------------------------------------------- |
+| `app/routes/_index.tsx`                                      | 已加註「首頁步驟說明順序，與 i18n key 對應」。                   |
+| `app/root.tsx`                                               | 已加註「package.json 讀取失敗時使用預設版號，不中斷啟動」。      |
+| `app/components/app/errorboundary/ErrorBoundaryFallback.tsx` | 已加檔頭「用於 route 與 root ErrorBoundary 的 fallback UI」。    |
+| `app/test/handlers.ts`                                       | 已於 `handleItemUpdate` 加註「PUT/PATCH 共用更新邏輯」。         |
+| `release-notes.$version.tsx`                                 | 已於 `structuredData` 加註「JSON-LD 結構化資料，供 meta 使用」。 |
 
 ---
 

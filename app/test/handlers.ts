@@ -35,6 +35,36 @@ const itemsFixture = itemsFixtureRaw.map((item) => mockItemSchema.parse(item));
 const ITEMS_BY_ID_PATH = "/api/items/:itemId";
 const ERROR_ITEM_NOT_FOUND = "Item not found";
 
+/** PUT/PATCH 共用更新邏輯：依 body 更新 item，回傳 200 或 404/400。 */
+async function handleItemUpdate(params: { itemId?: string }, request: Request) {
+  const item = itemsFixture.find((i) => i.id === params.itemId);
+  if (!item) {
+    return HttpResponse.json({ error: ERROR_ITEM_NOT_FOUND }, { status: 404 });
+  }
+  const raw = (await request.json()) as unknown;
+  const parsed = updateItemRequestSchema.safeParse(raw);
+  if (
+    !parsed.success ||
+    (parsed.data.name === undefined && parsed.data.description === undefined)
+  ) {
+    return HttpResponse.json(
+      { error: "Provide name or description to update" },
+      { status: 400 }
+    );
+  }
+  const updated = mockItemSchema.parse({
+    ...item,
+    name: parsed.data.name ?? item.name,
+    description:
+      parsed.data.description !== undefined
+        ? parsed.data.description
+        : item.description,
+    updatedAt: new Date().toISOString(),
+  });
+  const body = getItemResponseSchema.parse({ data: updated });
+  return HttpResponse.json(body);
+}
+
 // ---------- Items API handlers（response 經契約 schema 驗證） ----------
 export const itemsHandlers = [
   http.get("/api/items", () => {
@@ -72,70 +102,13 @@ export const itemsHandlers = [
     return HttpResponse.json(body, { status: 201 });
   }),
 
-  // TODO(CR-003): share PUT/PATCH logic via handleItemUpdate
-  http.put(ITEMS_BY_ID_PATH, async ({ params, request }) => {
-    const item = itemsFixture.find((i) => i.id === params.itemId);
-    if (!item) {
-      return HttpResponse.json(
-        { error: ERROR_ITEM_NOT_FOUND },
-        { status: 404 }
-      );
-    }
-    const raw = (await request.json()) as unknown;
-    const parsed = updateItemRequestSchema.safeParse(raw);
-    if (
-      !parsed.success ||
-      (parsed.data.name === undefined && parsed.data.description === undefined)
-    ) {
-      return HttpResponse.json(
-        { error: "Provide name or description to update" },
-        { status: 400 }
-      );
-    }
-    const updated = mockItemSchema.parse({
-      ...item,
-      name: parsed.data.name ?? item.name,
-      description:
-        parsed.data.description !== undefined
-          ? parsed.data.description
-          : item.description,
-      updatedAt: new Date().toISOString(),
-    });
-    const body = getItemResponseSchema.parse({ data: updated });
-    return HttpResponse.json(body);
-  }),
+  http.put(ITEMS_BY_ID_PATH, async ({ params, request }) =>
+    handleItemUpdate(params, request)
+  ),
 
-  http.patch(ITEMS_BY_ID_PATH, async ({ params, request }) => {
-    const item = itemsFixture.find((i) => i.id === params.itemId);
-    if (!item) {
-      return HttpResponse.json(
-        { error: ERROR_ITEM_NOT_FOUND },
-        { status: 404 }
-      );
-    }
-    const raw = (await request.json()) as unknown;
-    const parsed = updateItemRequestSchema.safeParse(raw);
-    if (
-      !parsed.success ||
-      (parsed.data.name === undefined && parsed.data.description === undefined)
-    ) {
-      return HttpResponse.json(
-        { error: "Provide name or description to update" },
-        { status: 400 }
-      );
-    }
-    const updated = mockItemSchema.parse({
-      ...item,
-      name: parsed.data.name ?? item.name,
-      description:
-        parsed.data.description !== undefined
-          ? parsed.data.description
-          : item.description,
-      updatedAt: new Date().toISOString(),
-    });
-    const body = getItemResponseSchema.parse({ data: updated });
-    return HttpResponse.json(body);
-  }),
+  http.patch(ITEMS_BY_ID_PATH, async ({ params, request }) =>
+    handleItemUpdate(params, request)
+  ),
 
   http.delete(ITEMS_BY_ID_PATH, ({ params }) => {
     const item = itemsFixture.find((i) => i.id === params.itemId);

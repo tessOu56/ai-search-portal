@@ -23,7 +23,10 @@ type LuiMeta = {
   nextSteps?: string[];
 };
 
-// TODO(CR-005): add SSE meta/final comment or schema
+/**
+ * 解析 SSE meta 事件 payload。目前 LUI chat API 的 meta/final 事件格式尚無契約 schema，
+ * 採手動驗證；日後若有契約可改為 schema.parse。
+ */
 function parseMetaEvent(data: string) {
   const parsed: unknown = JSON.parse(data);
   if (!parsed || typeof parsed !== "object") return null;
@@ -35,6 +38,9 @@ function parseMetaEvent(data: string) {
   };
 }
 
+/**
+ * 解析 SSE final 事件 payload（sources、nextSteps）。格式目前無契約，採手動驗證。
+ */
 function parseFinalEvent(data: string) {
   const parsed: unknown = JSON.parse(data);
   if (!parsed || typeof parsed !== "object") return null;

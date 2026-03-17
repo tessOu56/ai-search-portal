@@ -1,3 +1,6 @@
+/**
+ * 用於 route 與 root ErrorBoundary 的 fallback UI。
+ */
 import type { ReactNode } from "react";
 
 import { Button } from "~/components/ui/Button";

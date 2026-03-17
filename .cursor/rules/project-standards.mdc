@@ -16,6 +16,7 @@ This portal is the **skeleton for aggregating and organizing information systems
 ## Architecture
 - **Two pillars**：Clean architecture with docs/product as spec hub (`docs/architecture/clean-architecture.md`); semi-automated UI via design system (`docs/architecture/design-system.md`, `docs/DESIGN_SYSTEM.md`).
 - **Five layers**（`docs/architecture/repo-layers.md`）：**app** (shell: routes, root, entry) → **features** → **components** (ui/shared/app) → **services** (`app/services/*`, `app/shared/*`) → **infra** (optional). Features must not depend on other features; components must not depend on features.
+- **Design system / Figma MCP**（`docs/architecture/figma-mcp.md`）：Token canonical 在 repo。使用 Figma MCP 時：僅可更新既有 token 數值與 docs，不可新增 primitive token（未定義 token 標記待人工確認）；不新增 UI component 或 primitive variant，新增須人工確認；不依 Figma frame 生成或修改 layout，layout 權威在 repo。見 AGENT_CAPABILITIES.md 與 figma-mcp §4。
 - Feature code in `app/features/*` (hooks/server/types).
 - Shared code in `app/shared/*`, app services in `app/services/*`.
 - Routes in `app/routes/*` only coordinate UI + data flow.

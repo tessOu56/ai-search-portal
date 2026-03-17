@@ -7,6 +7,73 @@ export type SeoMetaInput = {
   type?: "website" | "article";
 };
 
+/** Loader 回傳給 meta 的 SEO 欄位形狀，供 route meta 使用以避免型別斷言 */
+export type SeoLoaderData = {
+  title: string;
+  description: string;
+  canonical: string;
+  image?: string;
+  locale: string;
+  structuredData: Record<string, unknown>[];
+};
+
+const DEFAULT_SEO: SeoLoaderData = {
+  title: "AI 搜尋入口",
+  description: "智能 AI 搜尋平台",
+  canonical: "",
+  locale: "zh_TW",
+  structuredData: [],
+};
+
+function toStructuredData(
+  raw: unknown,
+  fallback: Record<string, unknown>[]
+): Record<string, unknown>[] {
+  if (!Array.isArray(raw)) return fallback;
+  return raw.filter(
+    (item): item is Record<string, unknown> =>
+      typeof item === "object" && item !== null
+  );
+}
+
+/**
+ * 從 loader data 取出 SEO 欄位並補預設值，供 meta 使用，避免在 route 內做型別斷言。
+ */
+// eslint-disable-next-line complexity -- data shape branches for title/description/canonical/locale/image/structuredData
+export function getSeoFromLoader(
+  data: unknown,
+  defaults: Partial<SeoLoaderData> = {}
+): SeoLoaderData {
+  const d =
+    data && typeof data === "object" ? (data as Record<string, unknown>) : null;
+  if (!d) return { ...DEFAULT_SEO, ...defaults };
+  const imageVal =
+    typeof d.image === "string" ? d.image : (defaults.image ?? undefined);
+  return {
+    title:
+      typeof d.title === "string"
+        ? d.title
+        : (defaults.title ?? DEFAULT_SEO.title),
+    description:
+      typeof d.description === "string"
+        ? d.description
+        : (defaults.description ?? DEFAULT_SEO.description),
+    canonical:
+      typeof d.canonical === "string"
+        ? d.canonical
+        : (defaults.canonical ?? DEFAULT_SEO.canonical),
+    ...(imageVal !== undefined && { image: imageVal }),
+    locale:
+      typeof d.locale === "string"
+        ? d.locale
+        : (defaults.locale ?? DEFAULT_SEO.locale),
+    structuredData: toStructuredData(
+      d.structuredData,
+      defaults.structuredData ?? DEFAULT_SEO.structuredData
+    ),
+  };
+}
+
 const SCHEMA_ORG_CONTEXT = "https://schema.org";
 
 export type MetaDescriptor =

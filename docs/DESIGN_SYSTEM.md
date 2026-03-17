@@ -5,6 +5,12 @@
 這份設計系統文件用來維持 UI 一致性與可維護性；專案朝向 **半自動化 UI** 逐漸建立 design system（見 [docs/architecture/design-system.md](architecture/design-system.md)）。
 本專案採用 shadcn/ui 作為元件基礎，確保可維護且可客製。
 
+## Token Source of Truth
+
+- **Design token 的 canonical 在 repo**（不在 Figma）。
+- 理由：CI 可驗證、version control、code review。Figma 設計稿經 MCP 讀取後，由人工或 AI 依 mapping 更新 repo 內 token（如 `app/tailwind.css`），再由 CI 保護。
+- 設計稿與 token 同步流程見 [docs/architecture/figma-mcp.md](architecture/figma-mcp.md)。
+
 ## Design Tokens
 
 - Brand scale: `brand-50` ~ `brand-900`

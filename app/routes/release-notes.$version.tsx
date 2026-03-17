@@ -14,6 +14,7 @@ import {
   buildSeoMeta,
   getCanonicalUrl,
   getOrigin,
+  getSeoFromLoader,
 } from "~/shared/seo.server";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
@@ -39,6 +40,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   }
 
   const title = `v${note.version} - ${pageTitle}`;
+  /** JSON-LD 結構化資料，供 meta 使用 */
   const structuredData = [
     buildJsonLdArticle(canonical, title, note.summary, note.date, {
       inLanguage: locale,
@@ -61,21 +63,17 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  // TODO(CR-002): use SeoLoaderData to remove as assertions
-  const title = (data?.title as string) ?? "版本說明";
-  const description = (data?.description as string) ?? "";
-  const canonical = (data?.canonical as string) ?? "";
-  const locale = (data?.locale as string) ?? "zh_TW";
-  const structuredData =
-    (data?.structuredData as Record<string, unknown>[]) ?? [];
+  const seo = getSeoFromLoader(data, { title: "版本說明" });
   const metaTags = buildSeoMeta({
-    title,
-    description: description || title,
-    canonical,
-    locale,
+    title: seo.title,
+    description: seo.description || seo.title,
+    canonical: seo.canonical,
+    locale: seo.locale,
     type: "article",
   });
-  const jsonLdTags = structuredData.map((obj) => ({ "script:ld+json": obj }));
+  const jsonLdTags = seo.structuredData.map((obj) => ({
+    "script:ld+json": obj,
+  }));
   return [...metaTags, ...jsonLdTags];
 };
 

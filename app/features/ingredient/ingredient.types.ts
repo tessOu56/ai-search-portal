@@ -38,5 +38,3 @@ export interface UpdateIngredientInput {
   properties?: string[];
   region?: string;
 }
-
-

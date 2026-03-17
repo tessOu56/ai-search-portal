@@ -20,7 +20,7 @@
 
 ## 小結
 
-| 類型         | 作法                     | 參考 |
-|--------------|--------------------------|------|
-| 日常 patch/minor | 依流程更新、跑 CI/test | [local-dev](../runbooks/local-dev.md)、[packages-react](packages-react.md) |
-| 重大升級     | 先討論、再排期、必要時寫 ADR | [adr/](../adr/)、[upgrade-v7-discussion](../adr/upgrade-v7-discussion.md) |
+| 類型             | 作法                         | 參考                                                                       |
+| ---------------- | ---------------------------- | -------------------------------------------------------------------------- |
+| 日常 patch/minor | 依流程更新、跑 CI/test       | [local-dev](../runbooks/local-dev.md)、[packages-react](packages-react.md) |
+| 重大升級         | 先討論、再排期、必要時寫 ADR | [adr/](../adr/)、[upgrade-v7-discussion](../adr/upgrade-v7-discussion.md)  |

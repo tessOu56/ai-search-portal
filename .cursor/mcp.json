@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "figma": {
+      "command": "npm",
+      "args": ["run", "start", "--prefix", "tools/figma-mcp"],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "",
+        "FIGMA_FILE_KEY": ""
+      }
+    }
+  }
+}

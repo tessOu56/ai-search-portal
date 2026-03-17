@@ -1,0 +1,20 @@
+{
+  "name": "@ai-search-portal/figma-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Figma MCP server (read-only): get_file, get_variables, get_component_spec",
+  "bin": {
+    "figma-mcp": "server.mjs"
+  },
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.0",
+    "zod": "^3.23.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

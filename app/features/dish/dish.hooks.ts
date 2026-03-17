@@ -104,14 +104,7 @@ export function useDeleteDish() {
   const fetcher = useFetcher<{ success: boolean; error?: string }>();
 
   const deleteDish = (id: string) => {
-    // TODO(CR-004): use submitFormPayload for DELETE
-    fetcher.submit(
-      {},
-      {
-        method: "DELETE",
-        action: apiDish(id),
-      }
-    );
+    submitFormPayload(fetcher, {}, { method: "DELETE", action: apiDish(id) });
   };
 
   return {
