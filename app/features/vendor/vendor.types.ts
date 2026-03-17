@@ -86,5 +86,3 @@ export interface CreateDishVendorInput {
   availability?: boolean;
   notes?: string;
 }
-
-

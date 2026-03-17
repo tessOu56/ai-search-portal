@@ -71,7 +71,7 @@ Delta/Parquet 的核心價值是：把**檔案型資料湖**變成**可治理的
 | OpenAPI      | 無                                        | 可選：由 Zod 產 JSON Schema 或由 OpenAPI 產 Zod            |
 | 前端資料取得 | Remix `useFetcher` / loader               | 契約 + handler + CI 已就緒；可選加 TanStack Query 做 cache |
 | Contract     | Zod（`app/shared/contracts/`）            | 維持單一來源；handler/route 皆 parse                       |
-| Mock         | MSW handler，response 經 schema            | 補 Mock Dataset 版本化（datasets/v1, v2）                  |
+| Mock         | MSW handler，response 經 schema           | 補 Mock Dataset 版本化（datasets/v1, v2）                  |
 | CI           | lint:handlers、schema 於 handler 內 parse | 可選：contract test 對 staging、dataset version 檢查       |
 
 **優先優化目標**：本專案已選 **(1) 多人協作下的串接速度與穩定性**（contract + MSW + CI）。若之後要同時優化 **(2) 頁面效能與網路效率**，順序為：先鞏固 contract + service layer，再導入 TanStack Query / BFF。

@@ -25,6 +25,12 @@
 - **features / services / shared**：可為小寫 + 點號（如 `dish.server.ts`、`dish.types.ts`）或小寫（如 `cn.ts`、`errors.ts`），與現有專案一致即可。
 - **routes**：依 Remix 慣例（如 `_index.tsx`、`api.chat.ts`），不在此命名檢查範圍。
 
+### 元件層：ui vs theme（骨架 vs kit 表面）
+
+- **Primitive 元件**：一律放在 `app/components/ui/*`；不隨 UI kit 更換而搬動。
+- **與特定 UI kit 綁定的樣式或 wrapper**：放在 `app/components/theme/*`（可隨 kit 替換）。
+- **禁止**：在 `app/components/ui/*` 內依 kit 再分子目錄（例如不用 `ui/core/`、`ui/kit/`）；骨架保持單一 primitive 層。見 [design-system 骨架 vs 視覺](../architecture/design-system.md#骨架-vs-視覺ui-kit)。
+
 ### 簡表
 
 | 位置                         | 類型      | 規則           | 範例                        |

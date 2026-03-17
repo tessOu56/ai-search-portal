@@ -24,12 +24,12 @@ This file describes this repo’s **canonical capability boundaries**, **context
 
 ## Context Layers
 
-| Layer                     | Purpose                                      | This repo                          |
-| ------------------------- | -------------------------------------------- | ---------------------------------- |
-| **Contract**              | Verifiable contracts; code and agents obey   | `specs/`, `app/shared/contracts/`  |
-| **Engineering knowledge** | Architecture, conventions, runbooks, product | `docs/` (architecture, conventions, runbooks, product) |
-| **Organizational context**| Decisions, meetings, product context (optional) | Optional `docs/context/` or external; future RAG |
-| **Agent entry**           | What to read first, workflow, prohibitions   | [AGENTS.md](AGENTS.md), this file  |
+| Layer                      | Purpose                                         | This repo                                              |
+| -------------------------- | ----------------------------------------------- | ------------------------------------------------------ |
+| **Contract**               | Verifiable contracts; code and agents obey      | `specs/`, `app/shared/contracts/`                      |
+| **Engineering knowledge**  | Architecture, conventions, runbooks, product    | `docs/` (architecture, conventions, runbooks, product) |
+| **Organizational context** | Decisions, meetings, product context (optional) | Optional `docs/context/` or external; future RAG       |
+| **Agent entry**            | What to read first, workflow, prohibitions      | [AGENTS.md](AGENTS.md), this file                      |
 
 ---
 
@@ -41,7 +41,7 @@ Each class is described by: primary inputs, modifiable scope, out-of-scope, suit
 
 - **Primary inputs**: Branch-local `specs/`, `docs/`, [AGENTS.md](AGENTS.md), source code, schema, tests, config.
 - **Modifiable scope**: Code and tests under `app/`; `docs/` and `specs/` may be updated when following conventions.
-- **Out of scope**: Must not `fetch()` URLs outside the contract in components; must not violate dependency rules in [docs/architecture/repo-layers.md](docs/architecture/repo-layers.md); must use `git rm` when deleting tracked files to preserve history.
+- **Out of scope**: Must not `fetch()` URLs outside the contract in components; must not violate dependency rules in [docs/architecture/repo-layers.md](docs/architecture/repo-layers.md); must use `git rm` when deleting tracked files to preserve history. When design-system or Figma MCP is in use: (1) must not add new UI components or new primitive variants without human confirmation; may update design tokens (values only) and docs only; (2) **Token policy**: may only modify existing token values, must not add new primitive tokens—if design has undefined tokens, mark for human confirmation; (3) must not add or change layout based on Figma frame spec; layout authority stays in repo patterns (see [docs/architecture/figma-mcp.md](docs/architecture/figma-mcp.md) §4).
 - **Suitable tasks**: Completion, refactor, feature implementation, bug fixes, tests, updating docs to match changes.
 - **Tools**: Request only contract-defined paths via useFetcher or shared api; must not call arbitrary external APIs from UI.
 - **External knowledge**: Repo canonical sources only; no default reliance on external wiki.

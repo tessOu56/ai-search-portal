@@ -20,5 +20,3 @@ export interface NutritionPerUnit {
   fiber?: number; // 纖維（g）
   // 其他營養素可以在此擴充
 }
-
-

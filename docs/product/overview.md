@@ -8,6 +8,7 @@
 
 ## 專案定位
 
+- **階段**：現階段為 **v1** — 聚焦**規劃架構與 mock 模擬真實後端互動**；尚未接真實後端，所有對外資料流以契約 + MSW mock 為主。領域 API（dishes / ingredients / recipes / vendors）於 v1 為 mock／待補。
 - **產品名稱**：AI Search Portal（AI 搜尋入口）
 - **角色**：匯聚與整理多個資訊系統的**骨架/入口**；新功能以模組化入口設計，不在此專案內實作完整後端，以 mock / 輕量整合為主。
 - **使用者價值**：透過 LUI（Language User Interface）釐清意圖 → 給出結論與依據 → 提供可執行下一步；UI/UX 作為服務地圖，LUI 作為信任指引。

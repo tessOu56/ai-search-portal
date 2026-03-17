@@ -4,19 +4,21 @@
 
 本文件為依 [Code Review 規範](code-review-spec.md) 與實際目錄／程式所做的盤查結果，供後續階段對齊與改進參考。
 
-**盤查日期**：2026-03（依實際執行日更新）
+**盤查日期**：2026-03-16（CR-001～CR-005 已關閉；v1 階段說明已補於 docs/product/overview.md）
+
+**本次盤查**：依 [code-review-spec](code-review-spec.md) 覆核；`lint:filenames`、`lint:handlers`、`typecheck`、`lint`、`test` 皆通過；無 missing/orphan CR TODO；`as any` 僅存於 `submitPayload.ts` 並已註解，符合規範。docs 入口與一覽連結正確，無殘留 .cursor/wiki。
 
 ---
 
 ## 1. 檢查結果摘要
 
-| 項目 | 結果 | 說明 |
-|------|------|------|
-| lint:filenames | ✅ 通過 | 資料夾小寫、元件檔 PascalCase 符合 |
-| lint:handlers | ✅ 通過 | 需 handler 的 API（/api/items）皆有對應 MSW handler |
-| typecheck | ✅ 通過 | 無型別錯誤 |
-| lint (ESLint) | ✅ 通過 | 無違規 |
-| test | ✅ 通過 | 契約單元 + Items API 整合（MSW mock） |
+| 項目           | 結果    | 說明                                                |
+| -------------- | ------- | --------------------------------------------------- |
+| lint:filenames | ✅ 通過 | 資料夾小寫、元件檔 PascalCase 符合                  |
+| lint:handlers  | ✅ 通過 | 需 handler 的 API（/api/items）皆有對應 MSW handler |
+| typecheck      | ✅ 通過 | 無型別錯誤                                          |
+| lint (ESLint)  | ✅ 通過 | 無違規                                              |
+| test           | ✅ 通過 | 契約單元 + Items API 整合（MSW mock）               |
 
 ---
 
@@ -66,15 +68,15 @@
 
 ## 5. 待改進與建議
 
-| 項目 | 優先 | 說明 |
-|------|------|------|
-| **單元／整合測試** | 已補 | 已新增 `app/shared/contracts/items.contract.test.ts`（契約 parse）、`app/test/api.items.integration.test.ts`（GET /api/items 透過 MSW mock）；全部使用 mock。 |
-| **dishes/ingredients/recipes/vendors API** | 低 | 若產品需要真實 API：補 `api.dishes` 等 route 與對應 handler，並更新 handler-mapping；若僅 mock：在 handler-mapping 或 docs 註明「僅前端 mock，無 route」。 |
-| **ESLint 設定** | 低 | Remix 提示 `@remix-run/eslint-config` 將在 v7 棄用；可規劃改用官方建議之 ESLint 設定。 |
-| **docs/CAPABILITIES.md 區隔** | 低 | 可於檔頭加一句區隔「專案能力現況」與根目錄「AGENT_CAPABILITIES」避免混淆。 |
+| 項目                                       | 優先   | 說明                                                                                                                                                          |
+| ------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **單元／整合測試**                         | 已補   | 已新增 `app/shared/contracts/items.contract.test.ts`（契約 parse）、`app/test/api.items.integration.test.ts`（GET /api/items 透過 MSW mock）；全部使用 mock。 |
+| **dishes/ingredients/recipes/vendors API** | 低     | v1 維持 mock／待補；若產品需要真實 API：補 `api.dishes` 等 route 與 handler，並更新 handler-mapping。                                                         |
+| **ESLint 設定**                            | 低     | Remix 提示 `@remix-run/eslint-config` 將在 v7 棄用；可規劃改用官方建議之 ESLint 設定。                                                                        |
+| **docs/CAPABILITIES.md 區隔**              | 已具備 | 檔頭已註明與根目錄 AGENT_CAPABILITIES.md 之區隔（專案能力現況 vs agent 能力邊界）。                                                                           |
 
 ---
 
 ## 6. 小結
 
-專案在**分層、命名、路徑單一來源、型別與契約、文件與 Code Review 規範**上與現況一致；本次已修正 infra README 與 CONVENTIONS 連結。後續可優先補測試、再視需求補齊領域 API 或註明 mock-only，並依 [code-review-spec](code-review-spec.md) 在每階段工作後覆核。
+專案在**分層、命名、路徑單一來源、型別與契約、文件與 Code Review 規範**上與現況一致。CR-001～CR-005 已關閉；v1 階段說明已於 overview 標示；CAPABILITIES.md 與 AGENT_CAPABILITIES 區隔已具備。後續可視需求補齊領域 API 或註明 mock-only，並依 [code-review-spec](code-review-spec.md) 在每階段工作後覆核。

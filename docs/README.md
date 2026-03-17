@@ -24,6 +24,9 @@
 - [repo-layers](architecture/repo-layers.md) — 五層分層、依賴方向 【reference／1】
 - [clean-architecture](architecture/clean-architecture.md) — 業務規格中樞、Spec→Contract→Mock→Test→UI 【reference／2】
 - [design-system](architecture/design-system.md) — Design System 與半自動化 UI 【reference／2】
+- [design-system-references](architecture/design-system-references.md) — Reference-based 設計系統、外部 UI kit 對照與單一實作層 【reference／2】
+- [figma-mcp](architecture/figma-mcp.md) — Figma MCP 架構、Token 轉換層、導入順序、唯讀 tools 【reference／2】
+- [design-pattern-ui-kit](architecture/design-pattern-ui-kit.md) — Figma UI kit 選型評估、候選對照、導入前驗證 【reference／2】
 - [data-flow](architecture/data-flow.md) — 請求與契約資料流 【reference／2】
 - [data-governance](architecture/data-governance.md) — 資料治理與前端對等 【reference／2】
 
@@ -43,6 +46,7 @@
 
 - [local-dev](runbooks/local-dev.md) — 分支、PR、CI、依賴更新 【runbook／1】
 - [deployment](runbooks/deployment.md) — Vercel、Changesets 【runbook／2】
+- [figma-to-deploy-workflow](runbooks/figma-to-deploy-workflow.md) — AI-assisted Design-to-Code Pipeline（Figma → MCP → Repo → CI → Vercel） 【runbook／2】
 
 ### Product
 

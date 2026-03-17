@@ -115,13 +115,10 @@ export function useDeleteIngredient() {
   const fetcher = useFetcher<{ success: boolean; error?: string }>();
 
   const deleteIngredient = (id: string) => {
-    // TODO(CR-004): use submitFormPayload for DELETE
-    fetcher.submit(
+    submitFormPayload(
+      fetcher,
       {},
-      {
-        method: "DELETE",
-        action: apiIngredient(id),
-      }
+      { method: "DELETE", action: apiIngredient(id) }
     );
   };
 

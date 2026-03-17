@@ -35,13 +35,13 @@
 
 ## 角色對應
 
-| 角色           | 職責                                    |
-| -------------- | --------------------------------------- |
-| **Spec**       | 業務範圍、資料流、驗收；docs/product / ticket    |
-| **Contract**   | Zod schema；request/response 可驗證     |
-| **Mock (MSW)** | Handler 產出經 schema parse；可執行規格 |
-| **Test**       | 依 handler 與 fixture；可先於 UI        |
-| **UI**         | 只打契約路徑；不直接 fetch 硬編碼       |
+| 角色           | 職責                                          |
+| -------------- | --------------------------------------------- |
+| **Spec**       | 業務範圍、資料流、驗收；docs/product / ticket |
+| **Contract**   | Zod schema；request/response 可驗證           |
+| **Mock (MSW)** | Handler 產出經 schema parse；可執行規格       |
+| **Test**       | 依 handler 與 fixture；可先於 UI              |
+| **UI**         | 只打契約路徑；不直接 fetch 硬編碼             |
 
 ---
 

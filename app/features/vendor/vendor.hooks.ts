@@ -140,14 +140,7 @@ export function useDeleteVendor() {
   const fetcher = useFetcher<{ success: boolean; error?: string }>();
 
   const deleteVendor = (id: string) => {
-    // TODO(CR-004): use submitFormPayload for DELETE
-    fetcher.submit(
-      {},
-      {
-        method: "DELETE",
-        action: apiVendor(id),
-      }
-    );
+    submitFormPayload(fetcher, {}, { method: "DELETE", action: apiVendor(id) });
   };
 
   return {

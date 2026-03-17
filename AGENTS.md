@@ -40,7 +40,7 @@
 
 - **五層**：app (shell) | features | components | services | infra（可選）。目錄對應與依賴方向：[docs/architecture/repo-layers.md](docs/architecture/repo-layers.md)。
 - **總覽**（Tech stack、Data Flow）：[docs/architecture/system-overview.md](docs/architecture/system-overview.md)。
-- **Design System**：[docs/architecture/design-system.md](docs/architecture/design-system.md)、[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)。
+- **Design System**：[docs/architecture/design-system.md](docs/architecture/design-system.md)、[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)。**Figma MCP**（選用）：[docs/architecture/figma-mcp.md](docs/architecture/figma-mcp.md)、`tools/figma-mcp/`；需在 Cursor 設定 `FIGMA_ACCESS_TOKEN`，見 [figma-to-deploy-workflow](docs/runbooks/figma-to-deploy-workflow.md)。
 
 ---
 

@@ -1,4 +1,5 @@
 import "./tailwind.css";
+import "./styles/themes/untitled.css";
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -6,7 +7,6 @@ import path from "node:path";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
-  isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
@@ -20,6 +20,7 @@ import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { ensureSeeded } from "~/services/seed.server";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
+import { getRouteErrorDisplay } from "~/shared/utils/errors";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -47,7 +48,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     >;
     version = typeof pkg.version === "string" ? pkg.version : version;
   } catch {
-    // ignore
+    // package.json 讀取失敗時使用預設版號，不中斷啟動
   }
   return json({ locale, translations, version });
 }
@@ -101,30 +102,12 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-
-  if (isRouteErrorResponse(error)) {
-    const title =
-      error.status === 404 ? "找不到頁面" : `發生錯誤 (${error.status})`;
-    // TODO(CR-001): normalize error message mapping
-    const dataMessage =
-      error.data &&
-      typeof (error.data as { message?: unknown }).message === "string"
-        ? (error.data as { message: string }).message
-        : null;
-    const message =
-      error.status === 404
-        ? "您要前往的頁面不存在，請檢查網址或返回首頁。"
-        : (dataMessage ?? error.statusText ?? "請稍後再試。");
-    return (
-      <ErrorBoundaryFallback
-        title={title}
-        message={message}
-        statusCode={error.status}
-      />
-    );
-  }
-
-  const message =
-    error instanceof Error ? error.message : "發生未預期的錯誤，請稍後再試。";
-  return <ErrorBoundaryFallback title="出了點問題" message={message} />;
+  const { title, message, statusCode } = getRouteErrorDisplay(error);
+  return (
+    <ErrorBoundaryFallback
+      title={title}
+      message={message}
+      statusCode={statusCode}
+    />
+  );
 }
