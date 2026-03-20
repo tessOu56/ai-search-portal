@@ -43,7 +43,18 @@
 
 ---
 
+## 對應頁面（v1）
+
+- `/items`：列表頁
+- `/items/new`：新增頁
+- `/items/:itemId`：單筆詳情與編輯頁
+
+頁面 route：`app/routes/items.tsx`、`app/routes/items._index.tsx`、`app/routes/items.new.tsx`、`app/routes/items.$itemId.tsx`
+
+---
+
 ## 檔案對應
 
 - 路由：`app/routes/api.items.ts`（list, create）、`app/routes/api.items.$itemId.ts`（get, update, delete）
+- 頁面：`app/routes/items.tsx`、`app/routes/items._index.tsx`、`app/routes/items.new.tsx`、`app/routes/items.$itemId.tsx`
 - 服務：`app/services/mock-items.server.ts`（listMockItems, getMockItem, createMockItem, updateMockItem, deleteMockItem）
