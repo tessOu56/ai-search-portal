@@ -27,6 +27,7 @@
 ### 2.1 目錄結構
 
 - **app/**：routes、features、components（ui / shared / app）、services、shared、infra、test 齊全；符合 [repo-layers](architecture/repo-layers.md)。
+- **功能頁面（v1）**：已新增 `items`、`dishes`、`recipes` 三組 route（列表/詳情，items 含新增與編輯），作為從 mock 架構走向實際功能頁面的第一步。
 - **docs/**：architecture、conventions、runbooks、product 與 [docs/README](README.md) 一覽一致；根目錄 stub（ARCHITECTURE、CONVENTIONS、DEVELOPMENT）連結正確。
 - **specs/**：api/（handler-mapping、contract-schema）、schemas/（README）存在。
 

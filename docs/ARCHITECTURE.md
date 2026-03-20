@@ -8,4 +8,5 @@
 - **五層分層與依賴方向**：[docs/architecture/repo-layers.md](architecture/repo-layers.md)
 - **乾淨架構與業務規格**：[docs/architecture/clean-architecture.md](architecture/clean-architecture.md)
 - **Design System**：[docs/architecture/design-system.md](architecture/design-system.md)、[DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)
+- **進階架構（Figma / references）**：詳見 [docs/README.md](README.md) 的 architecture 一覽
 - **文件索引**：[docs/README.md](README.md)

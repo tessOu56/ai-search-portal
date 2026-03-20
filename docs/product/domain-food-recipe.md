@@ -53,6 +53,15 @@ Ingredient（原料）──┬── IngredientUsage ──► Dish（食物）
 
 ---
 
+## 對應頁面（v1）
+
+- `/dishes`、`/dishes/:dishId`：Dish 列表與詳情（含相關 Recipe/Vendor）
+- `/recipes`、`/recipes/:recipeId`：Recipe 列表與詳情
+
+說明：v1 領域頁面先採 **mock + server 直讀**（`app/features/*/*.server.ts`），暫不依賴完整領域 Resource Routes。
+
+---
+
 ## 現況儲存
 
 - 全部為 **in-memory Map**，重啟後清空。
