@@ -42,8 +42,8 @@
 ## 檢查方式
 
 - **ESLint**：程式碼與 import 等由既有 ESLint 規則檢查。
-- **檔名 / 資料夾名**：由 `npm run lint:filenames` 檢查，CI 與 pre-commit 會執行。
-- 新增或重新命名檔案、資料夾後請執行 `npm run lint:filenames` 或透過 commit 觸發檢查。
+- **檔名 / 資料夾名**：由 `pnpm run lint:filenames` 檢查，CI 與 pre-commit 會執行。
+- 新增或重新命名檔案、資料夾後請執行 `pnpm run lint:filenames` 或透過 commit 觸發檢查。
 
 ## AI 輔助開發（Cursor / 其他）
 

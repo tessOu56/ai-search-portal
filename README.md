@@ -26,22 +26,22 @@
 ## 開發
 
 ```bash
-# 安裝依賴
-npm install
+# 安裝依賴（需先 corepack enable，見 CONTRIBUTING.md）
+pnpm install
 
 # 啟動開發伺服器
-npm run dev
+pnpm run dev
 
 # 建置生產版本
-npm run build
+pnpm run build
 
 # 啟動生產伺服器
-npm start
+pnpm start
 ```
 
 ## 開發流程（協作規範）
 
-- 本地檢查：`npm run lint`、`npm run typecheck`
+- 本地檢查：`pnpm run lint`、`pnpm run typecheck`
 - 預提交：`lint-staged` 自動修正 ESLint/Prettier
 - CI：PR 必跑 `lint:strict` + `typecheck` + `knip`
 
@@ -59,13 +59,16 @@ npm start
 
 1. 將專案推送到 GitHub 倉庫
 2. 前往 [Vercel](https://vercel.com) 並登入
-3. 導入 GitHub 倉庫
-4. Vercel 會自動偵測 Remix 專案並完成部署
+3. 導入 GitHub 倉庫並綁定專案（取得 `VERCEL_TOKEN` / `ORG_ID` / `PROJECT_ID`）
+4. 在 GitHub Actions 使用：
+   - `.github/workflows/release.yml`（手動建立版本 tag + GitHub Release）
+   - `.github/workflows/deploy-vercel.yml`（手動部署 preview/production，可指定 ref）
+5. 建議在 GitHub 設定 `production` environment reviewers，以控制上線權限
 
 ### 方法 2: 使用其他 Node.js 平台
 
 - **Railway**: 連接 GitHub 倉庫即可自動部署
-- **Render**: 選擇 Node.js 環境並設定建置命令為 `npm run build`
+- **Render**: 選擇 Node.js 環境並設定建置命令為 `pnpm run build`（並啟用 pnpm／Corepack 與本 repo 的 `packageManager`）
 - **Fly.io**: 需要額外設定 Dockerfile
 
 ## 功能

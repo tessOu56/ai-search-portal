@@ -4,7 +4,7 @@
 
 ## 警告訊息是什麼？
 
-執行 `npm run lint` 時若看到：
+執行 `pnpm run lint` 時若看到：
 
 ```text
 REMIX FUTURE CHANGE: The `@remix-run/eslint-config` package is deprecated

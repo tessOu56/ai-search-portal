@@ -1,14 +1,19 @@
 /**
- * API 契約匯出：Zod schema 與型別。
- * 新增 API 時在此目錄新增 <feature>.contract.ts 並在此 re-export。
+ * 對外 API 契約唯一入口：re-export `@ai-search-portal/contracts`。
+ * 禁止在本目錄新增 `*.contract.ts`（Zod 定義僅能存在於 packages/shared-contracts）。
  */
 
-export type { MockItemContract } from "./items.contract";
+export type { MockItemContract } from "@ai-search-portal/contracts";
 export {
+  chatQueryParamsSchema,
   createItemRequestSchema,
   errorResponseSchema,
   getItemResponseSchema,
   listItemsResponseSchema,
   mockItemSchema,
+  stableChatErrorSchema,
+  stableChatFinalSchema,
+  stableChatMetaSchema,
+  stableToolStatusSchema,
   updateItemRequestSchema,
-} from "./items.contract";
+} from "@ai-search-portal/contracts";

@@ -13,9 +13,9 @@
 
 ## End-to-End Workflow
 
-1. **Setup**：`npm install` → `npm run dev`
+1. **Setup**：`pnpm install` → `pnpm run dev`（建議 `corepack enable` 對齊 `packageManager`）
 2. **Code**：修改 app/features、app/components、app/services、app/shared 等
-3. **Before PR**：`npm run build`、`npm run test`、`npm run lint:ci`
+3. **Before PR**：`pnpm run build`、`pnpm run test`、`pnpm run lint:ci`
 4. **Commit**：Conventional Commits（feat / fix / docs / chore / refactor / test）
 5. **Delete files**：用 `git rm <path>` 以保留操作紀錄；空資料夾 Git 不追蹤，可手動刪除。見 [docs/conventions/git-version-control.md](docs/conventions/git-version-control.md)
 
@@ -32,7 +32,7 @@
 
 - **Commands**：`lint:filenames`、`lint`（或 `lint:ci`）、`typecheck`、`test`
 - **CI**：`.github/workflows/ci.yml`（build、test、lint 皆通過才放行；失敗時產出說明報告，見 [docs/runbooks/local-dev.md](docs/runbooks/local-dev.md)）
-- **User-facing changes**：`npm run changeset`
+- **User-facing changes**：`pnpm run changeset`
 
 ---
 
@@ -54,14 +54,16 @@
 ## Data & API（Contract layer）
 
 - **Spec → Contract → Mock → Test → UI**。禁止在 component 內直接 `fetch(url)`；使用 useFetcher 或 `app/shared/api` 打契約路徑。
-- **契約**：`app/shared/contracts/`（Zod）。[specs/api/contract-schema.md](specs/api/contract-schema.md)、[specs/api/handler-mapping.md](specs/api/handler-mapping.md)。
+- **契約（Zod SoT）**：`@ai-search-portal/contracts`（[`packages/shared-contracts`](packages/shared-contracts/)）；Remix 端經 [`app/shared/contracts/index.ts`](app/shared/contracts/index.ts) re-export，**勿**在 `app/**` 新增 `*.contract.ts`。
+- **治理與過渡期 SoT**：[specs/README.md](specs/README.md)、[docs/adr/spec-driven-contracts-and-sot.md](docs/adr/spec-driven-contracts-and-sot.md)。OpenAPI 見 [specs/openapi/openapi.yaml](specs/openapi/openapi.yaml)；產物 `pnpm run codegen:openapi`。
+- **細部**：[specs/api/contract-schema.md](specs/api/contract-schema.md)、[specs/api/handler-mapping.md](specs/api/handler-mapping.md)。
 - **制度**：[docs/conventions/data-test-driven.md](docs/conventions/data-test-driven.md)。
 
 ---
 
 ## Conventions
 
-- **資料夾**（app/ 下，除 routes）：小寫、無連字號/底線。**元件檔**（app/components/\*_/_.tsx）：PascalCase。`npm run lint:filenames` 檢查。
+- **資料夾**（app/ 下，除 routes）：小寫、無連字號/底線。**元件檔**（app/components/\*_/_.tsx）：PascalCase。`pnpm run lint:filenames` 檢查。
 - 詳見 [docs/conventions/coding-conventions.md](docs/conventions/coding-conventions.md)。
 
 ---
@@ -69,7 +71,7 @@
 ## Code Review（階段後規格對齊）
 
 - 每階段工作完成後或 PR 前，依 [docs/code-review-spec.md](docs/code-review-spec.md) 審查，確保規格與專案現況一致（分層、契約、路徑、命名、文件連結）。供開發者與 AI（Coding / Review Agent）共用。
-- **當期報告與議題**：根目錄 [code-review/](code-review/README.md)（REPORT.md、issues.md）。待辦以 CR-001 等 ID 登錄於 issues.md；程式內僅使用 `// TODO(CR-xxx): description`。執行 `npm run code-review:list` 可列出 CR TODO 與 missing/orphan 一致性檢查。
+- **當期報告與議題**：根目錄 [code-review/](code-review/README.md)（REPORT.md、issues.md）。待辦以 CR-001 等 ID 登錄於 issues.md；程式內僅使用 `// TODO(CR-xxx): description`。執行 `pnpm run code-review:list` 可列出 CR TODO 與 missing/orphan 一致性檢查。
 
 ---
 

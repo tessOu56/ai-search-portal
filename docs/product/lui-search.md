@@ -9,8 +9,8 @@
 ## 業務流程（現況）
 
 1. 使用者開啟首頁，看到標語、Chat 輸入框與信任說明。
-2. 使用者輸入問題（query），送出後呼叫 **SSE** `GET /api/chat?q=...`。
-3. 伺服器回傳串流事件：先 **meta**（query、summary、confidence），再 **token**（逐字/詞回答），最後 **final**（sources、nextSteps）與 **done**。
+2. 使用者輸入問題（query），送出後呼叫 **SSE** `GET /api/chat?q=...`（可選 `sessionId`，見契約 `chatQueryParamsSchema`）。
+3. 伺服器回傳串流事件：先 **meta**（query、summary、confidence，可選 traceId），再 **token**（逐字/詞回答），最後 **final**（sources、nextSteps）與 **done**。應用層錯誤使用 **`failure`**（JSON `message`／`code`），**不用**事件名 `error`，以免與 `EventSource` 連線錯誤混淆。可選 **tool_status**（Phase 3+）。
 4. 前端以 `EventSource` 或等效方式消費 SSE，更新 UI（摘要、回答、來源、下一步）。
 
 ---
@@ -26,13 +26,15 @@
 
 ## API：GET /api/chat
 
-- **查參**：`q`（必填，查詢字串）
-- **回傳**：SSE stream
-  - `meta`：`{ query, summary, confidence }`
+- **查參**：`q`（必填）；`sessionId`（選填，記憶／Phase 4 預留）
+- **回傳**：SSE stream（穩定層；Zod：`@ai-search-portal/contracts`）
+  - `meta`：`{ query, summary, confidence, traceId? }`
   - `token`：回答片段（字串）
   - `final`：`{ sources: LuiSource[], nextSteps: string[] }`
   - `done`：結束
-- **實作**：`app/routes/api.chat.ts` 使用 `remix-utils/sse` 的 `eventStream`；回答內容由 `app/services/lui.server.ts` 的 `buildLuiResponse(query)` 產生。
+  - `failure`（可選）：`{ message, code? }`
+  - `tool_status`（可選）：`{ tool, status }`
+- **實作**：`app/routes/api.chat.ts` 使用 `remix-utils/sse` 的 `eventStream` → **`app/services/chat-gateway.server.ts`**：預設同 process 呼叫 **`@ai-search-portal/agent-core`**；若設定 **`AGENT_RUNTIME_URL`** 則改以 HTTP 銜接 **`services/agent-runtime`**（內部 `internal.*` SSE 再映射為穩定事件）。Mock 回應仍來自 agent-core 的 `buildLuiResponse`（`app/services/lui.server.ts` re-export）。
 
 ---
 

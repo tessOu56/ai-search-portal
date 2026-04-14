@@ -3,47 +3,40 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json ./
+RUN corepack enable
 
-# Install dependencies
-RUN npm ci
+# Copy package files (pnpm-lock.yaml is the reproducible install source)
+COPY package.json pnpm-lock.yaml ./
 
-# Copy source code
+RUN pnpm install --frozen-lockfile
+
 COPY . .
 
-# Build the application
-RUN npm run build
+RUN pnpm run build
 
 # Stage 2: Runtime
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 remix
 
-# Copy package files
-COPY package.json package-lock.json ./
+RUN corepack enable
 
-# Install production dependencies only
-RUN npm ci --only=production && npm cache clean --force
+COPY package.json pnpm-lock.yaml ./
 
-# Copy built application from builder stage
+RUN pnpm install --prod --frozen-lockfile && pnpm store prune && rm -rf ~/.local/share/pnpm/store
+
 COPY --from=builder --chown=remix:nodejs /app/build ./build
 COPY --from=builder --chown=remix:nodejs /app/public ./public
 
-# Switch to non-root user
 USER remix
 
-# Expose port (default 3000, configurable via PORT env var)
 EXPOSE 3000
 
-# Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Start the application
+# npx resolves local remix-serve from node_modules (.bin); same runtime contract as pre-pnpm image
 CMD ["npx", "remix-serve", "./build/server/index.js"]
-

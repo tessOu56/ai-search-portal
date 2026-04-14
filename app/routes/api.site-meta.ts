@@ -2,7 +2,7 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
 import { getReleaseNotes } from "~/shared/release-notes.server";
-import { getOrigin } from "~/shared/seo.server";
+import { getOrigin } from "~/shared/seo";
 
 /**
  * GET /api/site-meta

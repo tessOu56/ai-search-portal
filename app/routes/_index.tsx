@@ -17,7 +17,7 @@ import {
   getCanonicalUrl,
   getOrigin,
   getSeoFromLoader,
-} from "~/shared/seo.server";
+} from "~/shared/seo";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {

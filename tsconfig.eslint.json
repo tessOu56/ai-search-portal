@@ -1,18 +1,40 @@
 {
-  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": false,
+    "strict": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./app/*"]
+    }
+  },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "backend/**/*.ts",
+    "packages/shared-contracts/**/*.ts",
+    "packages/agent-core/**/*.ts",
+    "services/agent-runtime/**/*.ts",
     ".eslintrc.cjs",
+    "*.config.ts",
     "*.config.js",
     "*.config.cjs",
-    "*.config.ts"
+    "scripts/**/*.ts",
+    "scripts/**/*.js"
   ],
-  "exclude": ["node_modules", "build", ".cache", "dist"],
-  "compilerOptions": {
-    "allowJs": true,
-    "checkJs": false
-  }
+  "exclude": [
+    "node_modules",
+    "build",
+    ".cache",
+    "packages/shared-contracts/dist",
+    "backend/dist"
+  ]
 }

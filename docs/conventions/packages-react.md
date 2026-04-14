@@ -14,7 +14,7 @@
 | **React DOM** | ^18.3.1                    |
 | **Node**      | >= 20（engines）           |
 
-升級 React 大版（如 18→19）前，請依下方清單逐項確認 peer 與相容性，並跑 `npm run lint:ci`、`npm run test`。
+升級 React 大版（如 18→19）前，請依下方清單逐項確認 peer 與相容性，並跑 `pnpm run lint:ci`、`pnpm run test`。
 
 ---
 
@@ -56,7 +56,7 @@
 ## 維護方式
 
 1. **新增依賴時**：查 npm 該套件 `peerDependencies` 是否含 `react` / `react-dom`，並在本文「與 React 直接相關」或「其他」補一列。
-2. **升級 React 時**：執行 `npm run check:peers`（即 `npm ls react react-dom`），檢查 peer 衝突；依本表與官方遷移指南逐項驗證。
+2. **升級 React 時**：執行 `pnpm run check:peers`（即 `pnpm ls react react-dom`），檢查 peer 衝突；依本表與官方遷移指南逐項驗證。
 3. **升級 Radix / Remix / RTL 時**：查該套件 changelog 的 React 要求，並更新本表與 [system-overview](../architecture/system-overview.md) 的 Tech Stack。
 
 ---

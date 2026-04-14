@@ -27,9 +27,9 @@ This app is the **skeleton/portal** that aggregates and organizes multiple infor
 - **App services** (`app/services/*`): integration and computation. Routes in `app/routes/*` do not contain business logic.
 
 ## Quality & CI
-- Before PR: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run lint:filenames`.
+- Before PR: `pnpm run lint`, `pnpm run typecheck`, `pnpm run test`, `pnpm run lint:filenames`.
 - CI: lint:filenames, ESLint strict, typecheck, test; Knip optional until tuned.
-- User-facing changes: `npm run changeset`. Commits: Conventional Commits (commitlint).
+- User-facing changes: `pnpm run changeset`. Commits: Conventional Commits (commitlint).
 
 ## Workspace Alignment
 - **.vscode**: `settings.json` enforces format on save, ESLint, Prettier, Tailwind, non-relative TS imports. `extensions.json` recommends the stack in `docs/VSCODE.md` (ESLint, Prettier, Tailwind, Vitest, GitLens, TypeScript Hero, Path Intellisense, Project Manager, etc.) for large-scale collaboration.

@@ -5,13 +5,13 @@
 ## Prerequisites
 
 - Node.js >= 20
-- npm >= 9
+- pnpm 9（建議透過 Corepack：`corepack enable`，會依 `package.json` 的 `packageManager` 對齊版本）
 
 ## Local Setup
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 **編輯器**：建議安裝專案推薦的 VS Code / Cursor 擴充（開啟專案時會提示，或見 `docs/VSCODE.md`）。
@@ -19,11 +19,11 @@ npm run dev
 ## Quality Checks
 
 ```bash
-npm run build            # 建置
-npm run test             # 單元／整合測試
-npm run lint:ci          # 含 lint:filenames、lint:handlers、ESLint、typecheck
-npm run format:check
-npm run knip
+pnpm run build            # 建置
+pnpm run test             # 單元／整合測試
+pnpm run lint:ci          # 含 lint:filenames、lint:handlers、ESLint、typecheck
+pnpm run format:check
+pnpm run knip
 ```
 
 ## Commit Message

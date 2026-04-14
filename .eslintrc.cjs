@@ -192,6 +192,71 @@ module.exports = {
         "security/detect-non-literal-fs-filename": "off",
       },
     },
+    // Monorepo：app 與 backend 不得互相 import
+    {
+      files: ["app/**/*.{ts,tsx}"],
+      rules: {
+        "no-restricted-imports": [
+          "error",
+          {
+            patterns: [
+              {
+                group: ["**/backend*", "**/backend/**", "../*backend*", "*/backend/*"],
+                message:
+                  "App must not import backend; use @ai-search-portal/contracts for API shapes only.",
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["backend/**/*.ts"],
+      env: { node: true },
+      rules: {
+        "no-restricted-imports": [
+          "error",
+          {
+            patterns: [
+              {
+                group: ["**/app/*", "**/app/**", "~/*"],
+                message:
+                  "Backend must not import Remix app code; use @ai-search-portal/contracts for API shapes only.",
+              },
+            ],
+          },
+        ],
+      },
+    },
+    // 禁止在 app/shared/contracts 新增 *.contract.ts（契約僅在 packages/shared-contracts）
+    {
+      files: ["app/shared/contracts/**/*.contract.ts"],
+      rules: {
+        "no-restricted-syntax": [
+          "error",
+          {
+            selector: "Program",
+            message:
+              "Do not add *.contract.ts under app/shared/contracts. Define API contracts only in packages/shared-contracts.",
+          },
+        ],
+      },
+    },
+    // packages/shared-contracts：僅 Node／純 TS，放寬 React 相關
+    {
+      files: ["packages/shared-contracts/**/*.ts"],
+      env: { node: true },
+      rules: {
+        "@typescript-eslint/no-explicit-any": "error",
+      },
+    },
+    // API 進程啟動訊息
+    {
+      files: ["backend/src/index.ts"],
+      rules: {
+        "no-console": "off",
+      },
+    },
   ],
   // 簡化 ignore：只使用 ignorePatterns，移除 --ignore-path .gitignore
   ignorePatterns: [

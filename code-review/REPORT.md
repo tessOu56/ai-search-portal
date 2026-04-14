@@ -29,7 +29,7 @@
 
 ### §2.2 Meta 的型別斷言過多 — **已關閉 (CR-002)**
 
-**實作**：`app/shared/seo.server.ts` 定義 `SeoLoaderData` 與 `getSeoFromLoader(data, defaults)`，三處 meta 改用，無 `as`。
+**實作**：`app/shared/seo.ts` 定義 `SeoLoaderData` 與 `getSeoFromLoader(data, defaults)`，三處 meta 改用，無 `as`。
 
 ---
 

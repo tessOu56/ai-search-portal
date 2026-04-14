@@ -13,7 +13,7 @@
 | **Design Source**    | Figma（設計單一來源或與 DESIGN_SYSTEM.md 雙向對齊，見 [figma-mcp](../architecture/figma-mcp.md)） |
 | **Token Extraction** | MCP（read-only）：透過 Figma MCP server 讀取檔案、variables、component spec                       |
 | **Code Update**      | Cursor Agent：依 mapping 更新 token、docs；新增 component 須人工確認                              |
-| **Validation**       | CI：`npm run build`、`npm run test`、`npm run lint:ci`（見 [local-dev](local-dev.md)）            |
+| **Validation**       | CI：`pnpm run build`、`pnpm run test`、`pnpm run lint:ci`（見 [local-dev](local-dev.md)）         |
 | **Deployment**       | Vercel：main 分支 push 後自動建置並更新 production（見 [deployment](deployment.md)）              |
 
 ---

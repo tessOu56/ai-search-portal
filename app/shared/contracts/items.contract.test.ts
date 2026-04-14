@@ -3,8 +3,6 @@
  * 見 docs/conventions/data-test-driven.md、specs/api/contract-schema.md
  */
 
-import { describe, expect, it } from "vitest";
-
 import {
   createItemRequestSchema,
   errorResponseSchema,
@@ -12,7 +10,8 @@ import {
   listItemsResponseSchema,
   mockItemSchema,
   updateItemRequestSchema,
-} from "./items.contract";
+} from "@ai-search-portal/contracts";
+import { describe, expect, it } from "vitest";
 
 const validItem = {
   id: "1",

@@ -9,4 +9,4 @@
 - **機制說明**（ID 格式、TODO、關閉條件）：[../code-review/README.md](../code-review/README.md)
 - **審查規範**：[code-review-spec.md](code-review-spec.md)
 
-執行 `npm run code-review:list` 可列出 CR TODO 與 missing/orphan 檢查。
+執行 `pnpm run code-review:list` 可列出 CR TODO 與 missing/orphan 檢查。

@@ -6,7 +6,7 @@
 
 ## 日常依賴更新
 
-- **安全／patch**：依團隊流程更新（如 Dependabot、定期 `npm update`）；更新後跑 `npm run lint:ci`、`npm run test`。
+- **安全／patch**：依團隊流程更新（如 Dependabot、定期 `pnpm update`）；更新後跑 `pnpm run lint:ci`、`pnpm run test`。
 - **minor 升級**：在未改 API 的前提下可依需要升級；若為 React、Remix、Vite 等核心套件，請先查 [packages-react](packages-react.md) 與 peer 相容性。
 - **流程**：見 [runbooks/local-dev](../runbooks/local-dev.md) 的依賴更新一節。
 

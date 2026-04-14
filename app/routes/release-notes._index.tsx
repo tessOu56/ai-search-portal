@@ -12,7 +12,7 @@ import {
   getCanonicalUrl,
   getOrigin,
   getSeoFromLoader,
-} from "~/shared/seo.server";
+} from "~/shared/seo";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const locale = await getLocale(request);
