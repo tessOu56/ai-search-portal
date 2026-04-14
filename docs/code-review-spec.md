@@ -28,12 +28,12 @@
 
 ### 2.2 契約與 API
 
-- [ ] **契約單一來源**：API 的 request/response 形狀以 `app/shared/contracts/`（Zod）為準；與 [specs/api/contract-schema.md](../specs/api/contract-schema.md) 一致。
+- [ ] **契約單一來源**：API 的 request/response 形狀以 `@ai-search-portal/contracts`（[`packages/shared-contracts`](../packages/shared-contracts/)）為準；App 僅經 `app/shared/contracts/index.ts` re-export；與 [specs/api/contract-schema.md](../specs/api/contract-schema.md)、[specs/README.md](../specs/README.md) 一致。
 - [ ] **API 路徑單一來源**：所有 API 路徑從 `app/shared/api/paths.ts` import，不在 component / hooks / routes 內硬編碼路徑字串。
 - [ ] **Handler 對照**：對外 API 在 [specs/api/handler-mapping.md](../specs/api/handler-mapping.md) 有對照、且 `app/test/handlers.ts` 有對應 MSW handler；新增 API 時兩處皆需更新。
 - [ ] **錯誤 response**：若 API 回傳錯誤，形狀與契約一致（如 `errorResponseSchema`）；見 [docs/conventions/error-handling.md](conventions/error-handling.md)。
 
-**若違反**：補齊或修正 `app/shared/contracts/*`、`app/shared/api/paths.ts`、`specs/api/handler-mapping.md`、`app/test/handlers.ts`，以及 [docs/conventions/data-test-driven.md](conventions/data-test-driven.md) 若有提及流程。
+**若違反**：補齊或修正 `packages/shared-contracts`、`app/shared/contracts/index.ts`、`app/shared/api/paths.ts`、`specs/openapi/openapi.yaml`（並 `pnpm run codegen:openapi`）、`specs/api/handler-mapping.md`、`app/test/handlers.ts`，以及 [docs/conventions/data-test-driven.md](conventions/data-test-driven.md) 若有提及流程。
 
 ---
 
@@ -50,7 +50,7 @@
 
 - [ ] **資料夾**：`app/` 下（除 `app/routes`）資料夾為小寫、無連字號/底線（見 [docs/conventions/coding-conventions.md](conventions/coding-conventions.md)）。
 - [ ] **元件檔**：`app/components/**/*.tsx` 檔名為 PascalCase。
-- [ ] **檢查**：`npm run lint:filenames` 通過；`npm run lint`、`npm run typecheck` 通過。
+- [ ] **檢查**：`pnpm run lint:filenames` 通過；`pnpm run lint`、`pnpm run typecheck` 通過。
 
 **若違反**：重新命名或修正，並確認 [docs/conventions/coding-conventions.md](conventions/coding-conventions.md) 仍涵蓋當前規則。
 
@@ -78,13 +78,13 @@
 
 ## 3. 變更時應同步更新的對照
 
-| 變更類型       | 應更新的檔案／位置                                                                                                                                                                          |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 新增／變更 API | `app/shared/contracts/*`、`app/shared/api/paths.ts`、`specs/api/handler-mapping.md`、`app/test/handlers.ts`；必要時 [docs/conventions/data-test-driven.md](conventions/data-test-driven.md) |
-| 目錄或分層調整 | [docs/architecture/repo-layers.md](architecture/repo-layers.md)、[docs/architecture/system-overview.md](architecture/system-overview.md)、必要時 AGENTS.md / AGENT_CAPABILITIES.md          |
-| 錯誤處理慣例   | [docs/conventions/error-handling.md](conventions/error-handling.md)、契約內 error schema、specs 註明                                                                                        |
-| 命名／慣例調整 | [docs/conventions/coding-conventions.md](conventions/coding-conventions.md)、必要時 `lint:filenames` 規則                                                                                   |
-| 產品／領域變更 | [docs/product/](product/) 對應文件、[docs/README.md](README.md) 一覽                                                                                                                        |
+| 變更類型       | 應更新的檔案／位置                                                                                                                                                                                                                                            |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 新增／變更 API | `packages/shared-contracts`、`specs/openapi/openapi.yaml`、`app/shared/contracts/index.ts`、`app/shared/api/paths.ts`、`specs/api/handler-mapping.md`、`app/test/handlers.ts`；必要時 [docs/conventions/data-test-driven.md](conventions/data-test-driven.md) |
+| 目錄或分層調整 | [docs/architecture/repo-layers.md](architecture/repo-layers.md)、[docs/architecture/system-overview.md](architecture/system-overview.md)、必要時 AGENTS.md / AGENT_CAPABILITIES.md                                                                            |
+| 錯誤處理慣例   | [docs/conventions/error-handling.md](conventions/error-handling.md)、契約內 error schema、specs 註明                                                                                                                                                          |
+| 命名／慣例調整 | [docs/conventions/coding-conventions.md](conventions/coding-conventions.md)、必要時 `lint:filenames` 規則                                                                                                                                                     |
+| 產品／領域變更 | [docs/product/](product/) 對應文件、[docs/README.md](README.md) 一覽                                                                                                                                                                                          |
 
 ---
 

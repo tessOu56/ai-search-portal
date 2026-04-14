@@ -1,4 +1,5 @@
 # CI：build / test / lint 皆通過才放行；失敗時產出說明報告並上傳 Artifacts
+# 可重現性來自 pnpm-lock.yaml + pnpm install --frozen-lockfile；setup-node 的 pnpm cache 僅加速安裝，非真理來源。
 name: CI
 
 on:
@@ -19,23 +20,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
 
+      # Reproducibility: pnpm-lock.yaml + --frozen-lockfile. Cache above speeds install only.
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Prepare reports directory
         run: mkdir -p reports
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
+
+      - name: Build API (backend)
+        run: pnpm run build:api
 
       - name: Test
-        run: npm run test
+        run: pnpm run test && pnpm run test:api
         env:
           CI: true
 
@@ -49,18 +60,20 @@ jobs:
           fail-on-error: false
 
       - name: ESLint report (for failure summary)
-        run: npm run lint:report
+        run: pnpm run lint:report
         continue-on-error: true
 
       - name: Lint & typecheck
         run: |
-          npm run lint:filenames
-          npm run lint:handlers
-          npx eslint --max-warnings=0 --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives . -f gha
-          npm run typecheck
+          pnpm run lint:filenames
+          pnpm run lint:handlers
+          pnpm run lint:openapi
+          pnpm run verify:openapi-codegen
+          pnpm exec eslint --max-warnings=0 --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives . -f gha
+          pnpm run typecheck
 
       - name: Code review TODO list
-        run: npm run code-review:list
+        run: pnpm run code-review:list
         continue-on-error: true
 
       - name: Generate CI failure report
@@ -86,9 +99,14 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-      - run: npm ci
-      - run: npm run knip
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run knip

@@ -1,0 +1,94 @@
+name: Deploy to Vercel
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        default: preview
+        type: choice
+        options:
+          - preview
+          - production
+      target_ref:
+        description: "Git ref to deploy (branch/tag/sha)"
+        required: false
+        default: main
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vercel-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Checkout target ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_ref }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify OpenAPI and contracts
+        run: |
+          pnpm run lint:openapi
+          pnpm run verify:openapi-codegen
+
+      - name: Pull Vercel environment
+        run: npx --yes vercel pull --yes --environment=${{ inputs.environment }} --token=${{ env.VERCEL_TOKEN }}
+
+      - name: Build Vercel output
+        run: npx --yes vercel build --token=${{ env.VERCEL_TOKEN }}
+
+      - name: Deploy preview
+        if: ${{ inputs.environment == 'preview' }}
+        id: deploy_preview
+        shell: bash
+        run: |
+          URL="$(npx --yes vercel deploy --prebuilt --token=${{ env.VERCEL_TOKEN }})"
+          echo "preview_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy production
+        if: ${{ inputs.environment == 'production' }}
+        id: deploy_production
+        shell: bash
+        run: |
+          URL="$(npx --yes vercel deploy --prebuilt --prod --token=${{ env.VERCEL_TOKEN }})"
+          echo "production_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Write deployment summary
+        shell: bash
+        run: |
+          echo "## Vercel Deploy" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Environment: ${{ inputs.environment }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Ref: ${{ inputs.target_ref }}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ inputs.environment }}" = "preview" ]; then
+            echo "- URL: ${{ steps.deploy_preview.outputs.preview_url }}" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- URL: ${{ steps.deploy_production.outputs.production_url }}" >> "$GITHUB_STEP_SUMMARY"
+          fi

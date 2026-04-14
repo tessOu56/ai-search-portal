@@ -8,6 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
 import { ScrollArea } from "~/components/ui/ScrollArea";
 import { Textarea } from "~/components/ui/Textarea";
 import { apiChatQuery } from "~/shared/api/paths";
+import {
+  stableChatErrorSchema,
+  stableChatFinalSchema,
+  stableChatMetaSchema,
+} from "~/shared/contracts";
 import { useI18n } from "~/shared/i18n/context";
 
 type Message = {
@@ -23,47 +28,31 @@ type LuiMeta = {
   nextSteps?: string[];
 };
 
-/**
- * 解析 SSE meta 事件 payload。目前 LUI chat API 的 meta/final 事件格式尚無契約 schema，
- * 採手動驗證；日後若有契約可改為 schema.parse。
- */
-function parseMetaEvent(data: string) {
-  const parsed: unknown = JSON.parse(data);
-  if (!parsed || typeof parsed !== "object") return null;
-  const record = parsed as Record<string, unknown>;
+function parseStableMeta(data: string) {
+  const parsed = stableChatMetaSchema.safeParse(JSON.parse(data) as unknown);
+  if (!parsed.success) return null;
   return {
-    summary: typeof record.summary === "string" ? record.summary : undefined,
-    confidence:
-      typeof record.confidence === "number" ? record.confidence : undefined,
+    summary: parsed.data.summary,
+    confidence: parsed.data.confidence,
   };
 }
 
-/**
- * 解析 SSE final 事件 payload（sources、nextSteps）。格式目前無契約，採手動驗證。
- */
-function parseFinalEvent(data: string) {
-  const parsed: unknown = JSON.parse(data);
-  if (!parsed || typeof parsed !== "object") return null;
-  const record = parsed as Record<string, unknown>;
-  const sources = Array.isArray(record.sources)
-    ? record.sources.filter(
-        (source): source is { title: string; url: string } =>
-          typeof source === "object" &&
-          source !== null &&
-          typeof (source as Record<string, unknown>).title === "string" &&
-          typeof (source as Record<string, unknown>).url === "string"
-      )
-    : undefined;
-  const nextSteps = Array.isArray(record.nextSteps)
-    ? record.nextSteps.filter(
-        (step): step is string => typeof step === "string"
-      )
-    : undefined;
+function parseStableFinal(data: string) {
+  const parsed = stableChatFinalSchema.safeParse(JSON.parse(data) as unknown);
+  if (!parsed.success) return null;
+  return {
+    sources: parsed.data.sources,
+    nextSteps: parsed.data.nextSteps,
+  };
+}
 
-  return { sources, nextSteps };
+function parseStableFailure(data: string) {
+  const parsed = stableChatErrorSchema.safeParse(JSON.parse(data) as unknown);
+  return parsed.success ? parsed.data.message : null;
 }
 
 const KEY_SUMMARY_WAITING = "chat.summary.waiting";
+const KEY_CHAT_ERROR_PARSE = "chat.error.parse";
 
 export function ChatInterface() {
   const { t } = useI18n();
@@ -109,7 +98,7 @@ export function ChatInterface() {
     stream.addEventListener("meta", (event) => {
       try {
         const messageEvent = event as MessageEvent<string>;
-        const data = parseMetaEvent(messageEvent.data);
+        const data = parseStableMeta(messageEvent.data);
         if (!data) return;
         setMeta((prev) => ({
           ...prev,
@@ -117,7 +106,7 @@ export function ChatInterface() {
           confidence: data.confidence ?? prev.confidence,
         }));
       } catch {
-        setError(t("chat.error.parse"));
+        setError(t(KEY_CHAT_ERROR_PARSE));
       }
     });
 
@@ -139,7 +128,7 @@ export function ChatInterface() {
     stream.addEventListener("final", (event) => {
       try {
         const messageEvent = event as MessageEvent<string>;
-        const data = parseFinalEvent(messageEvent.data);
+        const data = parseStableFinal(messageEvent.data);
         if (!data) return;
         setMeta((prev) => ({
           ...prev,
@@ -147,8 +136,20 @@ export function ChatInterface() {
           nextSteps: data.nextSteps ?? prev.nextSteps,
         }));
       } catch {
-        setError(t("chat.error.parse"));
+        setError(t(KEY_CHAT_ERROR_PARSE));
       }
+    });
+
+    stream.addEventListener("failure", (event) => {
+      try {
+        const messageEvent = event as MessageEvent<string>;
+        const message = parseStableFailure(messageEvent.data);
+        setError(message ?? t(KEY_CHAT_ERROR_PARSE));
+      } catch {
+        setError(t(KEY_CHAT_ERROR_PARSE));
+      }
+      setIsStreaming(false);
+      stream.close();
     });
 
     stream.addEventListener("done", () => {

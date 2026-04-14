@@ -4,14 +4,26 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "packageManager": "pnpm@9.15.4",
   "scripts": {
-    "build": "remix vite:build",
+    "build": "pnpm run build:contracts && pnpm run build:agent-core && remix vite:build",
+    "build:agent-core": "pnpm --filter @ai-search-portal/agent-core run build",
+    "build:contracts": "pnpm run codegen:openapi && pnpm --filter @ai-search-portal/contracts run build",
+    "codegen:openapi": "npx --yes openapi-typescript@7.6.1 specs/openapi/openapi.yaml -o packages/shared-contracts/src/generated/openapi-types.ts",
+    "lint:openapi": "npx --yes @stoplight/spectral-cli@6.14.3 lint specs/openapi/openapi.yaml",
+    "verify:openapi-codegen": "pnpm run codegen:openapi && git diff --exit-code -- packages/shared-contracts/src/generated/openapi-types.ts",
     "dev": "remix vite:dev",
+    "dev:api": "pnpm --filter ai-search-api dev",
+    "dev:agent": "pnpm --filter @ai-search-portal/agent-runtime dev",
+    "build:api": "pnpm run build:contracts && pnpm --filter ai-search-api build",
+    "test:api": "pnpm run build:contracts && pnpm --filter ai-search-api test",
+    "test:agent": "pnpm run build:contracts && pnpm run build:agent-core && pnpm --filter @ai-search-portal/agent-core test && pnpm --filter @ai-search-portal/agent-runtime test",
+    "typecheck:api": "pnpm --filter ai-search-api typecheck",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives .",
     "lint:fix": "eslint --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives . --fix",
     "lint:strict": "eslint --max-warnings=0 --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives .",
-    "lint:ci": "npm run lint:filenames && npm run lint:handlers && npm run lint:strict && npm run typecheck",
-    "check:peers": "npm ls react react-dom",
+    "lint:ci": "pnpm run lint:filenames && pnpm run lint:handlers && pnpm run lint:openapi && pnpm run verify:openapi-codegen && pnpm run lint:strict && pnpm run typecheck",
+    "check:peers": "pnpm ls react react-dom",
     "lint:filenames": "node scripts/lint-filenames.mjs",
     "lint:handlers": "node scripts/lint-handlers.mjs",
     "code-review:list": "node scripts/list-code-review-todos.mjs",
@@ -20,16 +32,20 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "start": "remix-serve ./build/server/index.js",
-    "test": "vitest run",
+    "test": "pnpm run build:contracts && pnpm run build:agent-core && vitest run && pnpm --filter @ai-search-portal/agent-core test && pnpm --filter @ai-search-portal/agent-runtime test",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit && pnpm run typecheck:contracts && pnpm run typecheck:agent-core && pnpm run typecheck:agent-runtime && pnpm run typecheck:api",
+    "typecheck:contracts": "pnpm --filter @ai-search-portal/contracts run typecheck",
+    "typecheck:agent-core": "pnpm --filter @ai-search-portal/agent-core run typecheck",
+    "typecheck:agent-runtime": "pnpm --filter @ai-search-portal/agent-runtime run typecheck",
     "knip": "knip",
     "knip:fix": "knip --fix",
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "prepare": "husky install || true"
+    "prepare": "husky install || true",
+    "predev": "pnpm run build:contracts && pnpm run build:agent-core"
   },
   "dependencies": {
     "@radix-ui/react-scroll-area": "^1.2.10",
@@ -46,7 +62,9 @@
     "remix-utils": "^7.7.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "@ai-search-portal/agent-core": "workspace:*",
+    "@ai-search-portal/contracts": "workspace:*"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.8",
@@ -95,8 +113,10 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "overrides": {
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0"
+  "pnpm": {
+    "overrides": {
+      "@typescript-eslint/eslint-plugin": "^7.18.0",
+      "@typescript-eslint/parser": "^7.18.0"
+    }
   }
 }

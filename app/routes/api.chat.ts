@@ -1,54 +1,65 @@
+import { chatQueryParamsSchema } from "@ai-search-portal/contracts";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { eventStream } from "remix-utils/sse/server";
 
-import { buildLuiResponse, splitToTokens } from "~/services/lui.server";
+import {
+  getTraceIdFromRequest,
+  pipeAgentHttpToStableSse,
+  pipeLocalAgentCoreToStableSse,
+  resolveAgentRuntimeUrl,
+} from "~/services/chat-gateway.server";
 
 export function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const query = url.searchParams.get("q")?.trim();
+  const parsed = chatQueryParamsSchema.safeParse({
+    q: url.searchParams.get("q") ?? "",
+    sessionId: url.searchParams.get("sessionId") ?? undefined,
+  });
 
-  if (!query) {
+  if (!parsed.success) {
     return new Response("Missing query", { status: 400 });
   }
 
-  const response = buildLuiResponse(query);
-  const tokens = splitToTokens(response.answer);
+  const traceId = getTraceIdFromRequest(request);
+  const agentBaseUrl = resolveAgentRuntimeUrl();
 
-  return eventStream(request.signal, (send) => {
-    send({
-      event: "meta",
-      data: JSON.stringify({
-        query,
-        summary: response.summary,
-        confidence: response.confidence,
-      }),
-    });
+  return eventStream(request.signal, (send, close) => {
+    void (async () => {
+      try {
+        const stableSend = (args: { event: string; data: string }) => {
+          send({ event: args.event, data: args.data });
+        };
 
-    let index = 0;
-    const interval = setInterval(() => {
-      const token = tokens.at(index);
-      if (!token) {
+        if (agentBaseUrl) {
+          await pipeAgentHttpToStableSse({
+            agentBaseUrl,
+            query: parsed.data.q,
+            sessionId: parsed.data.sessionId,
+            traceId,
+            traceparent: request.headers.get("traceparent") ?? undefined,
+            signal: request.signal,
+            send: stableSend,
+          });
+        } else {
+          await pipeLocalAgentCoreToStableSse({
+            query: parsed.data.q,
+            sessionId: parsed.data.sessionId,
+            traceId,
+            send: stableSend,
+          });
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unknown chat error";
         send({
-          event: "final",
-          data: JSON.stringify({
-            sources: response.sources,
-            nextSteps: response.nextSteps,
-          }),
+          event: "failure",
+          data: JSON.stringify({ message, code: "chat_gateway_error" }),
         });
-        send({ event: "done", data: "done" });
-        clearInterval(interval);
-        return;
+      } finally {
+        close();
       }
+    })();
 
-      send({
-        event: "token",
-        data: token,
-      });
-      index += 1;
-    }, 120);
-
-    return () => {
-      clearInterval(interval);
-    };
+    return () => {};
   });
 }

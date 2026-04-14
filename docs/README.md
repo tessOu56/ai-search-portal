@@ -59,6 +59,7 @@
 
 ### ADR / 討論（架構與套件升級）
 
+- [spec-driven-contracts-and-sot](adr/spec-driven-contracts-and-sot.md) — Spec-driven 契約與單一來源（SoT）、monorepo 邊界 【spec／1】
 - [upgrade-v7-discussion](adr/upgrade-v7-discussion.md) — 是否升級到 React Router v7（討論摘要） 【adr／2】
 - 日常與重大升級區分見 [package-upgrade-policy](conventions/package-upgrade-policy.md)
 
@@ -70,5 +71,5 @@
 - **DESIGN_SYSTEM.md** — Design tokens、Core components、Usage guidelines 【reference／2】
 - **code-review-spec.md** — Code Review 規範（每階段工作後保持規格與現況一致；供 AI 與開發者） 【spec／1】
 - **code-review-report.md** — Code Review 報告入口（當期報告與議題見 [code-review/](../code-review/README.md)） 【entry／3】
-- **當期報告與議題**：根目錄 [code-review/](../code-review/README.md)（REPORT.md、issues.md、`npm run code-review:list`）
+- **當期報告與議題**：根目錄 [code-review/](../code-review/README.md)（REPORT.md、issues.md、`pnpm run code-review:list`）
 - **audit-report.md** — 專案盤查報告（依 code-review-spec 與現況盤查結果與待改進項） 【report／3】

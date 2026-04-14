@@ -4,6 +4,10 @@ node_modules/
 # Production
 /build
 /.cache
+/backend/dist
+/packages/shared-contracts/dist
+/packages/agent-core/dist
+/services/agent-runtime/dist
 
 # Misc
 .DS_Store

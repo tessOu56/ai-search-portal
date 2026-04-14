@@ -12,13 +12,15 @@ MCP server that exposes Figma file data to Cursor via read-only tools. See [docs
 
 ## Setup
 
+**Note:** The **repository root** uses **pnpm** (`pnpm-lock.yaml`). This folder (`tools/figma-mcp`) is a **separate npm package** with its own `package-lock.json`—install here with **npm**, not from the repo root’s pnpm workspace.
+
 1. **Install dependencies** (from repo root or this folder):
 
    ```bash
    npm install
    ```
 
-   (From repo root, run from `tools/figma-mcp`: `cd tools/figma-mcp && npm install`.)
+   (From repo root: `cd tools/figma-mcp && npm install`.)
 
 2. **Figma access token**
    - Create a [personal access token](https://www.figma.com/developers/api#access-tokens) in Figma (Settings → Account → Personal access tokens).

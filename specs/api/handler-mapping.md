@@ -8,19 +8,19 @@
 
 ## 對照表
 
-| API 路徑             | 方法      | Schema / 型別                                         | Handler 位置                    | 備註 |
-| -------------------- | --------- | ----------------------------------------------------- | ------------------------------- | ---- |
-| `/api/items`         | GET       | `{ data: MockItem[] }`                                | `handlers.ts` → `itemsHandlers` | 列表 |
-| `/api/items`         | POST      | body: `{ name, description? }` → `{ data: MockItem }` | `handlers.ts` → `itemsHandlers` | 建立 |
-| `/api/items/:itemId` | GET       | `{ data: MockItem }` 或 404                           | `handlers.ts` → `itemsHandlers` | 單筆 |
-| `/api/items/:itemId` | PUT/PATCH | body 部分欄位 → `{ data: MockItem }`                  | `handlers.ts` → `itemsHandlers` | 更新 |
-| `/api/items/:itemId` | DELETE    | `{ data: MockItem }` 或 404                           | `handlers.ts` → `itemsHandlers` | 刪除 |
-| `/api/dishes`        | GET       | `{ dishes: Dish[] }`                                  | 待補（routes 尚未實作）         | 領域 |
-| `/api/ingredients`   | GET       | `{ ingredients: Ingredient[] }`                       | 待補                            | 領域 |
-| `/api/recipes`       | GET       | `{ recipes: Recipe[] }`                               | 待補                            | 領域 |
-| `/api/vendors`       | GET       | `{ vendors: Vendor[] }`                               | 待補                            | 領域 |
-| `/api/chat`          | GET (SSE) | query `q` → SSE stream                                | 可選                            | LUI  |
-| `/api/release-notes` | GET       | ReleaseNote[]                                         | 可選                            | 版號 |
+| API 路徑             | 方法      | Schema / 型別                                                                                              | Handler 位置                         | 備註                                             |
+| -------------------- | --------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------ |
+| `/api/items`         | GET       | `{ data: MockItem[] }`                                                                                     | `handlers.ts` → `itemsHandlers`      | 列表                                             |
+| `/api/items`         | POST      | body: `{ name, description? }` → `{ data: MockItem }`                                                      | `handlers.ts` → `itemsHandlers`      | 建立                                             |
+| `/api/items/:itemId` | GET       | `{ data: MockItem }` 或 404                                                                                | `handlers.ts` → `itemsHandlers`      | 單筆                                             |
+| `/api/items/:itemId` | PUT/PATCH | body 部分欄位 → `{ data: MockItem }`                                                                       | `handlers.ts` → `itemsHandlers`      | 更新                                             |
+| `/api/items/:itemId` | DELETE    | `{ data: MockItem }` 或 404                                                                                | `handlers.ts` → `itemsHandlers`      | 刪除                                             |
+| `/api/dishes`        | GET       | `{ dishes: Dish[] }`                                                                                       | 待補（routes 尚未實作）              | 領域                                             |
+| `/api/ingredients`   | GET       | `{ ingredients: Ingredient[] }`                                                                            | 待補                                 | 領域                                             |
+| `/api/recipes`       | GET       | `{ recipes: Recipe[] }`                                                                                    | 待補                                 | 領域                                             |
+| `/api/vendors`       | GET       | `{ vendors: Vendor[] }`                                                                                    | 待補                                 | 領域                                             |
+| `/api/chat`          | GET (SSE) | query `q`（必填）、`sessionId`（選填）；SSE：`meta`→`token*`→`final`→`done`，可選 `tool_status`、`failure` | 可選（`/api/chat` 已列入 lint 例外） | LUI + `@ai-search-portal/contracts` chat schemas |
+| `/api/release-notes` | GET       | ReleaseNote[]                                                                                              | 可選                                 | 版號                                             |
 
 ---
 

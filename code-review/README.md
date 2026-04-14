@@ -27,7 +27,7 @@
 
 ## 指令
 
-`npm run code-review:list` — 列出 CR TODO、missing、orphan；不阻擋 build。
+`pnpm run code-review:list` — 列出 CR TODO、missing、orphan；不阻擋 build。
 
 ## CI
 

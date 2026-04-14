@@ -1,6 +1,5 @@
-npm run format
-npm run lint:fix
+pnpm run format
+pnpm run lint:fix
 git add -u
-npm run lint:filenames
-npx lint-staged
-
+pnpm run lint:filenames
+pnpm exec lint-staged

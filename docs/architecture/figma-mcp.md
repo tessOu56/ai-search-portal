@@ -127,7 +127,7 @@ MCP server **僅暴露讀取操作**，典型能力為：
 
 ### 實作位置
 
-- **MCP server**：`tools/figma-mcp/`（`server.mjs` + `package.json`）。執行方式：`npm run start --prefix tools/figma-mcp`，需 env `FIGMA_ACCESS_TOKEN`、可選 `FIGMA_FILE_KEY`。詳見 [tools/figma-mcp/README.md](../../tools/figma-mcp/README.md)。
+- **MCP server**：`tools/figma-mcp/`（`server.mjs` + `package.json`）。**倉庫根目錄**使用 pnpm；此子目錄為**獨立 npm 套件**。執行方式：`npm run start --prefix tools/figma-mcp`（或於 `tools/figma-mcp` 內 `npm run start`），需 env `FIGMA_ACCESS_TOKEN`、可選 `FIGMA_FILE_KEY`。詳見 [tools/figma-mcp/README.md](../../tools/figma-mcp/README.md)。
 
 ---
 

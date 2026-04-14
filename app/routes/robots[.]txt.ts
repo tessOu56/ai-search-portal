@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 
-import { getOrigin } from "~/shared/seo.server";
+import { getOrigin } from "~/shared/seo";
 
 /**
  * robots.txt for crawlers and AI. Allows all, points to sitemap.

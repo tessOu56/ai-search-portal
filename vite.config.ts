@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => {
     ],
     test: {
       globals: true,
+      include: ["app/**/*.{test,spec}.{ts,tsx}"],
       environment: "jsdom",
       environmentOptions: {
         jsdom: { url: "http://localhost" },

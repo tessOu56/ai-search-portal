@@ -4,9 +4,10 @@
     "app/routes/**/*.tsx",
     "app/routes/**/*.ts",
     "app/**/*.server.ts",
-    "app/shared/**/*.{ts,tsx}"
+    "app/shared/**/*.{ts,tsx}",
+    "packages/shared-contracts/src/index.ts"
   ],
-  "project": ["app/**/*.{ts,tsx}"],
+  "project": ["app/**/*.{ts,tsx}", "packages/shared-contracts/**/*.ts"],
   "ignore": ["build/**", ".cache/**", "node_modules/**", "public/**"],
   "ignoreDependencies": [
     "isbot",

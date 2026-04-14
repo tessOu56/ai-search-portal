@@ -1,0 +1,23 @@
+---
+description: Spec-driven 變更流程（契約／OpenAPI／generated）；與 AGENTS.md、specs/README 對齊
+globs: "**/*.{ts,tsx,md,yaml,yml}"
+alwaysApply: false
+---
+
+# Spec-driven workflow（執行層）
+
+**Canonical**：業務與 SoT 敘述以 [specs/README.md](specs/README.md)、[docs/adr/spec-driven-contracts-and-sot.md](docs/adr/spec-driven-contracts-and-sot.md) 為準。本規則不重複定義 truth。
+
+## MUST
+
+- 變更對外 HTTP 形狀時，先指出受影響的 **`packages/shared-contracts`**、`specs/openapi/openapi.yaml`，並在過渡期 **先改 Zod、再同步 OpenAPI**，然後執行 `pnpm run codegen:openapi`。
+- 完成後確保 `pnpm run lint:openapi` 與 `pnpm run verify:openapi-codegen` 可通過（或同等 CI 步驟）。
+
+## NEVER
+
+- 在 `app/shared/contracts/` 新增 `*.contract.ts`；在 `app/**` 或 `backend/**` 手寫第二套 API request/response schema 取代 `@ai-search-portal/contracts`。
+- 手修 `packages/shared-contracts/src/generated/openapi-types.ts`。
+
+## Import
+
+- `app/**` 不得 import `backend/**`；`backend/**` 不得 import `app/**`。API 形狀僅能經 `@ai-search-portal/contracts`。

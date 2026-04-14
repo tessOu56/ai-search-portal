@@ -13,11 +13,11 @@
 ## CI 檢查（GitHub Actions）
 
 - **CI workflow**（`.github/workflows/ci.yml`）在 PR / push 到 `main` 時執行，**build、test、lint 皆通過才放行**：
-  - **Build**：`npm run build`
-  - **Test**：`npm run test`（產出 `reports/vitest-results.json`、`reports/junit.xml`；JUnit 會由 **Publish Test Results** 步驟顯示在 GitHub Actions 該次 run 的測試摘要）
+  - **Build**：`pnpm run build`
+  - **Test**：`pnpm run test`（產出 `reports/vitest-results.json`、`reports/junit.xml`；JUnit 會由 **Publish Test Results** 步驟顯示在 GitHub Actions 該次 run 的測試摘要）
   - **Lint**：`lint:filenames`、`lint:handlers`、ESLint（strict）、`typecheck`（產出 `reports/eslint-report.json` 供失敗時彙整）
 - **失敗時**：會產出說明報告（`reports/ci-failure-summary.md`）並上傳為 Artifact **ci-reports**（保留 7 天），PR 的 Job summary 也會顯示簡要說明。
-- 合併前請在本地執行：`npm run build`、`npm run test`、`npm run lint:ci`。
+- 合併前請在本地執行：`pnpm run build`、`pnpm run test`、`pnpm run lint:ci`。
 
 ## 依賴更新
 
@@ -37,12 +37,25 @@
 3. **Issue / PR 範本**
    - 已提供 `.github/ISSUE_TEMPLATE` 與 `pull_request_template.md`，可依團隊習慣微調。
 
+4. **Environment 保護（部署控制）**
+   - 建立 `preview`、`production` environments。
+   - `production` 建議啟用 required reviewers，限制可部署人員。
+   - 在 `.github/workflows/deploy-vercel.yml` 透過 environment gate 控制上線。
+
 ## 建議新增的套件或步驟（可選）
 
-| 項目           | 說明                                                                      |
-| -------------- | ------------------------------------------------------------------------- |
-| **E2E 測試**   | 若需端對端測試，可引入 **Playwright** 或 **Cypress**，並在 CI 中跑 E2E。  |
-| **deploy.yml** | 目前為 GitHub Pages 部署；若已完全改用 Vercel，改為「僅建置驗證」或停用。 |
+| 項目          | 說明                                                                             |
+| ------------- | -------------------------------------------------------------------------------- |
+| **E2E 測試**  | 若需端對端測試，可引入 **Playwright** 或 **Cypress**，並在 CI 中跑 E2E。         |
+| **Main 建置** | 已併入 `ci.yml`（push `main` 時與 PR 同一套檢查）；不再維護獨立的 `deploy.yml`。 |
+| **可控部署**  | 使用 `.github/workflows/deploy-vercel.yml` 手動部署 preview/production。         |
+| **可控發版**  | 使用 `.github/workflows/release.yml` 手動建立 tag 與 GitHub Release。            |
+
+## Agent Runtime（可選）
+
+- 啟動獨立 Agent HTTP：`pnpm run dev:agent`（預設 `http://127.0.0.1:3002`，見 `services/agent-runtime/README.md`）。
+- Remix 若要以 HTTP 連線 Agent：設定 **`AGENT_RUNTIME_URL=http://127.0.0.1:3002`**；未設定時 `api.chat` 使用同 process 的 `@ai-search-portal/agent-core`。
+- 架構決策見 [ai-product](../architecture/ai-product/README.md)。
 
 ## 相關文件
 

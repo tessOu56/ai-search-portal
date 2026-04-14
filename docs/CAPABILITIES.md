@@ -12,8 +12,8 @@
 ### 現況：有流程，無 UI 顯示
 
 - **有**：使用 **Changesets**（`@changesets/cli`）管理版本與 CHANGELOG。
-  - PR 內執行 `npm run changeset` 選擇變更類型（major/minor/patch）並填寫說明。
-  - 發版時在 main 上執行 `npm run changeset:version`（更新版號與 CHANGELOG）、`npm run changeset:publish`（若為可發佈套件）。
+  - PR 內執行 `pnpm run changeset` 選擇變更類型（major/minor/patch）並填寫說明。
+  - 發版時在 main 上執行 `pnpm run changeset:version`（更新版號與 CHANGELOG）、`pnpm run changeset:publish`（若為可發佈套件）。
   - 詳見 `docs/DEVELOPMENT.md`。
 - **沒有**：專案為 `"private": true`，沒有在 **UI 上顯示版號**（例如 footer 的「v1.2.3」）。
 

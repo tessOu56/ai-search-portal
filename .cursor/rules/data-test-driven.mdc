@@ -16,7 +16,7 @@ alwaysApply: true
 - **Schema 可驗證**：使用 Zod，禁止僅依 TypeScript 型別。見 `specs/api/contract-schema.md`。
 - **Handler = Contract**：每個 API 必有 MSW handler；handler 產出須經 schema parse。見 `specs/api/handler-mapping.md`。
 - **API 走約定路徑**：禁止在 component 內直接 `fetch(url)`；用 useFetcher 或 `app/shared/api`。見 `app/shared/api/README.md`。
-- **CI**：`npm run lint:handlers` 檢查 api route 是否有對應 handler；未通過則 PR 失敗。
+- **CI**：`pnpm run lint:handlers` 檢查 api route 是否有對應 handler；未通過則 PR 失敗。
 
 ## 適用範圍
 - 新增／變更「對外 API」→ 必須走完整流程。

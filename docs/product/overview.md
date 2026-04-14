@@ -36,7 +36,7 @@
 | **領域：食物與食譜** | Ingredient → Dish → Recipe / Vendor；營養與功效計算     | `app/features/{ingredient,dish,recipe,vendor}`，`app/shared/services/domain.server.ts` |
 | **Release Notes**    | 版號與更新說明，來自 `content/release-notes.json`       | `/release-notes`，`api/release-notes`                                                  |
 | **i18n**             | 語系切換（zh-TW / en），cookie + Form POST              | `app/shared/i18n`，`api/locale`                                                        |
-| **SEO / Sitemap**    | meta、JSON-LD、sitemap.xml、robots.txt                  | `app/shared/seo.server.ts`，`routes/sitemap[.]xml.ts`、`robots[.]txt.ts`               |
+| **SEO / Sitemap**    | meta、JSON-LD、sitemap.xml、robots.txt                  | `app/shared/seo.ts`，`routes/sitemap[.]xml.ts`、`robots[.]txt.ts`                      |
 
 ---
 
