@@ -12,4 +12,5 @@
 - **Remix ESLint 棄用**：[docs/conventions/eslint-remix-deprecation.md](conventions/eslint-remix-deprecation.md)
 - **套件升級政策**：[docs/conventions/package-upgrade-policy.md](conventions/package-upgrade-policy.md)
 - **文件命名與權重**：[docs/conventions/doc-naming.md](conventions/doc-naming.md)
+- **文件與 TODO 治理**：[docs/conventions/doc-todo-governance.md](conventions/doc-todo-governance.md)
 - **文件索引**：[docs/README.md](README.md)

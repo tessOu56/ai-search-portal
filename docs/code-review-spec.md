@@ -99,6 +99,7 @@
 ## 5. 相關文件
 
 - [code-review/README.md](../code-review/README.md) — Code review 機制、TODO 格式、一致性檢查
+- [conventions/doc-todo-governance.md](conventions/doc-todo-governance.md) — 文件同步與 TODO 治理總表
 - [docs/README.md](README.md) — docs 目錄索引
 - [AGENTS.md](../AGENTS.md) — Coding agent 入口與流程
 - [AGENT_CAPABILITIES.md](../AGENT_CAPABILITIES.md) — 能力邊界與 agent class

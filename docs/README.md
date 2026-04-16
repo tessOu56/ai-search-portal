@@ -34,6 +34,7 @@
 
 - [coding-conventions](conventions/coding-conventions.md) — 檔案與資料夾命名、lint:filenames 【spec／1】
 - [data-test-driven](conventions/data-test-driven.md) — Spec→Contract→Mock→Test→UI 制度 【spec／1】
+- [doc-todo-governance](conventions/doc-todo-governance.md) — 文件同步與 CR TODO 治理流程 【spec／1】
 - [doc-naming](conventions/doc-naming.md) — 文件命名與權重定義 【reference／2】
 - [git-version-control](conventions/git-version-control.md) — Commit、git rm、空資料夾 【spec／1】
 - [packages-react](conventions/packages-react.md) — React 18 基準、套件 peer 對照 【reference／2】

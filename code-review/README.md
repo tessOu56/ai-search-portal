@@ -32,3 +32,7 @@
 ## CI
 
 僅產出報告，不擋 build。審查標準依 [docs/code-review-spec.md](../docs/code-review-spec.md)。未來可選：新增 orphan TODO 時 fail。
+
+## 治理入口
+
+- 文件與 TODO 治理總表：`docs/conventions/doc-todo-governance.md`

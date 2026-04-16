@@ -65,6 +65,7 @@
 
 - **資料夾**（app/ 下，除 routes）：小寫、無連字號/底線。**元件檔**（app/components/\*_/_.tsx）：PascalCase。`pnpm run lint:filenames` 檢查。
 - 詳見 [docs/conventions/coding-conventions.md](docs/conventions/coding-conventions.md)。
+- 文件與 TODO 治理總表： [docs/conventions/doc-todo-governance.md](docs/conventions/doc-todo-governance.md)。
 
 ---
 
