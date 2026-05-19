@@ -11,7 +11,8 @@
 | Guardrails v2     | ✅             | `packages/agent-core/src/tools/guardrails.ts`       |
 | RAG stub + local  | ✅ 部分        | `packages/agent-core/src/rag/`                      |
 | Langfuse trace    | ✅ SDK         | `packages/agent-core/src/observability/langfuse.ts` |
-| Offline eval      | ✅ MVP         | `labs/eval-runner/`                                 |
+| Offline eval      | ✅ MVP + CI    | `labs/eval-runner/`                                 |
+| items.lookup tool | ✅             | `packages/agent-core/src/tools/execute.ts`          |
 | design-vibe GAP   | 📋 規劃        | `labs/design-vibe/GAP-REPORT.md`                    |
 | catalog-search UI | ⏳ 未進 portal | 對齊 able_portal 後 port 或獨立實作                 |
 
@@ -27,6 +28,7 @@
 
 - [x] `eval-runner`：`AGENT_RAG_MODE=local` 與 `expectRag` 案例（run-case 自動設定）
 - [x] 分數匯出 `reports/eval-*.json` 納入 CI artifact
+- [x] W2：`items.lookup` 真實呼叫 Items API（`AGENT_EXECUTE_TOOLS` / `ITEMS_API_URL`）；CI `eval:offline`
 
 ### 3. design-vibe P0
 
