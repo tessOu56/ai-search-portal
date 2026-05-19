@@ -85,12 +85,12 @@ flowchart TB
 
 **策略**：ai-search-portal 作 **契約與 agent 實驗場**；完整 Catalog UX 以 **able_portal** 為準，portal 內只做 **可演示的最小殼**，避免雙邊 SSOT 分裂。
 
-| Flow           | Portal 目標                                             | 優先 | 依賴                                 |
-| -------------- | ------------------------------------------------------- | ---- | ------------------------------------ |
-| catalog-search | `app/features/catalog-search` + route `/catalog-search` | P0   | Figma MCP 或從 able 抽離型別         |
-| api-detail     | 三欄 layout 占位                                        | P0   | `ThreeColumnExplorerLayout` 模式文件 |
-| my-apis        | `/my-apis` 卡片列表                                     | P1   | Items/contract 擴充                  |
-| requests       | 規格 only                                               | P2   | —                                    |
+| Flow           | Portal 目標                                            | 優先 | 依賴                                 |
+| -------------- | ------------------------------------------------------ | ---- | ------------------------------------ |
+| catalog-search | `app/features/catalogsearch` + route `/catalog-search` | P0   | Figma MCP 或從 able 抽離型別         |
+| api-detail     | 三欄 layout 占位                                       | P0   | `ThreeColumnExplorerLayout` 模式文件 |
+| my-apis        | `/my-apis` 卡片列表                                    | P1   | Items/contract 擴充                  |
+| requests       | 規格 only                                              | P2   | —                                    |
 
 對照：`labs/design-vibe/GAP-REPORT.md`。
 

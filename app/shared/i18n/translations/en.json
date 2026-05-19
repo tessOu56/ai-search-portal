@@ -53,5 +53,7 @@
   "release-notes.date": "Released",
   "release-notes.back": "Back to release notes",
   "release-notes.notFound": "Release not found.",
-  "release-notes.footer.link": "Release notes"
+  "release-notes.footer.link": "Release notes",
+  "catalog-search.page.title": "Catalog search",
+  "catalog-search.page.description": "Explore catalog APIs and filters (placeholder shell)."
 }

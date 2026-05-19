@@ -53,5 +53,7 @@
   "release-notes.date": "發布日",
   "release-notes.back": "返回版本列表",
   "release-notes.notFound": "找不到該版本說明。",
-  "release-notes.footer.link": "版本說明"
+  "release-notes.footer.link": "版本說明",
+  "catalog-search.page.title": "目錄搜尋",
+  "catalog-search.page.description": "探索目錄 API 與篩選（占位殼，待對齊 able 主線）。"
 }

@@ -7,7 +7,7 @@
       "title": "Catalog search",
       "screens": ["search home", "filters", "results table", "API row detail"],
       "portalTargets": [
-        "app/features/catalog-search",
+        "app/features/catalogsearch",
         "CatalogSearchPanel",
         "ThreeColumnExplorerLayout"
       ]

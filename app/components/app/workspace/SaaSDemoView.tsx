@@ -1,3 +1,5 @@
+import { Link } from "@remix-run/react";
+
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
 import {
@@ -103,11 +105,12 @@ export function SaaSDemoView() {
                 </li>
                 <li>
                   <Button
+                    asChild
                     variant="ghost"
                     size="sm"
                     className="w-full justify-start rounded-lg"
                   >
-                    Price streams
+                    <Link to="/catalog-search">Catalog search</Link>
                   </Button>
                 </li>
               </ul>
