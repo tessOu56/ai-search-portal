@@ -18,6 +18,11 @@
     "build:api": "pnpm run build:contracts && pnpm --filter ai-search-api build",
     "test:api": "pnpm run build:contracts && pnpm --filter ai-search-api test",
     "test:agent": "pnpm run build:contracts && pnpm run build:agent-core && pnpm --filter @ai-search-portal/agent-core test && pnpm --filter @ai-search-portal/agent-runtime test",
+    "test:labs": "pnpm run build:agent-core && pnpm --filter @ai-search-portal/lab-eval-runner test",
+    "build:labs": "pnpm --filter @ai-search-portal/lab-eval-runner run build && pnpm --filter @ai-search-portal/lab-design-vibe run build",
+    "turbo": "turbo",
+    "eval:offline": "pnpm run build:agent-core && pnpm --filter @ai-search-portal/lab-eval-runner run build && pnpm --filter @ai-search-portal/lab-eval-runner run eval",
+    "design:prompt": "pnpm --filter @ai-search-portal/lab-design-vibe run build && pnpm --filter @ai-search-portal/lab-design-vibe run prompt",
     "typecheck:api": "pnpm --filter ai-search-api typecheck",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives .",
     "lint:fix": "eslint --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives . --fix",
@@ -108,6 +113,7 @@
     "typescript": "^5.6.2",
     "vite": "^5.4.10",
     "vite-tsconfig-paths": "^5.1.1",
+    "turbo": "^2.3.0",
     "vitest": "^2.1.4"
   },
   "engines": {

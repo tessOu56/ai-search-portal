@@ -1,0 +1,34 @@
+{
+  "source": "Downloads API Explorer (static reference)",
+  "purpose": "Designer vibe coding — map flows to portal components + Figma MCP",
+  "flows": [
+    {
+      "id": "catalog-search",
+      "title": "Catalog search",
+      "screens": ["search home", "filters", "results table", "API row detail"],
+      "portalTargets": [
+        "app/features/catalog-search",
+        "CatalogSearchPanel",
+        "ThreeColumnExplorerLayout"
+      ]
+    },
+    {
+      "id": "api-detail",
+      "title": "API detail",
+      "screens": ["endpoint list", "request builder", "response preview"],
+      "portalTargets": ["app/routes catalog api detail", "stable chat optional"]
+    },
+    {
+      "id": "my-apis",
+      "title": "My APIs / assets",
+      "screens": ["my assets grid", "card to catalog api"],
+      "portalTargets": ["My Work Center /my-apis", "view-myassets pattern"]
+    },
+    {
+      "id": "requests",
+      "title": "Requests history",
+      "screens": ["request list", "status", "replay"],
+      "portalTargets": ["TBD — document in gap report"]
+    }
+  ]
+}

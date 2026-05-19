@@ -1,0 +1,5 @@
+{"id":"basic-query","query":"什麼是 API gateway？","expectedKeywords":["結論","依據","下一步"],"minEventCount":4}
+{"id":"short-query","query":"hello","expectedKeywords":["理解","問題"],"minEventCount":4}
+{"id":"rag-path","query":"搜尋文件 about authentication","expectedKeywords":["理解"],"minEventCount":5,"expectRag":true}
+{"id":"catalog-search","query":"catalog search filter_type API","expectedKeywords":["理解"],"minEventCount":4}
+{"id":"oauth-local-rag","query":"authentication OAuth portal","expectedKeywords":["理解"],"minEventCount":5,"expectRag":true}

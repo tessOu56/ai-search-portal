@@ -46,7 +46,7 @@ jobs:
         run: pnpm run build:api
 
       - name: Test
-        run: pnpm run test && pnpm run test:api
+        run: pnpm run test && pnpm run test:api && pnpm run test:labs
         env:
           CI: true
 

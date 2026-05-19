@@ -11,7 +11,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -19,6 +21,7 @@
   },
   "dependencies": {
     "@ai-search-portal/contracts": "workspace:*",
+    "langfuse": "^3.38.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

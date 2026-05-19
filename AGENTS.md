@@ -36,6 +36,17 @@
 
 ---
 
+## Labs（實驗；promote 前勿破壞 v1 契約）
+
+- 目錄：[labs/README.md](labs/README.md)（pnpm workspace + turbo）
+- **eval-runner**：`pnpm run test:labs` / `pnpm run eval:offline` — 離線 golden 評測 agent-core stream
+- **design-vibe**：`pnpm run design:prompt` — Downloads explorer → Figma MCP 工作流
+- 個人生態 SSOT：[develop-md/vision/platform-2026.md](https://github.com/tessOu56/develop-md/blob/main/vision/platform-2026.md)
+- **免費雲端部署**：[develop-md/vision/platform-2026-cloud-deploy.md](https://github.com/tessOu56/develop-md/blob/main/vision/platform-2026-cloud-deploy.md)（本產品 → Vercel）
+- **規劃收件**：`docs/platform-inbox/CURRENT.md`（由 [platform-command](https://github.com/tessOu56/platform-command) 派送 tickets）
+
+---
+
 ## Architecture（架構規格）
 
 - **五層**：app (shell) | features | components | services | infra（可選）。目錄對應與依賴方向：[docs/architecture/repo-layers.md](docs/architecture/repo-layers.md)。

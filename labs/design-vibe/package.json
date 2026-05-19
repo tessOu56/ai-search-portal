@@ -1,0 +1,14 @@
+{
+  "name": "@ai-search-portal/lab-design-vibe",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prompt": "node dist/print-figma-prompt.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.2"
+  }
+}
