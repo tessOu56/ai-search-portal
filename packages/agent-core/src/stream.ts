@@ -7,13 +7,39 @@ import {
 import { buildLuiResponse, splitToTokens } from "./lui-mock.js";
 import { beginChatTrace } from "./observability/langfuse.js";
 import { runRagPipelineEvents } from "./rag/pipeline.js";
+import type { SseEventPart } from "./sse-types.js";
+import { executeItemsLookup, isItemsLookupEnabled } from "./tools/execute.js";
 import { assertQueryableText, GuardrailViolation } from "./tools/guardrails.js";
 import { isAllowedTool } from "./tools/registry.js";
 
-export type SseEventPart = {
-  event: string;
-  data: string;
-};
+export type { SseEventPart } from "./sse-types.js";
+
+function toolStatusPart(tool: string, status: string): SseEventPart | null {
+  if (!isAllowedTool(tool)) {
+    return null;
+  }
+  return {
+    event: "internal.tool_status",
+    data: JSON.stringify({ tool, status }),
+  };
+}
+
+async function* emitItemsLookupEvents(
+  query: string
+): AsyncGenerator<SseEventPart> {
+  const started = toolStatusPart("items.lookup", "started");
+  if (started) {
+    yield started;
+  }
+  const result = await executeItemsLookup(query);
+  const done = toolStatusPart(
+    "items.lookup",
+    result.ok ? "completed" : "failed"
+  );
+  if (done) {
+    yield done;
+  }
+}
 
 /**
  * 產生 **內部** SSE 事件流（Gateway 再以 mapInternalSseToStable 轉成對外穩定事件）。
@@ -21,16 +47,19 @@ export type SseEventPart = {
 export async function* streamChatInternalEvents(args: {
   query: string;
   traceId?: string;
-  /** Phase 3：是否發出 tool_status（mock） */
+  /** Phase 3：是否發出 rag.search tool_status */
   emitMockToolStatus?: boolean;
   /** Phase 3：是否跑 RAG internal 步驟事件 */
   includeRagSteps?: boolean;
+  /** Phase 3：是否執行 items.lookup（預設：env 啟用時 true） */
+  executeItemsLookup?: boolean;
 }): AsyncGenerator<SseEventPart> {
   const {
     query,
     traceId,
     emitMockToolStatus = true,
     includeRagSteps = true,
+    executeItemsLookup: runItemsLookup = isItemsLookupEnabled(),
   } = args;
 
   const traceSession = beginChatTrace({ traceId, query });
@@ -63,13 +92,14 @@ export async function* streamChatInternalEvents(args: {
     data: JSON.stringify(metaPayload),
   };
 
+  if (runItemsLookup) {
+    yield* emitItemsLookupEvents(query);
+  }
+
   if (emitMockToolStatus) {
-    const toolName = "rag.search";
-    if (isAllowedTool(toolName)) {
-      yield {
-        event: "internal.tool_status",
-        data: JSON.stringify({ tool: toolName, status: "started" }),
-      };
+    const ragStarted = toolStatusPart("rag.search", "started");
+    if (ragStarted) {
+      yield ragStarted;
     }
   }
 
@@ -88,10 +118,10 @@ export async function* streamChatInternalEvents(args: {
   }
 
   if (emitMockToolStatus) {
-    yield {
-      event: "internal.tool_status",
-      data: JSON.stringify({ tool: "rag.search", status: "completed" }),
-    };
+    const ragDone = toolStatusPart("rag.search", "completed");
+    if (ragDone) {
+      yield ragDone;
+    }
   }
 
   const tokens = splitToTokens(response.answer);

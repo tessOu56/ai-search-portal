@@ -25,8 +25,8 @@
 
 ### 2. Eval 強化
 
-- [ ] `eval-runner`：`AGENT_RAG_MODE=local` 與 `expectRag` 案例在 CI 文件化
-- [ ] 分數匯出 `reports/eval-*.json` 納入 CI artifact
+- [x] `eval-runner`：`AGENT_RAG_MODE=local` 與 `expectRag` 案例（run-case 自動設定）
+- [x] 分數匯出 `reports/eval-*.json` 納入 CI artifact
 
 ### 3. design-vibe P0
 

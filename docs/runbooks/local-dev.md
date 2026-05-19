@@ -56,6 +56,7 @@
 - 啟動獨立 Agent HTTP：`pnpm run dev:agent`（預設 `http://127.0.0.1:3002`，見 `services/agent-runtime/README.md`）。
 - Remix 若要以 HTTP 連線 Agent：設定 **`AGENT_RUNTIME_URL=http://127.0.0.1:3002`**；未設定時 `api.chat` 使用同 process 的 `@ai-search-portal/agent-core`。
 - **Local RAG**（in-memory docs）：`AGENT_RAG_MODE=local` 再啟動 dev；retrieve 會命中 `packages/agent-core/src/rag/local-store.ts` 內建文件。
+- **Items tool**：另開 `pnpm run dev:api`（port 3001），設定 `AGENT_EXECUTE_TOOLS=1` 或 `ITEMS_API_URL=http://127.0.0.1:3001/api/v1/items`；chat 串流會執行 `items.lookup`。
 - **Offline eval**：`pnpm run test:labs`、`pnpm run eval:offline` → `reports/eval-YYYY-MM-DD.json`（見 `labs/eval-runner/`）。
 - **Langfuse（可選）**：`labs/observability/docker-compose.langfuse.yml`；設定 `LANGFUSE_HOST` / `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` 後，每筆 chat 會在 Langfuse 建立 trace（含 RAG spans 與 mock generation）。見 `packages/agent-core/src/observability/langfuse.ts`。
 - 架構決策見 [ai-product](../architecture/ai-product/README.md)。

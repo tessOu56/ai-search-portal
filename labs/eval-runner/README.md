@@ -15,7 +15,9 @@ pnpm --filter @ai-search-portal/lab-eval-runner run eval
 Edit `fixtures/golden.jsonl` — one JSON object per line:
 
 - `expectedKeywords` — matched case-insensitively across all SSE payloads
-- `expectRag` — requires `internal.rag_step` events
+- `expectRag` — requires `internal.rag_step` events (runner sets `AGENT_RAG_MODE=local`)
+
+Offline eval disables `items.lookup` HTTP (`executeItemsLookup: false`) so CI does not require the Hono API process.
 
 ## Promote criteria
 

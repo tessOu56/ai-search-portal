@@ -5,6 +5,11 @@ export { runRagPipelineEvents } from "./rag/pipeline.js";
 export type { SseEventPart } from "./stream.js";
 export { streamChatInternalEvents } from "./stream.js";
 export {
+  executeItemsLookup,
+  isItemsLookupEnabled,
+  type ItemsLookupResult,
+} from "./tools/execute.js";
+export {
   assertQueryableText,
   GuardrailViolation,
   scanQueryableText,

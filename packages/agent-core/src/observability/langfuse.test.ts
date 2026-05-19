@@ -9,7 +9,10 @@ import {
 const flushAsync = vi.fn().mockResolvedValue(undefined);
 const traceUpdate = vi.fn();
 const traceGeneration = vi.fn();
-const traceSpan = vi.fn(() => ({ id: "span-1" }));
+const traceSpan = vi.fn(() => ({
+  id: "span-1",
+  span: vi.fn(() => ({ id: "span-nested" })),
+}));
 
 vi.mock("langfuse", () => ({
   Langfuse: vi.fn(() => ({

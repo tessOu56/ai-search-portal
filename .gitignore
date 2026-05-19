@@ -8,6 +8,7 @@ node_modules/
 /packages/shared-contracts/dist
 /packages/agent-core/dist
 /services/agent-runtime/dist
+/labs/eval-runner/dist
 
 # Misc
 .DS_Store

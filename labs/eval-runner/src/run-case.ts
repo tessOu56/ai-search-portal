@@ -6,16 +6,31 @@ import { scoreCase } from "./score.js";
 export async function runGoldenCase(testCase: GoldenCase) {
   const events = [];
   const textParts: string[] = [];
-
-  for await (const part of streamChatInternalEvents({
-    query: testCase.query,
-    traceId: `eval-${testCase.id}`,
-    emitMockToolStatus: true,
-    includeRagSteps: testCase.expectRag ?? true,
-  })) {
-    events.push(part);
-    textParts.push(part.data);
+  const prevRagMode = process.env.AGENT_RAG_MODE;
+  if (testCase.expectRag) {
+    process.env.AGENT_RAG_MODE = "local";
   }
 
-  return scoreCase(testCase, events, textParts.join(" "));
+  try {
+    for await (const part of streamChatInternalEvents({
+      query: testCase.query,
+      traceId: `eval-${testCase.id}`,
+      emitMockToolStatus: true,
+      includeRagSteps: testCase.expectRag ?? true,
+      executeItemsLookup: false,
+    })) {
+      events.push(part);
+      textParts.push(part.data);
+    }
+
+    return scoreCase(testCase, events, textParts.join(" "));
+  } finally {
+    if (testCase.expectRag) {
+      if (prevRagMode === undefined) {
+        delete process.env.AGENT_RAG_MODE;
+      } else {
+        process.env.AGENT_RAG_MODE = prevRagMode;
+      }
+    }
+  }
 }
