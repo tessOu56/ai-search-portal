@@ -2,12 +2,12 @@
 
 Reference: `fixtures/api-explorer-flows.json` (Downloads API Explorer) → **ai-search-portal** + Figma MCP.
 
-| Flow               | Reference screens                        | Portal target                                      | Figma node (MCP)                     | Priority | Gap / next action                                             |
-| ------------------ | ---------------------------------------- | -------------------------------------------------- | ------------------------------------ | -------- | ------------------------------------------------------------- |
-| **catalog-search** | search home, filters, results, API row   | `app/features/catalogsearch`, `CatalogSearchPanel` | `TBD` — run `pnpm run design:prompt` | P0       | Align toolbar/pagination; fill node after `get_file`          |
-| **api-detail**     | endpoint list, request builder, response | Catalog API detail, `ThreeColumnExplorerLayout`    | `TBD`                                | P0       | Map request/response panels; see `docs/product/lui-search.md` |
-| **my-apis**        | my assets grid, card → API               | My Work Center `/my-apis`                          | `TBD`                                | P1       | Card pattern from `view-myassets`                             |
-| **requests**       | request list, status, replay             | _Not in v1_                                        | `n/a`                                | P2       | Spec-only or defer                                            |
+| Flow               | Reference screens                        | Portal target                                      | Figma node (MCP)                      | Priority | Gap / next action                                                |
+| ------------------ | ---------------------------------------- | -------------------------------------------------- | ------------------------------------- | -------- | ---------------------------------------------------------------- |
+| **catalog-search** | search home, filters, results, API row   | `app/features/catalogsearch`, `CatalogSearchPanel` | **waiver** until Figma MCP (STOP-003) | P0       | ✅ URL type filter + pagination on mock; Access filters deferred |
+| **api-detail**     | endpoint list, request builder, response | Catalog API detail, `ThreeColumnExplorerLayout`    | `TBD`                                 | P0       | Map request/response panels; see `docs/product/lui-search.md`    |
+| **my-apis**        | my assets grid, card → API               | My Work Center `/my-apis`                          | `TBD`                                 | P1       | Card pattern from `view-myassets`                                |
+| **requests**       | request list, status, replay             | _Not in v1_                                        | `n/a`                                 | P2       | Spec-only or defer                                               |
 
 ## Component mapping (initial)
 
@@ -32,5 +32,5 @@ pnpm run design:prompt
 
 - [x] Fixture SSOT for four flows
 - [x] Initial GAP table with portal paths
-- [ ] At least one flow with Figma node IDs filled (column ready; needs `FIGMA_*` MCP)
-- [x] One PR touching portal UI from gap row P0 (`/catalog-search` shell)
+- [ ] At least one flow with Figma node IDs filled (blocked: external Figma token — see `docs/STOP-EXTERNAL.md`)
+- [x] One PR touching portal UI from gap row P0 (`/catalog-search` shell + filter/pagination)

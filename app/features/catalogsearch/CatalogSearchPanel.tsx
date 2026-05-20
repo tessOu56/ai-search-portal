@@ -1,3 +1,5 @@
+import { Link } from "@remix-run/react";
+
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
 import {
@@ -15,7 +17,22 @@ export type CatalogSearchPanelProps = {
   model: CatalogSearchViewModel;
 };
 
+function buildSearchUrl(
+  base: { q: string; type?: string },
+  page: number
+): string {
+  const sp = new URLSearchParams();
+  if (base.q) sp.set("q", base.q);
+  if (base.type) sp.set("type", base.type);
+  if (page > 1) sp.set("page", String(page));
+  const qs = sp.toString();
+  return qs ? `/catalog-search?${qs}` : "/catalog-search";
+}
+
 export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
+  const { pagination } = model;
+  const base = { q: model.query, type: model.activeType };
+
   return (
     <div className="space-y-6">
       <header className="space-y-2">
@@ -29,10 +46,8 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         </div>
         <h1 className="text-3xl font-bold tracking-tight">Catalog search</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Placeholder for Downloads API Explorer flows. Toolbar, filters, and
-          results table will align with{" "}
-          <code className="text-xs">labs/design-vibe/GAP-REPORT.md</code> after
-          Figma MCP / able_portal port.
+          Mock-first catalog UI (fixtures + GAP). Type filter and pagination
+          work on placeholder data — no Vercel or catalog API required.
         </p>
       </header>
 
@@ -40,11 +55,14 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         <CardHeader>
           <CardTitle className="text-base">Search</CardTitle>
           <CardDescription>
-            GET form only — no backend wiring in this shell.
+            GET form — filters preserved in URL.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form method="get" className="flex flex-col gap-3 sm:flex-row">
+            {model.activeType ? (
+              <input type="hidden" name="type" value={model.activeType} />
+            ) : null}
             <Input
               name="q"
               defaultValue={model.query}
@@ -61,11 +79,42 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         <CardHeader>
           <CardTitle className="text-base">Filters</CardTitle>
           <CardDescription>
-            Disabled until catalog API integration.
+            Type filter active via URL <code className="text-xs">?type=</code>.
+            Access filters deferred (GAP).
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          {model.filters.map((filter) => (
+        <CardContent className="flex flex-wrap gap-4">
+          <div className="space-y-1">
+            <span className="text-xs font-medium text-muted-foreground">
+              Type
+            </span>
+            <div className="flex flex-wrap gap-1">
+              <Link
+                to={buildSearchUrl({ q: model.query }, 1)}
+                className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium ${
+                  !model.activeType
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background hover:bg-muted"
+                }`}
+              >
+                All
+              </Link>
+              {model.filters[0]?.options.map((opt) => (
+                <Link
+                  key={opt.value}
+                  to={buildSearchUrl({ q: model.query, type: opt.value }, 1)}
+                  className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium ${
+                    model.activeType === opt.value
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background hover:bg-muted"
+                  }`}
+                >
+                  {opt.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+          {model.filters.slice(1).map((filter) => (
             <fieldset key={filter.id} className="space-y-1">
               <legend className="text-xs font-medium text-muted-foreground">
                 {filter.label}
@@ -79,6 +128,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
                     variant="outline"
                     disabled
                     className="rounded-full"
+                    title="Access filter — post-MVP"
                   >
                     {opt.label}
                   </Button>
@@ -93,11 +143,15 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         <CardHeader>
           <CardTitle className="text-base">Results</CardTitle>
           <CardDescription>
-            {model.results.length} row(s)
+            {pagination.total} row(s)
             {model.query ? ` matching “${model.query}”` : ""}
+            {model.activeType ? ` · type=${model.activeType}` : ""}
+            {pagination.totalPages > 1
+              ? ` · page ${pagination.page}/${pagination.totalPages}`
+              : ""}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="overflow-hidden rounded-lg border border-border">
             <div className="grid grid-cols-[1fr_2fr_auto] bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">
               <span>Name</span>
@@ -132,6 +186,36 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
               )}
             </div>
           </div>
+          {pagination.totalPages > 1 ? (
+            <nav
+              className="flex items-center justify-between gap-2"
+              aria-label="Results pagination"
+            >
+              {pagination.page > 1 ? (
+                <Link
+                  to={buildSearchUrl(base, pagination.page - 1)}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Previous
+                </Link>
+              ) : (
+                <span className="text-sm text-muted-foreground">Previous</span>
+              )}
+              <span className="text-xs text-muted-foreground">
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+              {pagination.page < pagination.totalPages ? (
+                <Link
+                  to={buildSearchUrl(base, pagination.page + 1)}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Next
+                </Link>
+              ) : (
+                <span className="text-sm text-muted-foreground">Next</span>
+              )}
+            </nav>
+          ) : null}
         </CardContent>
       </Card>
     </div>

@@ -18,4 +18,12 @@ export type CatalogSearchViewModel = {
   query: string;
   filters: CatalogSearchFilter[];
   results: CatalogApiRow[];
+  /** Active filter from query string (mock). */
+  activeType?: string;
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
 };
