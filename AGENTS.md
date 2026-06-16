@@ -36,6 +36,14 @@
 
 ---
 
+## Agent 協作（skills / hooks / commands）
+
+- **Playbook**：[docs/agent-collaboration.md](docs/agent-collaboration.md) — session 進入順序、儀式指令、prompt 範本
+- **階段 SSOT**：[docs/PROJECT-PLAN.md](docs/PROJECT-PLAN.md) — Phase 0–5 出口條件（無日曆）
+- **Skills**：`.cursor/skills/portal-phase-work`、`portal-contract-change`、`portal-lab-boundary`
+- **Hooks**：`.cursor/hooks.json`（session 指向 PROJECT-PLAN；git 守門）
+- **生態**： [platform-command/docs/agent-collaboration.md](https://github.com/tessOu56/platform-command/blob/main/docs/agent-collaboration.md)
+
 ## Labs（實驗；promote 前勿破壞 v1 契約）
 
 - 目錄：[labs/README.md](labs/README.md)（pnpm workspace + turbo）

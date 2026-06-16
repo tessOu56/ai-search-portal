@@ -2,6 +2,16 @@
 
 基於 Remix 框架建置的智能 AI 搜尋平台。
 
+## Portfolio / 履歷
+
+| 資源                                                                                                                       | 說明                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [docs/RESUME-DEMO.md](docs/RESUME-DEMO.md)                                                                                 | 3 分鐘 demo 腳本、檢查清單、履歷句                                        |
+| [platform-command resume SSOT](https://github.com/tessOu56/platform-command/blob/main/planning/career/resume-portfolio.md) | 公開作品集規劃                                                            |
+| 配對後端練習                                                                                                               | [py-able-labs](https://github.com/tessOu56/py-able-labs) catalog API 契約 |
+
+**本地 demo**：`pnpm dev` → `/catalog-search`（篩選 `?type=` + 分頁）。公開 URL 見 RESUME-DEMO（Vercel STOP-001 解除後填入 registry）。
+
 ## 技術棧
 
 - **框架**: Remix v2 + React 18

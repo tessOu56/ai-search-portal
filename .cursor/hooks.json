@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": ".cursor/hooks/session-context.ps1"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/guard-destructive-git.ps1",
+        "matcher": "git\\s+(push|reset)"
+      }
+    ]
+  }
+}

@@ -6,7 +6,8 @@ Experimental packages — **promote** to `packages/` or `app/` when stable; do n
 | ------------------------------- | ----------------------------------- | ------------------------------------------- |
 | [eval-runner](eval-runner/)     | `@ai-search-portal/lab-eval-runner` | MVP — offline golden cases                  |
 | [design-vibe](design-vibe/)     | `@ai-search-portal/lab-design-vibe` | MVP — Downloads explorer → Figma MCP bridge |
-| [observability](observability/) | _(compose only)_                    | Sprint 3 — Langfuse self-host               |
+| [observability](observability/) | _(compose only)_                    | Langfuse self-host                          |
+| on-device-media _(planned)_     | —                                   | Parallel track — WebCodecs → WebGPU POC     |
 
 ## Commands
 
