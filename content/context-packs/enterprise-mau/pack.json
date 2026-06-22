@@ -1,0 +1,6 @@
+{
+  "id": "enterprise-mau",
+  "name": "Enterprise analytics",
+  "description": "Generic enterprise MAU, CRM, and BI context pack for demos.",
+  "defaultLocale": "en"
+}

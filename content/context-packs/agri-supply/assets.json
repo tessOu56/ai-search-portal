@@ -1,0 +1,122 @@
+[
+  {
+    "id": "db-supply",
+    "name": "supply_chain",
+    "description": "Procurement and inventory analytics database",
+    "assetType": "Database",
+    "owner": "data-platform@example.com",
+    "tags": ["production", "supply"],
+    "classification": "internal",
+    "updatedAt": "2026-06-01T10:00:00.000Z",
+    "fqn": "supply_chain",
+    "columns": [],
+    "upstreamIds": [],
+    "downstreamIds": ["tbl-procurement-lot", "dim-ingredient"],
+    "datasetId": "supply-chain",
+    "packId": "agri-supply"
+  },
+  {
+    "id": "dim-ingredient",
+    "name": "dim_ingredient",
+    "description": "Ingredient dimension including spice and produce categories",
+    "assetType": "Table",
+    "owner": "catalog-owner@example.com",
+    "tags": ["dimension"],
+    "classification": "internal",
+    "updatedAt": "2026-06-05T08:00:00.000Z",
+    "fqn": "supply_chain.public.dim_ingredient",
+    "columns": [
+      {
+        "name": "ingredient_id",
+        "dataType": "varchar",
+        "description": "Surrogate key"
+      },
+      {
+        "name": "category",
+        "dataType": "varchar",
+        "description": "spice | produce | processed"
+      },
+      {
+        "name": "origin_region",
+        "dataType": "varchar"
+      }
+    ],
+    "upstreamIds": ["db-supply"],
+    "downstreamIds": ["tbl-procurement-lot"],
+    "datasetId": "dim-ingredient",
+    "packId": "agri-supply"
+  },
+  {
+    "id": "tbl-procurement-lot",
+    "name": "fact_procurement_lot",
+    "description": "Procurement lot fact with quantity, unit price, and origin",
+    "assetType": "Table",
+    "owner": "procurement-owner@example.com",
+    "tags": ["fact", "cost"],
+    "classification": "confidential",
+    "updatedAt": "2026-06-10T08:00:00.000Z",
+    "fqn": "supply_chain.public.fact_procurement_lot",
+    "columns": [
+      {
+        "name": "lot_id",
+        "dataType": "varchar",
+        "tags": ["key"]
+      },
+      {
+        "name": "ingredient_id",
+        "dataType": "varchar"
+      },
+      {
+        "name": "unit_price",
+        "dataType": "decimal",
+        "description": "Price per kg",
+        "sensitive": true
+      },
+      {
+        "name": "quantity_kg",
+        "dataType": "decimal"
+      },
+      {
+        "name": "market_region",
+        "dataType": "varchar"
+      }
+    ],
+    "upstreamIds": ["db-supply", "dim-ingredient"],
+    "downstreamIds": ["api-procurement", "dash-procurement"],
+    "datasetId": "procurement-lot",
+    "packId": "agri-supply",
+    "metricIds": ["metric-wholesale-basil-north"]
+  },
+  {
+    "id": "api-procurement",
+    "name": "GET /api/procurement/lots",
+    "description": "Procurement lots listing API",
+    "assetType": "API",
+    "owner": "api-team@example.com",
+    "tags": ["rest"],
+    "classification": "internal",
+    "updatedAt": "2026-06-12T11:00:00.000Z",
+    "fqn": "api.procurement.lots",
+    "columns": [],
+    "upstreamIds": ["tbl-procurement-lot"],
+    "downstreamIds": [],
+    "datasetId": "procurement-api",
+    "packId": "agri-supply"
+  },
+  {
+    "id": "dash-procurement",
+    "name": "procurement_dashboard",
+    "description": "Procurement decision dashboard with price trends",
+    "assetType": "Dashboard",
+    "owner": "bi-team@example.com",
+    "tags": ["bi"],
+    "classification": "confidential",
+    "updatedAt": "2026-06-15T14:00:00.000Z",
+    "fqn": "bi.dashboards.procurement",
+    "columns": [],
+    "upstreamIds": ["tbl-procurement-lot"],
+    "downstreamIds": [],
+    "datasetId": "procurement-dashboard",
+    "packId": "agri-supply"
+  }
+]

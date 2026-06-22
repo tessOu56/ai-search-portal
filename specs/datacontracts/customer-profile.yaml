@@ -1,0 +1,27 @@
+# Customer profile data contract (POC)
+# Aligns with content/metadata-assets.json asset id: tbl-customers
+# Direction: Open Data Contract Standard (ODCS); legacy ODCS deprecated — see ADR.
+
+id: customer-profile
+version: "1.0.0"
+owner: crm-owner@example.com
+classification: PII
+termsOfUse:
+  - analytics
+  - operations
+  - marketing_requires_approval
+fields:
+  - name: customer_id
+    type: bigint
+    sensitive: false
+  - name: email
+    type: varchar
+    sensitive: true
+    tags: [PII]
+  - name: phone
+    type: varchar
+    sensitive: true
+    tags: [PII]
+  - name: segment
+    type: varchar
+    sensitive: false

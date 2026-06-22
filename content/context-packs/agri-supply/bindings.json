@@ -1,0 +1,22 @@
+{
+  "bindings": [
+    {
+      "contextRef": "metric-wholesale-basil-north",
+      "module": "ingredient",
+      "entityId": "ingredient-basil",
+      "relation": "measures"
+    },
+    {
+      "contextRef": "tbl-procurement-lot",
+      "module": "vendor",
+      "entityId": "vendor-taipei-wholesale",
+      "relation": "sources_from"
+    },
+    {
+      "contextRef": "dash-procurement",
+      "module": "dish",
+      "entityId": "dish-three-cup-chicken",
+      "relation": "costs_into"
+    }
+  ]
+}

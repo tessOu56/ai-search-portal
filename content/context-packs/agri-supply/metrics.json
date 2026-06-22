@@ -1,0 +1,21 @@
+[
+  {
+    "id": "metric-wholesale-basil-north",
+    "definition": "Northern Taiwan wholesale market weighted average price per kg for basil lots.",
+    "owner": "Procurement Division",
+    "sourceAssetId": "tbl-procurement-lot",
+    "upstreamJobIds": ["ods_market_auction_etl", "dim_ingredient_sync"],
+    "downstreamDashboardIds": [
+      "Procurement Decision Dashboard",
+      "Recipe Cost Estimator"
+    ],
+    "qualityRules": ["unit must be kg", "price must be greater than zero"],
+    "accessPolicy": "Procurement and finance see detail; analysts see aggregates only",
+    "recentChanges": [
+      {
+        "date": "2026-05-20",
+        "change": "Season transition: increased weight for southern origin lots"
+      }
+    ]
+  }
+]

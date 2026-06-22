@@ -1,0 +1,19 @@
+# Metadata access domain spec (POC)
+
+roles:
+  - analyst
+  - data_admin
+  - engineer
+
+purposes:
+  - analytics
+  - marketing
+  - operations
+
+access_request_states:
+  - draft
+  - pending_approval
+  - approved
+  - denied
+
+default_role: analyst

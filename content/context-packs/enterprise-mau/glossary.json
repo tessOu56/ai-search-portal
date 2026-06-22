@@ -1,0 +1,14 @@
+[
+  {
+    "id": "term-mau",
+    "term": "MAU",
+    "definition": "Monthly Active Users — unique members with at least one login in a calendar month.",
+    "relatedAssetIds": ["tbl-customers", "dash-orders"]
+  },
+  {
+    "id": "term-pii",
+    "term": "PII",
+    "definition": "Personally identifiable information subject to access policy and masking.",
+    "relatedAssetIds": ["tbl-customers"]
+  }
+]

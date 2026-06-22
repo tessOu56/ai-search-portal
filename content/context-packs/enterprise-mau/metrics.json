@@ -1,0 +1,24 @@
+[
+  {
+    "id": "metric-monthly-active-users",
+    "definition": "Count of unique members with at least one login in the calendar month.",
+    "owner": "CRM Team",
+    "sourceAssetId": "tbl-customers",
+    "upstreamJobIds": ["ods_login_event_etl", "user_status_sync"],
+    "downstreamDashboardIds": [
+      "Executive Growth Dashboard",
+      "CRM Retention Report"
+    ],
+    "qualityRules": [
+      "login_time cannot be null",
+      "user_id must exist in dim_user"
+    ],
+    "accessPolicy": "Only Growth, CRM, and Executive teams can access aggregated data",
+    "recentChanges": [
+      {
+        "date": "2026-06-10",
+        "change": "Excluded suspended users from active user calculation"
+      }
+    ]
+  }
+]

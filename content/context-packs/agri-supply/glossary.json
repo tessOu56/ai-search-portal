@@ -1,0 +1,14 @@
+[
+  {
+    "id": "term-wholesale-index",
+    "term": "Wholesale price index",
+    "definition": "Regional weighted average transaction price per kg at wholesale markets.",
+    "relatedAssetIds": ["tbl-procurement-lot", "metric-wholesale-basil-north"]
+  },
+  {
+    "id": "term-seasonality",
+    "term": "Seasonality",
+    "definition": "Production season shifts that affect sourcing weights and price volatility.",
+    "relatedAssetIds": ["tbl-procurement-lot"]
+  }
+]

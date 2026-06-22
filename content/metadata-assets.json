@@ -1,0 +1,171 @@
+[
+  {
+    "id": "db-analytics",
+    "name": "analytics",
+    "description": "Production analytics database",
+    "assetType": "Database",
+    "owner": "data-platform@example.com",
+    "tags": ["production"],
+    "classification": "internal",
+    "updatedAt": "2026-06-01T10:00:00.000Z",
+    "fqn": "analytics",
+    "columns": [],
+    "upstreamIds": [],
+    "downstreamIds": ["tbl-customers", "tbl-orders"],
+    "datasetId": "analytics"
+  },
+  {
+    "id": "db-staging",
+    "name": "staging",
+    "description": "Staging database for ETL validation",
+    "assetType": "Database",
+    "owner": "data-platform@example.com",
+    "tags": ["staging"],
+    "classification": "internal",
+    "updatedAt": "2026-06-02T10:00:00.000Z",
+    "fqn": "staging",
+    "columns": [],
+    "upstreamIds": [],
+    "downstreamIds": ["tbl-etl-orders"],
+    "datasetId": "staging"
+  },
+  {
+    "id": "tbl-customers",
+    "name": "customer_profile",
+    "description": "Customer profile dimension table with PII fields",
+    "assetType": "Table",
+    "owner": "crm-owner@example.com",
+    "tags": ["PII", "dimension"],
+    "classification": "PII",
+    "updatedAt": "2026-06-10T08:00:00.000Z",
+    "fqn": "analytics.public.customer_profile",
+    "columns": [
+      {
+        "name": "customer_id",
+        "dataType": "bigint",
+        "description": "Surrogate key",
+        "tags": ["key"]
+      },
+      {
+        "name": "email",
+        "dataType": "varchar",
+        "description": "Customer email address",
+        "tags": ["PII"],
+        "sensitive": true
+      },
+      {
+        "name": "phone",
+        "dataType": "varchar",
+        "description": "Customer phone number",
+        "tags": ["PII"],
+        "sensitive": true
+      },
+      {
+        "name": "segment",
+        "dataType": "varchar",
+        "description": "Marketing segment"
+      }
+    ],
+    "upstreamIds": ["db-analytics"],
+    "downstreamIds": ["api-orders", "dash-orders"],
+    "datasetId": "customer-profile"
+  },
+  {
+    "id": "tbl-orders",
+    "name": "orders",
+    "description": "Order fact table",
+    "assetType": "Table",
+    "owner": "commerce-owner@example.com",
+    "tags": ["fact"],
+    "classification": "internal",
+    "updatedAt": "2026-06-11T09:00:00.000Z",
+    "fqn": "analytics.public.orders",
+    "columns": [
+      {
+        "name": "order_id",
+        "dataType": "bigint",
+        "tags": ["key"]
+      },
+      {
+        "name": "customer_id",
+        "dataType": "bigint"
+      },
+      {
+        "name": "amount",
+        "dataType": "decimal"
+      }
+    ],
+    "upstreamIds": ["db-analytics"],
+    "downstreamIds": ["tbl-etl-orders", "api-orders"],
+    "datasetId": "orders"
+  },
+  {
+    "id": "tbl-etl-orders",
+    "name": "etl_orders",
+    "description": "ETL staging orders table",
+    "assetType": "Table",
+    "owner": "data-platform@example.com",
+    "tags": ["etl"],
+    "classification": "internal",
+    "updatedAt": "2026-06-12T11:00:00.000Z",
+    "fqn": "staging.public.etl_orders",
+    "columns": [
+      {
+        "name": "order_id",
+        "dataType": "bigint"
+      },
+      {
+        "name": "status",
+        "dataType": "varchar"
+      }
+    ],
+    "upstreamIds": ["tbl-orders", "db-staging"],
+    "downstreamIds": ["dash-orders"],
+    "datasetId": "etl-orders"
+  },
+  {
+    "id": "api-orders",
+    "name": "GET /api/orders",
+    "description": "Orders listing API backed by orders table",
+    "assetType": "API",
+    "owner": "api-team@example.com",
+    "tags": ["rest"],
+    "classification": "internal",
+    "updatedAt": "2026-06-13T12:00:00.000Z",
+    "fqn": "api.orders.list",
+    "columns": [],
+    "upstreamIds": ["tbl-orders", "tbl-customers"],
+    "downstreamIds": [],
+    "datasetId": "orders-api"
+  },
+  {
+    "id": "api-dictionary",
+    "name": "GET /dictionary/search",
+    "description": "Catalog dictionary search endpoint",
+    "assetType": "API",
+    "owner": "catalog-team@example.com",
+    "tags": ["catalog"],
+    "classification": "public",
+    "updatedAt": "2026-06-14T13:00:00.000Z",
+    "fqn": "api.dictionary.search",
+    "columns": [],
+    "upstreamIds": [],
+    "downstreamIds": [],
+    "datasetId": "dictionary-api"
+  },
+  {
+    "id": "dash-orders",
+    "name": "orders_dashboard",
+    "description": "Executive orders dashboard",
+    "assetType": "Dashboard",
+    "owner": "bi-team@example.com",
+    "tags": ["bi"],
+    "classification": "confidential",
+    "updatedAt": "2026-06-15T14:00:00.000Z",
+    "fqn": "bi.dashboards.orders",
+    "columns": [],
+    "upstreamIds": ["tbl-etl-orders", "tbl-customers"],
+    "downstreamIds": [],
+    "datasetId": "orders-dashboard"
+  }
+]

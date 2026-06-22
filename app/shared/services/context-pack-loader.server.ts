@@ -1,0 +1,210 @@
+/**
+ * Context pack file loader — domain-neutral; reads content/context-packs/*.
+ */
+
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
+
+import {
+  type ContextGlossaryTermContract,
+  contextGlossaryTermSchema,
+  type ContextMetricContract,
+  contextMetricSchema,
+  type ContextPackManifestContract,
+  contextPackManifestSchema,
+  DEFAULT_CONTEXT_PACK_ID,
+  type DomainBindingContract,
+  domainBindingsFileSchema,
+  type MetadataAssetDetailContract,
+  metadataAssetDetailSchema,
+} from "@ai-search-portal/contracts";
+
+const PACKS_DIR = "content/context-packs";
+const CONTEXT_PACK_COOKIE = "context_pack";
+
+type PackCache = {
+  assets: Map<string, MetadataAssetDetailContract[]>;
+  metrics: Map<string, ContextMetricContract[]>;
+  glossary: Map<string, ContextGlossaryTermContract[]>;
+  bindings: Map<string, DomainBindingContract[]>;
+  manifests: ContextPackManifestContract[] | null;
+};
+
+function createPackCache(): PackCache {
+  return {
+    assets: new Map(),
+    metrics: new Map(),
+    glossary: new Map(),
+    bindings: new Map(),
+    manifests: null,
+  };
+}
+
+let cache: PackCache = createPackCache();
+
+function readJsonFile(filePath: string): unknown {
+  const raw = readFileSync(filePath, "utf-8");
+  return JSON.parse(raw) as unknown;
+}
+
+function packsRoot(contentRoot: string): string {
+  return path.join(contentRoot, PACKS_DIR);
+}
+
+function packDir(contentRoot: string, packId: string): string {
+  return path.join(packsRoot(contentRoot), packId);
+}
+
+function loadJsonArray<T>(
+  filePath: string,
+  parseItem: (item: unknown) => T
+): T[] {
+  if (!existsSync(filePath)) return [];
+  const data = readJsonFile(filePath);
+  if (!Array.isArray(data)) return [];
+  return data.map((item) => parseItem(item));
+}
+
+export function resolveContentRoot(cwd = process.cwd()): string {
+  return cwd;
+}
+
+export function listContextPackIds(contentRoot: string): string[] {
+  const root = packsRoot(contentRoot);
+  if (!existsSync(root)) return [];
+  return readdirSync(root, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name)
+    .filter((id) => existsSync(path.join(root, id, "pack.json")));
+}
+
+export function listContextPacks(
+  contentRoot: string
+): ContextPackManifestContract[] {
+  if (cache.manifests) return cache.manifests;
+  const ids = listContextPackIds(contentRoot);
+  const manifests = ids.map((id) => {
+    const manifestPath = path.join(packDir(contentRoot, id), "pack.json");
+    return contextPackManifestSchema.parse(readJsonFile(manifestPath));
+  });
+  cache.manifests = manifests;
+  return manifests;
+}
+
+export function loadPackAssets(
+  packId: string,
+  contentRoot: string
+): MetadataAssetDetailContract[] {
+  const cached = cache.assets.get(packId);
+  if (cached) return cached;
+  const filePath = path.join(packDir(contentRoot, packId), "assets.json");
+  const assets = loadJsonArray(filePath, (item) =>
+    metadataAssetDetailSchema.parse(item)
+  ).map((asset) => ({
+    ...asset,
+    packId: asset.packId ?? packId,
+  }));
+  cache.assets.set(packId, assets);
+  return assets;
+}
+
+export function loadPackMetrics(
+  packId: string,
+  contentRoot: string
+): ContextMetricContract[] {
+  const cached = cache.metrics.get(packId);
+  if (cached) return cached;
+  const filePath = path.join(packDir(contentRoot, packId), "metrics.json");
+  const metrics = loadJsonArray(filePath, (item) =>
+    contextMetricSchema.parse(item)
+  );
+  cache.metrics.set(packId, metrics);
+  return metrics;
+}
+
+export function loadPackGlossary(
+  packId: string,
+  contentRoot: string
+): ContextGlossaryTermContract[] {
+  const cached = cache.glossary.get(packId);
+  if (cached) return cached;
+  const filePath = path.join(packDir(contentRoot, packId), "glossary.json");
+  const terms = loadJsonArray(filePath, (item) =>
+    contextGlossaryTermSchema.parse(item)
+  );
+  cache.glossary.set(packId, terms);
+  return terms;
+}
+
+export function loadPackBindings(
+  packId: string,
+  contentRoot: string
+): DomainBindingContract[] {
+  const cached = cache.bindings.get(packId);
+  if (cached) return cached;
+  const filePath = path.join(packDir(contentRoot, packId), "bindings.json");
+  if (!existsSync(filePath)) {
+    cache.bindings.set(packId, []);
+    return [];
+  }
+  const parsed = domainBindingsFileSchema.parse(readJsonFile(filePath));
+  cache.bindings.set(packId, parsed.bindings);
+  return parsed.bindings;
+}
+
+export function getPackMetric(
+  packId: string,
+  metricId: string,
+  contentRoot: string
+): ContextMetricContract | null {
+  return (
+    loadPackMetrics(packId, contentRoot).find((m) => m.id === metricId) ?? null
+  );
+}
+
+export function resolveDomainBindings(
+  packId: string,
+  contextRef: string | undefined,
+  contentRoot: string
+): DomainBindingContract[] {
+  const all = loadPackBindings(packId, contentRoot);
+  if (!contextRef) return all;
+  return all.filter((b) => b.contextRef === contextRef);
+}
+
+export function resolveActivePackId(args: {
+  packQuery?: string | null;
+  cookieHeader?: string | null;
+  envPack?: string | null;
+}): string {
+  const fromQuery = args.packQuery?.trim();
+  if (fromQuery) return fromQuery;
+
+  const cookie = args.cookieHeader ?? "";
+  const match = cookie.match(
+    new RegExp(`(?:^|;\\s*)${CONTEXT_PACK_COOKIE}=([^;]+)`)
+  );
+  if (match?.[1]) {
+    return decodeURIComponent(match[1]);
+  }
+
+  const fromEnv = args.envPack?.trim();
+  if (fromEnv) return fromEnv;
+
+  return DEFAULT_CONTEXT_PACK_ID;
+}
+
+export function parsePackIdFromRequest(request: Request): string {
+  const url = new URL(request.url);
+  return resolveActivePackId({
+    packQuery: url.searchParams.get("pack"),
+    cookieHeader: request.headers.get("Cookie"),
+    envPack: process.env.CONTEXT_PACK ?? null,
+  });
+}
+
+export function resetContextPackCache(): void {
+  cache = createPackCache();
+}
+
+export { CONTEXT_PACK_COOKIE, DEFAULT_CONTEXT_PACK_ID };
