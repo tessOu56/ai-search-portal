@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: AI Search Portal HTTP API (Items)
-  version: 0.1.0
+  title: AI Search Portal HTTP API
+  version: 0.3.0
   description: >
-    Items CRUD under /api/items. Must stay aligned with @ai-search-portal/contracts (Zod) until OpenAPI is declared sole HTTP SoT. See specs/README.md.
+    Items CRUD and Metadata catalog APIs. Must stay aligned with @ai-search-portal/contracts (Zod).
 
 servers:
   - url: /
@@ -176,6 +176,163 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/metadata:
+    get:
+      operationId: listMetadata
+      summary: List metadata assets
+      parameters:
+        - name: pack
+          in: query
+          schema:
+            type: string
+          description: Context pack id (default enterprise-mau)
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListMetadataResponse"
+
+  /api/context/packs:
+    get:
+      operationId: listContextPacks
+      summary: List available context packs
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListContextPacksResponse"
+
+  /api/context/metrics/{metricId}:
+    parameters:
+      - name: metricId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: pack
+        in: query
+        schema:
+          type: string
+    get:
+      operationId: getContextMetric
+      summary: Get context metric definition
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetContextMetricResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/context/bindings:
+    get:
+      operationId: getContextBindings
+      summary: Resolve domain bindings for a context pack
+      parameters:
+        - name: pack
+          in: query
+          schema:
+            type: string
+        - name: ref
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetContextBindingsResponse"
+
+  /api/metadata/{assetId}:
+    parameters:
+      - name: assetId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getMetadataAsset
+      summary: Get metadata asset
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMetadataAssetResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/metadata/access-requests/evaluate:
+    post:
+      operationId: evaluateMetadataAccess
+      summary: Evaluate access policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetadataAccessEvaluateRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluateAccessResponse"
+
+  /api/metadata/access-requests:
+    post:
+      operationId: submitMetadataAccess
+      summary: Submit metadata access request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetadataAccessRequest"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitAccessResponse"
+        "422":
+          description: Approval required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     MockItem:
@@ -237,3 +394,237 @@ components:
       properties:
         error:
           type: string
+
+    MetadataAssetSummary:
+      type: object
+      required:
+        [id, name, description, assetType, owner, tags, classification, updatedAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        assetType:
+          type: string
+          enum: [Database, Table, API, Dashboard]
+        owner:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        classification:
+          type: string
+          enum: [public, internal, PII, confidential]
+        updatedAt:
+          type: string
+        fqn:
+          type: string
+
+    ListMetadataResponse:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetadataAssetSummary"
+        pagination:
+          type: object
+          required: [page, pageSize, total, totalPages]
+          properties:
+            page:
+              type: integer
+            pageSize:
+              type: integer
+            total:
+              type: integer
+            totalPages:
+              type: integer
+
+    MetadataAssetDetail:
+      allOf:
+        - $ref: "#/components/schemas/MetadataAssetSummary"
+        - type: object
+          required: [fqn, upstreamIds, downstreamIds]
+          properties:
+            fqn:
+              type: string
+            upstreamIds:
+              type: array
+              items:
+                type: string
+            downstreamIds:
+              type: array
+              items:
+                type: string
+
+    GetMetadataAssetResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: "#/components/schemas/MetadataAssetDetail"
+
+    MetadataAccessEvaluateRequest:
+      type: object
+      required: [assetId, purpose]
+      properties:
+        assetId:
+          type: string
+        purpose:
+          type: string
+          enum: [analytics, marketing, operations]
+        role:
+          type: string
+          enum: [analyst, data_admin, engineer]
+
+    MetadataAccessRequest:
+      allOf:
+        - $ref: "#/components/schemas/MetadataAccessEvaluateRequest"
+        - type: object
+          properties:
+            approved:
+              type: boolean
+
+    PolicyDecision:
+      type: object
+      required:
+        [allow, need_approval, mask_fields, require_audit, decision_id, reasons]
+      properties:
+        allow:
+          type: boolean
+        need_approval:
+          type: boolean
+        mask_fields:
+          type: array
+          items:
+            type: string
+        require_audit:
+          type: boolean
+        decision_id:
+          type: string
+        reasons:
+          type: array
+          items:
+            type: string
+
+    EvaluateAccessResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: "#/components/schemas/PolicyDecision"
+
+    SubmitAccessResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [requestId, status, decision, auditLogged]
+          properties:
+            requestId:
+              type: string
+            status:
+              type: string
+              enum: [approved, pending_approval, denied]
+            decision:
+              $ref: "#/components/schemas/PolicyDecision"
+            auditLogged:
+              type: boolean
+
+    ContextPackManifest:
+      type: object
+      required: [id, name, description, defaultLocale]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        defaultLocale:
+          type: string
+
+    ListContextPacksResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContextPackManifest"
+
+    ContextMetric:
+      type: object
+      required:
+        [id, definition, owner, sourceAssetId, accessPolicy]
+      properties:
+        id:
+          type: string
+        definition:
+          type: string
+        owner:
+          type: string
+        sourceAssetId:
+          type: string
+        upstreamJobIds:
+          type: array
+          items:
+            type: string
+        downstreamDashboardIds:
+          type: array
+          items:
+            type: string
+        qualityRules:
+          type: array
+          items:
+            type: string
+        accessPolicy:
+          type: string
+        recentChanges:
+          type: array
+          items:
+            type: object
+            required: [date, change]
+            properties:
+              date:
+                type: string
+              change:
+                type: string
+
+    GetContextMetricResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: "#/components/schemas/ContextMetric"
+
+    ResolvedDomainBinding:
+      type: object
+      required: [contextRef, module, entityId, relation, resolved]
+      properties:
+        contextRef:
+          type: string
+        module:
+          type: string
+        entityId:
+          type: string
+        relation:
+          type: string
+        resolved:
+          type: boolean
+        entityName:
+          type: string
+
+    GetContextBindingsResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResolvedDomainBinding"

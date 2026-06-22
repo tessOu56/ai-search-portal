@@ -85,6 +85,28 @@ export function createVendor(input: CreateVendorInput): Vendor {
   return vendor;
 }
 
+/** Seed / binding use: upsert vendor with a stable id. */
+export function putVendor(id: string, input: CreateVendorInput): Vendor {
+  const now = new Date();
+  const existing = vendorsMap.get(id);
+  const vendor: Vendor = {
+    id,
+    name: input.name,
+    type: input.type,
+    description: input.description,
+    region: input.region,
+    address: input.address,
+    phone: input.phone,
+    website: input.website,
+    rating: input.rating,
+    dishes: input.dishes ?? [],
+    createdAt: existing?.createdAt ?? now,
+    updatedAt: now,
+  };
+  vendorsMap.set(id, vendor);
+  return vendor;
+}
+
 /**
  * 更新 Vendor
  */

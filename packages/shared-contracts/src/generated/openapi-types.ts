@@ -44,6 +44,131 @@ export interface paths {
         patch: operations["updateItemPatch"];
         trace?: never;
     };
+    "/api/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List metadata assets */
+        get: operations["listMetadata"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/context/packs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List available context packs */
+        get: operations["listContextPacks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/context/metrics/{metricId}": {
+        parameters: {
+            query?: {
+                pack?: string;
+            };
+            header?: never;
+            path: {
+                metricId: string;
+            };
+            cookie?: never;
+        };
+        /** Get context metric definition */
+        get: operations["getContextMetric"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/context/bindings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resolve domain bindings for a context pack */
+        get: operations["getContextBindings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/metadata/{assetId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                assetId: string;
+            };
+            cookie?: never;
+        };
+        /** Get metadata asset */
+        get: operations["getMetadataAsset"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/metadata/access-requests/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Evaluate access policy */
+        post: operations["evaluateMetadataAccess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/metadata/access-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit metadata access request */
+        post: operations["submitMetadataAccess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -71,6 +196,103 @@ export interface components {
         };
         ErrorResponse: {
             error: string;
+        };
+        MetadataAssetSummary: {
+            id: string;
+            name: string;
+            description: string;
+            /** @enum {string} */
+            assetType: "Database" | "Table" | "API" | "Dashboard";
+            owner: string;
+            tags: string[];
+            /** @enum {string} */
+            classification: "public" | "internal" | "PII" | "confidential";
+            updatedAt: string;
+            fqn?: string;
+        };
+        ListMetadataResponse: {
+            data: components["schemas"]["MetadataAssetSummary"][];
+            pagination: {
+                page: number;
+                pageSize: number;
+                total: number;
+                totalPages: number;
+            };
+        };
+        MetadataAssetDetail: components["schemas"]["MetadataAssetSummary"] & {
+            fqn: string;
+            upstreamIds: string[];
+            downstreamIds: string[];
+        };
+        GetMetadataAssetResponse: {
+            data: components["schemas"]["MetadataAssetDetail"];
+        };
+        MetadataAccessEvaluateRequest: {
+            assetId: string;
+            /** @enum {string} */
+            purpose: "analytics" | "marketing" | "operations";
+            /** @enum {string} */
+            role?: "analyst" | "data_admin" | "engineer";
+        };
+        MetadataAccessRequest: components["schemas"]["MetadataAccessEvaluateRequest"] & {
+            approved?: boolean;
+        };
+        PolicyDecision: {
+            allow: boolean;
+            need_approval: boolean;
+            mask_fields: string[];
+            require_audit: boolean;
+            decision_id: string;
+            reasons: string[];
+        };
+        EvaluateAccessResponse: {
+            data: components["schemas"]["PolicyDecision"];
+        };
+        SubmitAccessResponse: {
+            data: {
+                requestId: string;
+                /** @enum {string} */
+                status: "approved" | "pending_approval" | "denied";
+                decision: components["schemas"]["PolicyDecision"];
+                auditLogged: boolean;
+            };
+        };
+        ContextPackManifest: {
+            id: string;
+            name: string;
+            description: string;
+            defaultLocale: string;
+        };
+        ListContextPacksResponse: {
+            data: components["schemas"]["ContextPackManifest"][];
+        };
+        ContextMetric: {
+            id: string;
+            definition: string;
+            owner: string;
+            sourceAssetId: string;
+            upstreamJobIds?: string[];
+            downstreamDashboardIds?: string[];
+            qualityRules?: string[];
+            accessPolicy: string;
+            recentChanges?: {
+                date: string;
+                change: string;
+            }[];
+        };
+        GetContextMetricResponse: {
+            data: components["schemas"]["ContextMetric"];
+        };
+        ResolvedDomainBinding: {
+            contextRef: string;
+            module: string;
+            entityId: string;
+            relation: string;
+            resolved: boolean;
+            entityName?: string;
+        };
+        GetContextBindingsResponse: {
+            data: components["schemas"]["ResolvedDomainBinding"][];
         };
     };
     responses: never;
@@ -329,6 +551,196 @@ export interface operations {
             };
             /** @description Method not allowed */
             405: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listMetadata: {
+        parameters: {
+            query?: {
+                /** @description Context pack id (default enterprise-mau) */
+                pack?: string;
+                q?: string;
+                type?: string;
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListMetadataResponse"];
+                };
+            };
+        };
+    };
+    listContextPacks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListContextPacksResponse"];
+                };
+            };
+        };
+    };
+    getContextMetric: {
+        parameters: {
+            query?: {
+                pack?: string;
+            };
+            header?: never;
+            path: {
+                metricId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetContextMetricResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getContextBindings: {
+        parameters: {
+            query?: {
+                pack?: string;
+                ref?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetContextBindingsResponse"];
+                };
+            };
+        };
+    };
+    getMetadataAsset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                assetId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetMetadataAssetResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    evaluateMetadataAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetadataAccessEvaluateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvaluateAccessResponse"];
+                };
+            };
+        };
+    };
+    submitMetadataAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetadataAccessRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubmitAccessResponse"];
+                };
+            };
+            /** @description Approval required */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
+import { contextApi } from "./routes/context.js";
 import { itemsApi } from "./routes/items.js";
+import { accessRequestsApi, metadataApi } from "./routes/metadata.js";
 
 const corsOrigin = process.env.CORS_ORIGIN;
 const origin =
@@ -22,4 +24,7 @@ app.use(
 
 app.get("/health", (c) => c.json({ ok: true }));
 
+app.route("/api/metadata/access-requests", accessRequestsApi);
+app.route("/api/metadata", metadataApi);
+app.route("/api/context", contextApi);
 app.route("/api/items", itemsApi);

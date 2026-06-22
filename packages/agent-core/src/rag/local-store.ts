@@ -16,6 +16,11 @@ const DEFAULT_DOCS: LocalDoc[] = [
     tags: ["catalog", "search"],
   },
   {
+    id: "metadata-1",
+    text: "The customer_profile table in analytics contains PII fields email and phone.",
+    tags: ["metadata", "pii", "catalog"],
+  },
+  {
     id: "agent-1",
     text: "The agent pipeline emits internal.rag_step before streaming answer chunks.",
     tags: ["agent", "rag"],

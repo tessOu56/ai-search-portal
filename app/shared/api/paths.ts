@@ -4,6 +4,14 @@
  */
 
 export const API_ITEMS = "/api/items";
+export const API_METADATA = "/api/metadata";
+export const API_CONTEXT_PACKS = "/api/context/packs";
+export const API_CONTEXT_BINDINGS = "/api/context/bindings";
+export const API_CONTEXT_PACK_SELECT = "/api/context/pack-select";
+export const API_METADATA_ACCESS_REQUESTS = "/api/metadata/access-requests";
+export const API_METADATA_ACCESS_EVALUATE =
+  "/api/metadata/access-requests/evaluate";
+export const API_MCP_GATEWAY = "/api/mcp/gateway";
 export const API_CHAT = "/api/chat";
 export const API_LOCALE = "/api/locale";
 export const API_RELEASE_NOTES = "/api/release-notes";
@@ -17,6 +25,24 @@ export const API_DISH_VENDORS = "/api/dish-vendors";
 
 export function apiItem(id: string) {
   return `${API_ITEMS}/${id}`;
+}
+
+export function apiMetadataAsset(id: string) {
+  return `${API_METADATA}/${id}`;
+}
+
+export function apiContextMetric(metricId: string, packId?: string) {
+  const base = `/api/context/metrics/${metricId}`;
+  if (!packId) return base;
+  return `${base}?pack=${encodeURIComponent(packId)}`;
+}
+
+export function apiContextBindings(ref?: string, packId?: string) {
+  const sp = new URLSearchParams();
+  if (ref) sp.set("ref", ref);
+  if (packId) sp.set("pack", packId);
+  const qs = sp.toString();
+  return qs ? `${API_CONTEXT_BINDINGS}?${qs}` : API_CONTEXT_BINDINGS;
 }
 
 export function apiDish(id: string) {

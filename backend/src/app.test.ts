@@ -1,4 +1,7 @@
-import { listItemsResponseSchema } from "@ai-search-portal/contracts";
+import {
+  listItemsResponseSchema,
+  listMetadataResponseSchema,
+} from "@ai-search-portal/contracts";
 import { describe, expect, it } from "vitest";
 
 import { app } from "./app.js";
@@ -17,5 +20,13 @@ describe("ai-search-api", () => {
     const body = listItemsResponseSchema.parse(json);
     expect(body.data).toHaveLength(2);
     expect(body.data[0]).toMatchObject({ id: "1", name: "Mock item alpha" });
+  });
+
+  it("GET /api/metadata returns catalog assets", async () => {
+    const res = await app.request("/api/metadata");
+    expect(res.status).toBe(200);
+    const body = listMetadataResponseSchema.parse(await res.json());
+    expect(body.data.length).toBeGreaterThan(0);
+    expect(body.pagination.total).toBeGreaterThan(0);
   });
 });

@@ -26,12 +26,14 @@
 
 ## 目錄約定
 
-| 路徑                 | 用途                                                                                                                     |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **`specs/api/`**     | 契約撰寫約定、handler 對照（[contract-schema.md](api/contract-schema.md)、[handler-mapping.md](api/handler-mapping.md)） |
-| **`specs/openapi/`** | HTTP 契約（YAML）；Spectral lint + codegen 來源                                                                          |
-| **`specs/schemas/`** | 索引與入口說明                                                                                                           |
-| **`specs/domain/`**  | （可選）領域／邊界結構化 spec，尚未建立時可略                                                                            |
+| 路徑                       | 用途                                                                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **`specs/api/`**           | 契約撰寫約定、handler 對照（[contract-schema.md](api/contract-schema.md)、[handler-mapping.md](api/handler-mapping.md)） |
+| **`specs/openapi/`**       | HTTP 契約（YAML）；Spectral lint + codegen 來源                                                                          |
+| **`specs/datacontracts/`** | 資料集治理契約（欄位、PII、owner、terms）                                                                                |
+| **`specs/policies/`**      | OPA Rego 政策（`opa test`）                                                                                              |
+| **`specs/domain/`**        | 領域流程 spec（如 metadata 申請狀態機）                                                                                  |
+| **`specs/schemas/`**       | 索引與入口說明                                                                                                           |
 
 ---
 

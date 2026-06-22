@@ -8,7 +8,12 @@ import { buildLuiResponse, splitToTokens } from "./lui-mock.js";
 import { beginChatTrace } from "./observability/langfuse.js";
 import { runRagPipelineEvents } from "./rag/pipeline.js";
 import type { SseEventPart } from "./sse-types.js";
-import { executeItemsLookup, isItemsLookupEnabled } from "./tools/execute.js";
+import {
+  executeItemsLookup,
+  executeMetadataLookup,
+  isItemsLookupEnabled,
+  isMetadataLookupEnabled,
+} from "./tools/execute.js";
 import { assertQueryableText, GuardrailViolation } from "./tools/guardrails.js";
 import { isAllowedTool } from "./tools/registry.js";
 
@@ -41,6 +46,23 @@ async function* emitItemsLookupEvents(
   }
 }
 
+async function* emitMetadataLookupEvents(
+  query: string
+): AsyncGenerator<SseEventPart> {
+  const started = toolStatusPart("metadata.lookup", "started");
+  if (started) {
+    yield started;
+  }
+  const result = await executeMetadataLookup(query);
+  const done = toolStatusPart(
+    "metadata.lookup",
+    result.ok ? "completed" : "failed"
+  );
+  if (done) {
+    yield done;
+  }
+}
+
 /**
  * 產生 **內部** SSE 事件流（Gateway 再以 mapInternalSseToStable 轉成對外穩定事件）。
  */
@@ -53,6 +75,8 @@ export async function* streamChatInternalEvents(args: {
   includeRagSteps?: boolean;
   /** Phase 3：是否執行 items.lookup（預設：env 啟用時 true） */
   executeItemsLookup?: boolean;
+  /** Metadata catalog lookup */
+  executeMetadataLookup?: boolean;
 }): AsyncGenerator<SseEventPart> {
   const {
     query,
@@ -60,6 +84,7 @@ export async function* streamChatInternalEvents(args: {
     emitMockToolStatus = true,
     includeRagSteps = true,
     executeItemsLookup: runItemsLookup = isItemsLookupEnabled(),
+    executeMetadataLookup: runMetadataLookup = isMetadataLookupEnabled(),
   } = args;
 
   const traceSession = beginChatTrace({ traceId, query });
@@ -94,6 +119,10 @@ export async function* streamChatInternalEvents(args: {
 
   if (runItemsLookup) {
     yield* emitItemsLookupEvents(query);
+  }
+
+  if (runMetadataLookup) {
+    yield* emitMetadataLookupEvents(query);
   }
 
   if (emitMockToolStatus) {

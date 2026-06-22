@@ -57,6 +57,28 @@ export function createIngredient(input: CreateIngredientInput): Ingredient {
   return ingredient;
 }
 
+/** Seed / binding use: upsert ingredient with a stable id. */
+export function putIngredient(
+  id: string,
+  input: CreateIngredientInput
+): Ingredient {
+  const now = new Date();
+  const existing = ingredientsMap.get(id);
+  const ingredient: Ingredient = {
+    id,
+    name: input.name,
+    category: input.category,
+    unit: input.unit,
+    nutritionPerUnit: input.nutritionPerUnit,
+    properties: input.properties ?? [],
+    region: input.region,
+    createdAt: existing?.createdAt ?? now,
+    updatedAt: now,
+  };
+  ingredientsMap.set(id, ingredient);
+  return ingredient;
+}
+
 /**
  * 更新 Ingredient
  */

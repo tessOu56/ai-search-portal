@@ -32,6 +32,12 @@ pnpm dev
 3. Show pagination on mock results
 4. Mention: SSE chat + guardrails in `labs/` (optional 30s if time)
 
+### Metadata context catalog (optional 2 minutes)
+
+1. Open `http://localhost:5173/metadata` — default **Enterprise analytics** pack (MAU / `customer_profile` / PII policy).
+2. Use **Context pack** dropdown → switch to **Agri supply chain**; show procurement assets and metrics API.
+3. Narrative: same platform (catalog, OPA, GenUI, MCP); domain knowledge lives in swappable packs, not core code.
+
 ## Public URL path
 
 | Step | Action                                                            |

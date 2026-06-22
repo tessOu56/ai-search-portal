@@ -101,6 +101,37 @@ export async function createDish(input: CreateDishInput): Promise<Dish> {
   return dish;
 }
 
+/** Seed / binding use: upsert dish with a stable id. */
+export async function putDish(
+  id: string,
+  input: CreateDishInput
+): Promise<Dish> {
+  const now = new Date();
+  const existing = dishesMap.get(id);
+  const enrichedIngredients = await enrichIngredientUsages(input.ingredients);
+  const calculatedNutrition = await calculateNutrition(enrichedIngredients);
+  const properties =
+    input.properties && input.properties.length > 0
+      ? input.properties
+      : await aggregateProperties(enrichedIngredients);
+
+  const dish: Dish = {
+    id,
+    name: input.name,
+    description: input.description,
+    region: input.region,
+    ingredients: enrichedIngredients,
+    calculatedNutrition,
+    properties,
+    servings: input.servings,
+    createdAt: existing?.createdAt ?? now,
+    updatedAt: now,
+  };
+
+  dishesMap.set(id, dish);
+  return dish;
+}
+
 /**
  * 更新 Dish（如果 ingredients 有變更，重新計算營養和功效）
  */

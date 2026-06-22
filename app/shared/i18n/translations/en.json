@@ -55,5 +55,7 @@
   "release-notes.notFound": "Release not found.",
   "release-notes.footer.link": "Release notes",
   "catalog-search.page.title": "Catalog search",
-  "catalog-search.page.description": "Explore catalog APIs and filters (placeholder shell)."
+  "catalog-search.page.description": "Explore catalog APIs and filters (placeholder shell).",
+  "metadata.page.title": "Metadata catalog",
+  "metadata.page.description": "OpenMetadata-style catalog with policy-driven access and GenUI lineage."
 }

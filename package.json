@@ -17,6 +17,7 @@
     "dev:agent": "pnpm --filter @ai-search-portal/agent-runtime dev",
     "build:api": "pnpm run build:contracts && pnpm --filter ai-search-api build",
     "test:api": "pnpm run build:contracts && pnpm --filter ai-search-api test",
+    "test:policies": "node scripts/test-policies.mjs",
     "test:agent": "pnpm run build:contracts && pnpm run build:agent-core && pnpm --filter @ai-search-portal/agent-core test && pnpm --filter @ai-search-portal/agent-runtime test",
     "test:labs": "pnpm run build:agent-core && pnpm --filter @ai-search-portal/lab-eval-runner test",
     "build:labs": "pnpm --filter @ai-search-portal/lab-eval-runner run build && pnpm --filter @ai-search-portal/lab-design-vibe run build",

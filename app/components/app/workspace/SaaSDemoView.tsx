@@ -113,6 +113,16 @@ export function SaaSDemoView() {
                     <Link to="/catalog-search">Catalog search</Link>
                   </Button>
                 </li>
+                <li>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start rounded-lg"
+                  >
+                    <Link to="/metadata">Metadata catalog</Link>
+                  </Button>
+                </li>
               </ul>
             </div>
           </nav>

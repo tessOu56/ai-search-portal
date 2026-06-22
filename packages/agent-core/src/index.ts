@@ -6,8 +6,11 @@ export type { SseEventPart } from "./stream.js";
 export { streamChatInternalEvents } from "./stream.js";
 export {
   executeItemsLookup,
+  executeMetadataLookup,
   isItemsLookupEnabled,
+  isMetadataLookupEnabled,
   type ItemsLookupResult,
+  type MetadataLookupResult,
 } from "./tools/execute.js";
 export {
   assertQueryableText,

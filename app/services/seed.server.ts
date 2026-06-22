@@ -108,4 +108,50 @@ export async function ensureSeeded(): Promise<void> {
     currency: "TWD",
     availability: true,
   });
+
+  await seedAgriBindingEntities();
+}
+
+async function seedAgriBindingEntities(): Promise<void> {
+  const { putIngredient } =
+    await import("~/features/ingredient/ingredient.server");
+  const { putVendor } = await import("~/features/vendor/vendor.server");
+  const { putDish } = await import("~/features/dish/dish.server");
+
+  putIngredient("ingredient-basil", {
+    name: "Basil",
+    category: "spice",
+    unit: "g",
+    nutritionPerUnit: {
+      calories: 0.23,
+      protein: 0.03,
+      fat: 0.004,
+      carbs: 0.04,
+      fiber: 0.016,
+    },
+    properties: ["aromatic"],
+    region: "Taiwan",
+  });
+
+  putVendor("vendor-taipei-wholesale", {
+    name: "Taipei wholesale market",
+    type: "market",
+    description: "Binding target for procurement context",
+    region: "Taiwan",
+  });
+
+  await putDish("dish-three-cup-chicken", {
+    name: "Three-cup chicken",
+    description: "Demo dish for recipe cost binding",
+    region: "Taiwan",
+    ingredients: [
+      {
+        ingredientId: "ingredient-basil",
+        ingredientName: "Basil",
+        amount: 20,
+        unit: "g",
+      },
+    ],
+    servings: 4,
+  });
 }

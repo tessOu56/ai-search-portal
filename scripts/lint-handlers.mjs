@@ -14,6 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const routesDir = path.join(root, "app", "routes");
 const handlersPath = path.join(root, "app", "test", "handlers.ts");
+const extraHandlerFiles = ["metadata-handlers.ts", "context-handlers.ts"];
 
 function getApiPathPrefixes() {
   if (!fs.existsSync(routesDir)) return [];
@@ -62,7 +63,12 @@ if (!fs.existsSync(handlersPath)) {
 }
 
 const handlersContent = fs.readFileSync(handlersPath, "utf-8");
-const handlerPaths = getHandlerPaths(handlersContent);
+const extraContent = extraHandlerFiles
+  .map((f) => path.join(root, "app", "test", f))
+  .filter((p) => fs.existsSync(p))
+  .map((p) => fs.readFileSync(p, "utf-8"))
+  .join("\n");
+const handlerPaths = getHandlerPaths(handlersContent + extraContent);
 
 const missing = [];
 for (const prefix of requiredPrefixes) {

@@ -2,7 +2,13 @@
  * Tool allowlist（Phase 3）。實際 tool 執行仍須經 domain API／契約。
  */
 
-export const DEFAULT_ALLOWED_TOOLS = ["items.lookup", "rag.search"] as const;
+export const DEFAULT_ALLOWED_TOOLS = [
+  "items.lookup",
+  "metadata.lookup",
+  "context.resolve_metric",
+  "context.bindings",
+  "rag.search",
+] as const;
 
 export type AllowedToolName = (typeof DEFAULT_ALLOWED_TOOLS)[number];
 

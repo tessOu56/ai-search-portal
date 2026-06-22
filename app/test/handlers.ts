@@ -13,6 +13,9 @@ import {
   updateItemRequestSchema,
 } from "~/shared/contracts";
 
+import { contextHandlers } from "./context-handlers";
+import { metadataHandlers } from "./metadata-handlers";
+
 // ---------- Fixtures：Items API mock data（須通過 mockItemSchema） ----------
 const itemsFixtureRaw = [
   {
@@ -124,4 +127,8 @@ export const itemsHandlers = [
 ];
 
 // ---------- 匯總：註冊所有 API handlers ----------
-export const handlers = [...itemsHandlers];
+export const handlers = [
+  ...itemsHandlers,
+  ...metadataHandlers,
+  ...contextHandlers,
+];
