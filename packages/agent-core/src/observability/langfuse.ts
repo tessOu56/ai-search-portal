@@ -127,10 +127,3 @@ export function beginChatTrace(args: {
   return createSession(trace, traceId, args.query);
 }
 
-/** @deprecated Use {@link beginChatTrace} — kept for call-site stability during migration. */
-export function recordChatTraceStart(args: {
-  traceId?: string;
-  query: string;
-}): void {
-  beginChatTrace(args);
-}

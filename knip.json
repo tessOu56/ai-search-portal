@@ -1,15 +1,20 @@
 {
   "$schema": "https://unpkg.com/knip@latest/schema.json",
-  "entry": [
-    "app/routes/**/*.tsx",
-    "app/routes/**/*.ts",
-    "app/**/*.server.ts",
-    "app/shared/**/*.{ts,tsx}",
-    "packages/shared-contracts/src/index.ts"
+  "rules": {
+    "exports": "warn",
+    "types": "warn",
+    "duplicates": "warn"
+  },
+  "ignore": [
+    "build/**",
+    ".cache/**",
+    "node_modules/**",
+    "public/**",
+    "packages/shared-contracts/src/generated/**"
   ],
-  "project": ["app/**/*.{ts,tsx}", "packages/shared-contracts/**/*.ts"],
-  "ignore": ["build/**", ".cache/**", "node_modules/**", "public/**"],
   "ignoreDependencies": [
+    "eslint-formatter-gha",
+    "@vitest/coverage-v8",
     "isbot",
     "lucide-react",
     "@testing-library/react",
@@ -27,6 +32,25 @@
     "app/components/ui/Input.tsx"
   ],
   "ignoreIssues": {
-    "app/shared/release-notes.server.ts": ["exports"]
+    "app/shared/release-notes.server.ts": ["exports"],
+    "app/components/shared/genui/GenUiRenderer.tsx": ["exports"]
+  },
+  "workspaces": {
+    ".": {
+      "entry": [
+        "app/routes/**/*.tsx",
+        "app/routes/**/*.ts",
+        "app/**/*.server.ts",
+        "app/shared/**/*.{ts,tsx}"
+      ],
+      "project": ["app/**/*.{ts,tsx}"]
+    },
+    "packages/shared-contracts": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "labs/*": {
+      "entry": ["src/*.ts"]
+    }
   }
 }

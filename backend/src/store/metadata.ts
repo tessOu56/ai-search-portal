@@ -5,7 +5,6 @@ import {
 
 import {
   loadPackAssets,
-  resetContextPackCache,
   resolveActivePackId,
 } from "../lib/context-pack-loader.js";
 
@@ -133,8 +132,4 @@ export function resolveMetadataLineage(assetId: string, packId?: string) {
   ];
 
   return { asset, upstream, downstream, nodes, edges };
-}
-
-export function resetMetadataCache(): void {
-  resetContextPackCache();
 }
