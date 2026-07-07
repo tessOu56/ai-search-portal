@@ -1,4 +1,3 @@
-export { getCatalogSearchPlaceholder } from "./catalog-search.server";
 export type {
   CatalogApiRow,
   CatalogSearchFilter,

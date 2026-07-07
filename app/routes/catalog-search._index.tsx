@@ -1,10 +1,8 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
-import {
-  CatalogSearchPanel,
-  getCatalogSearchPlaceholder,
-} from "~/features/catalogsearch";
+import { CatalogSearchPanel } from "~/features/catalogsearch";
+import { getCatalogSearchPlaceholder } from "~/features/catalogsearch/catalog-search.server";
 import { getLocale, getTranslations } from "~/shared/i18n";
 import { t } from "~/shared/i18n/server";
 import {
