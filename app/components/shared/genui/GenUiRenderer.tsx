@@ -127,7 +127,7 @@ export function buildDetailGenUiDocument(args: {
       ...(args.columns.length > 0
         ? [
             {
-              type: NODE_COLUMNS_TABLE as const,
+              type: NODE_COLUMNS_TABLE,
               props: {
                 columns: args.columns,
                 maskFields: args.maskFields,

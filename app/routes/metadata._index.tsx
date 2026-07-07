@@ -5,6 +5,7 @@ import { MetadataSearchPanel } from "~/features/metadata";
 import {
   listContextPacks,
   parsePackIdFromRequest,
+  resolveContentRoot,
 } from "~/services/context-pack.server";
 import { listMetadataAssets } from "~/services/metadata.server";
 import { getLocale, getTranslations } from "~/shared/i18n";
@@ -55,7 +56,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       query: query.trim(),
       activeType: type,
       activePackId: packId,
-      packs: listContextPacks(),
+      packs: listContextPacks(resolveContentRoot()),
       results: result.data,
       pagination: result.pagination,
     },

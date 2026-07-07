@@ -192,6 +192,51 @@ module.exports = {
         "security/detect-non-literal-fs-filename": "off",
       },
     },
+    // Context pack loaders read paths under content/context-packs (resolved root).
+    {
+      files: [
+        "app/shared/services/context-pack-loader.server.ts",
+        "backend/src/lib/context-pack-loader.ts",
+      ],
+      rules: {
+        "security/detect-non-literal-fs-filename": "off",
+      },
+    },
+    // Labs: CLI / eval scripts intentionally log and write report files.
+    {
+      files: ["labs/**/*.{ts,tsx}"],
+      rules: {
+        "no-console": "off",
+        "security/detect-non-literal-fs-filename": "off",
+      },
+    },
+    // MSW handlers may compose multi-branch fixtures.
+    {
+      files: ["app/test/**/*.{ts,tsx}"],
+      rules: {
+        "sonarjs/cognitive-complexity": "off",
+      },
+    },
+    // Guardrail patterns are reviewed regexes, not user input.
+    {
+      files: ["packages/agent-core/src/tools/guardrails.ts"],
+      rules: {
+        "security/detect-unsafe-regex": "off",
+      },
+    },
+    {
+      files: ["packages/agent-core/**/*.test.ts"],
+      rules: {
+        "@typescript-eslint/no-unnecessary-condition": "off",
+      },
+    },
+    {
+      files: ["packages/agent-core/src/stream.ts"],
+      rules: {
+        "sonarjs/cognitive-complexity": "off",
+        "@typescript-eslint/no-unnecessary-condition": "off",
+      },
+    },
     // Monorepo：app 與 backend 不得互相 import
     {
       files: ["app/**/*.{ts,tsx}"],

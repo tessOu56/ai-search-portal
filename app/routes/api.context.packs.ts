@@ -1,11 +1,14 @@
 import { json } from "@remix-run/node";
 
-import { listContextPacks } from "~/services/context-pack.server";
+import {
+  listContextPacks,
+  resolveContentRoot,
+} from "~/services/context-pack.server";
 import { listContextPacksResponseSchema } from "~/shared/contracts";
 
 export function loader() {
   const body = listContextPacksResponseSchema.parse({
-    data: listContextPacks(),
+    data: listContextPacks(resolveContentRoot()),
   });
   return json(body);
 }
