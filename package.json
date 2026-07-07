@@ -122,7 +122,7 @@
     "vitest": "^2.1.4"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "22.x"
   },
   "pnpm": {
     "overrides": {

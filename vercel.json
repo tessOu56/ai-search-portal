@@ -1,4 +1,9 @@
 {
   "framework": "remix",
-  "regions": ["hkg1"]
+  "regions": ["hkg1"],
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm run build",
+  "git": {
+    "deploymentEnabled": false
+  }
 }
