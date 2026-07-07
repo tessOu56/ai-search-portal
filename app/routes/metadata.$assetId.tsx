@@ -25,16 +25,10 @@ export function loader({ params, request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const purpose =
     (url.searchParams.get("purpose") as
-      | "analytics"
-      | "marketing"
-      | "operations"
-      | null) ?? "analytics";
+      "analytics" | "marketing" | "operations" | null) ?? "analytics";
   const role =
     (url.searchParams.get("role") as
-      | "analyst"
-      | "data_admin"
-      | "engineer"
-      | null) ?? "analyst";
+      "analyst" | "data_admin" | "engineer" | null) ?? "analyst";
 
   const lineage = resolveMetadataLineage(assetId, packId);
   const policyDecision = evaluateMetadataAccess({

@@ -116,31 +116,19 @@ export function resolveMetadataLineage(
       id: u.id,
       label: u.name,
       type: u.assetType.toLowerCase() as
-        | "table"
-        | "column"
-        | "api"
-        | "dashboard"
-        | "database",
+        "table" | "column" | "api" | "dashboard" | "database",
     })),
     {
       id: asset.id,
       label: asset.name,
       type: asset.assetType.toLowerCase() as
-        | "table"
-        | "column"
-        | "api"
-        | "dashboard"
-        | "database",
+        "table" | "column" | "api" | "dashboard" | "database",
     },
     ...downstream.map((d) => ({
       id: d.id,
       label: d.name,
       type: d.assetType.toLowerCase() as
-        | "table"
-        | "column"
-        | "api"
-        | "dashboard"
-        | "database",
+        "table" | "column" | "api" | "dashboard" | "database",
     })),
   ];
 
