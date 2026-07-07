@@ -126,4 +126,3 @@ export function beginChatTrace(args: {
 
   return createSession(trace, traceId, args.query);
 }
-

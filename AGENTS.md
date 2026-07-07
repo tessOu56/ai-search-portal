@@ -101,3 +101,10 @@
 能力邊界與 agent class 見 [AGENT_CAPABILITIES.md](AGENT_CAPABILITIES.md)。Canonical 與 tool adapter 分層、以及「何者可修改／不可越權」亦見該檔。
 
 - **Tool adapters**（如 `.cursor/rules/*.mdc`、`.claude/`）：僅指向本檔與 AGENT_CAPABILITIES.md，並補充該工具之格式或限制；不另定義架構／產品 truth，細部見 docs/、specs/。
+
+---
+
+## 開發環境（2026-07 統一）
+
+- Node 22（`.nvmrc`，CI 對齊；注意 Dockerfile 仍為 node:20 → 收斂 ticket 見 platform-command）· pnpm 9.15.4（`packageManager`）
+- 生態矩陣：`platform-command/docs/dev-environment.md` · Cowork sandbox 限制：`platform-command/docs/cowork-sandbox.md`
