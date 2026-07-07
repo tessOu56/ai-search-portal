@@ -17,6 +17,16 @@ import {
 
 const PACKS_DIR = "content/context-packs";
 
+// Pack ids can arrive from a query string. Restrict to a safe slug so they
+// can never traverse outside content/context-packs (e.g. "../../etc").
+const SAFE_PACK_ID_PATTERN = /^[a-z0-9][a-z0-9_-]{0,63}$/i;
+
+function sanitizePackId(candidate: string | null | undefined): string | null {
+  const trimmed = candidate?.trim();
+  if (!trimmed || !SAFE_PACK_ID_PATTERN.test(trimmed)) return null;
+  return trimmed;
+}
+
 type PackCache = {
   assets: Map<string, MetadataAssetDetailContract[]>;
   metrics: Map<string, ContextMetricContract[]>;
@@ -35,7 +45,7 @@ function createPackCache(): PackCache {
   };
 }
 
-let cache: PackCache = createPackCache();
+const cache: PackCache = createPackCache();
 
 function repoRoot(): string {
   const here = path.dirname(fileURLToPath(import.meta.url));
@@ -52,7 +62,13 @@ function packsRoot(): string {
 }
 
 function packDir(packId: string): string {
-  return path.join(packsRoot(), packId);
+  const root = packsRoot();
+  // Defense in depth: even a validated id must resolve strictly inside root.
+  const dir = path.resolve(root, packId);
+  if (!dir.startsWith(root + path.sep)) {
+    throw new Error(`Invalid context pack id: ${packId}`);
+  }
+  return dir;
 }
 
 function loadJsonArray<T>(
@@ -110,7 +126,7 @@ export function loadPackMetrics(packId: string): ContextMetricContract[] {
   return metrics;
 }
 
-export function loadPackBindings(packId: string): DomainBindingContract[] {
+function loadPackBindings(packId: string): DomainBindingContract[] {
   const cached = cache.bindings.get(packId);
   if (cached) return cached;
   const filePath = path.join(packDir(packId), "bindings.json");
@@ -140,15 +156,13 @@ export function resolveDomainBindings(
 }
 
 export function resolveActivePackId(packQuery?: string | null): string {
-  const fromQuery = packQuery?.trim();
+  // Untrusted query values fall through to env/default when they fail
+  // sanitizePackId, so a hostile value can never reach the fs layer.
+  const fromQuery = sanitizePackId(packQuery);
   if (fromQuery) return fromQuery;
-  const fromEnv = process.env.CONTEXT_PACK?.trim();
+  const fromEnv = sanitizePackId(process.env.CONTEXT_PACK);
   if (fromEnv) return fromEnv;
   return DEFAULT_CONTEXT_PACK_ID;
-}
-
-export function resetContextPackCache(): void {
-  cache = createPackCache();
 }
 
 export { DEFAULT_CONTEXT_PACK_ID };

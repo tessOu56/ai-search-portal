@@ -5,10 +5,11 @@ import { contextApi } from "./routes/context.js";
 import { itemsApi } from "./routes/items.js";
 import { accessRequestsApi, metadataApi } from "./routes/metadata.js";
 
+const DEV_ORIGINS = ["http://localhost:3000", "http://localhost:5173"];
 const corsOrigin = process.env.CORS_ORIGIN;
 const origin =
   corsOrigin === undefined || corsOrigin === ""
-    ? "*"
+    ? DEV_ORIGINS
     : corsOrigin.split(",").map((s) => s.trim());
 
 export const app = new Hono();

@@ -21,8 +21,7 @@
   },
   "dependencies": {
     "@ai-search-portal/contracts": "workspace:*",
-    "langfuse": "^3.38.0",
-    "zod": "^4.3.6"
+    "langfuse": "^3.38.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

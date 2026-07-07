@@ -14,8 +14,7 @@
     "@ai-search-portal/agent-core": "workspace:*",
     "@ai-search-portal/contracts": "workspace:*",
     "@hono/node-server": "^1.13.0",
-    "hono": "^4.6.0",
-    "zod": "^4.3.6"
+    "hono": "^4.12.25"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

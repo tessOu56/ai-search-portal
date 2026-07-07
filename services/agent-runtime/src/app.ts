@@ -14,9 +14,10 @@ function getTraceId(c: Context): string | undefined {
   }
   return c.req.header("x-trace-id") ?? undefined;
 }
+const DEV_ORIGINS = ["http://localhost:3000", "http://localhost:5173"];
 const origin =
   corsOrigin === undefined || corsOrigin === ""
-    ? "*"
+    ? DEV_ORIGINS
     : corsOrigin.split(",").map((s) => s.trim());
 
 export const app = new Hono();

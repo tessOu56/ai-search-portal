@@ -22,6 +22,18 @@ import {
 const PACKS_DIR = "content/context-packs";
 const CONTEXT_PACK_COOKIE = "context_pack";
 
+// Pack ids are user-controllable (query/cookie). Restrict to a safe slug so
+// they can never traverse outside content/context-packs (e.g. "../../etc").
+const SAFE_PACK_ID_PATTERN = /^[a-z0-9][a-z0-9_-]{0,63}$/i;
+
+export function sanitizePackId(
+  candidate: string | null | undefined
+): string | null {
+  const trimmed = candidate?.trim();
+  if (!trimmed || !SAFE_PACK_ID_PATTERN.test(trimmed)) return null;
+  return trimmed;
+}
+
 type PackCache = {
   assets: Map<string, MetadataAssetDetailContract[]>;
   metrics: Map<string, ContextMetricContract[]>;
@@ -52,7 +64,13 @@ function packsRoot(contentRoot: string): string {
 }
 
 function packDir(contentRoot: string, packId: string): string {
-  return path.join(packsRoot(contentRoot), packId);
+  const root = packsRoot(contentRoot);
+  // Defense in depth: even a validated id must resolve strictly inside root.
+  const dir = path.resolve(root, packId);
+  if (!dir.startsWith(root + path.sep)) {
+    throw new Error(`Invalid context pack id: ${packId}`);
+  }
+  return dir;
 }
 
 function loadJsonArray<T>(
@@ -172,23 +190,34 @@ export function resolveDomainBindings(
   return all.filter((b) => b.contextRef === contextRef);
 }
 
+function decodeCookieValue(value: string): string | null {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return null;
+  }
+}
+
 export function resolveActivePackId(args: {
   packQuery?: string | null;
   cookieHeader?: string | null;
   envPack?: string | null;
 }): string {
-  const fromQuery = args.packQuery?.trim();
+  // Untrusted sources (query, cookie) fall through to the next source when
+  // they fail sanitizePackId, so a hostile value can never reach the fs layer.
+  const fromQuery = sanitizePackId(args.packQuery);
   if (fromQuery) return fromQuery;
 
   const cookie = args.cookieHeader ?? "";
   const match = cookie.match(
     new RegExp(`(?:^|;\\s*)${CONTEXT_PACK_COOKIE}=([^;]+)`)
   );
-  if (match?.[1]) {
-    return decodeURIComponent(match[1]);
-  }
+  const fromCookie = match?.[1]
+    ? sanitizePackId(decodeCookieValue(match[1]))
+    : null;
+  if (fromCookie) return fromCookie;
 
-  const fromEnv = args.envPack?.trim();
+  const fromEnv = sanitizePackId(args.envPack);
   if (fromEnv) return fromEnv;
 
   return DEFAULT_CONTEXT_PACK_ID;
