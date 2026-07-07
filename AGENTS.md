@@ -90,6 +90,7 @@
 
 ## Code Review（階段後規格對齊）
 
+- **開發前**：feature／ticket 開工前依 [docs/spec-review.md](docs/spec-review.md) 做 spec review（drift 檢查、影響面、implementation plan），報告存 [code-review/spec-reviews/](code-review/spec-reviews/)。
 - 每階段工作完成後或 PR 前，依 [docs/code-review-spec.md](docs/code-review-spec.md) 審查，確保規格與專案現況一致（分層、契約、路徑、命名、文件連結）。供開發者與 AI（Coding / Review Agent）共用。
 - **當期報告與議題**：根目錄 [code-review/](code-review/README.md)（REPORT.md、issues.md）。待辦以 CR-001 等 ID 登錄於 issues.md；程式內僅使用 `// TODO(CR-xxx): description`。執行 `pnpm run code-review:list` 可列出 CR TODO 與 missing/orphan 一致性檢查。
 

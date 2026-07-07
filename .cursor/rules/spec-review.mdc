@@ -1,0 +1,19 @@
+---
+description: 開發前 spec review 流程；feature/ticket 開工前必讀
+globs: "**/*.{ts,tsx,md,yaml,yml}"
+alwaysApply: false
+---
+
+# Spec review（執行層）
+
+**Canonical**：[docs/spec-review.md](docs/spec-review.md)（portal 落地）與 develop-md `ai-skills/spec-review/SKILL.md`（跨 repo workflow）。本規則不重複定義流程。
+
+## MUST
+
+- 開始實作涉及對外 HTTP 形狀、domain 狀態機、datacontract、policy 的 feature 前，先完成 spec review 並產出報告至 `code-review/spec-reviews/YYYY-MM-DD-<slug>.md`。
+- 審查中執行 `pnpm run verify:openapi-codegen` 確認 generated 未 stale；裁決 `blocked` 時先補 spec 再寫碼。
+
+## NEVER
+
+- 未判斷 impacted spec files 就直接修改 `app/**`、`backend/**` 的 API 相關程式。
+- 在 spec review 階段修改產品程式碼（發現既存問題登錄 CR-xxx）。
