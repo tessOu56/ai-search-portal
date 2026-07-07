@@ -46,7 +46,7 @@ module.exports = {
     // Tailwind CSS 完整設定
     tailwindcss: {
       callees: ["classnames", "clsx", "ctl", "cn"],  // 支援常用的 class 合併函數
-      config: "tailwind.config.ts",
+      config: require("path").join(__dirname, "tailwind.config.ts"),
       cssFiles: ["**/*.css", "!**/node_modules/**"],
       removeDuplicates: true,
       whitelist: [],  // 如果有自定義 class 前綴，在此加入
