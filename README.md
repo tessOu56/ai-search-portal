@@ -1,16 +1,17 @@
-# AI 搜尋入口
+# AI Search Portal
 
-基於 Remix 框架建置的智能 AI 搜尋平台。
+AI 驅動的搜尋與資料目錄產品。核心理念：**AI 體驗雙路徑**——每一條 AI 流程（對話搜尋、代填、預審）都有對應的手動操作畫面，AI 失敗或使用者不信任時可無縫接手；agent 契約、guardrails 與離線評測內建於架構。
+
+視覺層採外接元件系統 [explore-design-sdk](https://github.com/tessOu56/explore-design-sdk)（semantic tokens × application maps），portal 不自持 design tokens。
 
 ## Portfolio / 履歷
 
-| 資源                                                                                                                       | 說明                                                                      |
-| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| [docs/RESUME-DEMO.md](docs/RESUME-DEMO.md)                                                                                 | 3 分鐘 demo 腳本、檢查清單、履歷句                                        |
-| [platform-command resume SSOT](https://github.com/tessOu56/platform-command/blob/main/planning/career/resume-portfolio.md) | 公開作品集規劃                                                            |
-| 配對後端練習                                                                                                               | [py-able-labs](https://github.com/tessOu56/py-able-labs) catalog API 契約 |
+| 資源                                                                     | 說明                               |
+| ------------------------------------------------------------------------ | ---------------------------------- |
+| [docs/RESUME-DEMO.md](docs/RESUME-DEMO.md)                               | 3 分鐘 demo 腳本、檢查清單、履歷句 |
+| [docs/product/ai-experience-plan.md](docs/product/ai-experience-plan.md) | AI 體驗流程 × 手動畫面規劃 SSOT    |
 
-**本地 demo**：`pnpm dev` → `/catalog-search`（篩選 `?type=` + 分頁）。公開 URL 見 RESUME-DEMO（Vercel STOP-001 解除後填入 registry）。
+**本地 demo**：`pnpm dev` → `/catalog-search`（篩選 `?type=` + 分頁）。
 
 ## 技術棧
 

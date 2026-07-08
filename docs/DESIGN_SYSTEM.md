@@ -7,15 +7,18 @@
 
 ## Token Source of Truth
 
-- **Design token 的 canonical 在 repo**（不在 Figma）。
-- 理由：CI 可驗證、version control、code review。Figma 設計稿經 MCP 讀取後，由人工或 AI 依 mapping 更新 repo 內 token（如 `app/tailwind.css`），再由 CI 保護。
+- **S1 起（2026-07-08）：token canonical 在 [explore-design-sdk](https://github.com/tessOu56/explore-design-sdk)**（`@explore-design/tokens`，application map `portal`），不在本 repo、不在 Figma。
+- 消費鏈：SDK `pnpm tokens:css` 產出 `[data-app="portal"]` CSS vars → 同步至本 repo `app/styles/tokens.portal.css`（vendored generated，待套件發布後改 import）→ `app/tailwind.css` 只做「shadcn 變數 ← SDK semantic 變數」橋接 → `tailwind.config.ts` 以 `var(--x)` 完整色值消費。
+- **改色請改 SDK 的 `portal.map.json`**，不要動 portal 內任何 CSS 值；`data-app="portal"` 掛在 `app/root.tsx` 的 `<html>`。
+- Dark theme 暫由 portal 自持（`app/tailwind.css` `.dark` 段），SDK dark map 為 S2 範圍。
+- 理由：CI 可驗證（SDK `tokens:validate`）、version control、跨專案一致（portal / nx / vue 同一 SDK）。
 - 設計稿與 token 同步流程見 [docs/architecture/figma-mcp.md](architecture/figma-mcp.md)。
 
 ## Design Tokens
 
-- Brand scale: `brand-50` ~ `brand-900`
-- Semantic: `bg-background`, `text-foreground`, `text-muted-foreground`
-- Border: `border-border`, `border-input`
+- Semantic（SDK）：`surface.canvas/elevated/muted`、`text.primary/secondary/inverse`、`accent.brand`、`border.primary`、`status.danger(-contrast)`、`radius.base`、`motion.*`
+- Tailwind 消費：`bg-background`, `text-foreground`, `text-muted-foreground`, `border-border`, `border-input`
+- Brand scale：`brand-50` ~ `brand-900`（暫留 `tailwind.config.ts` 硬編碼；S2 移入 SDK primitives `colors.sky`——值已同步）
 
 ## Core Components
 

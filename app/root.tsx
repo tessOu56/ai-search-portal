@@ -63,8 +63,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const data = useRouteLoaderData("root") as RootData | undefined;
   const locale = data?.locale ?? "zh-TW";
 
+  // data-app：掛載 @explore-design/tokens 的 application scope（見 app/styles/tokens.portal.css）
   return (
-    <html lang={locale === "en" ? "en" : "zh-TW"}>
+    <html lang={locale === "en" ? "en" : "zh-TW"} data-app="portal">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />

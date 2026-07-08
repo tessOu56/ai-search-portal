@@ -54,7 +54,7 @@ long:
 
 ## All tickets
 
-- **T-2026-021** [short] labs/deck-studio — document-first deck compiler (Phase B0–B1) - status: draft
+- **T-2026-021** [short] deck-studio — document-first deck compiler（2026-07-08 已遷出至獨立 repo `tessOu56/deck-studio`）- status: migrated
 - **T-2026-020** [mid] Defensive GenUI — Zod hardening + human-in-the-loop + dual-path E2E - status: draft
 - **T-2026-023** [mid] Governance demo flow — api-detail, apply, my-apis, review view (G1) - status: ready
 - **T-2026-025** [mid] RESUME-DEMO governance script + README demo section (G3) - status: draft

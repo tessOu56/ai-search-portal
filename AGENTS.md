@@ -49,6 +49,7 @@
 - 目錄：[labs/README.md](labs/README.md)（pnpm workspace + turbo）
 - **eval-runner**：`pnpm run test:labs` / `pnpm run eval:offline` — 離線 golden 評測 agent-core stream
 - **design-vibe**：`pnpm run design:prompt` — Downloads explorer → Figma MCP 工作流
+- **deck-studio**（已 promote）：獨立 repo [tessOu56/deck-studio](https://github.com/tessOu56/deck-studio)，不再位於 `labs/`
 - 個人生態 SSOT：[develop-md/vision/platform-2026.md](https://github.com/tessOu56/develop-md/blob/main/vision/platform-2026.md)
 - **免費雲端部署**：[develop-md/vision/platform-2026-cloud-deploy.md](https://github.com/tessOu56/develop-md/blob/main/vision/platform-2026-cloud-deploy.md)（本產品 → Vercel）
 - **規劃收件**：`docs/platform-inbox/CURRENT.md`（由 [platform-command](https://github.com/tessOu56/platform-command) 派送 tickets）
@@ -106,5 +107,5 @@
 
 ## 開發環境（2026-07 統一）
 
-- Node 22（`.nvmrc`，CI 對齊；注意 Dockerfile 仍為 node:20 → 收斂 ticket 見 platform-command）· pnpm 9.15.4（`packageManager`）
+- Node 22（`.nvmrc`，CI 對齊；注意 Dockerfile 仍為 node:20 → 收斂 ticket 見 platform-command）· pnpm 10.34.3（`packageManager`）
 - 生態矩陣：`platform-command/docs/dev-environment.md` · Cowork sandbox 限制：`platform-command/docs/cowork-sandbox.md`
