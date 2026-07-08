@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "@remix-run/react";
 import { Button } from "~/components/ui/Button";
 import { cn } from "~/shared/utils/cn";
 
-type WorkspaceView = "chat" | "saas";
+type WorkspaceView = "chat" | "dashboard";
 
 type WorkspaceViewSwitcherProps = {
   className?: string;
@@ -15,8 +15,10 @@ export function WorkspaceViewSwitcher({
   className,
 }: WorkspaceViewSwitcherProps) {
   const [searchParams] = useSearchParams();
-  const current =
-    (searchParams.get(VIEW_PARAM) as WorkspaceView | null) ?? "chat";
+  const raw = searchParams.get(VIEW_PARAM);
+  // `saas` 為舊參數，視同 dashboard
+  const current: WorkspaceView =
+    raw === "dashboard" || raw === "saas" ? "dashboard" : "chat";
 
   const makeHref = (view: WorkspaceView) => {
     const next = new URLSearchParams(searchParams);
@@ -44,9 +46,9 @@ export function WorkspaceViewSwitcher({
         label="AI Chat"
       />
       <ViewChip
-        to={makeHref("saas")}
-        isActive={current === "saas"}
-        label="SaaS Dashboard"
+        to={makeHref("dashboard")}
+        isActive={current === "dashboard"}
+        label="Dashboard"
       />
     </div>
   );

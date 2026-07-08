@@ -30,11 +30,11 @@
 
 **決策（2026-07-08）**：portal 視覺層全面改用 explore-design-sdk，portal 不再自持 design tokens 與基礎元件。
 
-| 階段              | 內容                                                                                                                                              | 出口條件                                          |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| **S1 tokens** ✅   | 2026-07-08 完成：SDK `portal` map 對齊 portal 亮色主題 → `tokens.portal.css`（vendored generated）→ `app/tailwind.css` 只留 shadcn 橋接；`tailwind.config` 改 `var(--x)` 全值；`data-app="portal"` 掛 `<html>`；dark theme 暫留 portal（S2 移 SDK） | 視覺 diff 為零（值逐項對齊）、SDK CI `tokens:validate` 綠；**待本機 `pnpm dev` 目視確認** |
-| **S2 components** | SDK 新增 `@explore-design/components` package；把 `app/components/ui/*`（cva variants）上移；portal 改 import SDK                                 | portal `app/components/ui` 清空、typecheck/E2E 綠 |
-| **S3 LUI 語義層** | 評估 `shared/lui/*`（ChatBubble 等）：通用者入 SDK，產品專屬留 portal                                                                             | 邊界文件化於 DESIGN_SYSTEM.md                     |
+| 階段                 | 內容                                                                                                                                                                                                                                                | 出口條件                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **S1 tokens** ✅     | 2026-07-08 完成：SDK `portal` map 對齊 portal 亮色主題 → `tokens.portal.css`（vendored generated）→ `app/tailwind.css` 只留 shadcn 橋接；`tailwind.config` 改 `var(--x)` 全值；`data-app="portal"` 掛 `<html>`；dark theme 暫留 portal（S2 移 SDK） | 視覺 diff 為零（值逐項對齊）、SDK CI `tokens:validate` 綠；**待本機 `pnpm dev` 目視確認** |
+| **S2 components** 🔄 | 2026-07-08：`@explore-design/components` 已建（9 元件上移為 canonical，portal 端暫為 vendored 副本）；**和色色盤**換裝（生成り紙底 + 藍主色 + 紙紋理，見 DESIGN_SYSTEM.md 色盤段）。待 npm 發布後 portal 改 import、清空 `app/components/ui`        | portal `app/components/ui` 清空、typecheck/E2E 綠                                         |
+| **S3 LUI 語義層**    | 評估 `shared/lui/*`（ChatBubble 等）：通用者入 SDK，產品專屬留 portal                                                                                                                                                                               | 邊界文件化於 DESIGN_SYSTEM.md                                                             |
 
 限制：`components/shared/chat`、`components/app` 為產品組合層，**不外移**。Token canonical 從 portal repo 移轉為 SDK repo（DESIGN_SYSTEM.md「Token Source of Truth」段落隨 S1 改寫）。
 

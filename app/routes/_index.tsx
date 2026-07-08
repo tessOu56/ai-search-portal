@@ -3,7 +3,7 @@ import { Link, useRouteError, useSearchParams } from "@remix-run/react";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import {
-  SaaSDemoView,
+  DashboardView,
   WorkspaceChatView,
   WorkspaceViewSwitcher,
 } from "~/components/app/workspace";
@@ -61,26 +61,28 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 export default function Index() {
   const [searchParams] = useSearchParams();
-  const view = searchParams.get("view") === "saas" ? "saas" : "chat";
-  const theme = view === "saas" ? "untitled" : "default";
+  const viewParam = searchParams.get("view");
+  // `saas` 為舊參數，向後相容導向 dashboard；主題與 chat 共用（roadmap R1：同一設計語言）
+  const view =
+    viewParam === "dashboard" || viewParam === "saas" ? "dashboard" : "chat";
 
   return (
-    <div data-theme={theme}>
-      <div className="border-b border-border bg-background/80">
+    <div>
+      <div className="bg-background/80 border-b border-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between p-4">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Hybrid workspace
             </p>
             <p className="text-sm text-muted-foreground">
-              Switch between AI-first chat and SaaS-style dashboard views.
+              Switch between AI-first chat and the dashboard overview.
             </p>
           </div>
           <WorkspaceViewSwitcher />
         </div>
       </div>
 
-      {view === "saas" ? <SaaSDemoView /> : <WorkspaceChatView />}
+      {view === "dashboard" ? <DashboardView /> : <WorkspaceChatView />}
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { useI18n } from "~/shared/i18n/context";
 export default function ReleaseNotesLayout() {
   const { t } = useI18n();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-background to-brand-50">
+    <div className="min-h-screen bg-background">
       <Container className="py-10">
         <nav
           className="mb-6 text-sm text-muted-foreground"

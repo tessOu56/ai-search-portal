@@ -11,42 +11,47 @@ import {
 } from "~/components/ui/Card";
 import { Container } from "~/components/ui/Container";
 
-export function SaaSDemoView() {
+/**
+ * Dashboard 總覽（輔助路徑，interface-roadmap R1）。
+ * 版面完整呈現、資料內容為空（尚未接資料來源）；主題與 chat 主流程共用（不另掛 theme）。
+ */
+export function DashboardView() {
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b border-border bg-card/60 backdrop-blur-sm">
+      <div className="bg-card/60 border-b border-border backdrop-blur-sm">
         <Container className="flex items-center justify-between py-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="rounded-full text-xs">
-                SaaS Demo
+                Dashboard
               </Badge>
               <span className="text-xs uppercase tracking-wide text-muted-foreground">
-                Untitled style
+                Overview
               </span>
             </div>
             <h1 className="text-xl font-semibold text-foreground">
               Workspace overview
             </h1>
             <p className="text-sm text-muted-foreground">
-              Example dashboard layout using the same primitives with a
-              different theme.
+              AI search overview — data status, shortcuts, and product lines.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              Invite teammate
+            <Button asChild variant="outline" size="sm">
+              <Link to="/catalog-search">Catalog search</Link>
             </Button>
-            <Button size="sm">New project</Button>
+            <Button asChild size="sm">
+              <Link to="/items/new">New item</Link>
+            </Button>
           </div>
         </Container>
       </div>
 
       <div className="flex">
-        <aside className="hidden w-64 border-r border-border bg-card/80 px-4 py-6 text-sm text-muted-foreground md:block">
+        <aside className="bg-card/80 hidden w-64 border-r border-border px-4 py-6 text-sm text-muted-foreground md:block">
           <nav className="space-y-6">
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+              <p className="text-muted-foreground/80 mb-2 text-xs font-semibold uppercase tracking-wide">
                 Main
               </p>
               <ul className="space-y-1">
@@ -54,7 +59,8 @@ export function SaaSDemoView() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start rounded-lg bg-primary/5 text-foreground hover:bg-primary/10"
+                    className="bg-primary/5 hover:bg-primary/10 w-full justify-start rounded-lg text-foreground"
+                    aria-current="page"
                   >
                     Overview
                   </Button>
@@ -64,43 +70,58 @@ export function SaaSDemoView() {
                     variant="ghost"
                     size="sm"
                     className="w-full justify-start rounded-lg"
+                    disabled
+                    title="Coming soon"
                   >
                     Activity
                   </Button>
                 </li>
                 <li>
                   <Button
+                    asChild
                     variant="ghost"
                     size="sm"
                     className="w-full justify-start rounded-lg"
                   >
-                    Projects
+                    <Link to="/insights">Insights</Link>
                   </Button>
                 </li>
               </ul>
             </div>
 
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+              <p className="text-muted-foreground/80 mb-2 text-xs font-semibold uppercase tracking-wide">
                 Data
               </p>
               <ul className="space-y-1">
                 <li>
                   <Button
+                    asChild
                     variant="ghost"
                     size="sm"
                     className="w-full justify-start rounded-lg"
                   >
-                    Recipes
+                    <Link to="/dishes">Dishes</Link>
                   </Button>
                 </li>
                 <li>
                   <Button
+                    asChild
                     variant="ghost"
                     size="sm"
                     className="w-full justify-start rounded-lg"
                   >
-                    Vendors
+                    <Link to="/recipes">Recipes</Link>
+                  </Button>
+                </li>
+                <li>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start rounded-lg"
+                  >
+                    <Link to="/items">Items</Link>
                   </Button>
                 </li>
                 <li>
@@ -131,58 +152,18 @@ export function SaaSDemoView() {
         <main className="flex-1">
           <Container className="py-8">
             <div className="mb-6 grid gap-4 md:grid-cols-3">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    AI queries today
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Total questions handled across all workspaces
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-semibold text-foreground">128</p>
-                  <p className="mt-1 text-xs text-emerald-600">
-                    +18% vs last 7 days
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Recipes indexed
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Structured items available for search
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-semibold text-foreground">
-                    3,245
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Including seasonal and vendor-specific variants
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Connected vendors
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Live price feeds configured
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-semibold text-foreground">12</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Real-time updates every 15 minutes
-                  </p>
-                </CardContent>
-              </Card>
+              <MetricCard
+                title="AI queries today"
+                description="Total questions handled across all workspaces"
+              />
+              <MetricCard
+                title="Recipes indexed"
+                description="Structured items available for search"
+              />
+              <MetricCard
+                title="Connected vendors"
+                description="Live price feeds configured"
+              />
             </div>
 
             <Card>
@@ -190,7 +171,7 @@ export function SaaSDemoView() {
                 <CardTitle className="flex items-center justify-between text-sm">
                   <span>Recent workspaces</span>
                   <span className="text-xs font-normal text-muted-foreground">
-                    Demo table, no real data
+                    No data source connected
                   </span>
                 </CardTitle>
               </CardHeader>
@@ -202,25 +183,11 @@ export function SaaSDemoView() {
                     <span>Last activity</span>
                     <span className="text-right">Status</span>
                   </div>
-                  <div className="divide-y divide-border text-sm">
-                    <DemoRow
-                      name="Recipe search"
-                      type="2B query"
-                      activity="5 min ago"
-                      status="Live"
-                    />
-                    <DemoRow
-                      name="Personal cookbook"
-                      type="2C maintenance"
-                      activity="32 min ago"
-                      status="In setup"
-                    />
-                    <DemoRow
-                      name="Vendor price monitor"
-                      type="2B pricing"
-                      activity="2 hours ago"
-                      status="Live"
-                    />
+                  <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    <p>No workspaces yet.</p>
+                    <p className="mt-1 text-xs">
+                      Data will appear here once a source is connected.
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -232,27 +199,24 @@ export function SaaSDemoView() {
   );
 }
 
-type DemoRowProps = {
-  name: string;
-  type: string;
-  activity: string;
-  status: string;
+type MetricCardProps = {
+  title: string;
+  description: string;
 };
 
-function DemoRow({ name, type, activity, status }: DemoRowProps) {
+function MetricCard({ title, description }: MetricCardProps) {
   return (
-    <div className="grid grid-cols-4 items-center px-4 py-3">
-      <span className="font-medium text-foreground">{name}</span>
-      <span className="text-muted-foreground">{type}</span>
-      <span className="text-muted-foreground">{activity}</span>
-      <div className="flex justify-end">
-        <Badge
-          variant={status === "Live" ? "default" : "secondary"}
-          className="rounded-full px-3 py-0.5 text-xs"
-        >
-          {status}
-        </Badge>
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
+        <CardDescription className="text-xs">{description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-2xl font-semibold text-muted-foreground">—</p>
+        <p className="mt-1 text-xs text-muted-foreground">No data yet</p>
+      </CardContent>
+    </Card>
   );
 }

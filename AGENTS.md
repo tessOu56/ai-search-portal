@@ -36,6 +36,15 @@
 
 ---
 
+## UI 產出規則（Design Read + Review Checklist，2026-07-08 起）
+
+產生或修改 UI 前：
+
+1. **標注 surface tag**：marketing / product / data / developer（分區定義見 [docs/product/visual-quality-plan.md](docs/product/visual-quality-plan.md) §1）。所有 surface 必標。
+2. **Design Read（marketing / developer surface 必填）**：動手前輸出一行宣告——「Reading this as: <頁面類型> for <受眾>, <風格語言>, 依 <token/主題依據>」。模糊時只問一個釐清問題，能推斷就不問。
+3. **出貨前自查** [docs/product/ui-review-checklist.md](docs/product/ui-review-checklist.md)（通用段全查；命中加驗段的 surface 再查）。任一項不過即未完成。
+4. **視覺值一律走 token**（SDK semantic vars／Tailwind 語意 utility）；改風格改 SDK map，不在 portal 寫死值。data surface 用 `section-dense`／`stack-dense` 密度檔。
+
 ## Agent 協作（skills / hooks / commands）
 
 - **Playbook**：[docs/agent-collaboration.md](docs/agent-collaboration.md) — session 進入順序、儀式指令、prompt 範本

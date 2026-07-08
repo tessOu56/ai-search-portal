@@ -197,7 +197,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                   <Link
                     key={row.id}
                     to={`/metadata/${row.id}?pack=${encodeURIComponent(model.activePackId)}`}
-                    className="grid grid-cols-[1fr_1fr_2fr_auto] items-center gap-2 px-4 py-3 hover:bg-muted/50"
+                    className="hover:bg-muted/50 grid grid-cols-[1fr_1fr_2fr_auto] items-center gap-2 px-4 py-3"
                   >
                     <span className="font-medium text-primary">{row.name}</span>
                     <span className="text-muted-foreground">{row.owner}</span>

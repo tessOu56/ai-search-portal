@@ -95,7 +95,7 @@ export default function ReleaseNotesIndex() {
                     v{note.version}
                   </Link>
                   {note.version === currentVersion && (
-                    <span className="rounded bg-primary/10 px-2 py-0.5 text-sm text-primary">
+                    <span className="bg-primary/10 rounded px-2 py-0.5 text-sm text-primary">
                       Current
                     </span>
                   )}

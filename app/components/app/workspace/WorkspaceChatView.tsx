@@ -33,7 +33,7 @@ export function WorkspaceChatView() {
   const version = root?.version ?? "0.0.0";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-background to-brand-50">
+    <div className="min-h-screen bg-background">
       <Container className="py-16">
         <div className="mb-12 text-center">
           <div className="mb-4 flex flex-wrap items-center justify-center gap-2">

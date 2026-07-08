@@ -18,7 +18,23 @@
 
 - Semantic（SDK）：`surface.canvas/elevated/muted`、`text.primary/secondary/inverse`、`accent.brand`、`border.primary`、`status.danger(-contrast)`、`radius.base`、`motion.*`
 - Tailwind 消費：`bg-background`, `text-foreground`, `text-muted-foreground`, `border-border`, `border-input`
-- Brand scale：`brand-50` ~ `brand-900`（暫留 `tailwind.config.ts` 硬編碼；S2 移入 SDK primitives `colors.sky`——值已同步）
+- Brand scale：`brand-50` ~ `brand-900` = SDK primitives `colors.ai`（藍/Japan Blue scale；config 內為 synced 硬編碼，發布後改產出）
+
+## 色盤 — 多主題系統（2026-07-08，SSOT：SDK docs/PALETTE.md）
+
+三套可切換主題，全部由 explore-design-sdk theme maps 供應（每套 light+dark）：
+
+| 主題                  | data-theme    | 種子                                                   |
+| --------------------- | ------------- | ------------------------------------------------------ |
+| 蜜蝋 Mitsurou（預設） | （無屬性）    | 蜂蜜黃 `#FFDA76` × 蜜蠟白底 `#FAF8F5` × 焦糖 `#DAA277` |
+| 山吹 Yamabuki         | `yamabuki`    | 金 `#F8B500` × 中性灰底 × 橙紐 `#C9703D`               |
+| 抹茶と藤 Matcha-Fuji  | `matcha-fuji` | 抹茶 `#CBD892` × 亞麻底 × 薰衣草 `#E1C2FF`             |
+
+切換：`<html>` 的 `data-theme` + `.dark` class（ThemeSwitcher 元件，localStorage 記憶，root.tsx init script 防 FOUC）。**portal 不自持任何色值**——bridge 只做 shadcn 變數 ← SDK semantic 變數的參照，主題與 dark 全由 `app/styles/tokens.portal.css`（generated）承接。新增 semantic：`surface.highlight`（chips/badge）、`accent.strong`（連結/小字級 accent）。改色一律改 SDK 對應 theme map。紙質感 noise（opacity 0.04）沿用。
+
+## 元件 Canonical（S2 起）
+
+基礎元件 canonical 在 **explore-design-sdk `packages/components`**（`@explore-design/components`）；本 repo `app/components/ui/*` 為 vendored 副本（見該目錄 README），發布 npm 後改 import。
 
 ## Core Components
 
@@ -44,6 +60,16 @@
 - 強調行動使用 `Button`，避免自建按鈕樣式。
 - 輕量提示使用 `Alert`，不要直接用裸 `div`。
 - 避免在頁面內直接改 class，改用 `variant` API。
+
+## UI Review Checklist（2026-07-08 起）
+
+所有 UI PR 依 [docs/product/ui-review-checklist.md](product/ui-review-checklist.md) 自查（surface 分區 + 通用/加驗段）。評估與取捨脈絡見 [docs/product/visual-quality-plan.md](product/visual-quality-plan.md)。
+
+## Typography / Spacing Tokens（S2.6，2026-07-08）
+
+- Semantic 新增：`font.{display,body,mono}`、`type.{display,title,body,label}.{size,tracking,leading}`、`weight.{heading,body}`、`space.{gutter,section,stack,inline,control-x,control-y}`——SSOT 同色彩，在 SDK maps。
+- 風格：portal＝**和紙編輯風**（Petrona/Shippori Mincho display、寬字距、body 行高 1.75）；後台＝Untitled UI 標準（`portal-untitled` map，Inter、tight、8pt）。此為明文品牌決策（反模板審查的「有意圖」證據）。
+- Tailwind 消費：`font-display`、`tracking-title`、`leading-body`、`p-gutter`、`gap-stack` 等（tailwind.config 映射）。
 
 ## LUI Copy Style
 

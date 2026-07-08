@@ -5,12 +5,15 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /*
-     * Token SSOT: explore-design-sdk（@explore-design/tokens, application: portal）
-     * 此區塊只做「shadcn/ui 變數 ← SDK semantic 變數」橋接，不定義顏色值。
-     * 值來源：app/styles/tokens.portal.css（generated，[data-app="portal"] 掛在 <html>）。
-     */
+  /*
+   * Token SSOT: explore-design-sdk（@explore-design/tokens, application: portal）
+   * 此區塊只做「shadcn/ui 變數 ← SDK semantic 變數」橋接，不定義顏色值。
+   * 值來源：app/styles/tokens.portal.css（generated，[data-app="portal"] 掛在 <html>）。
+   * [data-theme="untitled"] 一併列入：後台主題可掛在巢狀節點（SDK portal-untitled map），
+   * 橋接需在同節點重新宣告，var() 才會取到 scope 內的 semantic 值。
+   */
+  :root,
+  [data-theme="untitled"] {
     --background: var(--surface-canvas);
     --foreground: var(--text-primary);
     --card: var(--surface-elevated);
@@ -33,49 +36,40 @@
     --radius: var(--radius-base);
   }
 
-  /* Dark theme：portal 自持（SDK dark map 為 S2 範圍）。值 = 原 HSL triplet 轉 hsl() 全值。 */
-  .dark {
-    --background: hsl(222.2 47.4% 11.2%);
-    --foreground: hsl(210 40% 98%);
-    --card: hsl(222.2 47.4% 11.2%);
-    --card-foreground: hsl(210 40% 98%);
-    --popover: hsl(222.2 47.4% 11.2%);
-    --popover-foreground: hsl(210 40% 98%);
-    --primary: hsl(199 89% 55%);
-    --primary-foreground: hsl(222.2 47.4% 11.2%);
-    --secondary: hsl(217.2 32.6% 17.5%);
-    --secondary-foreground: hsl(210 40% 98%);
-    --muted: hsl(217.2 32.6% 17.5%);
-    --muted-foreground: hsl(215 20.2% 65.1%);
-    --accent: hsl(217.2 32.6% 17.5%);
-    --accent-foreground: hsl(210 40% 98%);
-    --destructive: hsl(0 62.8% 30.6%);
-    --destructive-foreground: hsl(210 40% 98%);
-    --border: hsl(217.2 32.6% 17.5%);
-    --input: hsl(217.2 32.6% 17.5%);
-    --ring: hsl(199 89% 55%);
-  }
+  /*
+   * Dark mode 與主題切換均由 SDK 產出的 token css 承接：
+   * tokens.portal.css 內含 [data-app="portal"](.dark) 與 [data-theme="…"](.dark) 六組變數，
+   * 本橋接段的 var() 參照會自動跟著換值。portal 不再自持任何色值。
+   */
 
   * {
     @apply border-border;
   }
 
   body {
-    font-family:
-      "Inter",
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      "Roboto",
-      "Oxygen",
-      "Ubuntu",
-      "Cantarell",
-      "Fira Sans",
-      "Droid Sans",
-      "Helvetica Neue",
-      sans-serif;
+    /* Typography tokens（SSOT: SDK semantic vars）— 和紙編輯風：body 微寬字距 + 行高 1.75 */
+    font-family: var(--font-body, "Inter", sans-serif);
+    letter-spacing: var(--type-body-tracking, 0);
+    line-height: var(--type-body-leading, 1.5);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     @apply bg-background text-foreground;
+    /* 紙質感：極低強度 fractal noise（SVG data URI），疊在 --background 上模擬和紙纖維 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  /* 標題走 display font（和紙編輯風：明朝系 + 寬字距；untitled 後台 scope 內自動換回 Inter + 緊字距） */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display, inherit);
+    font-weight: var(--weight-heading, 600);
+    letter-spacing: var(--type-title-tracking, 0);
+    line-height: var(--type-title-leading, 1.4);
+  }
+
+  h1 {
+    letter-spacing: var(--type-display-tracking, 0);
+    line-height: var(--type-display-leading, 1.25);
   }
 }

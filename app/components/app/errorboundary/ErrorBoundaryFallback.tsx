@@ -20,7 +20,7 @@ export function ErrorBoundaryFallback({
   children,
 }: ErrorBoundaryFallbackProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 via-background to-brand-50 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Container className="text-center">
         {statusCode != null && (
           <p className="mb-2 text-sm font-medium text-muted-foreground">

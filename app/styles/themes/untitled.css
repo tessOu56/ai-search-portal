@@ -1,29 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  /* S1（2026-07-08）：tailwind.config 改用 var(--x) 完整色值，本 theme 同步由 HSL triplet 轉為 hsl() 全值 */
-  [data-theme="untitled"] {
-    --background: hsl(210 40% 99%);
-    --foreground: hsl(222.2 47.4% 11.2%);
-    --card: hsl(0 0% 100%);
-    --card-foreground: hsl(222.2 47.4% 11.2%);
-    --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(222.2 47.4% 11.2%);
-    --primary: hsl(221 83% 53%);
-    --primary-foreground: hsl(210 40% 98%);
-    --secondary: hsl(210 40% 96.1%);
-    --secondary-foreground: hsl(222.2 47.4% 11.2%);
-    --muted: hsl(210 40% 96.1%);
-    --muted-foreground: hsl(215.4 16.3% 46.9%);
-    --accent: hsl(214 32% 91%);
-    --accent-foreground: hsl(222.2 47.4% 11.2%);
-    --destructive: hsl(0 84.2% 60.2%);
-    --destructive-foreground: hsl(210 40% 98%);
-    --border: hsl(214.3 31.8% 91.4%);
-    --input: hsl(214.3 31.8% 91.4%);
-    --ring: hsl(221 83% 53%);
-    --radius: 0.875rem;
-  }
-}
+/*
+ * DEPRECATED（2026-07-08）：untitled 後台主題已 SDK 化。
+ * SSOT：explore-design-sdk packages/tokens/applications/portal-untitled.map.json
+ * 值來源：app/styles/tokens.portal.css 的
+ *   [data-app="portal"] [data-theme="untitled"] 區塊（generated）。
+ * shadcn 橋接：app/tailwind.css 的 `:root, [data-theme="untitled"]` 段。
+ * 本檔已不再被 import，確認無回歸後可刪除。
+ */
