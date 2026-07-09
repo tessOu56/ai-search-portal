@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 
 import { CatalogSearchPanel } from "~/features/catalogsearch";
 import { getCatalogSearchPlaceholder } from "~/features/catalogsearch/catalog-search.server";
@@ -66,4 +66,28 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 export default function CatalogSearchPage() {
   const { model } = useLoaderData<typeof loader>();
   return <CatalogSearchPanel model={model} />;
+}
+
+/**
+ * Route-level error state (four-state completeness — visual-quality-plan A1).
+ * Manual path stays available: reset link returns to the bare URL contract.
+ */
+export function ErrorBoundary() {
+  return (
+    <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
+      <h1 className="text-lg font-semibold text-destructive">
+        Catalog search hit an error
+      </h1>
+      <p className="text-sm text-muted-foreground">
+        Something went wrong while loading results. Your filters live in the URL
+        — resetting them usually recovers.
+      </p>
+      <Link
+        to="/catalog-search"
+        className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
+      >
+        Reset filters and retry
+      </Link>
+    </div>
+  );
 }

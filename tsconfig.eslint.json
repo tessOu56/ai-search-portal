@@ -30,7 +30,10 @@
     "*.config.js",
     "*.config.cjs",
     "scripts/**/*.ts",
-    "scripts/**/*.js"
+    "scripts/**/*.js",
+    "e2e/**/*.ts",
+    "playwright.config.ts",
+    "playwright.perf.config.ts"
   ],
   "exclude": [
     "node_modules",

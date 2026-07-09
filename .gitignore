@@ -29,6 +29,9 @@ node_modules/
 
 # CI reports (generated in CI, do not commit)
 reports/
+/test-results/
+/playwright-report/
+/blob-report/
 
 # Linting and formatting
 .eslintcache

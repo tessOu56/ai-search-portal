@@ -30,7 +30,17 @@ pnpm dev
 1. Open `http://localhost:5173/catalog-search`
 2. Show filter by type (API / Dictionary) via URL or UI
 3. Show pagination on mock results
-4. Mention: SSE chat + guardrails in `labs/` (optional 30s if time)
+4. **Governance flow (Journey C)**: open `/metadata/tbl-customers?purpose=marketing&role=analyst` —
+   policy flips to `need_approval` → Request access → HITL confirm → status lands on
+   `pending_approval` with audit flag. This exact path is covered by **Playwright E2E**
+   (`e2e/access-request.spec.ts`, runs on every PR): assertions target the **status machine
+   and policy state**, not UI copy — AI can be added later without breaking the baseline.
+5. **Dual-path**: in chat, if the stream fails, `AiFallbackPanel` preserves the query and
+   prefills `/catalog-search?q=…` — every AI path degrades to a manual, auditable one.
+6. **Golden demo (Journey A)**: on `/`, click one of the 3 fixed questions —
+   streaming, tool status, confidence + sources render live; the "Mock agent"
+   badge is honest labelling (pipeline is real, LLM is not).
+7. Mention: SSE chat + guardrails in `labs/` (optional 30s if time)
 
 ### Metadata context catalog (optional 2 minutes)
 
@@ -52,6 +62,7 @@ pnpm dev
 - [ ] `/catalog-search` loads without console errors
 - [ ] `?type=API` filters mock rows
 - [ ] Pagination changes page in URL or UI
+- [ ] `pnpm run test:e2e` green (access-request baseline, offline)
 - [ ] `pnpm run lint` + `typecheck` pass
 - [ ] No links to company mirror repos in slides
 

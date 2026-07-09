@@ -1,0 +1,11 @@
+{
+  "measuredAt": "2026-07-09T07:03:38.662Z",
+  "off": {
+    "domRows": 10000,
+    "waitForRowsMs": 70
+  },
+  "on": {
+    "domRows": 23
+  },
+  "deltaDom": 9977
+}

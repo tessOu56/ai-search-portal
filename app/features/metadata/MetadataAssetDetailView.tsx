@@ -1,5 +1,4 @@
-import { Form, Link } from "@remix-run/react";
-import { useState } from "react";
+import { Form, Link, useSearchParams } from "@remix-run/react";
 
 import { GenUiRenderer } from "~/components/shared/genui";
 import { Badge } from "~/components/ui/Badge";
@@ -26,6 +25,99 @@ export type MetadataAssetDetailProps = {
   submitResult?: { ok: boolean; message: string };
 };
 
+function buildConfirmHref(
+  purpose: string,
+  role: string,
+  confirm: boolean
+): string {
+  const sp = new URLSearchParams();
+  sp.set("purpose", purpose);
+  sp.set("role", role);
+  if (confirm) sp.set("confirm", "1");
+  return `?${sp.toString()}`;
+}
+
+function AccessRequestPanel({
+  policyDecision,
+  role,
+  purpose,
+  submitResult,
+}: {
+  policyDecision: PolicyDecisionContract;
+  role: string;
+  purpose: string;
+  submitResult?: { ok: boolean; message: string };
+}) {
+  // URL-driven HITL step (not useState) so E2E / dual-path work without waiting on hydration.
+  const [searchParams] = useSearchParams();
+  const showConfirm = searchParams.get("confirm") === "1";
+  const canRequest = policyDecision.allow || policyDecision.need_approval;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Request access</CardTitle>
+        <CardDescription>
+          Role: {role} · Purpose: {purpose}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {submitResult ? (
+          <p
+            className={
+              submitResult.ok
+                ? "text-sm text-green-700"
+                : "text-sm text-destructive"
+            }
+            role="status"
+          >
+            {submitResult.message}
+          </p>
+        ) : null}
+
+        {!showConfirm ? (
+          canRequest ? (
+            <Button asChild>
+              <Link to={buildConfirmHref(purpose, role, true)}>
+                Request access
+              </Link>
+            </Button>
+          ) : (
+            <Button type="button" disabled>
+              Request access
+            </Button>
+          )
+        ) : (
+          <div className="space-y-3 rounded-lg border border-border p-4">
+            <p className="text-sm font-medium">
+              {policyDecision.need_approval
+                ? "Human confirmation required (HITL)"
+                : "Confirm access request"}
+            </p>
+            {policyDecision.need_approval ? (
+              <ul className="list-inside list-disc text-sm text-muted-foreground">
+                {policyDecision.reasons.map((r) => (
+                  <li key={`confirm-${r}`}>{r}</li>
+                ))}
+              </ul>
+            ) : null}
+            <Form method="post" className="flex gap-2">
+              <input type="hidden" name="intent" value="access-request" />
+              <input type="hidden" name="purpose" value={purpose} />
+              <input type="hidden" name="role" value={role} />
+              <input type="hidden" name="approved" value="true" />
+              <Button type="submit">Confirm</Button>
+              <Button asChild variant="outline">
+                <Link to={buildConfirmHref(purpose, role, false)}>Cancel</Link>
+              </Button>
+            </Form>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export function MetadataAssetDetailView({
   asset,
   genUiDocument,
@@ -34,8 +126,6 @@ export function MetadataAssetDetailView({
   purpose,
   submitResult,
 }: MetadataAssetDetailProps) {
-  const [showConfirm, setShowConfirm] = useState(false);
-
   return (
     <div className="space-y-6">
       <nav className="text-sm text-muted-foreground">
@@ -77,67 +167,12 @@ export function MetadataAssetDetailView({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Request access</CardTitle>
-          <CardDescription>
-            Role: {role} · Purpose: {purpose}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {submitResult ? (
-            <p
-              className={
-                submitResult.ok
-                  ? "text-sm text-green-700"
-                  : "text-sm text-destructive"
-              }
-              role="status"
-            >
-              {submitResult.message}
-            </p>
-          ) : null}
-
-          {!showConfirm ? (
-            <Button
-              type="button"
-              onClick={() => setShowConfirm(true)}
-              disabled={!policyDecision.allow && !policyDecision.need_approval}
-            >
-              Request access
-            </Button>
-          ) : (
-            <div className="space-y-3 rounded-lg border border-border p-4">
-              <p className="text-sm font-medium">
-                {policyDecision.need_approval
-                  ? "Human confirmation required (HITL)"
-                  : "Confirm access request"}
-              </p>
-              {policyDecision.need_approval ? (
-                <ul className="list-inside list-disc text-sm text-muted-foreground">
-                  {policyDecision.reasons.map((r) => (
-                    <li key={`confirm-${r}`}>{r}</li>
-                  ))}
-                </ul>
-              ) : null}
-              <Form method="post" className="flex gap-2">
-                <input type="hidden" name="intent" value="access-request" />
-                <input type="hidden" name="purpose" value={purpose} />
-                <input type="hidden" name="role" value={role} />
-                <input type="hidden" name="approved" value="true" />
-                <Button type="submit">Confirm</Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowConfirm(false)}
-                >
-                  Cancel
-                </Button>
-              </Form>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <AccessRequestPanel
+        policyDecision={policyDecision}
+        role={role}
+        purpose={purpose}
+        submitResult={submitResult}
+      />
 
       <div className="flex flex-wrap gap-4 text-sm">
         <div>

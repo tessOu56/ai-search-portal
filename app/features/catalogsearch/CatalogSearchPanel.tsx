@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link, useNavigation } from "@remix-run/react";
 
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
@@ -12,26 +12,19 @@ import {
 import { Input } from "~/components/ui/Input";
 
 import type { CatalogSearchViewModel } from "./catalog-search.types";
+import { buildCatalogSearchUrl } from "./catalog-search-url";
 
 export type CatalogSearchPanelProps = {
   model: CatalogSearchViewModel;
 };
 
-function buildSearchUrl(
-  base: { q: string; type?: string },
-  page: number
-): string {
-  const sp = new URLSearchParams();
-  if (base.q) sp.set("q", base.q);
-  if (base.type) sp.set("type", base.type);
-  if (page > 1) sp.set("page", String(page));
-  const qs = sp.toString();
-  return qs ? `/catalog-search?${qs}` : "/catalog-search";
-}
-
 export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
   const { pagination } = model;
   const base = { q: model.query, type: model.activeType };
+  const navigation = useNavigation();
+  const isLoading =
+    navigation.state === "loading" &&
+    navigation.location?.pathname === "/catalog-search";
 
   return (
     <div className="space-y-6">
@@ -47,7 +40,13 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         <h1 className="text-3xl font-bold tracking-tight">Catalog search</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
           Mock-first catalog UI (fixtures + GAP). Type filter and pagination
-          work on placeholder data — no Vercel or catalog API required.
+          work on placeholder data — no Vercel or catalog API required.{" "}
+          <Link
+            to="/catalog-search/dictionary"
+            className="text-primary hover:underline"
+          >
+            10k dictionary (virtualized) →
+          </Link>
         </p>
       </header>
 
@@ -90,7 +89,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
             </span>
             <div className="flex flex-wrap gap-1">
               <Link
-                to={buildSearchUrl({ q: model.query }, 1)}
+                to={buildCatalogSearchUrl({ q: model.query })}
                 className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium ${
                   !model.activeType
                     ? "border-primary bg-primary text-primary-foreground"
@@ -102,7 +101,10 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
               {model.filters[0]?.options.map((opt) => (
                 <Link
                   key={opt.value}
-                  to={buildSearchUrl({ q: model.query, type: opt.value }, 1)}
+                  to={buildCatalogSearchUrl({
+                    q: model.query,
+                    type: opt.value,
+                  })}
                   className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium ${
                     model.activeType === opt.value
                       ? "border-primary bg-primary text-primary-foreground"
@@ -159,7 +161,24 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
               <span className="text-right">Type</span>
             </div>
             <div className="divide-y divide-border text-sm">
-              {model.results.length === 0 ? (
+              {isLoading ? (
+                <div
+                  aria-label="Loading results"
+                  role="status"
+                  className="space-y-0"
+                >
+                  {[0, 1].map((i) => (
+                    <div
+                      key={i}
+                      className="grid animate-pulse grid-cols-[1fr_2fr_auto] items-center gap-2 px-4 py-3"
+                    >
+                      <span className="h-4 rounded bg-muted" />
+                      <span className="h-4 rounded bg-muted" />
+                      <span className="h-6 w-16 justify-self-end rounded-full bg-muted" />
+                    </div>
+                  ))}
+                </div>
+              ) : model.results.length === 0 ? (
                 <p className="px-4 py-6 text-muted-foreground">
                   No mock rows match your query.
                 </p>
@@ -193,7 +212,10 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
             >
               {pagination.page > 1 ? (
                 <Link
-                  to={buildSearchUrl(base, pagination.page - 1)}
+                  to={buildCatalogSearchUrl({
+                    ...base,
+                    page: pagination.page - 1,
+                  })}
                   className="text-sm font-medium text-primary hover:underline"
                 >
                   Previous
@@ -206,7 +228,10 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
               </span>
               {pagination.page < pagination.totalPages ? (
                 <Link
-                  to={buildSearchUrl(base, pagination.page + 1)}
+                  to={buildCatalogSearchUrl({
+                    ...base,
+                    page: pagination.page + 1,
+                  })}
                   className="text-sm font-medium text-primary hover:underline"
                 >
                   Next

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { ChatBubble } from "~/components/shared/lui/ChatBubble";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/Alert";
 import { Badge } from "~/components/ui/Badge";
@@ -61,6 +62,7 @@ export function ChatInterface() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [meta, setMeta] = useState<LuiMeta>({});
   const [error, setError] = useState<string | null>(null);
+  const [lastQuery, setLastQuery] = useState("");
   const lastAssistantId = useRef<string | null>(null);
   const streamRef = useRef<EventSource | null>(null);
 
@@ -70,12 +72,12 @@ export function ChatInterface() {
     };
   }, []);
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    const query = input.trim();
+  const submitQuery = (raw: string) => {
+    const query = raw.trim();
     if (!query || isStreaming) return;
 
     setError(null);
+    setLastQuery(query);
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: "user",
@@ -164,6 +166,17 @@ export function ChatInterface() {
     };
   };
 
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    submitQuery(input);
+  };
+
+  const goldenQuestions = [
+    t("chat.golden.q1"),
+    t("chat.golden.q2"),
+    t("chat.golden.q3"),
+  ];
+
   return (
     <div className="grid gap-6">
       <Card>
@@ -171,10 +184,28 @@ export function ChatInterface() {
           <div className="flex flex-wrap items-center gap-2">
             <Badge>{t("chat.badge.live")}</Badge>
             <Badge variant="secondary">{t("chat.badge.sse")}</Badge>
+            <Badge variant="outline">{t("chat.badge.mock")}</Badge>
           </div>
           <CardTitle>{t("chat.title")}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">
+              {t("chat.golden.label")}
+            </span>
+            {goldenQuestions.map((question) => (
+              <button
+                key={question}
+                type="button"
+                disabled={isStreaming}
+                onClick={() => submitQuery(question)}
+                className="inline-flex h-8 items-center rounded-full border border-border bg-background px-3 text-xs font-medium hover:bg-muted disabled:opacity-50"
+                data-testid="golden-question"
+              >
+                {question}
+              </button>
+            ))}
+          </div>
           <form onSubmit={handleSubmit} className="grid gap-3">
             <Textarea
               value={input}
@@ -200,10 +231,13 @@ export function ChatInterface() {
           </form>
 
           {error && (
-            <Alert className="border-destructive/20 bg-destructive/5 text-destructive">
-              <AlertTitle>{t("chat.error.title")}</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+            <>
+              <Alert className="border-destructive/20 bg-destructive/5 text-destructive">
+                <AlertTitle>{t("chat.error.title")}</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+              <AiFallbackPanel query={lastQuery} />
+            </>
           )}
         </CardContent>
       </Card>

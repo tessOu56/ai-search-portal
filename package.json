@@ -42,6 +42,8 @@
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "start": "remix-serve ./build/server/index.js",
     "test": "pnpm run build:contracts && pnpm run build:agent-core && vitest run && pnpm --filter @ai-search-portal/agent-core test && pnpm --filter @ai-search-portal/agent-runtime test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit && pnpm run typecheck:contracts && pnpm run typecheck:agent-core && pnpm run typecheck:agent-runtime && pnpm run typecheck:api",
@@ -59,6 +61,7 @@
   "dependencies": {
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-slot": "^1.2.4",
+    "@tanstack/react-virtual": "^3.13.0",
     "@remix-run/node": "^2.17.2",
     "@remix-run/react": "^2.17.2",
     "@remix-run/serve": "^2.17.2",
@@ -79,6 +82,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.27.8",
     "@commitlint/cli": "^19.5.0",
+    "@playwright/test": "^1.56.0",
     "@commitlint/config-conventional": "^19.5.0",
     "@remix-run/dev": "^2.17.2",
     "@remix-run/eslint-config": "^2.17.2",

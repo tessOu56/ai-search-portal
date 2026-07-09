@@ -2,6 +2,7 @@
 
 > 決策日：2026-07-08 · 對齊：T-2026-020（Defensive GenUI + dual-path）、[DESIGN_SYSTEM.md](../DESIGN_SYSTEM.md)、[explore-design-sdk PROJECT-PLAN Phase 1](https://github.com/tessOu56/explore-design-sdk)
 > 原則：**每一條 AI 流程都有對應的手動操作路徑**。AI 是加速器，不是唯一入口；AI 失敗、降級或使用者不信任時，同一任務可純手動完成。
+> 上層定位與 agentic 分階段路線圖見 [agentic-integration-review.md](agentic-integration-review.md)（2026-07-09）。
 
 ## 1. 雙路徑（dual-path）原則
 
@@ -15,16 +16,16 @@
 
 ## 2. 流程 × 畫面對照表
 
-| 任務              | AI 路徑                                                          | 手動路徑                                         | 狀態                                   |
-| ----------------- | ---------------------------------------------------------------- | ------------------------------------------------ | -------------------------------------- |
-| 目錄搜尋          | LUI 對話（`api.chat` + agent-core SSE）→ 生成篩選條件 → 導向結果 | `/catalog-search` 篩選（`?type=` + 分頁）        | 手動 ✅ / AI→手動預填 ⬜               |
-| 項目瀏覽/建立     | LUI 引導建立（草稿代填）                                         | `/items`、`/items/new` 表單                      | 手動 ✅ / AI 代填標記 ⬜               |
-| Metadata 存取申請 | `access-requests.evaluate` AI 預審 + 建議                        | 申請表單 + 人工送出（G1 flow）                   | AI 評估 ✅ / 申請畫面 ⬜（T-2026-023） |
-| 資產/血緣檢視     | LUI 問答（「這個資產上游是誰」）                                 | `/metadata/$assetId` + Lineage DAG（T-2026-016） | 手動 🔄                                |
-| Insights          | AI 摘要（依目前資訊 + 下一步）                                   | 圖表 + 手動 metric 選擇（`api.context.metrics`） | 手動 🔄                                |
-| Context pack 切換 | agent 依對話自動選 pack                                          | `pack-select` 手動指定                           | 兩者 ✅，缺 UI 標示 ⬜                 |
+| 任務              | AI 路徑                                                          | 手動路徑                                         | 狀態                                                                                                                                       |
+| ----------------- | ---------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 目錄搜尋          | LUI 對話（`api.chat` + agent-core SSE）→ 生成篩選條件 → 導向結果 | `/catalog-search` 篩選（`?type=` + 分頁）        | 手動 ✅ / AI→手動預填 ✅（2026-07-09：`AiFallbackPanel` 於 chat 失敗時帶 `?q=`+`?type=` 預填接手；URL 契約收斂於 `catalog-search-url.ts`） |
+| 項目瀏覽/建立     | LUI 引導建立（草稿代填）                                         | `/items`、`/items/new` 表單                      | 手動 ✅ / AI 代填標記 ⬜                                                                                                                   |
+| Metadata 存取申請 | `access-requests.evaluate` AI 預審 + 建議                        | 申請表單 + 人工送出（G1 flow）                   | AI 評估 ✅ / 申請畫面 ⬜（T-2026-023）                                                                                                     |
+| 資產/血緣檢視     | LUI 問答（「這個資產上游是誰」）                                 | `/metadata/$assetId` + Lineage DAG（T-2026-016） | 手動 🔄                                                                                                                                    |
+| Insights          | AI 摘要（依目前資訊 + 下一步）                                   | 圖表 + 手動 metric 選擇（`api.context.metrics`） | 手動 🔄                                                                                                                                    |
+| Context pack 切換 | agent 依對話自動選 pack                                          | `pack-select` 手動指定                           | 兩者 ✅，缺 UI 標示 ⬜                                                                                                                     |
 
-缺口優先序：① AI→手動預填（搜尋）② AI 代填視覺標記（items/申請）③ 降級 fallback 統一元件（`AiFallbackPanel`）。
+缺口優先序：① AI→手動預填（搜尋）✅（2026-07-09）② AI 代填視覺標記（items/申請）③ 降級 fallback 統一元件（`AiFallbackPanel`）✅ 首發（2026-07-09，chat 錯誤/斷線觸發；逾時與信心不足觸發待 T-2026-020）。
 
 ## 3. 外接元件系統（explore-design-sdk）接入
 

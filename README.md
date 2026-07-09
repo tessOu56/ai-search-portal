@@ -1,6 +1,25 @@
 # AI Search Portal
 
-AI 驅動的搜尋與資料目錄產品。核心理念：**AI 體驗雙路徑**——每一條 AI 流程（對話搜尋、代填、預審）都有對應的手動操作畫面，AI 失敗或使用者不信任時可無縫接手；agent 契約、guardrails 與離線評測內建於架構。
+> **用 AI 找資料與申請存取——可加速，但永遠能降級成手動，且每步可稽核。**
+
+**痛點**：企業導入 AI 搜尋後最常見的失敗不是「AI 不夠聰明」，而是 AI 出錯時使用者無路可退、治理流程不可稽核——資料團隊因此不敢把 AI 放進資料存取的關鍵路徑。
+
+**承諾（本產品證明的三件事）**：
+
+1. **Dual-path**：每條 AI 流程都有對應的手動畫面；AI 串流失敗時 `AiFallbackPanel` 保留你的輸入、預填 `?q=` 交給手動目錄搜尋接手
+2. **HITL 可稽核**：存取申請走 policy 評估 → 人工確認 → 狀態機（`approved / pending_approval / denied`）＋稽核旗標；這條手動路徑有 Playwright E2E 把關（`e2e/access-request.spec.ts`，PR 必跑）
+3. **來源／信心度**：AI 回覆附 confidence 與 sources，mock 誠實標示——不假裝有真 LLM
+
+**非目標**：這不是完整的企業 Catalog SaaS（不做連線器、多租戶、合規認證、銷售通路）。這是「可信 AI 資料發現」的**參考產品**——證明體驗與治理模式，domain 知識放在可換裝的 context pack，不寫死在核心。
+
+## 數字卡（證據）
+
+| 證據                                   | 數字                                                                                              |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| 治理申請 E2E（狀態機斷言，非 UI 文案） | 4 tests，PR 必跑，離線自足                                                                        |
+| 10k 列虛擬列表 vs naive 渲染           | **10000 → 23 DOM nodes（−99.8%）**（[perf note](docs/perf/catalog-dictionary-virtualization.md)） |
+| Contract 管線                          | OpenAPI codegen＋Spectral lint＋drift check＋zod v4，CI 亮紅可擋                                  |
+| 離線 AI 評測                           | `eval:offline` 於 CI 執行（lab-eval-runner）                                                      |
 
 視覺層採外接元件系統 [explore-design-sdk](https://github.com/tessOu56/explore-design-sdk)（semantic tokens × application maps），portal 不自持 design tokens。
 
@@ -11,7 +30,7 @@ AI 驅動的搜尋與資料目錄產品。核心理念：**AI 體驗雙路徑**�
 | [docs/RESUME-DEMO.md](docs/RESUME-DEMO.md)                               | 3 分鐘 demo 腳本、檢查清單、履歷句 |
 | [docs/product/ai-experience-plan.md](docs/product/ai-experience-plan.md) | AI 體驗流程 × 手動畫面規劃 SSOT    |
 
-**本地 demo**：`pnpm dev` → `/catalog-search`（篩選 `?type=` + 分頁）。
+**本地 demo**：`pnpm dev` → `/`（chat＋3 題 golden demo）→ `/catalog-search`（`?type=`＋分頁）→ `/catalog-search/dictionary`（10k 虛擬列表）→ `/metadata/tbl-customers?purpose=marketing&role=analyst`（治理申請 HITL）。
 
 ## 技術棧
 

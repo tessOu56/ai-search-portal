@@ -18,6 +18,7 @@ vi.mock("@remix-run/react", () => ({
       {children}
     </a>
   ),
+  useNavigation: () => ({ state: "idle", location: undefined }),
 }));
 
 describe("catalog-search shell", () => {
