@@ -83,7 +83,7 @@ flowchart TB
 
 ### Phase 4 — 產品 UI（design-vibe 對齊）
 
-**策略**：ai-search-portal 作 **契約與 agent 實驗場**；完整 Catalog UX 以 **able_portal** 為準，portal 內只做 **可演示的最小殼**，避免雙邊 SSOT 分裂。
+**策略**：ai-search-portal 作 **契約與 agent 實驗場**；完整 Catalog UX 以**內部參考產品（私有鏡像）**為準，portal 內只做 **可演示的最小殼**，避免雙邊 SSOT 分裂。
 
 | Flow           | Portal 目標                                            | 優先 | 依賴                                 |
 | -------------- | ------------------------------------------------------ | ---- | ------------------------------------ |
@@ -125,12 +125,12 @@ flowchart TB
 
 ## 5. 與生態系其他 repo
 
-| Repo                           | 關係                                                            |
-| ------------------------------ | --------------------------------------------------------------- |
-| **able_portal_release_hotfix** | Catalog UX、路由、E2E 主線；型別/adapter 可參考                 |
-| **polyglot-labs**              | 後端模式實驗（Postgres、Redis、metrics）→ 成熟後回灌 `backend/` |
-| **develop-md**                 | 願景、整合日誌、專案快照                                        |
-| **downloads-api**              | design-vibe fixture 來源（API Explorer flows）                  |
+| Repo                          | 關係                                                            |
+| ----------------------------- | --------------------------------------------------------------- |
+| **內部 catalog 鏡像（私有）** | Catalog UX、路由、E2E 主線；型別/adapter 可參考                 |
+| **polyglot-labs**             | 後端模式實驗（Postgres、Redis、metrics）→ 成熟後回灌 `backend/` |
+| **develop-md**                | 願景、整合日誌、專案快照                                        |
+| **downloads-api**             | design-vibe fixture 來源（API Explorer flows）                  |
 
 ---
 

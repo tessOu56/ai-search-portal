@@ -29,7 +29,7 @@ export type CatalogSearchParams = {
   page?: number;
 };
 
-/** Server-only placeholder data until able_portal adapters land. */
+/** Server-only placeholder data until internal catalog adapters land. */
 export function getCatalogSearchPlaceholder(
   query: string,
   params: CatalogSearchParams = {}

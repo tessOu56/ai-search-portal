@@ -102,12 +102,12 @@ Rules = always-on；Skills = 任務型。衝突時 **AGENTS.md > AGENT_CAPABILIT
 
 ## 6. 與其他 repo 協作
 
-| 情境              | 做法                                                           |
-| ----------------- | -------------------------------------------------------------- |
-| 收中央 ticket     | 讀 `docs/platform-inbox/tickets/T-*.md`，完成後 `status: done` |
-| 需要 Catalog 行為 | 唯讀參考 `able_portal_release_hotfix`，不 copy 全量            |
-| 更新中央 registry | 在 **platform-command** 開 session，跑 `ecosystem-inbox`       |
-| 長文規格          | 寫 **develop-md**，本 repo 只連結                              |
+| 情境              | 做法                                                                      |
+| ----------------- | ------------------------------------------------------------------------- |
+| 收中央 ticket     | 讀 `docs/platform-inbox/tickets/T-*.md`，完成後 `status: done`            |
+| 需要 Catalog 行為 | 唯讀參考內部 catalog 鏡像（platform-command registry 記載），不 copy 全量 |
+| 更新中央 registry | 在 **platform-command** 開 session，跑 `ecosystem-inbox`                  |
+| 長文規格          | 寫 **develop-md**，本 repo 只連結                                         |
 
 ---
 

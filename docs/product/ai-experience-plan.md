@@ -41,6 +41,6 @@
 
 ## 4. 與生態的邊界
 
-- 本文件不含任何公司鏡像（able_portal 等）業務內容與術語；展示一律用 food/recipe mock domain。
+- 本文件不含任何公司鏡像業務內容與術語；展示一律用 food/recipe mock domain。
 - 練習 repo（nx-playground、polyglot-labs 等）作為情境靈感來源，成熟能力經 SDK 或 contracts 引入，不直接複製碼。
 - 進度回報：platform-command `planning/projects/ai-search-portal.md`。

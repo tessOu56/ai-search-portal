@@ -39,7 +39,7 @@ description: >-
 ## Forbidden
 
 - WebGPU / WebLLM in `app/features` without promote checklist
-- Duplicate able_portal catalog UX in lab as production SSOT
+- Duplicate the internal reference catalog UX in lab as production SSOT
 
 ## References
 

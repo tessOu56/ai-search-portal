@@ -42,4 +42,4 @@ description: >-
 ## Forbidden
 
 - 在 platform-command 寫 portal 產品碼
-- 複製 able_portal 全量五主線進 `app/`
+- 複製內部參考 catalog 的全量主線進 `app/`

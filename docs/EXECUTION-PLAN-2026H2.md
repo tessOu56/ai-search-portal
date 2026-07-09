@@ -46,5 +46,5 @@
 ## 6. 不做
 
 - 不在 `app/` 直接掛 WebGPU / 本機 LLM（走 Lab + promote）。
-- 不複製 able_portal 五主線 UX。
+- 不複製內部參考 catalog 的五主線 UX。
 - 不為趨勢採用未 GA 項目於主線（RSC / Vapor / TS7 一律 spike）。

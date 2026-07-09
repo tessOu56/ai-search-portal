@@ -1,4 +1,4 @@
-/** Placeholder types — align with able_portal catalog-search when porting. */
+/** Placeholder types — align with the internal reference catalog when porting. */
 
 export type CatalogSearchFilter = {
   id: string;

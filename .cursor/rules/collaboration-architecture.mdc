@@ -7,11 +7,11 @@ alwaysApply: true
 
 **Tool adapter**: Project truth and agent capabilities live in [AGENTS.md](../../AGENTS.md) and [AGENT_CAPABILITIES.md](../../AGENT_CAPABILITIES.md). This file extends those canonical sources with tool-specific context; it must not override them. Keep in sync with AGENTS.md.
 
-## Reference: able_portal
-This project aligns with the **able_portal** reference (sibling repo: `able_portal`, underscore not dash). When extending conventions or tooling, prefer consistency with able_portal:
+## Reference: internal catalog reference product
+This project aligns with an **internal catalog reference product** (private mirror; registered in platform-command registry, not named here). When extending conventions or tooling, prefer consistency with that reference:
 - **docs/**: architecture, conventions, runbooks, product (engineering knowledge layer). **specs/**: API and schema contracts.
 - **.vscode**: format on save, Prettier as default formatter, ESLint on save; extensions for ESLint, Prettier, Vitest, GitLens, Tailwind, Path IntelliSense, Auto Close/Rename Tag, etc.
-- **Architecture**: features in `app/features/*`; shared/cross-module in shared layer; routes thin. (able_portal also has legacy `app/module/` and uses `app/store/`, `app/lib/`, `app/mocks/`; ai-search-portal uses `app/shared/*`, `app/services/*` and MSW in `app/test/`.)
+- **Architecture**: features in `app/features/*`; shared/cross-module in shared layer; routes thin. (The reference also has legacy `app/module/` and uses `app/store/`, `app/lib/`, `app/mocks/`; ai-search-portal uses `app/shared/*`, `app/services/*` and MSW in `app/test/`.)
 
 ## Portal Role
 This app is the **skeleton/portal** that aggregates and organizes multiple information systems. New features and routes are modular entry points; shared logic in `app/shared/*`, app-level integration in `app/services/*`. Keep routes thin—coordinate UI and data only.

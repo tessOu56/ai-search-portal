@@ -11,7 +11,7 @@
 
 **個人產品實驗場**：穩定 **Agent 契約 + 可觀測 + 離線評測**；Catalog 類 UX 只做 **可演示最小殼**；WebGPU／WebCodecs／本機 LLM 僅在 **`labs/`**，通過階段門檻再 promote。
 
-| 維度     | 本 repo                                      | Catalog（able_portal）       |
+| 維度     | 本 repo                                      | Catalog（內部參考產品）      |
 | -------- | -------------------------------------------- | ---------------------------- |
 | 產品 UX  | mock-first、LUI、Items、`/catalog-search` 殼 | 搜尋／字典／申請／Agent 全線 |
 | Agent    | `agent-core`、SSE、RAG、eval                 | 生產串流與錯誤治理           |
@@ -201,12 +201,12 @@ pnpm run observability:up && pnpm run observability:smoke
 
 ## 8. 相關 repo
 
-| Repo                       | 關係                               |
-| -------------------------- | ---------------------------------- |
-| platform-command           | registry、tickets、agent 生態 SSOT |
-| able_portal_release_hotfix | Catalog 參考（唯讀）               |
-| develop-md                 | 長文、願景                         |
-| polyglot-labs              | 後端模式實驗                       |
+| Repo                      | 關係                               |
+| ------------------------- | ---------------------------------- |
+| platform-command          | registry、tickets、agent 生態 SSOT |
+| 內部 catalog 鏡像（私有） | Catalog 參考（唯讀）               |
+| develop-md                | 長文、願景                         |
+| polyglot-labs             | 後端模式實驗                       |
 
 ---
 
