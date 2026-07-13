@@ -4,8 +4,11 @@
 
 1. [vercel.com](https://vercel.com) 註冊／登入
 2. Import `tessOu56/ai-search-portal`
-3. Run GitHub Action `Deploy to Vercel` 或 Vercel 自動 deploy
-4. 將 production URL 填入 `platform-command/registry/projects.json`
+3. 設定 GitHub Secrets：`VERCEL_TOKEN`、`VERCEL_ORG_ID`、`VERCEL_PROJECT_ID`
+4. 走 **Deploy to Vercel** workflow（先 preview，再 production）；見 [deployment](runbooks/deployment.md)
+5. production 綠且路由可開後，將 URL 填入 `platform-command/registry/projects.json`
+
+**解除條件**：`https://ai-search-portal.vercel.app` production 可開（含 `/catalog-search`），非 500。
 
 **解除前可繼續**：本機 `pnpm dev`、catalog-search、labs、CI。
 

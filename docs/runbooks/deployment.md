@@ -3,15 +3,26 @@
 **類型**：runbook | **權重**：2
 
 本專案使用 **GitHub Actions 控版控與部署節奏**，部署目標為 **Vercel**。  
-重點：CI 自動、Release 手動、Deploy 手動（preview / production 皆可指定 ref）。
+重點：CI 自動、Release 手動；App **preview** 手動驗收、**production** 在 CI 成功後自動或手動部署。文件站走 **GitHub Pages**（見 [github-pages-docs](github-pages-docs.md)），與 App 分離。
+
+## 發布通道
+
+| 通道     | 平台                          | 內容                 |
+| -------- | ----------------------------- | -------------------- |
+| 文件     | GitHub Pages (`gh-pages`)     | VitePress 靜態站     |
+| App 測試 | Vercel **preview** URL        | 完整 Remix SSR + API |
+| App 正式 | `ai-search-portal.vercel.app` | production domain    |
+
+對外：文件看 Pages；試產品用 Vercel preview；正式 Demo 用 production domain。
 
 ## Workflow 一覽
 
-| Workflow         | 檔案                                  | 觸發                | 用途                                        |
-| ---------------- | ------------------------------------- | ------------------- | ------------------------------------------- |
-| CI               | `.github/workflows/ci.yml`            | PR、push `main`     | 品質閘門（build / test / lint / typecheck） |
-| Release          | `.github/workflows/release.yml`       | `workflow_dispatch` | 建立 tag + GitHub Release（可 prerelease）  |
-| Deploy to Vercel | `.github/workflows/deploy-vercel.yml` | `workflow_dispatch` | 手動部署至 Vercel（preview / production）   |
+| Workflow         | 檔案                                  | 觸發                                                                | 用途                                        |
+| ---------------- | ------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------- |
+| CI               | `.github/workflows/ci.yml`            | PR、push `main`                                                     | 品質閘門（build / test / lint / typecheck） |
+| Release          | `.github/workflows/release.yml`       | `workflow_dispatch`                                                 | 建立 tag + GitHub Release（可 prerelease）  |
+| Deploy to Vercel | `.github/workflows/deploy-vercel.yml` | `workflow_dispatch`；**main CI 成功後** `workflow_run` → production | preview / production 部署至 Vercel          |
+| deploy-docs      | `.github/workflows/deploy-docs.yml`   | push `docs/**` 等；`workflow_dispatch`                              | VitePress → `gh-pages`（Pages branch 來源） |
 
 ## 必要 GitHub Secrets（repository 或 environment）
 
@@ -43,14 +54,22 @@
 
 ## 部署流程（可控）
 
-1. 手動執行 **Deploy to Vercel** workflow：
+1. **首次或重大變更**：手動執行 **Deploy to Vercel** → `environment: preview`，驗收 `/catalog-search` 等路由後再 production。
+2. **main 合併後**：CI 全綠 → `deploy-vercel` 自動以 `workflow_run` 部署 **production**（亦可改用手動 `workflow_dispatch`）。
+3. 手動部署參數：
    - `environment`: `preview` 或 `production`
    - `target_ref`: branch/tag/SHA（預設 `main`）
-2. workflow 會先執行：
+4. workflow 會先執行：
    - `pnpm install --frozen-lockfile`
    - `pnpm run lint:openapi`
    - `pnpm run verify:openapi-codegen`
-3. 通過後才部署至 Vercel，並在 Job Summary 顯示 deploy URL。
+   - `vercel build`（Linux；需 `vite.config.ts` 內 `process.env.VERCEL` 時啟用 `vercelPreset`）
+5. 通過後 `vercel deploy --prebuilt`，Job Summary 顯示 deploy URL。
+
+### 本機注意（Windows）
+
+- **不要**在本機跑 `vercel build --prebuilt`（Remix 動態路由 symlink 含 `:`，Windows 會失敗）。
+- 正式部署路徑：**GitHub Actions（ubuntu-latest）** 或 Vercel 雲端 `vercel deploy --prod`（非 prebuilt）。
 
 ## 版本與 Changelog（Changesets）
 
