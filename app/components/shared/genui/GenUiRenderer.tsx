@@ -43,6 +43,8 @@ export function GenUiRenderer({ document }: GenUiRendererProps) {
               key={nodeRenderKey(node.type, index)}
               nodes={props.data.nodes}
               edges={props.data.edges}
+              dependencyOrder={props.data.dependencyOrder}
+              cycleError={props.data.cycleError}
               themeMode={props.data.themeMode}
             />
           );
@@ -77,6 +79,8 @@ export function GenUiRenderer({ document }: GenUiRendererProps) {
 export function buildLineageGenUiDocument(args: {
   nodes: { id: string; label: string; type: string }[];
   edges: { source: string; target: string }[];
+  dependencyOrder?: { id: string; label: string; type: string }[];
+  cycleError?: { message: string; nodeIds: string[] } | null;
   assetId: string;
 }): GenUiDocumentContract {
   return genUiDocumentSchema.parse({
@@ -87,6 +91,8 @@ export function buildLineageGenUiDocument(args: {
         props: {
           nodes: args.nodes,
           edges: args.edges,
+          dependencyOrder: args.dependencyOrder,
+          cycleError: args.cycleError,
           themeMode: "dark",
         },
       },
@@ -110,6 +116,8 @@ export function buildDetailGenUiDocument(args: {
   maskFields: string[];
   lineageNodes: { id: string; label: string; type: string }[];
   lineageEdges: { source: string; target: string }[];
+  lineageDependencyOrder?: { id: string; label: string; type: string }[];
+  lineageCycleError?: { message: string; nodeIds: string[] } | null;
 }): GenUiDocumentContract {
   return genUiDocumentSchema.parse({
     version: "1",
@@ -140,6 +148,8 @@ export function buildDetailGenUiDocument(args: {
         props: {
           nodes: args.lineageNodes,
           edges: args.lineageEdges,
+          dependencyOrder: args.lineageDependencyOrder,
+          cycleError: args.lineageCycleError,
           themeMode: "dark",
         },
       },

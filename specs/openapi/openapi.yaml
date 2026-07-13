@@ -333,6 +333,27 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/audit:
+    get:
+      operationId: listAuditEvents
+      summary: List recent audit events
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListAuditEventsResponse"
+
 components:
   schemas:
     MockItem:
@@ -628,3 +649,62 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ResolvedDomainBinding"
+
+    AuditEvent:
+      type: object
+      required:
+        [id, at, action, actor, resource, decisionId, outcome, requireAudit, reasons]
+      properties:
+        id:
+          type: string
+          minLength: 1
+        at:
+          type: string
+          description: ISO 8601 timestamp
+        action:
+          type: string
+          pattern: "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+        actor:
+          type: object
+          required: [role]
+          properties:
+            role:
+              type: string
+              enum: [analyst, data_admin, engineer]
+        resource:
+          type: object
+          required: [type, id]
+          properties:
+            type:
+              type: string
+              minLength: 1
+            id:
+              type: string
+              minLength: 1
+        decisionId:
+          type: string
+          minLength: 1
+        requestId:
+          type: string
+          minLength: 1
+        outcome:
+          type: string
+          enum: [approved, pending_approval, denied]
+        requireAudit:
+          type: boolean
+        reasons:
+          type: array
+          items:
+            type: string
+
+    ListAuditEventsResponse:
+      type: object
+      required: [data, total]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditEvent"
+        total:
+          type: integer
+          minimum: 0

@@ -41,6 +41,9 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      - name: Bundle size budget
+        run: pnpm run size
+
       - name: Build API (backend)
         run: pnpm run build:api
 

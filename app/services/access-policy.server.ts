@@ -5,6 +5,7 @@ import {
   policyDecisionSchema,
 } from "@ai-search-portal/contracts";
 
+import { appendAuditEvent } from "~/services/audit-log.server";
 import { getMetadataAsset } from "~/services/metadata.server";
 
 export type EvaluateAccessInput = {
@@ -140,14 +141,30 @@ export function submitMetadataAccessRequest(args: {
         ? ("approved" as const)
         : ("denied" as const);
 
+  const requestId = randomUUID();
+
+  // auditLogged = 事件真實寫入與否（原為空頭布林，2026-07-09 起實作最小落盤）。
+  const auditLogged = decision.require_audit
+    ? appendAuditEvent({
+        action: "access_request.submit",
+        actor: { role: args.role ?? "analyst" },
+        resource: { type: "metadata_asset", id: args.assetId },
+        decisionId: decision.decision_id,
+        requestId,
+        outcome: status,
+        requireAudit: decision.require_audit,
+        reasons: decision.reasons,
+      }) !== null
+    : false;
+
   return {
     ok: true as const,
     status: 202,
     data: {
-      requestId: randomUUID(),
+      requestId,
       status,
       decision,
-      auditLogged: decision.require_audit,
+      auditLogged,
     },
   };
 }

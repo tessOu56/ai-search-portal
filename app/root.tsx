@@ -14,9 +14,11 @@ import {
   useRouteError,
   useRouteLoaderData,
 } from "@remix-run/react";
+import { useEffect } from "react";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { ThemeSwitcher } from "~/components/theme/ThemeSwitcher";
+import { startWebVitalsReporting } from "~/lib/analytics/web-vitals-reporter";
 import { ensureSeeded } from "~/services/seed.server";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
@@ -102,6 +104,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const data = useRouteLoaderData("root") as RootData | undefined;
+  useEffect(() => {
+    startWebVitalsReporting();
+  }, []);
   if (!data) {
     return <Outlet />;
   }

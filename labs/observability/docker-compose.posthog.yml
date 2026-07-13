@@ -1,0 +1,25 @@
+# Optional PostHog self-host spike for local RUM / product analytics (T-2026-058).
+# Mirror of docker-compose.langfuse.yml pattern — pin images after first successful up.
+name: ai-search-portal-posthog
+
+services:
+  posthog-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: posthog
+      POSTGRES_PASSWORD: posthog
+      POSTGRES_DB: posthog
+    ports:
+      - "5434:5432"
+    volumes:
+      - posthog_pg:/var/lib/postgresql/data
+
+  # Lightweight capture stub for local spike when full PostHog image is heavy.
+  # Replace with official posthog/posthog when you need the full UI.
+  posthog-capture:
+    image: mendhak/http-https-echo:31
+    ports:
+      - "19000:8080"
+
+volumes:
+  posthog_pg:

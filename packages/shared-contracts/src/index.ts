@@ -19,6 +19,26 @@ export {
   userRoleSchema,
 } from "./access-request.contract.js";
 export type {
+  AnalyticsEventContract,
+  AnalyticsEventName,
+} from "./analytics.contract.js";
+export {
+  accessRequestSubmittedEventSchema,
+  aiFallbackTakenEventSchema,
+  analyticsEventNameSchema,
+  analyticsEventSchema,
+  analyticsSurfaceSchema,
+  hitlIntervenedEventSchema,
+  taskCompletedEventSchema,
+} from "./analytics.contract.js";
+export type { AuditEventContract } from "./audit.contract.js";
+export {
+  auditActionSchema,
+  auditEventSchema,
+  auditOutcomeSchema,
+  listAuditEventsResponseSchema,
+} from "./audit.contract.js";
+export type {
   ChatQueryParams,
   InternalRagStepPayload,
 } from "./chat.contract.js";
@@ -101,3 +121,26 @@ export {
   metadataLineageResponseSchema,
   metadataPaginationSchema,
 } from "./metadata.contract.js";
+export type {
+  AgentToolName,
+  ToolContractDefinition,
+  ToolMetadataContract,
+  ToolRiskLevel,
+} from "./tool.contract.js";
+export {
+  AGENT_TOOL_METADATA,
+  agentToolNameSchema,
+  defineToolContract,
+  toolContextBindingsInputSchema,
+  toolContextBindingsOutputSchema,
+  toolContextResolveMetricInputSchema,
+  toolContextResolveMetricOutputSchema,
+  toolItemsLookupInputSchema,
+  toolItemsLookupOutputSchema,
+  toolMetadataLookupInputSchema,
+  toolMetadataLookupOutputSchema,
+  toolMetadataSchema,
+  toolRagSearchInputSchema,
+  toolRagSearchOutputSchema,
+  toolRiskLevelSchema,
+} from "./tool.contract.js";

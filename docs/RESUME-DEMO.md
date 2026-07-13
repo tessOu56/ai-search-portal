@@ -34,13 +34,16 @@ pnpm dev
    policy flips to `need_approval` → Request access → HITL confirm → status lands on
    `pending_approval` with audit flag. This exact path is covered by **Playwright E2E**
    (`e2e/access-request.spec.ts`, runs on every PR): assertions target the **status machine
-   and policy state**, not UI copy — AI can be added later without breaking the baseline.
+   and policy state**, not UI copy.
+   - **AI dual-path (T-020)**: add `?aiFill=1` for Zod-validated AI form fill + HITL; `?aiFill=invalid` shows `AiFallbackPanel` instead of rendering bad payloads.
 5. **Dual-path**: in chat, if the stream fails, `AiFallbackPanel` preserves the query and
    prefills `/catalog-search?q=…` — every AI path degrades to a manual, auditable one.
-6. **Golden demo (Journey A)**: on `/`, click one of the 3 fixed questions —
+6. **Lineage DAG (T-016)**: on a metadata detail with lineage, Kahn topological order is
+   shown when acyclic; cycles surface an inline warning (`docs/architecture/lineage-kahn.md`).
+7. **Golden demo (Journey A)**: on `/`, click one of the 3 fixed questions —
    streaming, tool status, confidence + sources render live; the "Mock agent"
    badge is honest labelling (pipeline is real, LLM is not).
-7. Mention: SSE chat + guardrails in `labs/` (optional 30s if time)
+8. Mention: SSE chat + shared `stable-sse-client` + guardrails in `labs/` (optional 30s)
 
 ### Metadata context catalog (optional 2 minutes)
 

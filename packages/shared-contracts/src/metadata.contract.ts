@@ -81,6 +81,11 @@ export const metadataLineageEdgeSchema = z.object({
   target: z.string(),
 });
 
+export const metadataLineageCycleSchema = z.object({
+  message: z.string(),
+  nodeIds: z.array(z.string()),
+});
+
 export const metadataLineageResponseSchema = z.object({
   data: z.object({
     assetId: z.string(),
@@ -88,5 +93,7 @@ export const metadataLineageResponseSchema = z.object({
     downstream: z.array(metadataAssetSummarySchema),
     nodes: z.array(metadataLineageNodeSchema),
     edges: z.array(metadataLineageEdgeSchema),
+    dependencyOrder: z.array(metadataLineageNodeSchema).optional(),
+    cycleError: metadataLineageCycleSchema.nullable().optional(),
   }),
 });

@@ -1,5 +1,6 @@
 import { Form, Link, useSearchParams } from "@remix-run/react";
 
+import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { GenUiRenderer } from "~/components/shared/genui";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
@@ -22,18 +23,36 @@ export type MetadataAssetDetailProps = {
   policyDecision: PolicyDecisionContract;
   role: string;
   purpose: string;
+  aiAccessRequest: AiAccessRequestState;
   submitResult?: { ok: boolean; message: string };
 };
+
+type AiAccessRequestState =
+  | { status: "idle" }
+  | {
+      status: "valid";
+      request: {
+        assetId: string;
+        purpose: "analytics" | "marketing" | "operations";
+        role?: "analyst" | "data_admin" | "engineer";
+        approved?: boolean;
+      };
+      genUiDocument: GenUiDocumentContract;
+      rationale: string;
+    }
+  | { status: "invalid"; query: string; reason: string };
 
 function buildConfirmHref(
   purpose: string,
   role: string,
-  confirm: boolean
+  confirm: boolean,
+  options?: { aiFill?: boolean }
 ): string {
   const sp = new URLSearchParams();
   sp.set("purpose", purpose);
   sp.set("role", role);
   if (confirm) sp.set("confirm", "1");
+  if (options?.aiFill) sp.set("aiFill", "1");
   return `?${sp.toString()}`;
 }
 
@@ -118,12 +137,137 @@ function AccessRequestPanel({
   );
 }
 
+function AiAccessRequestPanel({
+  aiAccessRequest,
+  policyDecision,
+  submitResult,
+}: {
+  aiAccessRequest: Exclude<AiAccessRequestState, { status: "idle" }>;
+  policyDecision: PolicyDecisionContract;
+  submitResult?: { ok: boolean; message: string };
+}) {
+  const [searchParams] = useSearchParams();
+  const showConfirm = searchParams.get("confirm") === "1";
+
+  if (aiAccessRequest.status === "invalid") {
+    return (
+      <div className="space-y-4">
+        <AiFallbackPanel query={aiAccessRequest.query} types={["Dataset"]} />
+        <p className="text-sm text-muted-foreground" role="alert">
+          {aiAccessRequest.reason}
+        </p>
+      </div>
+    );
+  }
+
+  const requestRole = aiAccessRequest.request.role ?? "analyst";
+  const canRequest = policyDecision.allow || policyDecision.need_approval;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">AI-assisted access request</CardTitle>
+        <CardDescription>
+          Validated by Zod before render. Human confirmation is required before
+          submit.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {submitResult ? (
+          <p
+            className={
+              submitResult.ok
+                ? "text-sm text-green-700"
+                : "text-sm text-destructive"
+            }
+            role="status"
+          >
+            {submitResult.message}
+          </p>
+        ) : null}
+
+        <div className="rounded-lg border border-border p-4">
+          <p className="mb-3 text-sm text-muted-foreground">
+            {aiAccessRequest.rationale}
+          </p>
+          <GenUiRenderer document={aiAccessRequest.genUiDocument} />
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="secondary">
+            purpose: {aiAccessRequest.request.purpose}
+          </Badge>
+          <Badge variant="outline">role: {requestRole}</Badge>
+        </div>
+
+        {!showConfirm ? (
+          canRequest ? (
+            <Button asChild>
+              <Link
+                to={buildConfirmHref(
+                  aiAccessRequest.request.purpose,
+                  requestRole,
+                  true,
+                  { aiFill: true }
+                )}
+              >
+                Review AI request
+              </Link>
+            </Button>
+          ) : (
+            <Button type="button" disabled>
+              Review AI request
+            </Button>
+          )
+        ) : (
+          <div className="space-y-3 rounded-lg border border-border p-4">
+            <p className="text-sm font-medium">
+              Review AI-generated request before submit (HITL)
+            </p>
+            {policyDecision.need_approval ? (
+              <ul className="list-inside list-disc text-sm text-muted-foreground">
+                {policyDecision.reasons.map((r) => (
+                  <li key={`ai-confirm-${r}`}>{r}</li>
+                ))}
+              </ul>
+            ) : null}
+            <Form method="post" className="flex gap-2">
+              <input type="hidden" name="intent" value="access-request" />
+              <input
+                type="hidden"
+                name="purpose"
+                value={aiAccessRequest.request.purpose}
+              />
+              <input type="hidden" name="role" value={requestRole} />
+              <input type="hidden" name="approved" value="true" />
+              <Button type="submit">Confirm AI request</Button>
+              <Button asChild variant="outline">
+                <Link
+                  to={buildConfirmHref(
+                    aiAccessRequest.request.purpose,
+                    requestRole,
+                    false,
+                    { aiFill: true }
+                  )}
+                >
+                  Cancel
+                </Link>
+              </Button>
+            </Form>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export function MetadataAssetDetailView({
   asset,
   genUiDocument,
   policyDecision,
   role,
   purpose,
+  aiAccessRequest,
   submitResult,
 }: MetadataAssetDetailProps) {
   return (
@@ -167,12 +311,20 @@ export function MetadataAssetDetailView({
         </CardContent>
       </Card>
 
-      <AccessRequestPanel
-        policyDecision={policyDecision}
-        role={role}
-        purpose={purpose}
-        submitResult={submitResult}
-      />
+      {aiAccessRequest.status === "idle" ? (
+        <AccessRequestPanel
+          policyDecision={policyDecision}
+          role={role}
+          purpose={purpose}
+          submitResult={submitResult}
+        />
+      ) : (
+        <AiAccessRequestPanel
+          aiAccessRequest={aiAccessRequest}
+          policyDecision={policyDecision}
+          submitResult={submitResult}
+        />
+      )}
 
       <div className="flex flex-wrap gap-4 text-sm">
         <div>

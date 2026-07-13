@@ -14,6 +14,7 @@ export type {
   PolicyDecisionContract,
 } from "@ai-search-portal/contracts";
 export type { MockItemContract } from "@ai-search-portal/contracts";
+export type { AuditEventContract } from "@ai-search-portal/contracts";
 export {
   contextMetricSchema,
   contextPackManifestSchema,
@@ -51,4 +52,11 @@ export {
   stableChatMetaSchema,
   stableToolStatusSchema,
   updateItemRequestSchema,
+} from "@ai-search-portal/contracts";
+export {
+  agentToolNameSchema,
+  auditEventSchema,
+  listAuditEventsResponseSchema,
+  toolMetadataSchema,
+  toolRiskLevelSchema,
 } from "@ai-search-portal/contracts";

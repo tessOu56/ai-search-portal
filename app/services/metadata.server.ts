@@ -4,6 +4,7 @@ import {
   type MetadataAssetSummaryContract,
 } from "@ai-search-portal/contracts";
 
+import { topologicalSort } from "~/lib/lineage/kahn";
 import {
   loadPackAssets,
   resetContextPackCache,
@@ -11,6 +12,12 @@ import {
 } from "~/shared/services/context-pack-loader.server";
 
 const PAGE_SIZE = 5;
+
+type MetadataLineageNode = {
+  id: string;
+  label: string;
+  type: "table" | "column" | "api" | "dashboard" | "database";
+};
 
 export type ListMetadataParams = {
   q?: string;
@@ -47,6 +54,27 @@ function toSummary(
 
 function loadAssetsForPack(packId: string): MetadataAssetDetailContract[] {
   return loadPackAssets(packId, resolveContentRoot());
+}
+
+function toLineageNode(
+  asset: MetadataAssetDetailContract
+): MetadataLineageNode {
+  return {
+    id: asset.id,
+    label: asset.name,
+    type: asset.assetType.toLowerCase() as MetadataLineageNode["type"],
+  };
+}
+
+function uniqueLineageNodes(
+  nodes: readonly MetadataLineageNode[]
+): MetadataLineageNode[] {
+  const seen = new Set<string>();
+  return nodes.filter((node) => {
+    if (seen.has(node.id)) return false;
+    seen.add(node.id);
+    return true;
+  });
 }
 
 export function listMetadataAssets(
@@ -111,26 +139,19 @@ export function resolveMetadataLineage(
     .filter((a): a is MetadataAssetDetailContract => a != null)
     .map(toSummary);
 
-  const nodes = [
-    ...upstream.map((u) => ({
-      id: u.id,
-      label: u.name,
-      type: u.assetType.toLowerCase() as
-        "table" | "column" | "api" | "dashboard" | "database",
-    })),
-    {
-      id: asset.id,
-      label: asset.name,
-      type: asset.assetType.toLowerCase() as
-        "table" | "column" | "api" | "dashboard" | "database",
-    },
-    ...downstream.map((d) => ({
-      id: d.id,
-      label: d.name,
-      type: d.assetType.toLowerCase() as
-        "table" | "column" | "api" | "dashboard" | "database",
-    })),
-  ];
+  const upstreamAssets = upstream
+    .map((u) => all.find((a) => a.id === u.id))
+    .filter((a): a is MetadataAssetDetailContract => a != null);
+  const downstreamAssets = downstream
+    .map((d) => all.find((a) => a.id === d.id))
+    .filter((a): a is MetadataAssetDetailContract => a != null);
+
+  const nodes = uniqueLineageNodes([
+    ...upstreamAssets.map(toLineageNode),
+    toLineageNode(asset),
+    ...downstreamAssets.map(toLineageNode),
+  ]);
+  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
 
   const edges = [
     ...asset.upstreamIds.map((source) => ({
@@ -141,9 +162,36 @@ export function resolveMetadataLineage(
       source: asset.id,
       target,
     })),
-  ];
+  ].filter((edge) => nodeMap.has(edge.source) && nodeMap.has(edge.target));
 
-  return { asset, upstream, downstream, nodes, edges };
+  const sortedLineage = topologicalSort(
+    nodes.map((node) => node.id),
+    edges
+  );
+  const dependencyOrder =
+    sortedLineage.status === "sorted"
+      ? sortedLineage.order
+          .map((nodeId) => nodeMap.get(nodeId))
+          .filter((node): node is MetadataLineageNode => node != null)
+      : [];
+  const cycleError =
+    sortedLineage.status === "cycle"
+      ? {
+          message:
+            "Lineage contains a cycle. Dependency order is unavailable until the cycle is fixed.",
+          nodeIds: sortedLineage.cyclicNodeIds,
+        }
+      : null;
+
+  return {
+    asset,
+    upstream,
+    downstream,
+    nodes,
+    edges,
+    dependencyOrder,
+    cycleError,
+  };
 }
 
 /** Reset cache for tests */

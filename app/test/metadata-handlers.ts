@@ -7,6 +7,7 @@ import { http, HttpResponse } from "msw";
 import {
   evaluateAccessResponseSchema,
   getMetadataAssetResponseSchema,
+  listAuditEventsResponseSchema,
   listMetadataResponseSchema,
   mcpDiscoverSchema,
   mcpToolsCallResponseSchema,
@@ -22,6 +23,20 @@ import {
 const ERROR_INVALID_BODY = "Invalid request body";
 const ERROR_ASSET_NOT_FOUND = "Asset not found";
 const PAGE_SIZE = 5;
+const MOCK_AUDIT_EVENTS = [
+  {
+    id: "aud-mock-1",
+    at: "2026-07-09T00:00:00.000Z",
+    action: "access.request.submit",
+    actor: { role: "analyst" as const },
+    resource: { type: "metadata_asset", id: "tbl-customers" },
+    decisionId: "dec-mock-1",
+    requestId: "mock-req-1",
+    outcome: "pending_approval" as const,
+    requireAudit: true,
+    reasons: ["sensitive classification requires approval"],
+  },
+];
 
 function packFromRequest(request: Request): string {
   const url = new URL(request.url);
@@ -274,6 +289,18 @@ export const metadataHandlers = [
       },
     });
     return HttpResponse.json(body, { status: 202 });
+  }),
+
+  http.get("/api/audit", ({ request }) => {
+    const url = new URL(request.url);
+    const rawLimit = Number.parseInt(url.searchParams.get("limit") ?? "50", 10);
+    const limit = Number.isNaN(rawLimit) ? 50 : Math.max(0, rawLimit);
+    const data = MOCK_AUDIT_EVENTS.slice(0, limit);
+    const body = listAuditEventsResponseSchema.parse({
+      data,
+      total: MOCK_AUDIT_EVENTS.length,
+    });
+    return HttpResponse.json(body);
   }),
 
   http.post("/api/mcp/gateway", async ({ request }) => {

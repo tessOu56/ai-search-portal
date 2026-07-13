@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import {
   metadataColumnSchema,
+  metadataLineageCycleSchema,
   metadataLineageEdgeSchema,
   metadataLineageNodeSchema,
 } from "./metadata.contract.js";
@@ -21,6 +22,8 @@ export type GenUiNodeType = z.infer<typeof genUiNodeTypeSchema>;
 export const lineageGraphPropsSchema = z.object({
   nodes: z.array(metadataLineageNodeSchema),
   edges: z.array(metadataLineageEdgeSchema),
+  dependencyOrder: z.array(metadataLineageNodeSchema).optional(),
+  cycleError: metadataLineageCycleSchema.nullable().optional(),
   themeMode: z.enum(["light", "dark"]).default("dark"),
 });
 

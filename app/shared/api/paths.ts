@@ -11,6 +11,7 @@ export const API_CONTEXT_PACK_SELECT = "/api/context/pack-select";
 export const API_METADATA_ACCESS_REQUESTS = "/api/metadata/access-requests";
 export const API_METADATA_ACCESS_EVALUATE =
   "/api/metadata/access-requests/evaluate";
+export const API_AUDIT = "/api/audit";
 export const API_MCP_GATEWAY = "/api/mcp/gateway";
 export const API_CHAT = "/api/chat";
 export const API_LOCALE = "/api/locale";
