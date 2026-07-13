@@ -13,6 +13,7 @@
 
 ## End-to-End Workflow
 
+0. **Session context**：讀 [`docs/platform-inbox/PROFILE.md`](docs/platform-inbox/PROFILE.md)（業務×技術×目標；platform-command 派送）。
 1. **Setup**：`pnpm install` → `pnpm run dev`（建議 `corepack enable` 對齊 `packageManager`）
 2. **Code**：修改 app/features、app/components、app/services、app/shared 等
 3. **Before PR / push（硬性）**：`pnpm run pr-gate`（= build + test + lint:ci）。**Cowork 沙箱無法跑 pnpm**（見 [platform-command cowork-sandbox](https://github.com/tessOu56/platform-command/blob/main/docs/cowork-sandbox.md) §8）——沙箱內改碼後必須在本機跑 pr-gate，全綠才可 push；不得用 `--no-verify` 略過 hook。
