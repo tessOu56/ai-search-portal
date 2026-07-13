@@ -1,42 +1,44 @@
 # GitHub Pages — VitePress docs 首次部署
 
-> **T-2026-067** 驗收項之一。`pnpm run docs:build` 與 workflow install/build 已綠；**`configure-pages` 失敗 = repo 尚未完成 Pages 一次性設定**（無法只靠 YAML 自動開）。
+> **T-2026-067** 驗收項。`deploy-docs` 使用 **純 shell + `gh-pages` 分支**，不依賴 `actions/checkout` 等第三方 action（避開 repo「僅允許 tessOu56 actions」政策）。
 
-## 必做：一次性手動設定（repo admin）
-
-`GITHUB_TOKEN` **不能**在大多數個人 repo 上呼叫 `Create Pages site`（會出現 `Resource not accessible by integration`）。workflow 的 `enablement: true` 已移除——請在 GitHub UI 完成下列兩步，**只做一次**。
-
-### A. 開啟 GitHub Pages（Actions 來源）
+## 必做：Pages 來源設為 branch（一次性）
 
 1. [Settings → Pages](https://github.com/tessOu56/ai-search-portal/settings/pages)
-2. **Build and deployment → Source** → **GitHub Actions**（不要選 Deploy from a branch）
-3. **Custom domain** 留空
+2. **Build and deployment → Source** → **Deploy from a branch**
+3. **Branch** → `gh-pages` · **Folder** → `/ (root)`
+4. **Custom domain** 留空
 
-### B. 放寬 Workflow token 權限（若 A 後仍 `Resource not accessible`）
+首次 workflow 成功 push `gh-pages` 後，數分鐘內站點可用。
 
-1. [Settings → Actions → General](https://github.com/tessOu56/ai-search-portal/settings/actions)
-2. **Workflow permissions** → 選 **Read and write permissions**
-3. Save
+## 觸發部署
 
-### C. 重跑部署
-
-Actions → **deploy-docs** → **Run workflow**（或 push `docs/**`）
+- push `main` 且 paths 含 `docs/**` / `package.json` / `pnpm-lock.yaml` / 本 workflow
+- 或 Actions → **deploy-docs** → **Run workflow**
 
 ## 驗收
 
-- Workflow：`build` + `deploy` 皆 success
-- URL：`https://tessou56.github.io/ai-search-portal/`（VitePress `base: /ai-search-portal/`）
-- 成功後更新 `platform-command/registry/projects.json` deploy 欄或 sprint 檢查項
+- Workflow **deploy** job success
+- URL：`https://tessou56.github.io/ai-search-portal/`（`base: /ai-search-portal/`）
+- 成功後更新 `platform-command/registry/projects.json` deploy 欄
 
-## 常見失敗對照
+## 常見失敗
 
-| Annotation                                                              | 意義                       | 處理                                                              |
-| ----------------------------------------------------------------------- | -------------------------- | ----------------------------------------------------------------- |
-| `Get Pages site failed` / **Not Found**                                 | Pages 從未啟用             | 完成上方 **A**                                                    |
-| `Create Pages site failed` / **Resource not accessible by integration** | token 無權自動建立 site    | 完成 **A + B**；勿依賴 `enablement: true`                         |
-| Node.js 20 deprecated（configure-pages@v5）                             | runner 強制 Node 24 的警告 | 可忽略，不擋部署                                                  |
-| 404 但 workflow 綠                                                      | `base` 路徑錯              | 確認 `docs/.vitepress/config.mts` 的 `base: "/ai-search-portal/"` |
-| pnpm version 衝突                                                       | 重複宣告 pnpm 版本         | 已對齊 `ci.yml`（2026-07-13）                                     |
+| Annotation                                              | 意義                                         | 處理                                                                      |
+| ------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------- |
+| `actions/... are not allowed ... must be from tessOu56` | repo 禁止非 tessOu56 的 action               | 本 workflow 已改純 shell；若 **CI** 仍報此錯，見下方「放寬 Actions 政策」 |
+| Pages 404 / 空白                                        | Source 仍為 GitHub Actions 或未選 `gh-pages` | 改 **Deploy from a branch → gh-pages**                                    |
+| `base` 路徑錯                                           | 資源 404                                     | 確認 `docs/.vitepress/config.mts` 的 `base: "/ai-search-portal/"`         |
+
+## 可選：放寬 Actions 政策（讓 CI 等 workflow 用官方 action）
+
+若希望 `ci.yml` 繼續用 `actions/checkout`、`pnpm/action-setup` 等：
+
+1. [Settings → Actions → General](https://github.com/tessOu56/ai-search-portal/settings/actions)
+2. **Actions permissions** → **Allow all actions and reusable workflows**（或允許 `actions/*`、`pnpm/*`）
+3. Save
+
+`deploy-docs` **不必**改回 GitHub Actions Pages 管線；branch 部署已足夠。
 
 ## 本機預檢
 
