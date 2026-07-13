@@ -97,13 +97,26 @@ export {
   mockItemSchema,
   updateItemRequestSchema,
 } from "./items.contract.js";
+export type { McpArgsParseResult, McpToolName } from "./mcp.contract.js";
 export {
+  MCP_TOOL_ARG_SCHEMAS,
+  MCP_TOOL_METADATA,
+  MCP_TOOL_NAME_GET,
+  MCP_TOOL_NAME_LINEAGE,
+  MCP_TOOL_NAME_POLICY,
+  MCP_TOOL_NAME_SEARCH,
+  MCP_TOOL_NAMES,
   mcpClientMetaSchema,
   mcpDiscoverSchema,
+  mcpMetadataGetArgsSchema,
+  mcpMetadataLineageArgsSchema,
+  mcpMetadataSearchArgsSchema,
+  mcpPolicyEvaluateArgsSchema,
   mcpTaskEventSchema,
   mcpToolNameSchema,
   mcpToolsCallRequestSchema,
   mcpToolsCallResponseSchema,
+  parseMcpToolArguments,
 } from "./mcp.contract.js";
 export type {
   MetadataAssetDetailContract,
@@ -122,10 +135,19 @@ export {
   metadataPaginationSchema,
 } from "./metadata.contract.js";
 export type {
+  AgentGovernedToolName,
   AgentToolName,
   ToolContractDefinition,
   ToolMetadataContract,
   ToolRiskLevel,
+} from "./tool.contract.js";
+export {
+  AGENT_GOVERNED_TOOL_METADATA,
+  agentGovernedToolNameSchema,
+  toolAccessRequestDraftInputSchema,
+  toolAccessRequestDraftOutputSchema,
+  toolAccessRequestSubmitInputSchema,
+  toolAccessRequestSubmitOutputSchema,
 } from "./tool.contract.js";
 export {
   AGENT_TOOL_METADATA,

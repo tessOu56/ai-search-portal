@@ -6,7 +6,12 @@
 
 import { z } from "zod";
 
-import { userRoleSchema } from "./access-request.contract.js";
+import {
+  metadataAccessEvaluateRequestSchema,
+  metadataAccessRequestSchema,
+  policyDecisionSchema,
+  userRoleSchema,
+} from "./access-request.contract.js";
 
 export const toolRiskLevelSchema = z.enum(["low", "medium", "high"]);
 
@@ -173,6 +178,59 @@ export const AGENT_TOOL_METADATA: Record<AgentToolName, ToolMetadataContract> =
       timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
     }),
   };
+
+// ---- Governed tools（write 類；階段二契約先行，**不進 DEFAULT_ALLOWED_TOOLS**）----
+// 進 allowlist 的前置條件 = 階段三「HITL 伺服器端強制」落地；在那之前只有契約與 metadata。
+
+export const agentGovernedToolNameSchema = z.enum([
+  "access_request.draft",
+  "access_request.submit",
+]);
+
+export type AgentGovernedToolName = z.infer<typeof agentGovernedToolNameSchema>;
+
+/** draft = 政策預審 + 申請草稿（無副作用）；I/O 直接複用 access-request 契約，零漂移。 */
+export const toolAccessRequestDraftInputSchema =
+  metadataAccessEvaluateRequestSchema;
+
+export const toolAccessRequestDraftOutputSchema = z.object({
+  decision: policyDecisionSchema,
+  draft: metadataAccessRequestSchema,
+});
+
+/** submit = 正式送出（副作用 + 稽核）；high risk ⇒ HITL 必停（metadata 不變式驗證）。 */
+export const toolAccessRequestSubmitInputSchema = metadataAccessRequestSchema;
+
+export const toolAccessRequestSubmitOutputSchema = z.object({
+  requestId: z.string(),
+  status: z.enum(["approved", "pending_approval", "denied"]),
+  decision: policyDecisionSchema,
+  auditLogged: z.boolean(),
+});
+
+export const AGENT_GOVERNED_TOOL_METADATA: Record<
+  AgentGovernedToolName,
+  ToolMetadataContract
+> = {
+  "access_request.draft": toolMetadataSchema.parse({
+    name: "access_request.draft",
+    description:
+      "Evaluate policy and prepare an access request draft (no side effects).",
+    riskLevel: "medium",
+    requiresHitl: false,
+    forceAudit: false,
+    timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
+  }),
+  "access_request.submit": toolMetadataSchema.parse({
+    name: "access_request.submit",
+    description:
+      "Submit a metadata access request (side effects; audit required).",
+    riskLevel: "high",
+    requiresHitl: true, // 不變式：high ⇒ HITL；伺服器端強制屬階段三
+    forceAudit: true,
+    timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
+  }),
+};
 
 // ---- Tool contract（metadata + I/O schema 綁定；無 schema 無法建構）----
 

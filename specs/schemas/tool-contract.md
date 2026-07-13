@@ -23,6 +23,12 @@
 2. registry（`packages/agent-core/src/tools/registry.ts`）鍵集 = `agentToolNameSchema` 選項 = `DEFAULT_ALLOWED_TOOLS`，由 `registry.test.ts` 交叉驗證。
 3. 對外行為與 allowlist 時代一致；本規格為階段二地基，不改執行路徑。
 
+## 階段二收尾（2026-07-13）
+
+- **MCP arguments 契約化**：`mcp.contract.ts` 提供 per-tool args schema + `parseMcpToolArguments()`；gateway 不再使用 `as` 斷言。envelope（`{name, arguments}`）不變，對外非破壞；非法型別由放行改為拒絕（刻意收緊）。
+- **discover 風險註記**：`MCP_TOOL_METADATA` 為單一 SoT，discover tools 附 `riskLevel`/`requiresHitl`（optional 欄位，向後相容）。
+- **Governed tools**：`access_request.draft`（medium）/ `access_request.submit`（high，HITL+audit）契約與 metadata 已註冊於 `GOVERNED_TOOL_REGISTRY`，**不在 DEFAULT_ALLOWED_TOOLS**——進 allowlist 的前置條件 = 階段三 HITL 伺服器端強制落地。I/O 直接複用 access-request 契約（零漂移）。
+
 ## 後續（規劃，未實作）
 
 - 階段三：`access_request.draft`（medium）、`access_request.submit`（high，HITL 必停）包成 tool。

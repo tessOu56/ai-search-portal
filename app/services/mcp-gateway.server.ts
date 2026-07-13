@@ -1,8 +1,10 @@
 import { randomUUID } from "node:crypto";
 
 import {
+  MCP_TOOL_METADATA,
   mcpDiscoverSchema,
   mcpToolsCallRequestSchema,
+  parseMcpToolArguments,
 } from "@ai-search-portal/contracts";
 import type { z } from "zod";
 
@@ -32,18 +34,13 @@ export function getMcpDiscover() {
       name: "ai-search-portal-mcp",
       version: "0.1.0",
     },
-    tools: [
-      {
-        name: "metadata.search",
-        description: "Search metadata catalog assets",
-      },
-      { name: "metadata.get", description: "Get metadata asset by id" },
-      { name: "metadata.lineage", description: "Resolve asset lineage graph" },
-      {
-        name: "policy.evaluate",
-        description: "Evaluate access policy for an asset",
-      },
-    ],
+    // 階段二收尾：discover 由 MCP_TOOL_METADATA 生成，附風險註記（單一 SoT）
+    tools: Object.values(MCP_TOOL_METADATA).map((meta) => ({
+      name: meta.name,
+      description: meta.description,
+      riskLevel: meta.riskLevel,
+      requiresHitl: meta.requiresHitl,
+    })),
     ttlMs: 60_000,
   });
 }
@@ -76,32 +73,33 @@ export function handleMcpToolsCall(body: unknown): {
 type McpToolsCallRequest = z.infer<typeof mcpToolsCallRequestSchema>;
 
 function handleMetadataSearch(req: McpToolsCallRequest) {
-  const args = req.params.arguments as {
-    q?: string;
-    type?: string;
-    page?: number;
-  };
+  const parsed = parseMcpToolArguments("metadata.search", req.params.arguments);
+  if (!parsed.ok) return { error: parsed.error };
+  const args = parsed.data as { q?: string; type?: string; page?: number };
   const result = listMetadataAssets({
-    q: typeof args.q === "string" ? args.q : "",
-    type: typeof args.type === "string" ? args.type : undefined,
-    page: typeof args.page === "number" ? args.page : 1,
+    q: args.q ?? "",
+    type: args.type,
+    page: args.page ?? 1,
   });
   return { result };
 }
 
 function handleMetadataGet(req: McpToolsCallRequest) {
-  const args = req.params.arguments as { assetId?: string };
-  const assetId = args.assetId;
-  if (!assetId) return { error: "assetId required" };
+  const parsed = parseMcpToolArguments("metadata.get", req.params.arguments);
+  if (!parsed.ok) return { error: "assetId required" };
+  const { assetId } = parsed.data as { assetId: string };
   const asset = getMetadataAsset(assetId);
   if (!asset) return { error: ERROR_ASSET_NOT_FOUND };
   return { result: asset };
 }
 
 function handleMetadataLineage(req: McpToolsCallRequest) {
-  const args = req.params.arguments as { assetId?: string };
-  const assetId = args.assetId;
-  if (!assetId) return { error: "assetId required" };
+  const parsed = parseMcpToolArguments(
+    "metadata.lineage",
+    req.params.arguments
+  );
+  if (!parsed.ok) return { error: "assetId required" };
+  const { assetId } = parsed.data as { assetId: string };
   const lineage = resolveMetadataLineage(assetId);
   if (!lineage) return { error: ERROR_ASSET_NOT_FOUND };
 
@@ -124,14 +122,13 @@ function handleMetadataLineage(req: McpToolsCallRequest) {
 }
 
 function handlePolicyEvaluate(req: McpToolsCallRequest) {
-  const args = req.params.arguments as {
-    assetId?: string;
-    purpose?: "analytics" | "marketing" | "operations";
+  const parsed = parseMcpToolArguments("policy.evaluate", req.params.arguments);
+  if (!parsed.ok) return { error: "assetId and purpose required" };
+  const args = parsed.data as {
+    assetId: string;
+    purpose: "analytics" | "marketing" | "operations";
     role?: "analyst" | "data_admin" | "engineer";
   };
-  if (!args.assetId || !args.purpose) {
-    return { error: "assetId and purpose required" };
-  }
   try {
     const decision = evaluateMetadataAccess({
       assetId: args.assetId,

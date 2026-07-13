@@ -6,8 +6,14 @@
  */
 
 import {
+  AGENT_GOVERNED_TOOL_METADATA,
   AGENT_TOOL_METADATA,
+  type AgentGovernedToolName,
   defineToolContract,
+  toolAccessRequestDraftInputSchema,
+  toolAccessRequestDraftOutputSchema,
+  toolAccessRequestSubmitInputSchema,
+  toolAccessRequestSubmitOutputSchema,
   toolContextBindingsInputSchema,
   toolContextBindingsOutputSchema,
   toolContextResolveMetricInputSchema,
@@ -80,4 +86,32 @@ export function listToolMetadata(): ToolMetadataContract[] {
     // eslint-disable-next-line security/detect-object-injection -- typed registry key
     return TOOL_REGISTRY[name].metadata;
   });
+}
+
+/**
+ * Governed tools（write 類）：契約已註冊、**不在 DEFAULT_ALLOWED_TOOLS**。
+ * 進 allowlist 前置條件 = 階段三 HITL 伺服器端強制落地（見 specs/schemas/tool-contract.md）。
+ */
+export const GOVERNED_TOOL_REGISTRY: Record<
+  AgentGovernedToolName,
+  ToolContractDefinition
+> = {
+  "access_request.draft": defineToolContract(
+    AGENT_GOVERNED_TOOL_METADATA["access_request.draft"],
+    {
+      input: toolAccessRequestDraftInputSchema,
+      output: toolAccessRequestDraftOutputSchema,
+    }
+  ),
+  "access_request.submit": defineToolContract(
+    AGENT_GOVERNED_TOOL_METADATA["access_request.submit"],
+    {
+      input: toolAccessRequestSubmitInputSchema,
+      output: toolAccessRequestSubmitOutputSchema,
+    }
+  ),
+};
+
+export function isGovernedTool(name: string): name is AgentGovernedToolName {
+  return name in GOVERNED_TOOL_REGISTRY;
 }

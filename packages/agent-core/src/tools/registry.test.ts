@@ -7,7 +7,9 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_ALLOWED_TOOLS,
   getToolContract,
+  GOVERNED_TOOL_REGISTRY,
   isAllowedTool,
+  isGovernedTool,
   listToolMetadata,
   TOOL_REGISTRY,
 } from "./registry";
@@ -57,5 +59,28 @@ describe("TOOL_REGISTRY (agentic 階段二)", () => {
     for (const meta of metas) {
       expect(() => JSON.stringify(meta)).not.toThrow();
     }
+  });
+});
+
+describe("GOVERNED_TOOL_REGISTRY (階段二收尾：write 類契約先行)", () => {
+  it("registers governed tools with full contracts but keeps them out of the allowlist", () => {
+    for (const name of Object.keys(GOVERNED_TOOL_REGISTRY)) {
+      expect(isAllowedTool(name)).toBe(false);
+      expect(isGovernedTool(name)).toBe(true);
+      const contract =
+        GOVERNED_TOOL_REGISTRY[name as keyof typeof GOVERNED_TOOL_REGISTRY];
+      expect(contract.input).toBeDefined();
+      expect(contract.output).toBeDefined();
+      expect(toolMetadataSchema.safeParse(contract.metadata).success).toBe(
+        true
+      );
+    }
+  });
+
+  it("submit contract enforces high-risk governance flags", () => {
+    const submit = GOVERNED_TOOL_REGISTRY["access_request.submit"];
+    expect(submit.metadata.riskLevel).toBe("high");
+    expect(submit.metadata.requiresHitl).toBe(true);
+    expect(submit.metadata.forceAudit).toBe(true);
   });
 });
