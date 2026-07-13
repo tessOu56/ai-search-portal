@@ -3,6 +3,7 @@
  * Lint file and folder names under app/ per docs/CONVENTIONS.md.
  * - Folders (except under app/routes): lowercase letters and numbers only, no separator.
  * - Component .tsx under app/components: filename must be PascalCase (or index.ts).
+ *   Co-located tests: ComponentName.test.tsx / ComponentName.spec.tsx (base name PascalCase).
  * Exit code: 0 if OK, 1 if violations.
  */
 
@@ -16,6 +17,19 @@ const appDir = path.join(root, "app");
 
 const FOLDER_REGEX = /^[a-z][a-z0-9]*$/;
 const PASCAL_REGEX = /^[A-Z][a-zA-Z0-9]*$/;
+const COMPONENT_TEST_SUFFIXES = [".test.tsx", ".spec.tsx"];
+
+function componentTsxBaseName(fileName) {
+  for (const suffix of COMPONENT_TEST_SUFFIXES) {
+    if (fileName.endsWith(suffix)) {
+      return fileName.slice(0, -suffix.length);
+    }
+  }
+  if (fileName.endsWith(".tsx")) {
+    return fileName.slice(0, -4);
+  }
+  return null;
+}
 
 const violations = [];
 
@@ -43,8 +57,8 @@ function walk(dir, relativeDir = "app", skipFolderCheck = false) {
     }
 
     if (ent.isFile() && relativeDir.startsWith("app/components") && ent.name.endsWith(".tsx")) {
-      const base = ent.name.slice(0, -4);
-      if (base !== "index" && !PASCAL_REGEX.test(base)) {
+      const base = componentTsxBaseName(ent.name);
+      if (base !== null && base !== "index" && !PASCAL_REGEX.test(base)) {
         violations.push({
           path: rel,
           rule: "component",

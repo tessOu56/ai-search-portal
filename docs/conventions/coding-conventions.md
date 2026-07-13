@@ -18,7 +18,7 @@
 - **路徑**：`app/components/**/*.tsx`。
 - **規則**：檔名（不含副檔名）為 **PascalCase**。
 - **範例**：`ChatInterface.tsx`、`ErrorBoundaryFallback.tsx`、`Button.tsx`。
-- **例外**：`index.ts` / `index.tsx` 作為 barrel 可接受。
+- **例外**：`index.ts` / `index.tsx` 作為 barrel 可接受；co-located 測試 `ComponentName.test.tsx` / `ComponentName.spec.tsx`（base 名須 PascalCase）。
 
 ### 其他程式檔
 
@@ -33,11 +33,12 @@
 
 ### 簡表
 
-| 位置                         | 類型      | 規則           | 範例                        |
-| ---------------------------- | --------- | -------------- | --------------------------- |
-| `app/**` 資料夾（非 routes） | 資料夾    | 小寫、無分隔符 | `errorboundary`             |
-| `app/components/**`          | `.tsx` 檔 | PascalCase     | `ErrorBoundaryFallback.tsx` |
-| `app/components/**`          | barrel    | `index.ts`     | `index.ts`                  |
+| 位置                         | 類型            | 規則                     | 範例                        |
+| ---------------------------- | --------------- | ------------------------ | --------------------------- |
+| `app/**` 資料夾（非 routes） | 資料夾          | 小寫、無分隔符           | `errorboundary`             |
+| `app/components/**`          | `.tsx` 檔       | PascalCase               | `ErrorBoundaryFallback.tsx` |
+| `app/components/**`          | co-located test | `ComponentName.test.tsx` | `AiFallbackPanel.test.tsx`  |
+| `app/components/**`          | barrel          | `index.ts`               | `index.ts`                  |
 
 ## 檢查方式
 

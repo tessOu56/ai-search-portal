@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Fast lint gate
+        run: pnpm run lint:filenames && pnpm run lint:handlers
+
       - name: Prepare reports directory
         run: mkdir -p reports
 

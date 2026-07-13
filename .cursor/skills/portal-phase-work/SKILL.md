@@ -25,7 +25,7 @@ description: >-
 1. 從 PROJECT-PLAN §2 確認**當前 Phase**（現況表）。
 2. 列出該 Phase **出口條件**；未完成項 = 本次 scope。
 3. **禁止**在未滿足出口條件時擴 scope 到下一 Phase（Lab 平行軌除外，且須標註 `portal-lab-boundary`）。
-4. 結束前建議跑 **pr-gate**：`pnpm run build && pnpm run test && pnpm run lint:ci`；Phase 2+ 加 `pnpm run test:labs`。
+4. **結束前必跑 pr-gate（硬性，push 前）**：`pnpm run pr-gate`（= build + test + lint:ci）。Phase 2+ 另加 `pnpm run test:labs`。沙箱無法跑 pnpm 時登記 [cowork-sandbox](https://github.com/tessOu56/platform-command/blob/main/docs/cowork-sandbox.md) 待本機補跑，**全綠才可 push**。
 
 ## Phase 速查
 

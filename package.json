@@ -32,6 +32,7 @@
     "lint:fix": "eslint --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives . --fix",
     "lint:strict": "eslint --max-warnings=0 --cache --cache-location ./node_modules/.cache/eslint --report-unused-disable-directives .",
     "lint:ci": "pnpm run lint:filenames && pnpm run lint:handlers && pnpm run lint:openapi && pnpm run verify:openapi-codegen && pnpm run lint:strict && pnpm run typecheck",
+    "pr-gate": "pnpm run build && pnpm run test && pnpm run lint:ci",
     "check:peers": "pnpm ls react react-dom",
     "lint:filenames": "node scripts/lint-filenames.mjs",
     "lint:handlers": "node scripts/lint-handlers.mjs",

@@ -15,7 +15,7 @@
 
 1. **Setup**：`pnpm install` → `pnpm run dev`（建議 `corepack enable` 對齊 `packageManager`）
 2. **Code**：修改 app/features、app/components、app/services、app/shared 等
-3. **Before PR**：`pnpm run build`、`pnpm run test`、`pnpm run lint:ci`
+3. **Before PR / push（硬性）**：`pnpm run pr-gate`（= build + test + lint:ci）。**Cowork 沙箱無法跑 pnpm**（見 [platform-command cowork-sandbox](https://github.com/tessOu56/platform-command/blob/main/docs/cowork-sandbox.md) §8）——沙箱內改碼後必須在本機跑 pr-gate，全綠才可 push；不得用 `--no-verify` 略過 hook。
 4. **Commit**：Conventional Commits（feat / fix / docs / chore / refactor / test）
 5. **Delete files**：用 `git rm <path>` 以保留操作紀錄；空資料夾 Git 不追蹤，可手動刪除。見 [docs/conventions/git-version-control.md](docs/conventions/git-version-control.md)
 
@@ -30,8 +30,10 @@
 
 ## Quality & CI
 
+- **pr-gate（push 前必跑）**：`pnpm run pr-gate` — 單一入口，對齊 CI 主線
 - **Commands**：`lint:filenames`、`lint`（或 `lint:ci`）、`typecheck`、`test`
-- **CI**：`.github/workflows/ci.yml`（build、test、lint 皆通過才放行；失敗時產出說明報告，見 [docs/runbooks/local-dev.md](docs/runbooks/local-dev.md)）
+- **CI**：`.github/workflows/ci.yml`（install 後 fast lint gate → build → test → lint:ci；失敗時產出說明報告，見 [docs/runbooks/local-dev.md](docs/runbooks/local-dev.md)）
+- **新 workflow**：複製 `ci.yml` 的 checkout / pnpm / node 三步；**禁止** `pnpm/action-setup` 同時設 `version:` 與 `package.json#packageManager`
 - **User-facing changes**：`pnpm run changeset`
 
 ---
