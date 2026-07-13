@@ -9,6 +9,8 @@ import { userRoleSchema } from "./access-request.contract.js";
 
 export const auditActionSchema = z
   .string()
+  // Bounded dotted identifiers (a.b); not user-controlled free text.
+  // eslint-disable-next-line security/detect-unsafe-regex -- closed identifier pattern
   .regex(/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/, "expect dot.separated name");
 
 export const auditOutcomeSchema = z.enum([

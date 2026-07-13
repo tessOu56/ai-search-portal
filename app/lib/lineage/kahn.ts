@@ -18,39 +18,45 @@ function edgeKey(edge: LineageEdge): string {
   return `${edge.source}\u0000${edge.target}`;
 }
 
-export function topologicalSort(
+function ensureNode(
+  nodeId: string,
+  nodeSet: Set<string>,
+  orderedNodeIds: string[]
+): void {
+  if (nodeSet.has(nodeId)) return;
+  nodeSet.add(nodeId);
+  orderedNodeIds.push(nodeId);
+}
+
+function collectGraph(
   nodeIds: readonly string[],
   edges: readonly LineageEdge[]
-): TopologicalSortResult {
+) {
   const orderedNodeIds: string[] = [];
   const nodeSet = new Set<string>();
-
   for (const nodeId of nodeIds) {
-    if (!nodeSet.has(nodeId)) {
-      nodeSet.add(nodeId);
-      orderedNodeIds.push(nodeId);
-    }
+    ensureNode(nodeId, nodeSet, orderedNodeIds);
   }
 
   const uniqueEdges: LineageEdge[] = [];
   const edgeKeys = new Set<string>();
-
   for (const edge of edges) {
-    if (!nodeSet.has(edge.source)) {
-      nodeSet.add(edge.source);
-      orderedNodeIds.push(edge.source);
-    }
-    if (!nodeSet.has(edge.target)) {
-      nodeSet.add(edge.target);
-      orderedNodeIds.push(edge.target);
-    }
-
+    ensureNode(edge.source, nodeSet, orderedNodeIds);
+    ensureNode(edge.target, nodeSet, orderedNodeIds);
     const key = edgeKey(edge);
     if (!edgeKeys.has(key)) {
       edgeKeys.add(key);
       uniqueEdges.push(edge);
     }
   }
+  return { orderedNodeIds, uniqueEdges };
+}
+
+export function topologicalSort(
+  nodeIds: readonly string[],
+  edges: readonly LineageEdge[]
+): TopologicalSortResult {
+  const { orderedNodeIds, uniqueEdges } = collectGraph(nodeIds, edges);
 
   const inDegree = new Map<string, number>(
     orderedNodeIds.map((nodeId) => [nodeId, 0])
@@ -67,10 +73,9 @@ export function topologicalSort(
   const ready = orderedNodeIds.filter((nodeId) => inDegree.get(nodeId) === 0);
   const order: string[] = [];
 
-  for (let index = 0; index < ready.length; index += 1) {
-    const nodeId = ready[index];
+  while (ready.length > 0) {
+    const nodeId = ready.shift() as string;
     order.push(nodeId);
-
     for (const target of outgoing.get(nodeId) ?? []) {
       const nextDegree = (inDegree.get(target) ?? 0) - 1;
       inDegree.set(target, nextDegree);

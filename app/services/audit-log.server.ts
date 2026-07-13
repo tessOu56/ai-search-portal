@@ -19,7 +19,10 @@ const memoryStore: AuditEventContract[] = [];
 function tryAppendJsonl(event: AuditEventContract): void {
   const path = process.env.AUDIT_LOG_PATH?.trim();
   if (!path) return;
+  // AUDIT_LOG_PATH is operator-configured; not user input.
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- env path
   mkdirSync(dirname(path), { recursive: true });
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- env path
   appendFileSync(path, `${JSON.stringify(event)}\n`, "utf8");
 }
 

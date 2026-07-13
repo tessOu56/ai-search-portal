@@ -69,10 +69,15 @@ export function isAllowedTool(name: string): name is AllowedToolName {
 }
 
 export function getToolContract(name: AllowedToolName): ToolContractDefinition {
+  // name is a closed AllowedToolName union, not arbitrary user input.
+  // eslint-disable-next-line security/detect-object-injection -- typed registry key
   return TOOL_REGISTRY[name];
 }
 
 /** Serializable tool 清單（未來 MCP discover / guardrails 面板用）。 */
 export function listToolMetadata(): ToolMetadataContract[] {
-  return DEFAULT_ALLOWED_TOOLS.map((name) => TOOL_REGISTRY[name].metadata);
+  return DEFAULT_ALLOWED_TOOLS.map((name) => {
+    // eslint-disable-next-line security/detect-object-injection -- typed registry key
+    return TOOL_REGISTRY[name].metadata;
+  });
 }

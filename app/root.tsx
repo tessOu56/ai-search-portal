@@ -79,6 +79,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         {/* 主題 init（防 FOUC）：讀 localStorage 還原 data-theme 與 .dark，值域見 ThemeSwitcher */}
         <script
+          // Static theme bootstrap only; no user-controlled HTML.
+          // eslint-disable-next-line react/no-danger -- FOUC theme init
           dangerouslySetInnerHTML={{
             __html: `try{var t=localStorage.getItem("portal-theme");if(t==="mitsurou"){delete document.documentElement.dataset.theme;}else if(t){document.documentElement.dataset.theme=t;}if(localStorage.getItem("portal-mode")==="dark")document.documentElement.classList.add("dark");}catch(e){}`,
           }}
