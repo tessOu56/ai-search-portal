@@ -2,10 +2,12 @@
 
 > **T-2026-067** 驗收項之一。`deploy-docs` workflow 的 build 已綠；`configure-pages@v5` 失敗代表 **repo 尚未啟用 GitHub Pages（Actions 來源）**。
 
-## 一次性設定（需 repo admin）
+## 一次性設定（通常不必手動）
+
+本 repo workflow 已在 `configure-pages` 設 **`enablement: true`**——首次成功 run 會自動把 Pages 設為 **GitHub Actions** 來源。若仍 404，再手動：
 
 1. 開啟 [Settings → Pages](https://github.com/tessOu56/ai-search-portal/settings/pages)
-2. **Build and deployment → Source** 選 **GitHub Actions**（不要選 Deploy from a branch）
+2. **Build and deployment → Source** 選 **GitHub Actions**
 3. **Custom domain** 留空（project site 用 `https://tessou56.github.io/ai-search-portal/`）
 4. Actions → **deploy-docs** → **Run workflow**（或 push `docs/**` 觸發）
 
@@ -17,11 +19,11 @@
 
 ## 常見失敗
 
-| 症狀                    | 根因                                                                                                  |
-| ----------------------- | ----------------------------------------------------------------------------------------------------- |
-| `configure-pages@v5` 紅 | Pages 未啟用或 Source 不是 GitHub Actions                                                             |
-| 404 但 workflow 綠      | `base` 與 project site 路徑不一致                                                                     |
-| pnpm version 衝突       | `pnpm/action-setup` 勿同時設 `version:` 與 `package.json#packageManager`（已對齊 ci.yml，2026-07-13） |
+| 症狀                                             | 根因                                                                                                  |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `configure-pages@v5` 紅、`Get Pages site failed` | Pages 未啟用 → workflow 已加 `enablement: true`；仍失敗則手動 Settings → Pages → GitHub Actions       |
+| 404 但 workflow 綠                               | `base` 與 project site 路徑不一致                                                                     |
+| pnpm version 衝突                                | `pnpm/action-setup` 勿同時設 `version:` 與 `package.json#packageManager`（已對齊 ci.yml，2026-07-13） |
 
 ## 本機預檢
 
