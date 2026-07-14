@@ -121,3 +121,15 @@
 
 - Node 22（`.nvmrc`，CI 對齊；注意 Dockerfile 仍為 node:20 → 收斂 ticket 見 platform-command）· pnpm 10.34.3（`packageManager`）
 - 生態矩陣：`platform-command/docs/dev-environment.md` · Cowork sandbox 限制：`platform-command/docs/cowork-sandbox.md`
+
+---
+
+## Cursor Cloud specific instructions
+
+The startup update script already runs `pnpm install`. Node 22 and pnpm 10.34.3 are preinstalled. Commands below are the canonical ones from `package.json`; this section only records non-obvious caveats for future cloud agents.
+
+- **Mock-first, fully offline**: The main Remix app runs the AI agent in-process (`@ai-search-portal/agent-core`) with mock data — no real LLM, no secrets, and no external services are required to develop, run, or E2E-test the product. All env vars (`AGENT_RUNTIME_URL`, `ITEMS_API_URL`, `LANGFUSE_*`, `OPA_URL`, …) are opt-in for the optional distributed/observability topology.
+- **Build internal libs before standalone typecheck/lint**: `packages/shared-contracts/dist` and `packages/agent-core/dist` are git-ignored and regenerated per VM. `pnpm run dev` (via `predev`) and `pnpm run test` build them automatically, but standalone `pnpm run typecheck` / `pnpm run lint:ci` assume they already exist. If either fails on a fresh VM, run `pnpm run build:contracts && pnpm run build:agent-core` first.
+- **Run the app**: `pnpm run dev` serves the main app on `http://localhost:5173/` (`predev` builds contracts + agent-core first, so cold start takes longer). Optional sibling services: `pnpm run dev:api` (backend Hono API, port 3001) and `pnpm run dev:agent` (agent-runtime SSE, port 3002) — only needed to exercise the HTTP/distributed paths.
+- **E2E**: `pnpm run test:e2e` (Playwright) auto-starts `pnpm dev` on 5173 via its `webServer` config; no manual server start or secrets needed.
+- **`pnpm install` build-script warning** (esbuild/msw ignored) is expected and harmless — dev, tests, and Playwright all work without approving those scripts.
