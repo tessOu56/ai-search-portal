@@ -1,0 +1,6 @@
+{
+  "id": "scenario-lab",
+  "name": "Scenario lab (edge cases)",
+  "description": "QA／demo 專用情境包：每筆資產都設計來觸發一種前端狀態（lineage 循環、極簡資料、空描述、全欄位遮罩、default deny、過期資料、未來時間窗、長字串溢出、Unicode 混排、分頁邊界）。對照表見 content/context-packs/SCENARIOS.md。非正式領域資料。",
+  "defaultLocale": "zh-TW"
+}

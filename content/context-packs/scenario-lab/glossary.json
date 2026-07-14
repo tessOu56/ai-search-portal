@@ -1,0 +1,13 @@
+[
+  {
+    "id": "term-scenario-lab",
+    "term": "Scenario lab",
+    "definition": "Edge-case pack for QA and demos. Every asset id encodes the state it triggers; see content/context-packs/SCENARIOS.md for the full trigger → expected-UI map.",
+    "relatedAssetIds": [
+      "asset-cycle-a",
+      "asset-minimal",
+      "asset-all-masked",
+      "asset-default-deny"
+    ]
+  }
+]

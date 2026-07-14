@@ -5,7 +5,7 @@ import type { ButtonHTMLAttributes } from "react";
 import { cn } from "~/shared/utils/cn";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ring-offset-background",
+  "inline-flex items-center justify-center gap-space-8 whitespace-nowrap rounded-full font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ring-offset-background",
   {
     variants: {
       variant: {
@@ -18,9 +18,9 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
       },
       size: {
-        sm: "h-9 px-4 text-sm",
-        md: "h-11 px-6 text-base",
-        lg: "h-12 px-8 text-lg",
+        sm: "h-8 px-space-16 text-type-14",
+        md: "h-10 px-space-16 text-type-16",
+        lg: "h-12 px-space-32 text-type-18",
       },
     },
     defaultVariants: {

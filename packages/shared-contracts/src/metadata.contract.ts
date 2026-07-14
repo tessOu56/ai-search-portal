@@ -5,6 +5,8 @@
 
 import { z } from "zod";
 
+import { domainFacetsSchema } from "./domain-facets.contract.js";
+
 export const metadataAssetTypeSchema = z.enum([
   "Database",
   "Table",
@@ -20,6 +22,8 @@ export const metadataColumnSchema = z.object({
   description: z.string().optional(),
   tags: z.array(z.string()).optional(),
   sensitive: z.boolean().optional(),
+  /** Display unit for numeric columns, e.g. "TWD/kg", "days". */
+  unit: z.string().optional(),
 });
 
 export type MetadataColumnContract = z.infer<typeof metadataColumnSchema>;
@@ -34,6 +38,8 @@ export const metadataAssetSummarySchema = z.object({
   classification: z.enum(["public", "internal", "PII", "confidential"]),
   updatedAt: z.string(),
   fqn: z.string().optional(),
+  /** Optional money/time/region facets; see domain-facets.contract.ts. */
+  facets: domainFacetsSchema.optional(),
 });
 
 export type MetadataAssetSummaryContract = z.infer<

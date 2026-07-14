@@ -1,0 +1,16 @@
+{
+  "bindings": [
+    {
+      "contextRef": "asset-minimal",
+      "module": "ghost",
+      "entityId": "entity-does-not-exist",
+      "relation": "haunts"
+    },
+    {
+      "contextRef": "ref-does-not-exist",
+      "module": "ghost",
+      "entityId": "entity-also-missing",
+      "relation": "haunts"
+    }
+  ]
+}

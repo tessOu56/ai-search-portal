@@ -26,58 +26,36 @@
 
 ## 2. 多語系（i18n）
 
-### 現況：無
+### 現況：有（手動字典）
 
-- **沒有**：未引入 i18n 套件，無翻譯檔、無語系切換、無 `useTranslation`。
-- 僅在 `app/root.tsx` 設定 `<html lang="zh-TW">`，介面文案皆為中文寫死。
-
-### 可選改進（若未來要支援多語）
-
-| 方案              | 說明                                                                           |
-| ----------------- | ------------------------------------------------------------------------------ |
-| **remix-i18next** | Remix 常見搭配，支援 server/client、namespace、locale 切換。                   |
-| **Paraglide**     | 輕量、型別友善，編譯期產出翻譯。                                               |
-| **手動字典**      | 自建 `locale/zh.json`、`locale/en.json` + context 或 loader 注入，無額外套件。 |
-
-引入後需決定：預設語系、語系切換方式（URL / cookie / 選單）、Remix loader 如何帶入 locale。
+- Cookie / Accept-Language locale（`zh-TW` · `en`）。
+- 翻譯在 `app/shared/i18n/translations/*.json`；`{year}` / `{version}` 等 placeholder 於 runtime 插值。
+- **版權年**勿寫死：`footer.copyright` 用 `© {year} …` + `new Date().getFullYear()`。
 
 ---
 
 ## 3. 無障礙（Accessibility / a11y）
 
-### 現況：部分具備
+### 現況：部分具備 + 規劃中
 
-- **有**：
-  - `<html lang="zh-TW">` 已設定，利於螢幕朗讀與語言判定。
-  - **ESLint**：`@remix-run/eslint-config` 已包含 `eslint-plugin-jsx-a11y`，會檢查部分 a11y 問題（例如圖片 alt、表單 label）。
-  - 部分元件具語意或 ARIA：例如 `Alert` 使用 `role="alert"`；Radix UI 元件（Button、ScrollArea 等）自帶一定鍵盤與 ARIA 支援。
-- **尚未系統化**：
-  - 無 **Skip Link**（跳過主內容的連結）。
-  - 未全面檢查表單與互動元件的 `aria-label` / `aria-describedby`。
-  - 未在文件或 PR 檢查清單中明確列出 a11y 要求。
+- **有**：`<html lang>`；`eslint-plugin-jsx-a11y`；部分 Radix / Alert ARIA；chat history `role="log"` + polite live region（起步）；home ask 圖示按鈕含 `aria-label`。
+- **規劃 SSOT**：[docs/product/a11y-voice-plan.md](./product/a11y-voice-plan.md) · ticket **T-2026-078**（語音輸入 Web Speech、chat live region 深化）。
 
-### 可選改進
+### 目標改進
 
-| 項目           | 說明                                                                                                                   |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **Skip Link**  | 在 `root.tsx` 主內容前加「跳至主內容」連結，並以 CSS 僅在 focus 時顯示，利於鍵盤與螢幕朗讀。                           |
-| **焦點與鍵盤** | 確認所有互動元件可鍵盤操作、焦點順序合理；Modal / 下拉關閉時焦點回到觸發元素。                                         |
-| **表單與按鈕** | 表單欄位對應 `<label>` 或 `aria-label`；圖標按鈕提供 `aria-label`。                                                    |
-| **a11y 檢查**  | 可選：加入 **axe-core** 或 **eslint-plugin-jsx-a11y** 更嚴格規則；PR 或發版前手動用瀏覽器擴充（如 axe DevTools）抽檢。 |
-| **文件**       | 在 `CONTRIBUTING.md` 或本文件註明「新 UI 需考慮無障礙（鍵盤、ARIA、對比）」。                                          |
+| 項目          | 說明                                                  |
+| ------------- | ----------------------------------------------------- |
+| **Skip Link** | `a11y.skipToContent` → 主內容 / `#home-chat`          |
+| **Chat live** | 有資料時禮貌公告助理回覆；錯誤用 assertive            |
+| **Voice**     | `SpeechRecognition` 能力偵測 + 權限；失敗不擋文字輸入 |
+| **檢查**      | axe / jsx-a11y；PR 抽檢                               |
 
 ---
 
 ## 總結
 
-| 項目       | 現況                           | 建議                                                                    |
-| ---------- | ------------------------------ | ----------------------------------------------------------------------- |
-| **打版號** | 有 Changesets 流程，無 UI 版號 | 可選：建置時注入版號並在 footer 顯示；自動化 changeset version。        |
-| **多語系** | 無                             | 若需要：引入 remix-i18next / Paraglide 或手動字典，並訂語系與切換方式。 |
-| **無障礙** | 有 lang、jsx-a11y、部分 ARIA   | 可選：Skip Link、系統化 aria/鍵盤、a11y 檢查與文件。                    |
-
-若你希望，我可以下一步幫你：
-
-- 在 root/footer 加「版號顯示」範例，或
-- 在 root 加 Skip Link 與簡短 a11y 說明，或
-- 在 `CONTRIBUTING.md` 加一節「無障礙與多語系」指引。
+| 項目       | 現況                        | 建議                            |
+| ---------- | --------------------------- | ------------------------------- |
+| **打版號** | Changesets + footer version | 維持                            |
+| **多語系** | 手動字典 + locale 切換      | 版權與 UI 文案皆走 i18n         |
+| **無障礙** | 部分 ARIA + chat live 起步  | 完成 T-2026-078（a11y + voice） |

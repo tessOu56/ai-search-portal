@@ -1,0 +1,37 @@
+/* Local scale system — do not confuse with generated tokens.portal.css */
+
+:root,
+[data-app="portal"] {
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-16: 16px;
+  --space-32: 32px;
+
+  --type-10: 10px;
+  --type-12: 12px;
+  --type-14: 14px;
+  --type-16: 16px;
+  --type-18: 18px;
+  --type-20: 20px;
+  --type-22: 22px;
+  --type-26: 26px;
+  --type-32: 32px;
+  --type-36: 36px;
+  --type-42: 42px;
+  --type-52: 52px;
+  --type-62: 62px;
+  --type-72: 72px;
+  --type-108: 108px;
+}
+
+/* RWD: slightly smaller display steps below md */
+@media (max-width: 767px) {
+  :root,
+  [data-app="portal"] {
+    --type-52: 40px;
+    --type-62: 48px;
+    --type-72: 52px;
+    --type-108: 72px;
+  }
+}

@@ -82,7 +82,10 @@ accessRequestsApi.post("/evaluate", async (c) => {
     return c.json({ error: "Invalid request body" }, 400);
   }
   try {
-    const decision = await evaluateAccess(parsed.data);
+    // Pack-aware evaluation: mirror the sibling metadata routes (and the
+    // Remix BFF, which passes packId) so non-default packs can be evaluated.
+    const packId = resolveActivePackId(c.req.query("pack"));
+    const decision = await evaluateAccess({ ...parsed.data, packId });
     const body = evaluateAccessResponseSchema.parse({ data: decision });
     return c.json(body);
   } catch {
@@ -104,7 +107,8 @@ accessRequestsApi.post("/", async (c) => {
 
   let decision;
   try {
-    decision = await evaluateAccess(parsed.data);
+    const packId = resolveActivePackId(c.req.query("pack"));
+    decision = await evaluateAccess({ ...parsed.data, packId });
   } catch {
     return c.json({ error: ERROR_ASSET_NOT_FOUND }, 404);
   }

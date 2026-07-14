@@ -1,0 +1,16 @@
+[
+  {
+    "id": "asset-invalid-type",
+    "name": "broken_asset",
+    "description": "INTENTIONALLY INVALID: assetType 'Spreadsheet' is not in the enum [Database, Table, API, Dashboard]. Loading this pack's assets must throw a schema error — this is the error-path test fixture.",
+    "assetType": "Spreadsheet",
+    "owner": "scenario-lab@example.com",
+    "tags": ["scenario", "broken"],
+    "classification": "internal",
+    "updatedAt": "2026-07-14T00:00:00.000Z",
+    "fqn": "lab.broken",
+    "upstreamIds": [],
+    "downstreamIds": [],
+    "packId": "scenario-broken-assets"
+  }
+]

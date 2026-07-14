@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { ChatBubble } from "~/components/shared/lui/ChatBubble";
@@ -55,7 +55,15 @@ function parseStableFailure(data: string) {
 const KEY_SUMMARY_WAITING = "chat.summary.waiting";
 const KEY_CHAT_ERROR_PARSE = "chat.error.parse";
 
-export function ChatInterface() {
+type ChatInterfaceProps = {
+  pendingQuery?: string | null;
+  onPendingQueryConsumed?: () => void;
+};
+
+export function ChatInterface({
+  pendingQuery = null,
+  onPendingQueryConsumed,
+}: ChatInterfaceProps) {
   const { t } = useI18n();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -65,6 +73,7 @@ export function ChatInterface() {
   const [lastQuery, setLastQuery] = useState("");
   const lastAssistantId = useRef<string | null>(null);
   const streamRef = useRef<EventSource | null>(null);
+  const submitQueryRef = useRef<(raw: string) => void>(() => undefined);
 
   useEffect(() => {
     return () => {
@@ -166,7 +175,15 @@ export function ChatInterface() {
     };
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  submitQueryRef.current = submitQuery;
+
+  useEffect(() => {
+    if (!pendingQuery?.trim()) return;
+    submitQueryRef.current(pendingQuery);
+    onPendingQueryConsumed?.();
+  }, [pendingQuery, onPendingQueryConsumed]);
+
+  const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     submitQuery(input);
   };
@@ -176,6 +193,14 @@ export function ChatInterface() {
     t("chat.golden.q2"),
     t("chat.golden.q3"),
   ];
+
+  const liveAnnouncement = (() => {
+    const last = messages[messages.length - 1];
+    if (!last || last.role !== "assistant") return "";
+    if (isStreaming && last.content) return last.content.slice(-120);
+    if (!isStreaming && last.content) return last.content;
+    return isStreaming ? t(KEY_SUMMARY_WAITING) : "";
+  })();
 
   return (
     <div className="grid gap-6">
@@ -244,11 +269,21 @@ export function ChatInterface() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("chat.history.title")}</CardTitle>
+          <CardTitle id="chat-history-heading">
+            {t("chat.history.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="sr-only" aria-live="polite" aria-atomic="false">
+            {liveAnnouncement}
+          </div>
           <ScrollArea className="h-[320px] rounded-2xl border border-border px-4 py-3">
-            <div className="space-y-4">
+            <div
+              className="space-y-4"
+              role="log"
+              aria-relevant="additions"
+              aria-labelledby="chat-history-heading"
+            >
               {messages.length === 0 && (
                 <p className="text-sm text-muted-foreground">
                   {t("chat.history.empty")}

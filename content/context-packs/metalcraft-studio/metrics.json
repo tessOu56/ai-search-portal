@@ -1,0 +1,91 @@
+[
+  {
+    "id": "metric-silver-cost",
+    "definition": "Weighted average purchase cost per gram for 925 silver sheet across suppliers (spot-linked).",
+    "owner": "Workshop Owner",
+    "sourceAssetId": "tbl-material-cost",
+    "upstreamJobIds": ["material_purchase_ingest", "silver_spot_sync"],
+    "downstreamDashboardIds": ["Studio Margin Dashboard"],
+    "qualityRules": [
+      "unit must be gram",
+      "cost must be greater than zero",
+      "spot reference must be within 24h"
+    ],
+    "accessPolicy": "Studio owners see supplier-level detail; designers see blended average only",
+    "recentChanges": [
+      {
+        "date": "2026-07-10",
+        "change": "Silver spot rally: blended cost +1.8 TWD/g"
+      }
+    ],
+    "valueType": "money",
+    "latestValue": {
+      "value": 32.5,
+      "unit": "TWD/g",
+      "asOf": "2026-07-13T09:00:00+08:00",
+      "region": { "code": "TW-TPE", "label": "台北", "level": "city" }
+    }
+  },
+  {
+    "id": "metric-session-utilization",
+    "definition": "Booked seats over capacity for experience sessions in the rolling 4-week window.",
+    "owner": "Studio Operations",
+    "sourceAssetId": "tbl-experience-session",
+    "upstreamJobIds": ["booking_rollup"],
+    "downstreamDashboardIds": ["Studio Margin Dashboard"],
+    "qualityRules": [
+      "ratio bounded between 0 and 1",
+      "cancelled bookings excluded"
+    ],
+    "accessPolicy": "Internal: studio operations",
+    "recentChanges": [],
+    "valueType": "ratio",
+    "latestValue": {
+      "value": 0.78,
+      "unit": "%",
+      "asOf": "2026-07-13T00:00:00+08:00"
+    }
+  },
+  {
+    "id": "metric-product-leadtime",
+    "definition": "Average days from material purchase to finished product listed for sale.",
+    "owner": "Workshop Owner",
+    "sourceAssetId": "tbl-product",
+    "upstreamJobIds": ["production_log_ingest"],
+    "downstreamDashboardIds": ["Studio Margin Dashboard"],
+    "qualityRules": ["lead time must be non-negative"],
+    "accessPolicy": "Internal: studio operations",
+    "recentChanges": [],
+    "valueType": "duration",
+    "latestValue": {
+      "value": 6,
+      "unit": "days",
+      "asOf": "2026-07-12T00:00:00+08:00"
+    }
+  },
+  {
+    "id": "metric-auction-premium",
+    "definition": "Average winning-bid premium over reserve price for one-off auction lots.",
+    "owner": "Auction Curator",
+    "sourceAssetId": "tbl-auction-bid",
+    "upstreamJobIds": ["auction_settlement"],
+    "downstreamDashboardIds": ["Studio Margin Dashboard"],
+    "qualityRules": [
+      "only settled lots counted",
+      "premium computed against reserve, not start price"
+    ],
+    "accessPolicy": "Confidential: studio owners and curator",
+    "recentChanges": [
+      {
+        "date": "2026-07-11",
+        "change": "潮汐銅手鐲 settled at +1800 over reserve"
+      }
+    ],
+    "valueType": "money",
+    "latestValue": {
+      "value": 1800,
+      "unit": "TWD",
+      "asOf": "2026-07-11T22:00:00+08:00"
+    }
+  }
+]

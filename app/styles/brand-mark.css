@@ -1,0 +1,226 @@
+/**
+ * @explore-design/tokens — Vesper (晨星) fine-line 米字 brand mark
+ *
+ * Stroke-only asterisk / 米字. Hover (interactive, not sm): 星芒線 sweeps
+ * along an arc from bottom-left → top-right. Plinth metal stroke tokens.
+ * CIS: docs/CIS-VESPER.md
+ */
+
+:root,
+[data-app],
+:root[data-theme="light"] {
+  --eds-brand-mark-size: 1.75rem;
+  --eds-brand-tilt-duration: var(
+    --motion-brand-tilt-duration,
+    var(--motion-duration-slow, 500ms)
+  );
+  --eds-brand-tilt-easing: var(
+    --motion-brand-tilt-easing,
+    var(--motion-easing-enter, cubic-bezier(0, 0, 0.2, 1))
+  );
+  --eds-brand-arc-duration: 1.05s;
+
+  --eds-brand-stroke-primary: var(--brand-mark-face-top-end, #e9e216);
+  --eds-brand-stroke-secondary: var(--brand-mark-face-left-start, #2a2e24);
+  --eds-brand-stroke-spark: var(
+    --brand-mark-star-glow,
+    var(--brand-mark-face-top-start, #fbf9d0)
+  );
+  --eds-brand-stroke: 1.25;
+  --eds-brand-stroke-secondary-w: 1;
+}
+
+.eds-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--eds-brand-mark-size);
+  height: var(--eds-brand-mark-size);
+  vertical-align: middle;
+}
+
+.eds-brand-mark--sm {
+  --eds-brand-mark-size: 1.25rem;
+  --eds-brand-stroke: 1.65;
+  --eds-brand-stroke-secondary-w: 1.35;
+}
+
+.eds-brand-mark--md {
+  --eds-brand-mark-size: 1.75rem;
+}
+
+.eds-brand-mark--lg {
+  --eds-brand-mark-size: 2.5rem;
+}
+
+.eds-brand-mark--xl {
+  --eds-brand-mark-size: 3.25rem;
+}
+
+.eds-brand-mark-orbit {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.eds-brand-mark-orbit-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+}
+
+.eds-brand-mark-stage {
+  position: relative;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  perspective: calc(var(--eds-brand-mark-size) * 7);
+}
+
+.eds-brand-mark-body {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(10deg) rotateY(-12deg);
+}
+
+.eds-brand-mark--flat .eds-brand-mark-body {
+  transform: none;
+}
+
+.eds-brand-mark--tilt .eds-brand-mark-body {
+  transition: transform var(--eds-brand-tilt-duration)
+    var(--eds-brand-tilt-easing);
+}
+
+.eds-brand-mark--tilt[data-interactive]:hover .eds-brand-mark-body,
+.eds-brand-mark--tilt[data-interactive]:focus-visible .eds-brand-mark-body,
+.eds-brand-mark--tilt.is-active .eds-brand-mark-body {
+  transform: rotateX(16deg) rotateY(-20deg) rotateZ(4deg);
+}
+
+.eds-brand-mark-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.eds-brand-ray {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.eds-brand-ray--primary {
+  stroke: var(--eds-brand-stroke-primary);
+  stroke-width: var(--eds-brand-stroke);
+}
+
+.eds-brand-ray--secondary {
+  stroke: var(--eds-brand-stroke-secondary);
+  stroke-width: var(--eds-brand-stroke-secondary-w);
+  opacity: 0.92;
+}
+
+/* Arm rests at 12 o'clock; animate 225→405deg = SW → NE around the mark */
+.eds-brand-mark-comet-arm {
+  transform-origin: 32px 32px;
+  transform: rotate(225deg);
+  opacity: 0;
+}
+
+.eds-brand-mark-comet-trail {
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.eds-brand-mark-comet-ball {
+  fill: var(--eds-brand-stroke-primary);
+  stroke: none;
+  filter: drop-shadow(0 0 2px var(--eds-brand-stroke-spark));
+}
+
+.eds-brand-mark[data-interactive]:hover .eds-brand-mark-comet-arm,
+.eds-brand-mark[data-interactive]:focus-visible .eds-brand-mark-comet-arm,
+.eds-brand-mark.is-active .eds-brand-mark-comet-arm {
+  animation: eds-brand-arc-sweep var(--eds-brand-arc-duration)
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.eds-brand-mark--sm .eds-brand-mark-orbit-svg {
+  display: none;
+}
+
+.eds-brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.eds-brand-lockup--horizontal {
+  flex-direction: row;
+  align-items: center;
+}
+
+.eds-brand-lockup--stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.eds-brand-lockup-wordmark {
+  font-family: var(--font-display, inherit);
+  font-weight: var(--weight-heading, 600);
+  font-size: 1.05em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary, var(--foreground, currentColor));
+}
+
+@keyframes eds-brand-arc-sweep {
+  0% {
+    transform: rotate(225deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(405deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eds-brand-mark--tilt .eds-brand-mark-body {
+    transition: none;
+  }
+
+  .eds-brand-mark--tilt[data-interactive]:hover .eds-brand-mark-body,
+  .eds-brand-mark--tilt[data-interactive]:focus-visible .eds-brand-mark-body,
+  .eds-brand-mark--tilt.is-active .eds-brand-mark-body {
+    transform: rotateX(10deg) rotateY(-12deg);
+  }
+
+  .eds-brand-mark-orbit-svg,
+  .eds-brand-mark[data-interactive]:hover .eds-brand-mark-comet-arm,
+  .eds-brand-mark[data-interactive]:focus-visible .eds-brand-mark-comet-arm,
+  .eds-brand-mark.is-active .eds-brand-mark-comet-arm {
+    animation: none;
+    display: none;
+  }
+}

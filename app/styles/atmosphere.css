@@ -1,0 +1,222 @@
+/**
+ * @explore-design/tokens — photographic-light / multi-layer atmosphere shell
+ *
+ * Token-colored layers only (no hard-coded brand hues).
+ * Mount after application CSS:
+ *   @import "@explore-design/tokens/css/atmosphere.css";
+ *
+ * Markup:
+ *   <div class="eds-atmosphere" aria-hidden>
+ *     <div class="eds-atmosphere-layer eds-atmosphere-layer--canvas"></div>
+ *     <div class="eds-atmosphere-layer eds-atmosphere-layer--glow"></div>
+ *     <div class="eds-atmosphere-layer eds-atmosphere-layer--leak"></div>
+ *     <div class="eds-atmosphere-layer eds-atmosphere-layer--geometry"></div>
+ *     <div class="eds-atmosphere-layer eds-atmosphere-layer--veil"></div>
+ *   </div>
+ */
+
+:root,
+[data-app] {
+  --eds-atmosphere-breathe-duration: var(
+    --motion-atmosphere-breathe-duration,
+    22s
+  );
+  --eds-atmosphere-drift-duration: var(--motion-atmosphere-drift-duration, 28s);
+  --eds-atmosphere-breathe-easing: ease-in-out;
+}
+
+.eds-atmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.eds-atmosphere-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+}
+
+.eds-atmosphere-layer--canvas {
+  background: var(--surface-canvas, var(--background, #0a0805));
+}
+
+.eds-atmosphere-layer--glow {
+  background:
+    radial-gradient(
+      55% 45% at 18% 72%,
+      color-mix(in srgb, var(--accent-brand, var(--primary)) 28%, transparent)
+        0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      40% 35% at 78% 28%,
+      color-mix(
+          in srgb,
+          var(--surface-highlight, var(--accent)) 22%,
+          transparent
+        )
+        0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      60% 50% at 50% 100%,
+      color-mix(in srgb, var(--accent-strong, var(--primary)) 16%, transparent)
+        0%,
+      transparent 55%
+    );
+  filter: blur(28px);
+  opacity: 0.9;
+  animation: eds-atmosphere-breathe var(--eds-atmosphere-breathe-duration)
+    var(--eds-atmosphere-breathe-easing) infinite;
+}
+
+.eds-atmosphere-layer--leak {
+  background: linear-gradient(
+    118deg,
+    transparent 8%,
+    color-mix(in srgb, var(--accent-brand, var(--primary)) 18%, transparent) 32%,
+    color-mix(in srgb, var(--surface-highlight, var(--accent)) 14%, transparent)
+      48%,
+    color-mix(in srgb, var(--accent-strong, var(--primary)) 10%, transparent)
+      62%,
+    transparent 82%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  filter: blur(18px);
+  animation: eds-atmosphere-drift var(--eds-atmosphere-drift-duration)
+    var(--eds-atmosphere-breathe-easing) infinite alternate;
+}
+
+.eds-atmosphere-layer--geometry {
+  background:
+    radial-gradient(
+      closest-side at 12% 40%,
+      transparent 72%,
+      color-mix(
+          in srgb,
+          var(--text-inverse, var(--foreground)) 18%,
+          transparent
+        )
+        73%,
+      transparent 74%
+    ),
+    repeating-linear-gradient(
+      128deg,
+      transparent 0 14px,
+      color-mix(in srgb, var(--border-primary, var(--border)) 35%, transparent)
+        14px 15px
+    );
+  background-size:
+    140% 140%,
+    42px 42px;
+  background-position:
+    -10% 10%,
+    80% 0;
+  opacity: 0.35;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 25%,
+    #000 75%,
+    transparent 100%
+  );
+}
+
+.eds-atmosphere-layer--veil {
+  background: linear-gradient(
+    to top,
+    var(--surface-canvas, var(--background)) 0%,
+    color-mix(
+        in srgb,
+        var(--surface-canvas, var(--background)) 55%,
+        transparent
+      )
+      42%,
+    color-mix(
+        in srgb,
+        var(--surface-canvas, var(--background)) 12%,
+        transparent
+      )
+      100%
+  );
+}
+
+@keyframes eds-atmosphere-breathe {
+  0%,
+  100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.06) translate(1.5%, -1%);
+    opacity: 1;
+  }
+}
+
+@keyframes eds-atmosphere-drift {
+  from {
+    transform: translate(-2%, 1%) rotate(-1deg);
+  }
+  to {
+    transform: translate(3%, -2%) rotate(1.5deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eds-atmosphere-layer--glow,
+  .eds-atmosphere-layer--leak {
+    animation: none;
+  }
+}
+
+/* Portal home: glow spans hero + upper half of second screen, then fades */
+.eds-atmosphere--home-span {
+  height: 160svh;
+  max-height: 160svh;
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 52%,
+    rgba(0, 0, 0, 0.55) 72%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 52%,
+    rgba(0, 0, 0, 0.55) 72%,
+    transparent 100%
+  );
+}
+
+.eds-atmosphere-layer--glow-soft {
+  filter: blur(48px);
+  opacity: 0.95;
+  background:
+    radial-gradient(
+      70% 55% at 22% 38%,
+      color-mix(in srgb, var(--accent-brand, var(--primary)) 32%, transparent)
+        0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      55% 48% at 78% 22%,
+      color-mix(
+          in srgb,
+          var(--surface-highlight, var(--accent)) 26%,
+          transparent
+        )
+        0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      80% 60% at 50% 88%,
+      color-mix(in srgb, var(--accent-strong, var(--primary)) 18%, transparent)
+        0%,
+      transparent 60%
+    );
+}

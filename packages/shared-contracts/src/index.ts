@@ -75,6 +75,24 @@ export {
   resolvedDomainBindingSchema,
 } from "./context.contract.js";
 export type {
+  DataCompletenessContract,
+  DomainFacetsContract,
+  MetricValueContract,
+  MetricValueTypeContract,
+  MonetaryAmountContract,
+  RegionRefContract,
+  TimeWindowContract,
+} from "./domain-facets.contract.js";
+export {
+  dataCompletenessSchema,
+  domainFacetsSchema,
+  metricValueSchema,
+  metricValueTypeSchema,
+  monetaryAmountSchema,
+  regionRefSchema,
+  timeWindowSchema,
+} from "./domain-facets.contract.js";
+export type {
   components,
   operations,
   paths,

@@ -9,6 +9,34 @@
     "id": "term-seasonality",
     "term": "Seasonality",
     "definition": "Production season shifts that affect sourcing weights and price volatility.",
-    "relatedAssetIds": ["tbl-procurement-lot"]
+    "relatedAssetIds": ["tbl-procurement-lot", "tbl-harvest-lot"]
+  },
+  {
+    "id": "term-traceability",
+    "term": "產銷履歷 (Traceability)",
+    "definition": "Certified farm-to-table production and sales record; assets tagged traceability participate in the certified chain.",
+    "relatedAssetIds": ["dim-farm", "tbl-harvest-lot"]
+  },
+  {
+    "id": "term-recipe-costing",
+    "term": "Recipe costing",
+    "definition": "Per-serving ingredient cost derived by joining recipe quantity maps with current wholesale prices.",
+    "relatedAssetIds": [
+      "tbl-recipe",
+      "tbl-recipe-ingredient",
+      "metric-recipe-cost-three-cup"
+    ]
+  },
+  {
+    "id": "term-farm-to-recipe",
+    "term": "Farm-to-recipe chain",
+    "definition": "The full data chain: farm (dim_farm) → harvest lot → procurement lot → ingredient → recipe. Money (TWD), time (season/lead time), and region (TW-*) facets attach at each hop.",
+    "relatedAssetIds": [
+      "dim-farm",
+      "tbl-harvest-lot",
+      "tbl-procurement-lot",
+      "dim-ingredient",
+      "tbl-recipe"
+    ]
   }
 ]

@@ -1,7 +1,9 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useRouteError, useSearchParams } from "@remix-run/react";
+import { useCallback, useState } from "react";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
+import { HomeLanding } from "~/components/app/home/HomeLanding";
 import {
   DashboardView,
   WorkspaceChatView,
@@ -62,27 +64,59 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 export default function Index() {
   const [searchParams] = useSearchParams();
   const viewParam = searchParams.get("view");
-  // `saas` 為舊參數，向後相容導向 dashboard；主題與 chat 共用（roadmap R1：同一設計語言）
   const view =
     viewParam === "dashboard" || viewParam === "saas" ? "dashboard" : "chat";
+  const [focusChat, setFocusChat] = useState(false);
+  const [pendingQuery, setPendingQuery] = useState<string | null>(null);
+
+  const onAsk = useCallback((query: string) => {
+    setPendingQuery(query);
+    setFocusChat(true);
+    window.requestAnimationFrame(() => {
+      document.getElementById("home-chat")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, []);
+
+  if (view === "dashboard") {
+    return (
+      <div className="relative min-h-screen bg-background">
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
+          <div className="pointer-events-auto mx-auto flex max-w-6xl items-center justify-end p-space-16 md:px-space-32">
+            <WorkspaceViewSwitcher className="bg-background/70 backdrop-blur-md" />
+          </div>
+        </div>
+        <DashboardView />
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="bg-background/80 border-b border-border">
-        <div className="mx-auto flex max-w-6xl items-center justify-between p-4">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Hybrid workspace
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Switch between AI-first chat and the dashboard overview.
-            </p>
-          </div>
-          <WorkspaceViewSwitcher />
-        </div>
+    <div className="relative">
+      {/* Soft glow spans first viewport + upper half of second screen */}
+      <div
+        className="eds-atmosphere eds-atmosphere--home-span pointer-events-none absolute inset-x-0 top-0 -z-10"
+        aria-hidden
+      >
+        <div className="eds-atmosphere-layer eds-atmosphere-layer--canvas" />
+        <div className="eds-atmosphere-layer eds-atmosphere-layer--glow eds-atmosphere-layer--glow-soft" />
+        <div className="eds-atmosphere-layer eds-atmosphere-layer--leak" />
+        <div className="eds-atmosphere-layer eds-atmosphere-layer--veil" />
       </div>
 
-      {view === "dashboard" ? <DashboardView /> : <WorkspaceChatView />}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
+        <div className="pointer-events-auto mx-auto flex max-w-6xl items-center justify-end p-space-16 md:px-space-32">
+          <WorkspaceViewSwitcher className="bg-background/50 backdrop-blur-md" />
+        </div>
+      </div>
+      <HomeLanding onAsk={onAsk} />
+      <WorkspaceChatView
+        focusChat={focusChat}
+        pendingQuery={pendingQuery}
+        onPendingQueryConsumed={() => setPendingQuery(null)}
+      />
     </div>
   );
 }

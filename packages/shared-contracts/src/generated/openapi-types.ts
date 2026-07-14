@@ -226,6 +226,52 @@ export interface components {
             classification: "public" | "internal" | "PII" | "confidential";
             updatedAt: string;
             fqn?: string;
+            facets?: components["schemas"]["DomainFacets"];
+        };
+        MonetaryAmount: {
+            amount: number;
+            /** @description ISO 4217 code, e.g. TWD. */
+            currency: string;
+            /** @description Pricing basis: kg, g, session, half_day, unit. */
+            per?: string;
+        };
+        RegionRef: {
+            /** @description Stable region code, e.g. TW-TPE, TW-NORTH. */
+            code: string;
+            label?: string;
+            /** @enum {string} */
+            level?: "country" | "region" | "city" | "district" | "market";
+        };
+        TimeWindow: {
+            /** @description ISO 8601. */
+            start: string;
+            /** @description ISO 8601; absent means open-ended. */
+            end?: string;
+            /** @description IANA zone, e.g. Asia/Taipei. */
+            timezone?: string;
+            /** @description Recurrence hint, e.g. seasonal:JUL-SEP, weekly:SAT. */
+            recurrence?: string;
+        };
+        /** @description Optional money/time/region facet bundle on metadata assets. */
+        DomainFacets: {
+            /** @description Domain key, e.g. agri, metalcraft. */
+            domain?: string;
+            pricing?: components["schemas"]["MonetaryAmount"];
+            region?: components["schemas"]["RegionRef"];
+            timeWindow?: components["schemas"]["TimeWindow"];
+            /**
+             * @description Modeled completeness signal for partial-but-reasonable data.
+             * @enum {string}
+             */
+            completeness?: "complete" | "partial" | "minimal";
+        };
+        MetricValue: {
+            value: number;
+            /** @description Display unit, e.g. TWD/kg, days, "%". */
+            unit?: string;
+            /** @description ISO 8601 timestamp of the reading. */
+            asOf: string;
+            region?: components["schemas"]["RegionRef"];
         };
         ListMetadataResponse: {
             data: components["schemas"]["MetadataAssetSummary"][];
@@ -296,6 +342,9 @@ export interface components {
                 date: string;
                 change: string;
             }[];
+            /** @enum {string} */
+            valueType?: "money" | "duration" | "count" | "ratio" | "score";
+            latestValue?: components["schemas"]["MetricValue"];
         };
         GetContextMetricResponse: {
             data: components["schemas"]["ContextMetric"];

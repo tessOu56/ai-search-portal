@@ -5,6 +5,11 @@
 
 import { z } from "zod";
 
+import {
+  metricValueSchema,
+  metricValueTypeSchema,
+} from "./domain-facets.contract.js";
+
 export const contextPackManifestSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -35,6 +40,10 @@ export const contextMetricSchema = z.object({
   qualityRules: z.array(z.string()).default([]),
   accessPolicy: z.string(),
   recentChanges: z.array(contextRecentChangeSchema).default([]),
+  /** What kind of value this metric carries (money/duration/...). */
+  valueType: metricValueTypeSchema.optional(),
+  /** Latest reading with unit/asOf/region provenance. */
+  latestValue: metricValueSchema.optional(),
 });
 
 export type ContextMetricContract = z.infer<typeof contextMetricSchema>;

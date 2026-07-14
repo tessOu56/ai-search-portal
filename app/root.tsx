@@ -17,14 +17,16 @@ import {
 import { useEffect } from "react";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
+import { NavProgress } from "~/components/shared/chrome/NavProgress";
+import { StarCursor } from "~/components/shared/chrome/StarCursor";
 import { ThemeSwitcher } from "~/components/theme/ThemeSwitcher";
 import { startWebVitalsReporting } from "~/lib/analytics/web-vitals-reporter";
-import { ensureSeeded } from "~/services/seed.server";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
 
 export const links: LinksFunction = () => [
+  { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -36,10 +38,16 @@ export const links: LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Petrona:wght@400;500;600&family=Shippori+Mincho:wght@400;500;600&display=swap",
   },
+  {
+    rel: "preload",
+    href: "/marketing/home-atmosphere.svg",
+    as: "image",
+    type: "image/svg+xml",
+  },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await ensureSeeded();
+  // Seed 不阻塞 document shell：冷啟動／無快取時先噴畫布，資料由路由級 ensureSeeded 補齊
   const locale = await getLocale(request);
   const translations = getTranslations(locale);
   let version = "0.0.0";
@@ -93,10 +101,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         >
-          {locale === "en" ? "Skip to main content" : "跳至主內容"}
+          {data?.translations?.["a11y.skipToContent"] ??
+            (locale === "en" ? "Skip to main content" : "跳至主內容")}
         </a>
         {children}
         <ThemeSwitcher />
+        <NavProgress />
+        <StarCursor />
         <ScrollRestoration />
         <Scripts />
       </body>

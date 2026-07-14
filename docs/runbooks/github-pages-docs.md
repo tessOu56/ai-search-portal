@@ -13,8 +13,10 @@
 
 ## 觸發部署
 
-- push `main` 且 paths 含 `docs/**` / `package.json` / `pnpm-lock.yaml` / 本 workflow
-- 或 Actions → **deploy-docs** → **Run workflow**
+- push `main` 且 paths 含 **`docs/**`** 或本 workflow 檔（**不含** `package.json` / lockfile，避免與 App／Vercel 依賴變更誤聯）
+- 文件依賴需重建時：Actions → **deploy-docs** → **Run workflow**
+
+兩條管道獨立：Vercel 從不推 `gh-pages`；改 App 依賴不會自動重佈 Pages。
 
 ## 驗收
 

@@ -1,0 +1,6 @@
+{
+  "id": "metalcraft-studio",
+  "name": "Metalcraft studio",
+  "description": "台灣金工工作室領域 pack：原料（銀板／銅片）→ 產品（飾品／孤品拍賣）→ 體驗服務（鍛造課／場地租借）的完整資料鏈，含金額（TWD）、時間（場次／拍賣窗口）、地區（TW-TPE／TW-NTP）三個 facet。實體 id 對齊 metalcraft-platform seed（studio-1, prod-mat-1…）。",
+  "defaultLocale": "zh-TW"
+}

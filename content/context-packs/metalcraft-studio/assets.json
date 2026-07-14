@@ -1,0 +1,331 @@
+[
+  {
+    "id": "db-metalcraft",
+    "name": "studio_ops",
+    "description": "Studio operations database: materials, products, sessions, orders, auctions",
+    "assetType": "Database",
+    "owner": "studio-data@example.com",
+    "tags": ["production", "metalcraft"],
+    "classification": "internal",
+    "updatedAt": "2026-07-01T09:00:00.000Z",
+    "fqn": "studio_ops",
+    "columns": [],
+    "upstreamIds": [],
+    "downstreamIds": [
+      "dim-material",
+      "tbl-material-cost",
+      "tbl-product",
+      "tbl-experience-session",
+      "tbl-auction-bid"
+    ],
+    "datasetId": "studio-ops",
+    "packId": "metalcraft-studio",
+    "facets": { "domain": "metalcraft", "completeness": "complete" }
+  },
+  {
+    "id": "dim-studio",
+    "name": "dim_studio",
+    "description": "Studio master data: 青銅作坊（台北大安）、鎚光工作室（新北淡水）",
+    "assetType": "Table",
+    "owner": "studio-data@example.com",
+    "tags": ["dimension", "studio"],
+    "classification": "public",
+    "updatedAt": "2026-07-02T10:00:00.000Z",
+    "fqn": "studio_ops.public.dim_studio",
+    "columns": [
+      { "name": "studio_id", "dataType": "varchar", "tags": ["key"] },
+      { "name": "studio_name", "dataType": "varchar" },
+      {
+        "name": "region_code",
+        "dataType": "varchar",
+        "description": "TPE | NTP | TYC | TXG | KHH"
+      },
+      { "name": "city", "dataType": "varchar" },
+      { "name": "district", "dataType": "varchar" }
+    ],
+    "upstreamIds": [],
+    "downstreamIds": ["tbl-experience-session", "tbl-rental-slot"],
+    "datasetId": "studio",
+    "packId": "metalcraft-studio",
+    "facets": {
+      "domain": "metalcraft",
+      "region": { "code": "TW-TPE", "label": "台北", "level": "city" },
+      "completeness": "complete"
+    }
+  },
+  {
+    "id": "dim-material",
+    "name": "dim_material",
+    "description": "Raw material master: 925 銀板、紅銅片、黃銅線，含純度與供應商 — the origin end of the material-to-experience chain",
+    "assetType": "Table",
+    "owner": "workshop-owner@example.com",
+    "tags": ["dimension", "material", "raw"],
+    "classification": "internal",
+    "updatedAt": "2026-07-03T09:00:00.000Z",
+    "fqn": "studio_ops.public.dim_material",
+    "columns": [
+      { "name": "material_id", "dataType": "varchar", "tags": ["key"] },
+      {
+        "name": "material_name",
+        "dataType": "varchar",
+        "description": "e.g. 925 銀板 10×10cm"
+      },
+      {
+        "name": "purity",
+        "dataType": "varchar",
+        "description": "e.g. 925 | C1100"
+      },
+      { "name": "supplier", "dataType": "varchar" },
+      { "name": "stock_qty", "dataType": "int", "unit": "sheet" }
+    ],
+    "upstreamIds": ["db-metalcraft"],
+    "downstreamIds": ["tbl-material-cost", "tbl-product"],
+    "datasetId": "material",
+    "packId": "metalcraft-studio",
+    "facets": { "domain": "metalcraft", "completeness": "complete" }
+  },
+  {
+    "id": "tbl-material-cost",
+    "name": "fact_material_cost",
+    "description": "Material purchase cost by supplier and date; silver spot-linked pricing",
+    "assetType": "Table",
+    "owner": "workshop-owner@example.com",
+    "tags": ["fact", "cost"],
+    "classification": "confidential",
+    "updatedAt": "2026-07-10T08:00:00.000Z",
+    "fqn": "studio_ops.public.fact_material_cost",
+    "columns": [
+      { "name": "purchase_id", "dataType": "varchar", "tags": ["key"] },
+      { "name": "material_id", "dataType": "varchar" },
+      {
+        "name": "unit_cost",
+        "dataType": "decimal",
+        "description": "Purchase cost per gram",
+        "sensitive": true,
+        "unit": "TWD/g"
+      },
+      { "name": "quantity_g", "dataType": "decimal", "unit": "g" },
+      { "name": "purchased_at", "dataType": "timestamp" }
+    ],
+    "upstreamIds": ["db-metalcraft", "dim-material"],
+    "downstreamIds": ["dash-studio-margin"],
+    "datasetId": "material-cost",
+    "packId": "metalcraft-studio",
+    "metricIds": ["metric-silver-cost"],
+    "facets": {
+      "domain": "metalcraft",
+      "pricing": { "amount": 32.5, "currency": "TWD", "per": "g" },
+      "region": { "code": "TW-TPE", "label": "台北", "level": "city" },
+      "completeness": "complete"
+    }
+  },
+  {
+    "id": "tbl-product",
+    "name": "dim_product",
+    "description": "Finished goods and offerings across all five types: experience / physical / material / tool / venue_rental（對齊 metalcraft-platform ProductType）",
+    "assetType": "Table",
+    "owner": "studio-data@example.com",
+    "tags": ["dimension", "product"],
+    "classification": "internal",
+    "updatedAt": "2026-07-08T10:00:00.000Z",
+    "fqn": "studio_ops.public.dim_product",
+    "columns": [
+      { "name": "product_id", "dataType": "varchar", "tags": ["key"] },
+      {
+        "name": "product_type",
+        "dataType": "varchar",
+        "description": "experience | physical | material | tool | venue_rental"
+      },
+      { "name": "price", "dataType": "decimal", "unit": "TWD" },
+      { "name": "stock", "dataType": "int" },
+      { "name": "auction_eligible", "dataType": "boolean" },
+      {
+        "name": "material_id",
+        "dataType": "varchar",
+        "description": "Primary raw material"
+      }
+    ],
+    "upstreamIds": ["dim-material"],
+    "downstreamIds": ["api-booking", "tbl-auction-bid", "dash-studio-margin"],
+    "datasetId": "product",
+    "packId": "metalcraft-studio",
+    "metricIds": ["metric-product-leadtime"],
+    "facets": {
+      "domain": "metalcraft",
+      "pricing": { "amount": 4200, "currency": "TWD", "per": "unit" },
+      "completeness": "complete"
+    }
+  },
+  {
+    "id": "tbl-experience-session",
+    "name": "fact_experience_session",
+    "description": "Experience course sessions（銀戒鍛造體驗）with capacity, bookings, and schedule",
+    "assetType": "Table",
+    "owner": "studio-data@example.com",
+    "tags": ["fact", "experience", "booking"],
+    "classification": "internal",
+    "updatedAt": "2026-07-12T09:00:00.000Z",
+    "fqn": "studio_ops.public.fact_experience_session",
+    "columns": [
+      { "name": "session_id", "dataType": "varchar", "tags": ["key"] },
+      { "name": "product_id", "dataType": "varchar" },
+      { "name": "studio_id", "dataType": "varchar" },
+      { "name": "start_time", "dataType": "timestamp" },
+      { "name": "end_time", "dataType": "timestamp" },
+      { "name": "capacity", "dataType": "int", "unit": "seat" },
+      { "name": "booked", "dataType": "int", "unit": "seat" },
+      { "name": "price", "dataType": "decimal", "unit": "TWD/session" }
+    ],
+    "upstreamIds": ["dim-studio", "db-metalcraft"],
+    "downstreamIds": ["api-booking"],
+    "datasetId": "experience-session",
+    "packId": "metalcraft-studio",
+    "metricIds": ["metric-session-utilization"],
+    "facets": {
+      "domain": "metalcraft",
+      "pricing": { "amount": 2800, "currency": "TWD", "per": "session" },
+      "region": { "code": "TW-TPE", "label": "台北大安", "level": "district" },
+      "timeWindow": {
+        "start": "2026-07-18T14:00:00+08:00",
+        "end": "2026-07-18T17:00:00+08:00",
+        "timezone": "Asia/Taipei",
+        "recurrence": "weekly:SAT"
+      },
+      "completeness": "complete"
+    }
+  },
+  {
+    "id": "api-booking",
+    "name": "POST /api/bookings",
+    "description": "Booking API for experience sessions and venue rental slots",
+    "assetType": "API",
+    "owner": "api-team@example.com",
+    "tags": ["rest", "booking"],
+    "classification": "internal",
+    "updatedAt": "2026-07-12T10:00:00.000Z",
+    "fqn": "api.bookings",
+    "columns": [],
+    "upstreamIds": ["tbl-experience-session", "tbl-product"],
+    "downstreamIds": [],
+    "datasetId": "booking-api",
+    "packId": "metalcraft-studio",
+    "facets": { "domain": "metalcraft" }
+  },
+  {
+    "id": "tbl-auction-bid",
+    "name": "fact_auction_bid",
+    "description": "Bid records for one-off pieces（孤品拍賣, e.g. 潮汐銅手鐲）with reserve and increment rules",
+    "assetType": "Table",
+    "owner": "auction-owner@example.com",
+    "tags": ["fact", "auction"],
+    "classification": "internal",
+    "updatedAt": "2026-07-11T21:00:00.000Z",
+    "fqn": "studio_ops.public.fact_auction_bid",
+    "columns": [
+      { "name": "bid_id", "dataType": "varchar", "tags": ["key"] },
+      { "name": "lot_id", "dataType": "varchar" },
+      { "name": "bid_amount", "dataType": "decimal", "unit": "TWD" },
+      { "name": "bid_at", "dataType": "timestamp" }
+    ],
+    "upstreamIds": ["tbl-product", "db-metalcraft"],
+    "downstreamIds": ["dash-studio-margin"],
+    "datasetId": "auction-bid",
+    "packId": "metalcraft-studio",
+    "metricIds": ["metric-auction-premium"],
+    "facets": {
+      "domain": "metalcraft",
+      "pricing": { "amount": 12000, "currency": "TWD", "per": "unit" },
+      "timeWindow": {
+        "start": "2026-07-20T20:00:00+08:00",
+        "end": "2026-07-27T22:00:00+08:00",
+        "timezone": "Asia/Taipei"
+      },
+      "completeness": "complete"
+    }
+  },
+  {
+    "id": "tbl-customer-profile",
+    "name": "dim_customer_profile",
+    "description": "Customer profiles from booking and checkout flows — contains direct identifiers and payment references",
+    "assetType": "Table",
+    "owner": "crm-owner@example.com",
+    "tags": ["PII", "customer"],
+    "classification": "PII",
+    "updatedAt": "2026-07-12T18:00:00.000Z",
+    "fqn": "studio_ops.public.dim_customer_profile",
+    "columns": [
+      { "name": "customer_id", "dataType": "varchar", "tags": ["key"] },
+      { "name": "email", "dataType": "varchar", "sensitive": true },
+      { "name": "phone", "dataType": "varchar", "sensitive": true },
+      {
+        "name": "line_uid",
+        "dataType": "varchar",
+        "sensitive": true,
+        "description": "LINE OA user id"
+      },
+      { "name": "preferred_region", "dataType": "varchar" }
+    ],
+    "upstreamIds": [],
+    "downstreamIds": [],
+    "datasetId": "customer-profile",
+    "packId": "metalcraft-studio",
+    "facets": { "domain": "metalcraft", "completeness": "complete" }
+  },
+  {
+    "id": "dash-studio-margin",
+    "name": "studio_margin_dashboard",
+    "description": "Margin dashboard: material cost vs product price vs auction premium by studio",
+    "assetType": "Dashboard",
+    "owner": "bi-team@example.com",
+    "tags": ["bi", "margin"],
+    "classification": "confidential",
+    "updatedAt": "2026-07-13T08:00:00.000Z",
+    "fqn": "bi.dashboards.studio_margin",
+    "columns": [],
+    "upstreamIds": ["tbl-material-cost", "tbl-product", "tbl-auction-bid"],
+    "downstreamIds": [],
+    "datasetId": "studio-margin-dashboard",
+    "packId": "metalcraft-studio",
+    "facets": { "domain": "metalcraft" }
+  },
+  {
+    "id": "tbl-rental-slot",
+    "name": "fact_rental_slot",
+    "description": "（資料待補）場地租借時段表：鍛造台半日租，欄位定義與利用率統計尚未建齊，先以此占位供搜尋",
+    "assetType": "Table",
+    "owner": "studio-data@example.com",
+    "tags": ["fact", "venue_rental", "wip"],
+    "classification": "internal",
+    "updatedAt": "2026-07-05T00:00:00.000Z",
+    "fqn": "studio_ops.public.fact_rental_slot",
+    "upstreamIds": ["dim-studio"],
+    "downstreamIds": [],
+    "packId": "metalcraft-studio",
+    "facets": {
+      "domain": "metalcraft",
+      "pricing": { "amount": 1500, "currency": "TWD", "per": "half_day" },
+      "region": { "code": "TW-NTP", "label": "新北淡水", "level": "district" },
+      "completeness": "partial"
+    }
+  },
+  {
+    "id": "api-material-quote",
+    "name": "GET /api/materials/{id}/quote",
+    "description": "Live material quote API: current silver/copper purchase reference price by gram",
+    "assetType": "API",
+    "owner": "api-team@example.com",
+    "tags": ["rest", "cost"],
+    "classification": "internal",
+    "updatedAt": "2026-07-13T09:30:00.000Z",
+    "fqn": "api.materials.quote",
+    "columns": [],
+    "upstreamIds": ["tbl-material-cost"],
+    "downstreamIds": [],
+    "datasetId": "material-quote-api",
+    "packId": "metalcraft-studio",
+    "facets": {
+      "domain": "metalcraft",
+      "pricing": { "amount": 32.5, "currency": "TWD", "per": "g" }
+    }
+  }
+]

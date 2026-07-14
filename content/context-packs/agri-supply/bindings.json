@@ -17,6 +17,30 @@
       "module": "dish",
       "entityId": "dish-three-cup-chicken",
       "relation": "costs_into"
+    },
+    {
+      "contextRef": "dim-farm",
+      "module": "vendor",
+      "entityId": "vendor-yunlin-basil-farm",
+      "relation": "sources_from"
+    },
+    {
+      "contextRef": "tbl-recipe",
+      "module": "recipe",
+      "entityId": "recipe-three-cup-chicken",
+      "relation": "defines"
+    },
+    {
+      "contextRef": "metric-recipe-cost-three-cup",
+      "module": "dish",
+      "entityId": "dish-three-cup-chicken",
+      "relation": "costs_into"
+    },
+    {
+      "contextRef": "metric-seasonal-availability",
+      "module": "ingredient",
+      "entityId": "ingredient-basil",
+      "relation": "constrains"
     }
   ]
 }

@@ -11,9 +11,15 @@
     "fqn": "supply_chain",
     "columns": [],
     "upstreamIds": [],
-    "downstreamIds": ["tbl-procurement-lot", "dim-ingredient"],
+    "downstreamIds": [
+      "tbl-procurement-lot",
+      "dim-ingredient",
+      "dim-farm",
+      "tbl-harvest-lot"
+    ],
     "datasetId": "supply-chain",
-    "packId": "agri-supply"
+    "packId": "agri-supply",
+    "facets": { "domain": "agri", "completeness": "complete" }
   },
   {
     "id": "dim-ingredient",
@@ -36,15 +42,13 @@
         "dataType": "varchar",
         "description": "spice | produce | processed"
       },
-      {
-        "name": "origin_region",
-        "dataType": "varchar"
-      }
+      { "name": "origin_region", "dataType": "varchar" }
     ],
     "upstreamIds": ["db-supply"],
-    "downstreamIds": ["tbl-procurement-lot"],
+    "downstreamIds": ["tbl-procurement-lot", "tbl-recipe-ingredient"],
     "datasetId": "dim-ingredient",
-    "packId": "agri-supply"
+    "packId": "agri-supply",
+    "facets": { "domain": "agri", "completeness": "complete" }
   },
   {
     "id": "tbl-procurement-lot",
@@ -57,35 +61,37 @@
     "updatedAt": "2026-06-10T08:00:00.000Z",
     "fqn": "supply_chain.public.fact_procurement_lot",
     "columns": [
-      {
-        "name": "lot_id",
-        "dataType": "varchar",
-        "tags": ["key"]
-      },
-      {
-        "name": "ingredient_id",
-        "dataType": "varchar"
-      },
+      { "name": "lot_id", "dataType": "varchar", "tags": ["key"] },
+      { "name": "ingredient_id", "dataType": "varchar" },
       {
         "name": "unit_price",
         "dataType": "decimal",
         "description": "Price per kg",
-        "sensitive": true
+        "sensitive": true,
+        "unit": "TWD/kg"
       },
-      {
-        "name": "quantity_kg",
-        "dataType": "decimal"
-      },
+      { "name": "quantity_kg", "dataType": "decimal", "unit": "kg" },
       {
         "name": "market_region",
-        "dataType": "varchar"
+        "dataType": "varchar",
+        "description": "Region code, e.g. TW-NORTH"
       }
     ],
-    "upstreamIds": ["db-supply", "dim-ingredient"],
+    "upstreamIds": ["db-supply", "dim-ingredient", "tbl-harvest-lot"],
     "downstreamIds": ["api-procurement", "dash-procurement"],
     "datasetId": "procurement-lot",
     "packId": "agri-supply",
-    "metricIds": ["metric-wholesale-basil-north"]
+    "metricIds": ["metric-wholesale-basil-north"],
+    "facets": {
+      "domain": "agri",
+      "pricing": { "amount": 182.5, "currency": "TWD", "per": "kg" },
+      "region": {
+        "code": "TW-NORTH",
+        "label": "北台灣批發圈",
+        "level": "market"
+      },
+      "completeness": "complete"
+    }
   },
   {
     "id": "api-procurement",
@@ -101,7 +107,8 @@
     "upstreamIds": ["tbl-procurement-lot"],
     "downstreamIds": [],
     "datasetId": "procurement-api",
-    "packId": "agri-supply"
+    "packId": "agri-supply",
+    "facets": { "domain": "agri" }
   },
   {
     "id": "dash-procurement",
@@ -117,6 +124,206 @@
     "upstreamIds": ["tbl-procurement-lot"],
     "downstreamIds": [],
     "datasetId": "procurement-dashboard",
-    "packId": "agri-supply"
+    "packId": "agri-supply",
+    "facets": { "domain": "agri" }
+  },
+  {
+    "id": "dim-farm",
+    "name": "dim_farm",
+    "description": "Farm master data with certification and production region — the origin end of the farm-to-recipe chain",
+    "assetType": "Table",
+    "owner": "sourcing-owner@example.com",
+    "tags": ["dimension", "origin", "traceability"],
+    "classification": "internal",
+    "updatedAt": "2026-07-01T09:00:00.000Z",
+    "fqn": "supply_chain.public.dim_farm",
+    "columns": [
+      { "name": "farm_id", "dataType": "varchar", "tags": ["key"] },
+      {
+        "name": "farm_name",
+        "dataType": "varchar",
+        "description": "e.g. 雲林九層塔友善農場"
+      },
+      {
+        "name": "region_code",
+        "dataType": "varchar",
+        "description": "Production region, e.g. TW-YUN"
+      },
+      {
+        "name": "certification",
+        "dataType": "varchar",
+        "description": "organic | traceable | none"
+      },
+      {
+        "name": "contract_price_floor",
+        "dataType": "decimal",
+        "description": "Contract farming floor price",
+        "sensitive": true,
+        "unit": "TWD/kg"
+      }
+    ],
+    "upstreamIds": ["db-supply"],
+    "downstreamIds": ["tbl-harvest-lot"],
+    "datasetId": "dim-farm",
+    "packId": "agri-supply",
+    "facets": {
+      "domain": "agri",
+      "region": { "code": "TW-YUN", "label": "雲林", "level": "region" },
+      "completeness": "complete"
+    }
+  },
+  {
+    "id": "tbl-harvest-lot",
+    "name": "fact_harvest_lot",
+    "description": "Harvest lots by farm and week; seasonal availability drives procurement weights",
+    "assetType": "Table",
+    "owner": "sourcing-owner@example.com",
+    "tags": ["fact", "seasonal"],
+    "classification": "internal",
+    "updatedAt": "2026-07-06T07:30:00.000Z",
+    "fqn": "supply_chain.public.fact_harvest_lot",
+    "columns": [
+      { "name": "harvest_lot_id", "dataType": "varchar", "tags": ["key"] },
+      { "name": "farm_id", "dataType": "varchar" },
+      { "name": "harvest_date", "dataType": "date" },
+      { "name": "quantity_kg", "dataType": "decimal", "unit": "kg" },
+      { "name": "grade", "dataType": "varchar", "description": "A | B | C" }
+    ],
+    "upstreamIds": ["dim-farm", "db-supply"],
+    "downstreamIds": ["tbl-procurement-lot"],
+    "datasetId": "harvest-lot",
+    "packId": "agri-supply",
+    "metricIds": ["metric-harvest-leadtime", "metric-seasonal-availability"],
+    "facets": {
+      "domain": "agri",
+      "region": { "code": "TW-YUN", "label": "雲林", "level": "region" },
+      "timeWindow": {
+        "start": "2026-07-01T00:00:00+08:00",
+        "end": "2026-09-30T23:59:59+08:00",
+        "timezone": "Asia/Taipei",
+        "recurrence": "seasonal:JUL-SEP"
+      },
+      "completeness": "complete"
+    }
+  },
+  {
+    "id": "tbl-recipe",
+    "name": "dim_recipe",
+    "description": "Recipe dimension — the consumption end of the chain; per-serving cost estimates feed the Recipe Cost Estimator",
+    "assetType": "Table",
+    "owner": "recipe-owner@example.com",
+    "tags": ["dimension", "recipe", "consumer"],
+    "classification": "public",
+    "updatedAt": "2026-07-08T10:00:00.000Z",
+    "fqn": "supply_chain.public.dim_recipe",
+    "columns": [
+      { "name": "recipe_id", "dataType": "varchar", "tags": ["key"] },
+      {
+        "name": "recipe_name",
+        "dataType": "varchar",
+        "description": "e.g. 三杯雞"
+      },
+      { "name": "servings", "dataType": "int" },
+      {
+        "name": "est_cost_per_serving",
+        "dataType": "decimal",
+        "description": "Estimated ingredient cost per serving",
+        "unit": "TWD/serving"
+      },
+      { "name": "prep_minutes", "dataType": "int", "unit": "min" }
+    ],
+    "upstreamIds": [],
+    "downstreamIds": ["tbl-recipe-ingredient", "api-recipe-cost"],
+    "datasetId": "recipe",
+    "packId": "agri-supply",
+    "metricIds": ["metric-recipe-cost-three-cup"],
+    "facets": {
+      "domain": "agri",
+      "pricing": { "amount": 85, "currency": "TWD", "per": "serving" },
+      "completeness": "complete"
+    }
+  },
+  {
+    "id": "tbl-recipe-ingredient",
+    "name": "map_recipe_ingredient",
+    "description": "Recipe-to-ingredient mapping with quantities; joins the procurement side to the recipe side",
+    "assetType": "Table",
+    "owner": "recipe-owner@example.com",
+    "tags": ["mapping"],
+    "classification": "internal",
+    "updatedAt": "2026-07-08T10:05:00.000Z",
+    "fqn": "supply_chain.public.map_recipe_ingredient",
+    "columns": [
+      { "name": "recipe_id", "dataType": "varchar", "tags": ["key"] },
+      { "name": "ingredient_id", "dataType": "varchar", "tags": ["key"] },
+      { "name": "quantity_g", "dataType": "decimal", "unit": "g" }
+    ],
+    "upstreamIds": ["tbl-recipe", "dim-ingredient"],
+    "downstreamIds": ["api-recipe-cost"],
+    "datasetId": "recipe-ingredient",
+    "packId": "agri-supply",
+    "facets": { "domain": "agri", "completeness": "complete" }
+  },
+  {
+    "id": "api-recipe-cost",
+    "name": "GET /api/recipes/{id}/cost",
+    "description": "Recipe cost estimator API combining current wholesale prices with recipe ingredient quantities",
+    "assetType": "API",
+    "owner": "api-team@example.com",
+    "tags": ["rest", "cost"],
+    "classification": "internal",
+    "updatedAt": "2026-07-09T09:00:00.000Z",
+    "fqn": "api.recipes.cost",
+    "columns": [],
+    "upstreamIds": ["tbl-recipe", "tbl-recipe-ingredient"],
+    "downstreamIds": [],
+    "datasetId": "recipe-cost-api",
+    "packId": "agri-supply",
+    "facets": {
+      "domain": "agri",
+      "pricing": { "amount": 85, "currency": "TWD", "per": "serving" }
+    }
+  },
+  {
+    "id": "tbl-consumer-preference",
+    "name": "dim_consumer_preference",
+    "description": "Consumer dietary preferences and allergies collected from the recipe app — contains direct identifiers",
+    "assetType": "Table",
+    "owner": "crm-owner@example.com",
+    "tags": ["PII", "consumer"],
+    "classification": "PII",
+    "updatedAt": "2026-07-10T16:00:00.000Z",
+    "fqn": "supply_chain.public.dim_consumer_preference",
+    "columns": [
+      { "name": "member_id", "dataType": "varchar", "tags": ["key"] },
+      { "name": "email", "dataType": "varchar", "sensitive": true },
+      { "name": "phone", "dataType": "varchar", "sensitive": true },
+      {
+        "name": "dietary_flags",
+        "dataType": "varchar",
+        "description": "vegetarian | vegan | gluten_free | none"
+      },
+      { "name": "allergy_notes", "dataType": "text", "sensitive": true }
+    ],
+    "upstreamIds": [],
+    "downstreamIds": [],
+    "datasetId": "consumer-preference",
+    "packId": "agri-supply",
+    "facets": { "domain": "agri", "completeness": "complete" }
+  },
+  {
+    "id": "tbl-market-price-legacy",
+    "name": "legacy_market_price",
+    "description": "（資料待補）Legacy 批發行情表：來源系統已退役，欄位說明與血緣尚未補齊，僅保留供歷史比價",
+    "assetType": "Table",
+    "owner": "data-platform@example.com",
+    "tags": ["legacy"],
+    "classification": "internal",
+    "updatedAt": "2023-11-30T00:00:00.000Z",
+    "fqn": "supply_chain.legacy.market_price",
+    "upstreamIds": [],
+    "downstreamIds": [],
+    "packId": "agri-supply",
+    "facets": { "domain": "agri", "completeness": "minimal" }
   }
 ]

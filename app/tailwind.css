@@ -1,4 +1,7 @@
 @import "./styles/tokens.portal.css";
+@import "./styles/scale.system.css";
+@import "./styles/brand-mark.css";
+@import "./styles/atmosphere.css";
 
 @tailwind base;
 @tailwind components;
@@ -46,19 +49,74 @@
     @apply border-border;
   }
 
+  html.star-cursor-active,
+  html.star-cursor-active * {
+    cursor: none !important;
+  }
+
+  /* Glass rail + accent thumb — no native arrows/buttons */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--accent-brand) 85%, transparent)
+      color-mix(in srgb, var(--surface-muted) 35%, transparent);
+  }
+
+  *::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+
+  *::-webkit-scrollbar-track {
+    margin: 4px 0;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--border-primary) 35%, transparent);
+    background: color-mix(in srgb, var(--surface-muted) 28%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    background-color: color-mix(in srgb, var(--accent-brand) 88%, transparent);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--accent-brand) 40%, transparent);
+    transition: background-color 0.35s var(--motion-easing-enter, ease);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-strong);
+  }
+
+  *::-webkit-scrollbar-button,
+  *::-webkit-scrollbar-button:single-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
   body {
-    /* Typography tokens（SSOT: SDK semantic vars）— 和紙編輯風：body 微寬字距 + 行高 1.75 */
     font-family: var(--font-body, "Inter", sans-serif);
+    font-size: var(--type-16);
     letter-spacing: var(--type-body-tracking, 0);
     line-height: var(--type-body-leading, 1.5);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     @apply bg-background text-foreground;
-    /* 紙質感：極低強度 fractal noise（SVG data URI），疊在 --background 上模擬和紙纖維 */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)' opacity='0.04'/%3E%3C/svg%3E");
   }
 
-  /* 標題走 display font（和紙編輯風：明朝系 + 寬字距；untitled 後台 scope 內自動換回 Inter + 緊字距） */
+  label {
+    font-size: var(--type-14);
+    letter-spacing: var(--type-label-tracking, 0);
+    line-height: var(--type-label-leading, 1.4);
+  }
+
   h1,
   h2,
   h3 {
@@ -69,7 +127,34 @@
   }
 
   h1 {
+    font-size: var(--type-32);
     letter-spacing: var(--type-display-tracking, 0);
     line-height: var(--type-display-leading, 1.25);
+  }
+
+  @media (min-width: 768px) {
+    h1 {
+      font-size: var(--type-42);
+    }
+  }
+
+  h2 {
+    font-size: var(--type-26);
+  }
+
+  @media (min-width: 768px) {
+    h2 {
+      font-size: var(--type-32);
+    }
+  }
+
+  h3 {
+    font-size: var(--type-20);
+  }
+
+  @media (min-width: 768px) {
+    h3 {
+      font-size: var(--type-22);
+    }
   }
 }

@@ -17,12 +17,20 @@
 
 ## Workflow 一覽
 
-| Workflow         | 檔案                                  | 觸發                                                                | 用途                                        |
-| ---------------- | ------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------- |
-| CI               | `.github/workflows/ci.yml`            | PR、push `main`                                                     | 品質閘門（build / test / lint / typecheck） |
-| Release          | `.github/workflows/release.yml`       | `workflow_dispatch`                                                 | 建立 tag + GitHub Release（可 prerelease）  |
-| Deploy to Vercel | `.github/workflows/deploy-vercel.yml` | `workflow_dispatch`；**main CI 成功後** `workflow_run` → production | preview / production 部署至 Vercel          |
-| deploy-docs      | `.github/workflows/deploy-docs.yml`   | push `docs/**` 等；`workflow_dispatch`                              | VitePress → `gh-pages`（Pages branch 來源） |
+| Workflow         | 檔案                                  | 觸發                                                                | 用途                                                     |
+| ---------------- | ------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------- |
+| CI               | `.github/workflows/ci.yml`            | PR、push `main`                                                     | 品質閘門（build / test / lint / typecheck）              |
+| Release          | `.github/workflows/release.yml`       | `workflow_dispatch`                                                 | 建立 tag + GitHub Release（可 prerelease）               |
+| Deploy to Vercel | `.github/workflows/deploy-vercel.yml` | `workflow_dispatch`；**main CI 成功後** `workflow_run` → production | preview / production 部署至 Vercel                       |
+| deploy-docs      | `.github/workflows/deploy-docs.yml`   | push **`docs/**`**（或本 workflow）；`workflow_dispatch`            | VitePress → `gh-pages`（與 Vercel／`package.json` 無關） |
+
+> **獨立通道**：App 上 Vercel、文件走 Pages。改 `package.json`／lockfile **不會**再觸發 `deploy-docs`（避免「跟 Vercel 一起上 gh-pages」的誤感）。依賴變更若需重建文件站：Actions → deploy-docs → Run workflow。
+
+## 冷啟動／LCP（App）
+
+- Document shell **不** `await ensureSeeded()`——氛圍底＋品牌可先畫；seed 留在需要 mock 資料的路由。
+- 首頁 LCP 候選：`/marketing/home-atmosphere.*`（prefer webp／svg，目標 **≤ ~200KB**）；`root` links 有 preload。
+- Web Vitals 仍走既有 reporter；本輪不開 PostHog P75 真面板。
 
 ## 必要 GitHub Secrets（repository 或 environment）
 

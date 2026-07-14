@@ -16,6 +16,82 @@
         "date": "2026-05-20",
         "change": "Season transition: increased weight for southern origin lots"
       }
-    ]
+    ],
+    "valueType": "money",
+    "latestValue": {
+      "value": 182.5,
+      "unit": "TWD/kg",
+      "asOf": "2026-07-13T06:00:00+08:00",
+      "region": {
+        "code": "TW-NORTH",
+        "label": "北台灣批發圈",
+        "level": "market"
+      }
+    }
+  },
+  {
+    "id": "metric-recipe-cost-three-cup",
+    "definition": "Estimated ingredient cost per serving for 三杯雞, derived from current wholesale prices and recipe quantities.",
+    "owner": "Recipe Platform Team",
+    "sourceAssetId": "tbl-recipe",
+    "upstreamJobIds": ["recipe_cost_rollup"],
+    "downstreamDashboardIds": ["Recipe Cost Estimator"],
+    "qualityRules": [
+      "all mapped ingredients must have a current wholesale price",
+      "cost must be recomputed within 24h of a price change"
+    ],
+    "accessPolicy": "Public aggregate; ingredient-level cost breakdown restricted to procurement",
+    "recentChanges": [
+      {
+        "date": "2026-07-08",
+        "change": "Basil price spike propagated: +6 TWD/serving"
+      }
+    ],
+    "valueType": "money",
+    "latestValue": {
+      "value": 85,
+      "unit": "TWD/serving",
+      "asOf": "2026-07-13T06:00:00+08:00"
+    }
+  },
+  {
+    "id": "metric-harvest-leadtime",
+    "definition": "Average days from harvest at farm to availability at wholesale market.",
+    "owner": "Sourcing Team",
+    "sourceAssetId": "tbl-harvest-lot",
+    "upstreamJobIds": ["harvest_lot_ingest"],
+    "downstreamDashboardIds": ["Procurement Decision Dashboard"],
+    "qualityRules": [
+      "lead time must be non-negative",
+      "exclude lots without market arrival timestamp"
+    ],
+    "accessPolicy": "Internal: sourcing and procurement",
+    "recentChanges": [],
+    "valueType": "duration",
+    "latestValue": {
+      "value": 3.5,
+      "unit": "days",
+      "asOf": "2026-07-12T00:00:00+08:00",
+      "region": { "code": "TW-YUN", "label": "雲林", "level": "region" }
+    }
+  },
+  {
+    "id": "metric-seasonal-availability",
+    "definition": "Share of contracted demand covered by in-season domestic supply for the current window (JUL-SEP).",
+    "owner": "Sourcing Team",
+    "sourceAssetId": "tbl-harvest-lot",
+    "upstreamJobIds": ["harvest_lot_ingest", "demand_forecast_sync"],
+    "downstreamDashboardIds": ["Procurement Decision Dashboard"],
+    "qualityRules": ["ratio bounded between 0 and 1"],
+    "accessPolicy": "Internal: sourcing and procurement",
+    "recentChanges": [
+      { "date": "2026-07-01", "change": "Window rolled to JUL-SEP season" }
+    ],
+    "valueType": "ratio",
+    "latestValue": {
+      "value": 0.62,
+      "unit": "%",
+      "asOf": "2026-07-12T00:00:00+08:00"
+    }
   }
 ]

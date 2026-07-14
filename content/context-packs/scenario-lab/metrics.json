@@ -1,0 +1,24 @@
+[
+  {
+    "id": "metric-dangling-source",
+    "definition": "SCENARIO: dangling reference — sourceAssetId points to an asset that does not exist; consumers must degrade gracefully instead of crashing.",
+    "owner": "scenario-lab@example.com",
+    "sourceAssetId": "asset-does-not-exist",
+    "upstreamJobIds": [],
+    "downstreamDashboardIds": [],
+    "qualityRules": [],
+    "accessPolicy": "Open (lab)",
+    "recentChanges": []
+  },
+  {
+    "id": "metric-empty-everything",
+    "definition": "SCENARIO: all optional lists empty and no latestValue — metric detail views must render empty states for jobs, dashboards, rules, and changes.",
+    "owner": "scenario-lab@example.com",
+    "sourceAssetId": "asset-minimal",
+    "upstreamJobIds": [],
+    "downstreamDashboardIds": [],
+    "qualityRules": [],
+    "accessPolicy": "Open (lab)",
+    "recentChanges": []
+  }
+]

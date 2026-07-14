@@ -1,0 +1,46 @@
+{
+  "bindings": [
+    {
+      "contextRef": "dim-material",
+      "module": "product",
+      "entityId": "prod-mat-1",
+      "relation": "catalogs"
+    },
+    {
+      "contextRef": "tbl-material-cost",
+      "module": "product",
+      "entityId": "prod-mat-1",
+      "relation": "prices"
+    },
+    {
+      "contextRef": "tbl-experience-session",
+      "module": "product",
+      "entityId": "prod-exp-1",
+      "relation": "schedules"
+    },
+    {
+      "contextRef": "tbl-auction-bid",
+      "module": "product",
+      "entityId": "prod-phy-2",
+      "relation": "bids_on"
+    },
+    {
+      "contextRef": "dim-studio",
+      "module": "studio",
+      "entityId": "studio-1",
+      "relation": "describes"
+    },
+    {
+      "contextRef": "tbl-rental-slot",
+      "module": "product",
+      "entityId": "prod-venue-1",
+      "relation": "schedules"
+    },
+    {
+      "contextRef": "metric-silver-cost",
+      "module": "product",
+      "entityId": "prod-mat-1",
+      "relation": "measures"
+    }
+  ]
+}

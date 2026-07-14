@@ -1,0 +1,42 @@
+[
+  {
+    "id": "term-material-to-experience",
+    "term": "Material-to-experience chain",
+    "definition": "The full metalcraft data chain: raw material (dim_material) → cost fact → product → experience session / auction. Money (TWD), time (session & auction windows), and region (TW-TPE/TW-NTP) facets attach at each hop.",
+    "relatedAssetIds": [
+      "dim-material",
+      "tbl-material-cost",
+      "tbl-product",
+      "tbl-experience-session",
+      "tbl-auction-bid"
+    ]
+  },
+  {
+    "id": "term-one-off",
+    "term": "孤品 (One-off piece)",
+    "definition": "A unique, non-reproducible piece (stock = 1) sold via timed auction with reserve price and minimum increment.",
+    "relatedAssetIds": ["tbl-product", "tbl-auction-bid"]
+  },
+  {
+    "id": "term-reserve-price",
+    "term": "底價 (Reserve price)",
+    "definition": "Minimum acceptable price for an auction lot; premium metrics are computed against reserve, not starting price.",
+    "relatedAssetIds": ["tbl-auction-bid", "metric-auction-premium"]
+  },
+  {
+    "id": "term-925-silver",
+    "term": "925 銀 (Sterling silver)",
+    "definition": "92.5% silver alloy; the primary raw material for rings and bracelets. Cost is quoted per gram and linked to the silver spot price.",
+    "relatedAssetIds": [
+      "dim-material",
+      "tbl-material-cost",
+      "metric-silver-cost"
+    ]
+  },
+  {
+    "id": "term-venue-rental",
+    "term": "場地租借 (Venue rental)",
+    "definition": "Bench-time rental of forging stations by half-day slot; a service product type alongside experience courses.",
+    "relatedAssetIds": ["tbl-rental-slot", "api-booking"]
+  }
+]

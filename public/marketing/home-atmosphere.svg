@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1280" viewBox="0 0 1920 1280" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#faf8f5"/>
+      <stop offset="45%" stop-color="#ebe6da"/>
+      <stop offset="100%" stop-color="#ffda76"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="70%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#ffda76" stop-opacity="0.55"/>
+      <stop offset="55%" stop-color="#daa277" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#faf8f5" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.06"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="1920" height="1280" fill="url(#sky)"/>
+  <rect width="1920" height="1280" fill="url(#glow)"/>
+  <ellipse cx="420" cy="980" rx="680" ry="260" fill="#ded6c9" opacity="0.35"/>
+  <ellipse cx="1480" cy="220" rx="420" ry="300" fill="#8a6500" opacity="0.08"/>
+  <rect width="1920" height="1280" filter="url(#grain)"/>
+</svg>

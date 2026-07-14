@@ -1,0 +1,6 @@
+{
+  "id": "scenario-broken-assets",
+  "name": "⚠️ Scenario: broken pack (intentional)",
+  "description": "故意壞掉的 pack：pack.json 合法（所以會出現在 pack 清單），但 assets.json 違反 schema（assetType 非法值）。選取此 pack 後任何 metadata 載入都會 parse 失敗並拋錯 — 專門用來驗證前端/後端的 5xx 錯誤處理與錯誤邊界。切勿修好它。",
+  "defaultLocale": "zh-TW"
+}
