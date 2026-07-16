@@ -20,11 +20,11 @@ export function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const meta: MetaFunction = () => [
-  { title: "Catalog dictionary — virtualized 10k rows" },
+  { title: "Catalog dictionary — virtualized 100k rows" },
   {
     name: "description",
     content:
-      "Virtual scrolling demo over a 10k-row mock dictionary with URL-driven filters.",
+      "Virtual scrolling demo over a 100k-row mock dictionary (Web Worker) with URL-driven filters.",
   },
 ];
 

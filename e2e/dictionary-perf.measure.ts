@@ -1,7 +1,6 @@
 /**
- * One-shot DOM-count measurement for T-2026-017.
- * Run via: pnpm exec playwright test --config=playwright.perf.config.ts
- * Not part of CI gate — fills docs/perf numbers.
+ * DOM-count + worker metrics for T-017 / T-064.
+ * Run: pnpm exec playwright test --config=playwright.perf.config.ts
  */
 import { writeFileSync } from "node:fs";
 import path from "node:path";
@@ -10,6 +9,7 @@ import { expect, test } from "@playwright/test";
 
 const ROW_SELECTOR = "[data-row]";
 const WAIT_DOM = "domcontentloaded";
+const NAIVE_TOTAL = 10_000;
 
 test.describe.configure({ mode: "serial" });
 
@@ -18,7 +18,9 @@ test("measure dictionary virtualization DOM counts", async ({ page }) => {
   const onUrl = "/catalog-search/dictionary";
 
   await page.goto(offUrl, { waitUntil: WAIT_DOM });
-  await expect(page.getByText("naive render")).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText("naive baseline")).toBeVisible({
+    timeout: 60_000,
+  });
   const tOff0 = Date.now();
   await page.waitForFunction(
     (sel) => document.querySelectorAll(sel).length >= 10000,
@@ -32,20 +34,26 @@ test("measure dictionary virtualization DOM counts", async ({ page }) => {
   );
 
   await page.goto(onUrl, { waitUntil: WAIT_DOM });
-  await expect(page.getByText("virtualized")).toBeVisible({ timeout: 60_000 });
-  await page.waitForSelector(ROW_SELECTOR, { timeout: 60_000 });
-  // Give virtualizer a paint cycle.
-  await page.waitForTimeout(500);
+  await expect(page.getByText("100,000")).toBeVisible({ timeout: 60_000 });
+  await page.waitForSelector('[data-testid="worker-metrics"]', {
+    timeout: 120_000,
+  });
+  await page.waitForSelector(ROW_SELECTOR, { timeout: 120_000 });
+  await page.waitForTimeout(1000);
   const onCount = await page.evaluate(
     (sel) => document.querySelectorAll(sel).length,
     ROW_SELECTOR
   );
+  const workerMetrics = await page.getByTestId("worker-metrics").textContent();
 
   const result = {
     measuredAt: new Date().toISOString(),
-    off: { domRows: offCount, waitForRowsMs: offMs },
-    on: { domRows: onCount },
+    ticket: "T-2026-064",
+    off: { domRows: offCount, waitForRowsMs: offMs, datasetRows: NAIVE_TOTAL },
+    on: { domRows: onCount, datasetRows: 100_000, workerMetrics },
     deltaDom: offCount - onCount,
+    memoryNote:
+      "Capture heap snapshot manually in Chrome Memory panel after scroll",
   };
 
   const out = path.join("docs", "perf", "catalog-dictionary-measured.json");
@@ -53,7 +61,7 @@ test("measure dictionary virtualization DOM counts", async ({ page }) => {
   // eslint-disable-next-line no-console
   console.log("PERF_RESULT", JSON.stringify(result));
 
-  expect(offCount).toBe(10000);
+  expect(offCount).toBe(NAIVE_TOTAL);
   expect(onCount).toBeLessThanOrEqual(40);
   expect(onCount).toBeGreaterThan(0);
 });

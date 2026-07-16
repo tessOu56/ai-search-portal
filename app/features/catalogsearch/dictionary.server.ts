@@ -1,37 +1,16 @@
 import type { CatalogApiRow } from "./catalog-search.types";
+import {
+  DICTIONARY_TOTAL,
+  filterDictionaryRows,
+  generateDictionaryRows,
+  NAIVE_BASELINE_TOTAL,
+} from "./dictionary.fixture";
 
 /**
- * T-2026-017 — 10k-row deterministic fixture for the virtualized dictionary.
- *
- * Generated in-process (no I/O, no randomness) so E2E/unit tests and perf
- * measurements are reproducible. Same row shape as the paginated catalog
- * (CatalogApiRow) so the URL contract (?q= ?type=) keeps its semantics.
+ * T-2026-017 / T-064 — dictionary fixture for naive baseline (server) and
+ * 100k virtual path (Web Worker on client).
  */
-export const DICTIONARY_TOTAL = 10_000;
-
-const DOMAINS = [
-  "orders",
-  "customers",
-  "billing",
-  "inventory",
-  "shipping",
-  "analytics",
-  "auth",
-  "catalog",
-  "search",
-  "audit",
-] as const;
-
-const VERBS = [
-  "list",
-  "get",
-  "search",
-  "export",
-  "aggregate",
-  "validate",
-  "sync",
-  "archive",
-] as const;
+export { DICTIONARY_TOTAL, NAIVE_BASELINE_TOTAL } from "./dictionary.fixture";
 
 export type DictionaryModel = {
   phase: "placeholder";
@@ -41,58 +20,54 @@ export type DictionaryModel = {
   totalUnfiltered: number;
   results: CatalogApiRow[];
   virtual: boolean;
+  /** When true, client Web Worker owns the 100k dataset (no SSR rows). */
+  workerMode?: boolean;
 };
 
-function buildRow(i: number): CatalogApiRow {
-  const domain = DOMAINS[i % DOMAINS.length];
-  const verb = VERBS[i % VERBS.length];
-  const itemType = i % 3 === 0 ? "Dataset" : "API";
-  return {
-    id: `dict-${i}`,
-    name:
-      itemType === "API"
-        ? `${domain}/${verb}-${i}`
-        : `${domain}_${verb}_v${i % 7}`,
-    description: `Mock ${itemType.toLowerCase()} #${i} for the ${domain} domain (${verb}).`,
-    itemType,
-  };
-}
+let naiveCache: CatalogApiRow[] | null = null;
 
-let cache: CatalogApiRow[] | null = null;
-
-export function getDictionaryRows(): CatalogApiRow[] {
-  if (!cache) {
-    cache = Array.from({ length: DICTIONARY_TOTAL }, (_, i) => buildRow(i));
+export function getNaiveBaselineRows(): CatalogApiRow[] {
+  if (!naiveCache) {
+    naiveCache = generateDictionaryRows(NAIVE_BASELINE_TOTAL);
   }
-  return cache;
+  return naiveCache;
 }
 
 export function getDictionaryModel(
   query: string,
   options: { type?: string; virtual?: boolean } = {}
 ): DictionaryModel {
-  const q = query.trim().toLowerCase();
-  const all = getDictionaryRows();
+  const virtual = options.virtual ?? true;
 
-  let rows = all;
-  if (q) {
-    rows = rows.filter(
-      (row) =>
-        row.name.toLowerCase().includes(q) ||
-        row.description.toLowerCase().includes(q)
-    );
+  if (virtual) {
+    return {
+      phase: "placeholder",
+      query,
+      activeType: options.type,
+      total: 0,
+      totalUnfiltered: DICTIONARY_TOTAL,
+      results: [],
+      virtual: true,
+      workerMode: true,
+    };
   }
-  if (options.type) {
-    rows = rows.filter((row) => row.itemType === options.type);
-  }
+
+  const all = getNaiveBaselineRows();
+  const rows = filterDictionaryRows(all, query, options.type);
 
   return {
     phase: "placeholder",
     query,
     activeType: options.type,
     total: rows.length,
-    totalUnfiltered: all.length,
+    totalUnfiltered: NAIVE_BASELINE_TOTAL,
     results: rows,
-    virtual: options.virtual ?? true,
+    virtual: false,
+    workerMode: false,
   };
+}
+
+/** @deprecated Use getNaiveBaselineRows — kept for tests migrating from 10k API */
+export function getDictionaryRows(): CatalogApiRow[] {
+  return getNaiveBaselineRows();
 }

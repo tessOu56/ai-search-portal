@@ -1,11 +1,9 @@
 {
-  "measuredAt": "2026-07-09T07:03:38.662Z",
-  "off": {
-    "domRows": 10000,
-    "waitForRowsMs": 70
-  },
-  "on": {
-    "domRows": 23
-  },
-  "deltaDom": 9977
+  "measuredAt": "2026-07-16T00:00:00.000Z",
+  "ticket": "T-2026-064",
+  "note": "Run pnpm exec playwright test --config=playwright.perf.config.ts to refresh numbers",
+  "off": { "domRows": null, "waitForRowsMs": null, "datasetRows": 10000 },
+  "on": { "domRows": null, "datasetRows": 100000, "workerMetrics": null },
+  "deltaDom": null,
+  "memoryNote": "Capture heap snapshot manually in Chrome Memory panel after scroll on both virtual=off and virtual=on"
 }

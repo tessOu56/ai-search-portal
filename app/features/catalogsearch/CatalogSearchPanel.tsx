@@ -45,7 +45,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
             to="/catalog-search/dictionary"
             className="text-primary hover:underline"
           >
-            10k dictionary (virtualized) →
+            100k dictionary (virtualized) →
           </Link>
         </p>
       </header>

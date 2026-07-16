@@ -1,16 +1,17 @@
-# Perf note — catalog dictionary virtualization (T-2026-017)
+# Perf note — catalog dictionary virtualization (T-2026-017 / T-064)
 
-> Route: `/catalog-search/dictionary` (10,000 deterministic mock rows)
-> Baseline toggle: `?virtual=off` renders the naive full list on the SAME data
-> and filters, so before/after is measured apples-to-apples.
+> Route: `/catalog-search/dictionary`
+> **Virtual (default):** 100,000 rows parsed in a **Web Worker**; `@tanstack/react-virtual` window.
+> **Baseline:** `?virtual=off` renders **10,000** naive DOM rows (same fixture slice — full 100k naive is not a fair baseline).
 
-## What changed
+## What changed (T-064)
 
-|                    | Before (`?virtual=off`)                | After (default, `@tanstack/react-virtual`)       |
-| ------------------ | -------------------------------------- | ------------------------------------------------ |
-| DOM rows rendered  | 10,000 (all)                           | ~15–25 (viewport 560px / row 44px + overscan 10) |
-| Rendering strategy | full list, browser layout on every row | absolute-positioned window, translateY per row   |
-| Pagination         | none (this view)                       | none — replaced by virtual scroll                |
+|                    | Baseline (`?virtual=off`, 10k) | Virtual (default, 100k + worker)                 |
+| ------------------ | ------------------------------ | ------------------------------------------------ |
+| Dataset size       | 10,000 rows (server loader)    | 100,000 rows (worker init)                       |
+| DOM rows rendered  | 10,000 (all)                   | ~15–25 (viewport 560px / row 44px + overscan 10) |
+| Parsing / filter   | main thread (loader)           | **Web Worker** (`dictionary.worker.ts`)          |
+| Rendering strategy | full list                      | absolute-positioned window, translateY per row   |
 
 URL contract: `?q=` and `?type=` keep the exact `/catalog-search` semantics;
 the paginated `/catalog-search` route is untouched (no-regression acceptance).
@@ -18,35 +19,33 @@ the paginated `/catalog-search` route is untouched (no-regression acceptance).
 ## How to measure (locally, Chrome)
 
 1. `pnpm dev` → open `/catalog-search/dictionary?virtual=off`
-2. **DOM count**: DevTools console
-   `document.querySelectorAll('[data-row]').length` → expect 10000
-3. **Initial render**: Performance panel → reload with recording →
-   note scripting + rendering time for first paint of the list
-4. **Heap**: Memory panel → heap snapshot after load → note retained size
-5. **Scroll responsiveness**: Performance panel → record while scrolling the
-   list for ~5s → check for long tasks (>50ms) and dropped frames
-6. Repeat 2–5 on `/catalog-search/dictionary` (virtual on) and fill the table
+2. **DOM count**: `document.querySelectorAll('[data-row]').length` → expect **10000**
+3. Open `/catalog-search/dictionary` (virtual on) → wait for `data-testid="worker-metrics"` ready
+4. **DOM count** virtual → expect **≤40**
+5. **Long tasks**: scroll ~5s; check `dictionary-long-task` observer / Performance panel — target **0 tasks >50ms** on main thread during scroll after worker ready
+6. **Heap**: Memory snapshot after worker ready + scroll (see `catalog-dictionary-measured.json` memory section)
+7. Automated: `pnpm exec playwright test --config=playwright.perf.config.ts`
 
-## Measured results (fill after local run)
+## Measured results
 
-| Metric                                        | virtual=off                           | virtual=on     | Δ                  |
-| --------------------------------------------- | ------------------------------------- | -------------- | ------------------ |
-| `[data-row]` DOM nodes                        | **10000**                             | **23**         | **−9977 (−99.8%)** |
-| Time to reach full row set (ms)               | **70** (waitForFunction after paint)  | n/a (windowed) | —                  |
-| First render scripting+rendering (ms)         | _(optional Chrome Performance panel)_ |                |                    |
-| Heap retained (MB)                            | _(optional heap snapshot)_            |                |                    |
-| Long tasks while scrolling (count / worst ms) | _(optional)_                          |                |                    |
+| Metric                                  | virtual=off (10k naive) | virtual=on (100k worker) | Δ         |
+| --------------------------------------- | ----------------------- | ------------------------ | --------- |
+| `[data-row]` DOM nodes                  | **10000**               | **≤40** (target)         | **−99%+** |
+| Worker init / filter (ms)               | n/a                     | _(see worker-metrics)_   | —         |
+| Long tasks >50ms while scrolling (main) | _(baseline high)_       | **0** (target)           | —         |
+| Heap retained after scroll (MB)         | _(fill locally)_        | _(fill locally)_         | —         |
 
-> Measured 2026-07-09 via `playwright.perf.config.ts` → `e2e/dictionary-perf.measure.ts`
-> (artifact: `docs/perf/catalog-dictionary-measured.json`). DOM-node delta is the
-> Gate 0 acceptance number; Chrome Performance/heap panels remain optional resume polish.
+> Run `e2e/dictionary-perf.measure.ts` to refresh `docs/perf/catalog-dictionary-measured.json`.
 
 ## Design notes
 
-- Fixture is generated in-process and cached (`dictionary.server.ts`),
-  deterministic — measurements and tests are reproducible.
-- Row height is fixed (44px) so `estimateSize` is exact; if rows become
-  variable-height, switch to `measureElement`.
-- Filtering stays server-side (loader) to keep the URL as the single source
-  of state; a 10k JSON payload (~1.2MB) is acceptable for this demo and is
-  itself part of the story (worker parsing is the Phase 2 follow-up).
+- Shared fixture: `dictionary.fixture.ts` (deterministic `buildDictionaryRow`).
+- Virtual path: loader returns metadata only; worker owns 100k array off main thread.
+- Naive baseline capped at 10k — comparing 100k DOM nodes is not meaningful.
+- Row height fixed at 44px; `estimateSize` exact.
+
+## Gate 2 / hygiene cross-refs
+
+- Ticket: T-2026-064
+- README perf card: update DOM delta row after measure run
+- Memory leak follow-up: capability-alignment §5.3 — one heap curve per scenario
