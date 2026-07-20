@@ -107,7 +107,7 @@
     "@vitest/coverage-v8": "^2.1.4",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-formatter-gha": "^1.5.2",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
