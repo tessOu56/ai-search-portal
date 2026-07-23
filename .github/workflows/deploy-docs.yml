@@ -1,6 +1,7 @@
 # VitePress docs → GitHub Pages (project site base /ai-search-portal/)
 # 純 shell 部署：不依賴 actions/*、pnpm/*（repo 若設「僅允許 tessOu56 actions」仍可跑）。
 # Pages 設定：Settings → Pages → Deploy from a branch → gh-pages / root（非 GitHub Actions 來源）。
+# Vercel：gh-pages 產物會寫入 ignore-all vercel.json，避免 Git 整合把 docs 當 Remix 建置（2026-07-23）。
 name: deploy-docs
 
 on:
@@ -55,6 +56,14 @@ jobs:
           test -f "$DIST/index.html"
           cd "$DIST"
           touch .nojekyll
+          # gh-pages has no app vercel.json; without this, Vercel Git integration
+          # tries to build the static docs tree as Remix and ERROR-spams the project.
+          cat > vercel.json <<'EOF'
+          {
+            "git": { "deploymentEnabled": false },
+            "ignoreCommand": "echo 'gh-pages is GitHub Pages only — skip Vercel'; exit 0"
+          }
+          EOF
           git init -b gh-pages
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

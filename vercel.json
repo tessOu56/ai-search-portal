@@ -3,7 +3,11 @@
   "regions": ["hkg1"],
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm run build",
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"main\" ]; then exit 1; else echo \"Skip Vercel build for branch: $VERCEL_GIT_COMMIT_REF\"; exit 0; fi",
   "git": {
-    "deploymentEnabled": false
+    "deploymentEnabled": {
+      "main": false,
+      "gh-pages": false
+    }
   }
 }
