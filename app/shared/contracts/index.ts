@@ -15,6 +15,11 @@ export type {
 } from "@ai-search-portal/contracts";
 export type { MockItemContract } from "@ai-search-portal/contracts";
 export type { AuditEventContract } from "@ai-search-portal/contracts";
+export type {
+  KnowledgeChunkContract,
+  KnowledgeChunkKind,
+  KnowledgeSearchResponse,
+} from "@ai-search-portal/contracts";
 export {
   contextMetricSchema,
   contextPackManifestSchema,
@@ -45,12 +50,24 @@ export {
   createItemRequestSchema,
   errorResponseSchema,
   getItemResponseSchema,
+  inferIndustryFacetsFromText,
+  knowledgeChunkKindSchema,
+  knowledgeChunkSchema,
+  knowledgeClassificationSchema,
+  knowledgeIndustryStandardCodeSchema,
+  knowledgeMaterialSchema,
+  knowledgeProductTypeSchema,
+  knowledgeSearchQuerySchema,
+  knowledgeSearchResponseSchema,
+  knowledgeTechniqueSchema,
   listItemsResponseSchema,
   mockItemSchema,
+  normalizeIndustryStandard,
   stableChatErrorSchema,
   stableChatFinalSchema,
   stableChatMetaSchema,
   stableToolStatusSchema,
+  standardsMatch,
   updateItemRequestSchema,
 } from "@ai-search-portal/contracts";
 export {

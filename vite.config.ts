@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
         : [
             remix({
               presets: process.env.VERCEL ? [vercelPreset()] : [],
+              ignoredRouteFiles: ["**/.*", "**/*.test.*", "**/*.spec.*"],
               future: {
                 v3_fetcherPersist: true,
                 v3_relativeSplatPath: true,

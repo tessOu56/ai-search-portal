@@ -3,6 +3,7 @@
  */
 
 import {
+  chatQueryParamsSchema,
   mapInternalSseToStable,
   stableChatMetaSchema,
 } from "@ai-search-portal/contracts";
@@ -17,6 +18,15 @@ function expectMapped(
 } {
   expect(result.kind).toBe("mapped");
 }
+
+describe("chatQueryParamsSchema", () => {
+  it("trims q and rejects blank values", () => {
+    expect(chatQueryParamsSchema.safeParse({ q: "  hello  " }).success).toBe(
+      true
+    );
+    expect(chatQueryParamsSchema.safeParse({ q: "   " }).success).toBe(false);
+  });
+});
 
 describe("stableChatMetaSchema", () => {
   it("accepts meta with optional traceId", () => {

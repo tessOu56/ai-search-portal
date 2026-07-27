@@ -46,6 +46,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:watch": "vitest",
+    "sync:metalcraft-knowledge": "node scripts/sync-metalcraft-knowledge.mjs",
+    "check:metalcraft-knowledge": "CHECK_ONLY=1 node scripts/sync-metalcraft-knowledge.mjs",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit && pnpm run typecheck:contracts && pnpm run typecheck:agent-core && pnpm run typecheck:agent-runtime && pnpm run typecheck:api",
     "typecheck:contracts": "pnpm --filter @ai-search-portal/contracts run typecheck",

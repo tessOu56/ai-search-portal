@@ -1,7 +1,18 @@
+export {
+  buildCatalogFacetUrl,
+  buildKnowledgeContinueSources,
+  buildKnowledgeSourceUrl,
+  buildMetadataFacetUrl,
+} from "./knowledge-links.js";
 export type { LuiResponse, LuiSource } from "./lui-mock.js";
 export { buildLuiResponse, splitToTokens } from "./lui-mock.js";
 export { beginChatTrace, isLangfuseEnabled } from "./observability/langfuse.js";
-export { runRagPipelineEvents } from "./rag/pipeline.js";
+export {
+  loadPackDocs,
+  resolveRagCorpus,
+  retrieveLocal,
+} from "./rag/local-store.js";
+export { runLocalRag, runRagPipelineEvents } from "./rag/pipeline.js";
 export type { SseEventPart } from "./stream.js";
 export { streamChatInternalEvents } from "./stream.js";
 export {

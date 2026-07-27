@@ -14,6 +14,7 @@ export const API_METADATA_ACCESS_EVALUATE =
 export const API_AUDIT = "/api/audit";
 export const API_MCP_GATEWAY = "/api/mcp/gateway";
 export const API_CHAT = "/api/chat";
+export const API_KNOWLEDGE_SEARCH = "/api/knowledge/search";
 export const API_LOCALE = "/api/locale";
 export const API_RELEASE_NOTES = "/api/release-notes";
 export const API_SITE_META = "/api/site-meta";
@@ -76,4 +77,29 @@ export function apiVendor(id: string) {
 
 export function apiChatQuery(query: string) {
   return `${API_CHAT}?q=${encodeURIComponent(query)}`;
+}
+
+export function apiKnowledgeSearch(args: {
+  q?: string;
+  pack?: string;
+  kind?: string;
+  material?: string;
+  technique?: string;
+  region?: string;
+  classification?: string;
+  standard?: string;
+  limit?: number;
+}) {
+  const sp = new URLSearchParams();
+  if (args.q) sp.set("q", args.q);
+  if (args.pack) sp.set("pack", args.pack);
+  if (args.kind) sp.set("kind", args.kind);
+  if (args.material) sp.set("material", args.material);
+  if (args.technique) sp.set("technique", args.technique);
+  if (args.region) sp.set("region", args.region);
+  if (args.classification) sp.set("classification", args.classification);
+  if (args.standard) sp.set("standard", args.standard);
+  if (args.limit !== undefined) sp.set("limit", String(args.limit));
+  const qs = sp.toString();
+  return qs ? `${API_KNOWLEDGE_SEARCH}?${qs}` : API_KNOWLEDGE_SEARCH;
 }

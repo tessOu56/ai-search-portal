@@ -1,0 +1,95 @@
+[
+  {
+    "id": "ops-order-lifecycle",
+    "title": "訂單狀態機（薄 stub）",
+    "summary": "Order: pending → confirmed → completed | cancelled。Payment: unpaid → paid | refunded。Fulfillment: none → preparing → shipped → delivered（商品）；體驗為 picked_up。對齊工作室零售／體驗履約常見狀態。",
+    "statusTerms": [
+      "pending",
+      "confirmed",
+      "completed",
+      "cancelled",
+      "unpaid",
+      "paid",
+      "refunded",
+      "preparing",
+      "shipped",
+      "delivered",
+      "picked_up"
+    ],
+    "tags": ["ops", "order", "payment", "fulfillment"],
+    "refs": ["studio-1", "prod-exp-1"],
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": ["TPE"],
+      "classification": "studio_ops",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "ops-auction-lifecycle",
+    "title": "拍賣狀態機（薄 stub）",
+    "summary": "Event: scheduled → live → closed → settled。Lot: open → closed → settled | unsold。底價與加價單位綁定孤品拍賣，貼近拍場營運慣例。",
+    "statusTerms": [
+      "scheduled",
+      "live",
+      "closed",
+      "settled",
+      "open",
+      "unsold",
+      "reserve",
+      "底價"
+    ],
+    "tags": ["ops", "auction", "reserve"],
+    "refs": ["prod-phy-2", "tbl-auction-bid"],
+    "facets": {
+      "materials": ["copper"],
+      "techniques": ["forging"],
+      "regions": ["NTP"],
+      "classification": "auction",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "ops-quote-process",
+    "title": "報價與製程備註（薄 stub）",
+    "summary": "材料成本（銀／克，連動 spot）→ 工時報價 → 成品定價。體驗課含退火與拋光工時；場地租借以半日槽計價。",
+    "statusTerms": ["quote", "報價", "工時", "退火", "拋光", "製程"],
+    "tags": ["ops", "quote", "process", "pricing"],
+    "refs": ["prod-mat-1", "metric-silver-cost", "prod-exp-1"],
+    "facets": {
+      "materials": ["sterling_silver"],
+      "techniques": ["annealing", "polishing", "forging"],
+      "regions": ["TPE"],
+      "classification": "studio_ops",
+      "locale": "zh-TW",
+      "standards": ["925"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "ops-assay-intake",
+    "title": "成色查驗與入庫（薄 stub）",
+    "summary": "原料／成品入庫前核對印記（925／999／18K），記錄批次與克重，再進入成本或拍賣上架流程。",
+    "statusTerms": ["assay", "hallmark", "intake", "入庫", "成色"],
+    "tags": ["ops", "assay", "provenance", "inventory"],
+    "refs": ["dim-material", "prod-mat-1"],
+    "facets": {
+      "materials": ["sterling_silver", "fine_silver", "gold"],
+      "techniques": [],
+      "regions": ["TPE", "NTP"],
+      "classification": "provenance",
+      "locale": "zh-TW",
+      "standards": ["925", "999", "18K"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  }
+]

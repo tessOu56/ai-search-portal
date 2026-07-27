@@ -6,7 +6,7 @@ import {
 
 import { buildLuiResponse, splitToTokens } from "./lui-mock.js";
 import { beginChatTrace } from "./observability/langfuse.js";
-import { runRagPipelineEvents } from "./rag/pipeline.js";
+import { runLocalRag, runRagPipelineEvents } from "./rag/pipeline.js";
 import type { SseEventPart } from "./sse-types.js";
 import {
   executeItemsLookup,
@@ -69,6 +69,8 @@ async function* emitMetadataLookupEvents(
 export async function* streamChatInternalEvents(args: {
   query: string;
   traceId?: string;
+  /** Active context pack for pack-aware local RAG */
+  packId?: string;
   /** Phase 3：是否發出 rag.search tool_status */
   emitMockToolStatus?: boolean;
   /** Phase 3：是否跑 RAG internal 步驟事件 */
@@ -81,6 +83,7 @@ export async function* streamChatInternalEvents(args: {
   const {
     query,
     traceId,
+    packId,
     emitMockToolStatus = true,
     includeRagSteps = true,
     executeItemsLookup: runItemsLookup = isItemsLookupEnabled(),
@@ -104,7 +107,11 @@ export async function* streamChatInternalEvents(args: {
     throw e;
   }
 
-  const response = buildLuiResponse(query);
+  const rag = runLocalRag(query, { packId });
+  const response = buildLuiResponse(query, {
+    ragHits: rag.hits,
+    packId: rag.packId ?? packId,
+  });
   const metaPayload = stableChatMetaSchema.parse({
     query,
     summary: response.summary,
@@ -133,7 +140,7 @@ export async function* streamChatInternalEvents(args: {
   }
 
   if (includeRagSteps) {
-    for await (const ev of runRagPipelineEvents(query)) {
+    for await (const ev of runRagPipelineEvents(query, { packId })) {
       if (traceSession && ev.event === "internal.rag_step") {
         const parsed = internalRagStepPayloadSchema.safeParse(
           JSON.parse(ev.data)

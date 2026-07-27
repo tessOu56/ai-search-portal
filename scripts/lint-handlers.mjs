@@ -14,7 +14,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const routesDir = path.join(root, "app", "routes");
 const handlersPath = path.join(root, "app", "test", "handlers.ts");
-const extraHandlerFiles = ["metadata-handlers.ts", "context-handlers.ts"];
+const extraHandlerFiles = [
+  "metadata-handlers.ts",
+  "context-handlers.ts",
+  "knowledge-handlers.ts",
+];
 
 function getApiPathPrefixes() {
   if (!fs.existsSync(routesDir)) return [];
@@ -48,7 +52,9 @@ if (apiPrefixes.length === 0) {
   process.exit(0);
 }
 
-/** 尚未要求 handler 的 API 前綴（內部用或非資料契約）；目標是逐步補齊後移出此列表 */
+/** 尚未要求 handler 的 API 前綴（內部用或非資料契約）；目標是逐步補齊後移出此列表。
+ * `/api/chat`：SSE 串流，契約測試在 `api.chat.route.test.ts` + `chat.contract.test.ts`。
+ */
 const EXCLUDED_PREFIXES = new Set([
   "/api/chat",
   "/api/locale",

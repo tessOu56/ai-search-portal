@@ -34,6 +34,27 @@ describe("buildCatalogSearchUrl (URL contract)", () => {
     );
   });
 
+  it("carries intent for AI fallback continuity", () => {
+    expect(buildCatalogSearchUrl({ q: "orders", intent: "ai-fallback" })).toBe(
+      `${CATALOG_PATH}?q=orders&intent=ai-fallback`
+    );
+  });
+
+  it("carries industry material and standard facets", () => {
+    expect(
+      buildCatalogSearchUrl({ material: "sterling_silver", standard: "925" })
+    ).toBe(`${CATALOG_PATH}?material=sterling_silver&standard=925`);
+  });
+
+  it("carries commerce productType and auctionEligible", () => {
+    expect(
+      buildCatalogSearchUrl({
+        productType: "experience",
+        auctionEligible: true,
+      })
+    ).toBe(`${CATALOG_PATH}?productType=experience&auctionEligible=true`);
+  });
+
   it("omits page=1 (canonical) but carries page>1", () => {
     expect(buildCatalogSearchUrl({ q: "a", page: 1 })).toBe(
       `${CATALOG_PATH}?q=a`

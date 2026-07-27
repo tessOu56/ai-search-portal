@@ -126,10 +126,23 @@ export const toolContextBindingsOutputSchema = z.object({
 
 export const toolRagSearchInputSchema = z.object({
   query: z.string().min(1),
+  packId: z.string().min(1).optional(),
 });
 
-/** RAG 管線輸出於 Phase 3 真實化時收斂為嚴格 schema；先以 unknown 佔位（仍是必填 schema）。 */
-export const toolRagSearchOutputSchema = z.unknown();
+export const toolRagSearchHitSchema = z.object({
+  id: z.string(),
+  kind: z.enum(["glossary", "narrative", "ops", "doc"]),
+  title: z.string(),
+  text: z.string(),
+  score: z.number().nonnegative().optional(),
+  refs: z.array(z.string()).default([]),
+});
+
+export const toolRagSearchOutputSchema = z.object({
+  hits: z.array(toolRagSearchHitSchema),
+  total: z.number().int().nonnegative(),
+  packId: z.string().optional(),
+});
 
 // ---- Metadata registry（serializable；供 registry 與未來 MCP discover 使用）----
 

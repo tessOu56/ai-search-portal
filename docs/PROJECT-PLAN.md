@@ -176,6 +176,13 @@ Phase 1 已完成；**當前焦點**：Phase 0 收尾 + Phase 2 閉環 + Phase 4
 - [ ] T-2026-004 CatalogSearchPanel GAP
 - [ ] api-detail GAP 占位文件
 
+**Backlog（非 sprint；T-2026-092 draft P2）**
+
+- [ ] CI／ritual：`check:metalcraft-knowledge`（commerce drift）
+- [ ] Node 22：`e2e/catalog-commerce.spec.ts` 綠或 waiver
+- [ ] `/api/knowledge/search` OpenAPI 升格 **或** 維持 Zod-only（已註記）
+- [ ] Metadata commerce chips（僅 UX 需要時）
+
 ---
 
 ## 6. 停步與不做

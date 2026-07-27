@@ -14,6 +14,7 @@ import {
 } from "~/shared/contracts";
 
 import { contextHandlers } from "./context-handlers";
+import { knowledgeHandlers } from "./knowledge-handlers";
 import { metadataHandlers } from "./metadata-handlers";
 
 // ---------- Fixtures：Items API mock data（須通過 mockItemSchema） ----------
@@ -33,17 +34,25 @@ const itemsFixtureRaw = [
     updatedAt: "2026-02-03T00:05:00.000Z",
   },
 ];
-const itemsFixture = itemsFixtureRaw.map((item) => mockItemSchema.parse(item));
+let itemsFixture = itemsFixtureRaw.map((item) => mockItemSchema.parse(item));
+let nextItemId = itemsFixture.length + 1;
 
 const ITEMS_BY_ID_PATH = "/api/items/:itemId";
 const ERROR_ITEM_NOT_FOUND = "Item not found";
 
+function findItemIndex(itemId: string | readonly string[] | undefined): number {
+  const id = typeof itemId === "string" ? itemId : itemId?.[0];
+  if (!id) return -1;
+  return itemsFixture.findIndex((item) => item.id === id);
+}
+
 /** PUT/PATCH 共用更新邏輯：依 body 更新 item，回傳 200 或 404/400。 */
 async function handleItemUpdate(params: { itemId?: string }, request: Request) {
-  const item = itemsFixture.find((i) => i.id === params.itemId);
-  if (!item) {
+  const index = findItemIndex(params.itemId);
+  if (index === -1) {
     return HttpResponse.json({ error: ERROR_ITEM_NOT_FOUND }, { status: 404 });
   }
+  const item = itemsFixture[index];
   const raw = (await request.json()) as unknown;
   const parsed = updateItemRequestSchema.safeParse(raw);
   if (
@@ -64,6 +73,9 @@ async function handleItemUpdate(params: { itemId?: string }, request: Request) {
         : item.description,
     updatedAt: new Date().toISOString(),
   });
+  itemsFixture = itemsFixture.map((current, currentIndex) =>
+    currentIndex === index ? updated : current
+  );
   const body = getItemResponseSchema.parse({ data: updated });
   return HttpResponse.json(body);
 }
@@ -95,12 +107,14 @@ export const itemsHandlers = [
     }
     const now = new Date().toISOString();
     const newItem = mockItemSchema.parse({
-      id: "mock-3",
+      id: String(nextItemId),
       name: parsed.data.name,
       description: parsed.data.description ?? null,
       createdAt: now,
       updatedAt: now,
     });
+    nextItemId += 1;
+    itemsFixture = [newItem, ...itemsFixture];
     const body = getItemResponseSchema.parse({ data: newItem });
     return HttpResponse.json(body, { status: 201 });
   }),
@@ -114,14 +128,15 @@ export const itemsHandlers = [
   ),
 
   http.delete(ITEMS_BY_ID_PATH, ({ params }) => {
-    const item = itemsFixture.find((i) => i.id === params.itemId);
-    if (!item) {
+    const index = findItemIndex(params.itemId);
+    if (index === -1) {
       return HttpResponse.json(
         { error: ERROR_ITEM_NOT_FOUND },
         { status: 404 }
       );
     }
-    const body = getItemResponseSchema.parse({ data: item });
+    const [removed] = itemsFixture.splice(index, 1);
+    const body = getItemResponseSchema.parse({ data: removed });
     return HttpResponse.json(body);
   }),
 ];
@@ -131,4 +146,5 @@ export const handlers = [
   ...itemsHandlers,
   ...metadataHandlers,
   ...contextHandlers,
+  ...knowledgeHandlers,
 ];

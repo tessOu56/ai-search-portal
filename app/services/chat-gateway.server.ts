@@ -70,12 +70,14 @@ export async function pipeLocalAgentCoreToStableSse(args: {
   query: string;
   sessionId?: string;
   traceId?: string;
+  packId?: string;
   send: ChatGatewaySend;
 }): Promise<void> {
   void args.sessionId;
   for await (const part of streamChatInternalEvents({
     query: args.query,
     traceId: args.traceId,
+    packId: args.packId,
     emitMockToolStatus: true,
     includeRagSteps: true,
   })) {

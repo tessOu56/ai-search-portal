@@ -2,7 +2,9 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
 import { CatalogSearchPanel } from "~/features/catalogsearch";
-import { getCatalogSearchPlaceholder } from "~/features/catalogsearch/catalog-search.server";
+import { getCatalogSearchViewModel } from "~/features/catalogsearch/catalog-search.server";
+import type { CatalogSearchIntent } from "~/features/catalogsearch/catalog-search.types";
+import { parsePackIdFromRequest } from "~/services/context-pack.server";
 import { getLocale, getTranslations } from "~/shared/i18n";
 import { t } from "~/shared/i18n/server";
 import {
@@ -13,12 +15,21 @@ import {
   getOrigin,
   getSeoFromLoader,
 } from "~/shared/seo";
+import { parseIndustryFacetsFromSearchParams } from "~/shared/utils/industry-facets-url";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const query = url.searchParams.get("q") ?? "";
   const type = url.searchParams.get("type") ?? undefined;
+  const { material, standard, productType, auctionEligible, facetWarning } =
+    parseIndustryFacetsFromSearchParams(url.searchParams);
   const page = Number(url.searchParams.get("page") ?? "1");
+  const intentParam = url.searchParams.get("intent");
+  const intent: CatalogSearchIntent | undefined =
+    intentParam === "ai-fallback" || intentParam === "manual"
+      ? intentParam
+      : undefined;
+  const packId = parsePackIdFromRequest(request);
   const locale = await getLocale(request);
   const translations = getTranslations(locale);
   const origin = getOrigin(request);
@@ -40,9 +51,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
     image: `${origin}/og-image.png`,
     locale: ogLocale,
     structuredData,
-    model: getCatalogSearchPlaceholder(query, {
+    model: getCatalogSearchViewModel(query, {
       type,
       page: Number.isFinite(page) ? page : 1,
+      packId,
+      intent,
+      material,
+      standard,
+      productType,
+      auctionEligible,
+      facetWarning,
     }),
   };
 }

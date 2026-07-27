@@ -6,14 +6,10 @@ import {
   getMockItem,
   updateMockItem,
 } from "~/services/mock-items.server";
-
-type UpdatePayload = {
-  name?: unknown;
-  description?: unknown;
-};
-
-const isNonEmptyString = (value: unknown): value is string =>
-  typeof value === "string" && value.trim().length > 0;
+import {
+  getItemResponseSchema,
+  updateItemRequestSchema,
+} from "~/shared/contracts";
 
 const ERROR_ITEM_NOT_FOUND = "Item not found";
 
@@ -28,7 +24,7 @@ export function loader({ params }: LoaderFunctionArgs) {
     return json({ error: ERROR_ITEM_NOT_FOUND }, { status: 404 });
   }
 
-  return json({ data: item });
+  return json(getItemResponseSchema.parse({ data: item }));
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
@@ -42,7 +38,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
     if (!removed) {
       return json({ error: ERROR_ITEM_NOT_FOUND }, { status: 404 });
     }
-    return json({ data: removed });
+    return json(getItemResponseSchema.parse({ data: removed }));
   }
 
   if (request.method !== "PUT" && request.method !== "PATCH") {
@@ -52,20 +48,18 @@ export async function action({ params, request }: ActionFunctionArgs) {
     );
   }
 
-  let payload: UpdatePayload;
+  let raw: unknown;
   try {
-    payload = (await request.json()) as UpdatePayload;
+    raw = await request.json();
   } catch {
     return json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
-  const nextName = isNonEmptyString(payload.name)
-    ? payload.name.trim()
-    : undefined;
-  const nextDescription =
-    typeof payload.description === "string" ? payload.description : undefined;
-
-  if (nextName === undefined && nextDescription === undefined) {
+  const parsed = updateItemRequestSchema.safeParse(raw);
+  if (
+    !parsed.success ||
+    (parsed.data.name === undefined && parsed.data.description === undefined)
+  ) {
     return json(
       { error: "Provide name or description to update" },
       { status: 400 }
@@ -73,12 +67,12 @@ export async function action({ params, request }: ActionFunctionArgs) {
   }
 
   const updated = updateMockItem(itemId, {
-    name: nextName,
-    description: nextDescription,
+    name: parsed.data.name,
+    description: parsed.data.description,
   });
   if (!updated) {
     return json({ error: ERROR_ITEM_NOT_FOUND }, { status: 404 });
   }
 
-  return json({ data: updated });
+  return json(getItemResponseSchema.parse({ data: updated }));
 }

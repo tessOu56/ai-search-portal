@@ -1,3 +1,7 @@
+import {
+  inferIndustryFacetsFromText,
+  listIndustryStandards,
+} from "@ai-search-portal/contracts";
 import { Link } from "@remix-run/react";
 
 import {
@@ -8,6 +12,7 @@ import {
   CardTitle,
 } from "~/components/ui/Card";
 import { buildCatalogSearchUrl } from "~/features/catalogsearch/catalog-search-url";
+import { buildMetadataSearchUrl } from "~/features/metadata/metadata-search-url";
 import { useI18n } from "~/shared/i18n/context";
 
 export type AiFallbackPanelProps = {
@@ -16,6 +21,22 @@ export type AiFallbackPanelProps = {
   /** Quick type-filter shortcuts offered alongside the main takeover link. */
   types?: string[];
 };
+
+const INDUSTRY_SHORTCUTS = listIndustryStandards()
+  .filter((e) => ["925", "18K", "950"].includes(e.code))
+  .map((e) => ({
+    code: e.code,
+    material: e.material,
+    label: e.code,
+  }));
+
+const COMMERCE_SHORTCUTS = [
+  { productType: "experience" as const, label: "Experience" },
+  { productType: "physical" as const, label: "Physical" },
+  { auctionEligible: true as const, label: "Auction" },
+];
+
+const AI_FALLBACK_INTENT = "ai-fallback";
 
 /**
  * Dual-path degradation panel (interface-roadmap R2 ③).
@@ -31,6 +52,14 @@ export function AiFallbackPanel({
 }: AiFallbackPanelProps) {
   const { t } = useI18n();
   const trimmed = query.trim();
+  const inferred = inferIndustryFacetsFromText(trimmed);
+  const fallbackIntent = {
+    intent: AI_FALLBACK_INTENT,
+    material: inferred.material,
+    standard: inferred.standard,
+    productType: inferred.productType,
+    auctionEligible: inferred.auctionEligible,
+  };
 
   return (
     <Card
@@ -43,7 +72,7 @@ export function AiFallbackPanel({
       </CardHeader>
       <CardContent className="flex flex-wrap items-center gap-2">
         <Link
-          to={buildCatalogSearchUrl({ q: trimmed })}
+          to={buildCatalogSearchUrl({ q: trimmed, ...fallbackIntent })}
           className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
           data-testid="ai-fallback-takeover"
         >
@@ -51,14 +80,54 @@ export function AiFallbackPanel({
             ? t("chat.fallback.action.query", { query: trimmed })
             : t("chat.fallback.action")}
         </Link>
+        <Link
+          to={buildMetadataSearchUrl({ q: trimmed, ...fallbackIntent })}
+          className="inline-flex h-9 items-center rounded-full border border-border bg-background px-4 text-sm font-medium hover:bg-muted"
+          data-testid="ai-fallback-metadata"
+        >
+          {trimmed
+            ? t("chat.fallback.metadata.query", { query: trimmed })
+            : t("chat.fallback.metadata")}
+        </Link>
         {types.map((type) => (
           <Link
             key={type}
-            to={buildCatalogSearchUrl({ q: trimmed, type })}
+            to={buildCatalogSearchUrl({ q: trimmed, type, ...fallbackIntent })}
             className="inline-flex h-8 items-center rounded-full border border-border bg-background px-3 text-xs font-medium hover:bg-muted"
             data-testid={`ai-fallback-type-${type}`}
           >
             {type}
+          </Link>
+        ))}
+        {INDUSTRY_SHORTCUTS.map((chip) => (
+          <Link
+            key={chip.code}
+            to={buildCatalogSearchUrl({
+              q: trimmed,
+              intent: AI_FALLBACK_INTENT,
+              material: chip.material,
+              standard: chip.code,
+            })}
+            className="inline-flex h-8 items-center rounded-full border border-amber-400/50 bg-background px-3 text-xs font-medium hover:bg-muted"
+            data-testid={`ai-fallback-standard-${chip.code}`}
+          >
+            {chip.label}
+          </Link>
+        ))}
+        {COMMERCE_SHORTCUTS.map((chip) => (
+          <Link
+            key={chip.label}
+            to={buildCatalogSearchUrl({
+              q: trimmed,
+              intent: AI_FALLBACK_INTENT,
+              productType: "productType" in chip ? chip.productType : undefined,
+              auctionEligible:
+                "auctionEligible" in chip ? chip.auctionEligible : undefined,
+            })}
+            className="inline-flex h-8 items-center rounded-full border border-amber-400/50 bg-background px-3 text-xs font-medium hover:bg-muted"
+            data-testid={`ai-fallback-commerce-${chip.label.toLowerCase()}`}
+          >
+            {chip.label}
           </Link>
         ))}
       </CardContent>

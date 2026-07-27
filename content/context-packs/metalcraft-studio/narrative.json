@@ -1,0 +1,200 @@
+[
+  {
+    "id": "narr-designer-1",
+    "title": "林語晨",
+    "summary": "專注鍛造紋理與寶石鑲嵌，作品帶有建築感線條。",
+    "entityType": "designer",
+    "tags": ["designer", "鍛造首飾", "TPE"],
+    "refs": ["designer-1", "studio-1"],
+    "facets": {
+      "materials": ["sterling_silver"],
+      "techniques": ["forging"],
+      "regions": ["TPE"],
+      "classification": "general",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "narr-designer-2",
+    "title": "陳惟庭",
+    "summary": "以傳統金工技法詮釋日常配戴的當代物件。",
+    "entityType": "designer",
+    "tags": ["designer", "日常銀飾", "TPE"],
+    "refs": ["designer-2", "studio-1"],
+    "facets": {
+      "materials": ["sterling_silver"],
+      "techniques": ["forging"],
+      "regions": ["TPE"],
+      "classification": "general",
+      "locale": "zh-TW",
+      "standards": ["925"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "narr-designer-3",
+    "title": "吳海陽",
+    "summary": "大型鍛造與雕塑性金工，常見於限時拍賣專場。",
+    "entityType": "designer",
+    "tags": ["designer", "雕塑金工", "NTP"],
+    "refs": ["designer-3", "studio-2"],
+    "facets": {
+      "materials": ["sterling_silver"],
+      "techniques": ["forging"],
+      "regions": ["NTP"],
+      "classification": "general",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "narr-prod-exp-1",
+    "title": "銀戒鍛造入門體驗",
+    "summary": "4 小時完成一枚專屬銀戒，含退火與拋光。體驗產品，價格 2800 TWD。",
+    "entityType": "product",
+    "tags": ["product", "experience", "銀戒", "鍛造"],
+    "refs": ["prod-exp-1", "studio-1", "designer-1"],
+    "facets": {
+      "materials": ["sterling_silver"],
+      "techniques": ["forging"],
+      "regions": ["TPE"],
+      "classification": "experience",
+      "locale": "zh-TW",
+      "standards": ["925"],
+      "productTypes": ["experience"],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "narr-prod-mat-1",
+    "title": "925 銀板 10×10cm",
+    "summary": "適合初學鍛造與鋸切練習的 sterling silver 材料。價格 650 TWD。",
+    "entityType": "product",
+    "tags": ["product", "material", "925", "銀"],
+    "refs": ["prod-mat-1", "studio-1", "designer-1"],
+    "facets": {
+      "materials": ["sterling_silver"],
+      "techniques": ["forging"],
+      "regions": ["TPE"],
+      "classification": "material",
+      "locale": "zh-TW",
+      "standards": ["925"],
+      "productTypes": ["material"],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "narr-prod-phy-1",
+    "title": "摺紋純銀戒指",
+    "summary": "手工摺疊紋理純銀戒指，可選尺寸。stock 可售；auctionEligible。",
+    "entityType": "product",
+    "tags": ["product", "physical", "純銀", "auction"],
+    "refs": ["prod-phy-1", "studio-1", "designer-2"],
+    "facets": {
+      "materials": ["sterling_silver"],
+      "techniques": ["forging"],
+      "regions": ["TPE"],
+      "classification": "auction",
+      "locale": "zh-TW",
+      "standards": ["925"],
+      "productTypes": ["physical"],
+      "auctionEligible": true
+    }
+  },
+  {
+    "id": "narr-prod-phy-2",
+    "title": "潮汐銅手鐲（孤品）",
+    "summary": "拍賣專場代表作，鍛面保留捶痕，可搭配化學發色。stock=1，auctionEligible。",
+    "entityType": "product",
+    "tags": ["product", "physical", "孤品", "auction", "銅"],
+    "refs": ["prod-phy-2", "studio-2", "designer-3"],
+    "facets": {
+      "materials": ["copper"],
+      "techniques": ["forging"],
+      "regions": ["NTP"],
+      "classification": "auction",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": ["physical"],
+      "auctionEligible": true
+    }
+  },
+  {
+    "id": "narr-prod-tool-1",
+    "title": "台座鎚組（三支）",
+    "summary": "平鎚、圓鎚、十字鎚，工作室同款工具組。價格 1800 TWD。",
+    "entityType": "product",
+    "tags": ["product", "tool", "鎚"],
+    "refs": ["prod-tool-1", "studio-2", "designer-3"],
+    "facets": {
+      "materials": ["mixed"],
+      "techniques": ["forging"],
+      "regions": ["NTP"],
+      "classification": "commerce",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": ["tool"],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "narr-prod-venue-1",
+    "title": "鍛造台租借（半日）",
+    "summary": "含基本工具與安全講解，需自備材料或現場加購。場地租借產品類型。",
+    "entityType": "product",
+    "tags": ["product", "venue_rental", "場地"],
+    "refs": ["prod-venue-1", "studio-2", "designer-3"],
+    "facets": {
+      "materials": ["mixed"],
+      "techniques": ["forging"],
+      "regions": ["NTP"],
+      "classification": "experience",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": ["venue_rental"],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "narr-studio-1",
+    "title": "青銅作坊 Bronze Atelier",
+    "summary": "台北市大安區金工工作室。手作金工與當代首飾",
+    "entityType": "studio",
+    "tags": ["studio", "TPE", "台北市"],
+    "refs": ["studio-1"],
+    "facets": {
+      "materials": ["sterling_silver"],
+      "techniques": ["forging"],
+      "regions": ["TPE"],
+      "classification": "general",
+      "locale": "zh-TW",
+      "standards": ["925"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "narr-studio-2",
+    "title": "鎚光工作室 Hammer & Light",
+    "summary": "新北市淡水區金工工作室。海岸靈感與鍛造體驗",
+    "entityType": "studio",
+    "tags": ["studio", "NTP", "新北市"],
+    "refs": ["studio-2"],
+    "facets": {
+      "materials": ["copper", "bronze"],
+      "techniques": ["forging"],
+      "regions": ["NTP"],
+      "classification": "general",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  }
+]

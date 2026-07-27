@@ -47,3 +47,33 @@ describe("GET /api/items/:itemId — MSW mock", () => {
     expect(json.error).toBeDefined();
   });
 });
+
+describe("POST /api/items — MSW mock persistence", () => {
+  it("creates an item and returns contract-shaped response", async () => {
+    const res = await fetch(API_ITEMS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Integration test item",
+        description: "Created via MSW",
+      }),
+    });
+    expect(res.status).toBe(201);
+    const json = (await res.json()) as unknown;
+    const parsed = getItemResponseSchema.safeParse(json);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.data.name).toBe("Integration test item");
+      expect(parsed.data.data.id).toMatch(/^\d+$/);
+    }
+  });
+
+  it("returns 400 when name is missing", async () => {
+    const res = await fetch(API_ITEMS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description: "no name" }),
+    });
+    expect(res.status).toBe(400);
+  });
+});

@@ -1,3 +1,5 @@
+import { inferIndustryFacetsFromText } from "@ai-search-portal/contracts";
+import { Link } from "@remix-run/react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
@@ -8,6 +10,8 @@ import { Button } from "~/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
 import { ScrollArea } from "~/components/ui/ScrollArea";
 import { Textarea } from "~/components/ui/Textarea";
+import { buildCatalogSearchUrl } from "~/features/catalogsearch/catalog-search-url";
+import { buildMetadataSearchUrl } from "~/features/metadata/metadata-search-url";
 import { apiChatQuery } from "~/shared/api/paths";
 import {
   stableChatErrorSchema,
@@ -28,6 +32,9 @@ type LuiMeta = {
   sources?: Array<{ title: string; url: string }>;
   nextSteps?: string[];
 };
+
+const CHIP_CLASS =
+  "inline-flex h-8 items-center rounded-full border border-border bg-background px-3 text-xs font-medium";
 
 function parseStableMeta(data: string) {
   const parsed = stableChatMetaSchema.safeParse(JSON.parse(data) as unknown);
@@ -54,6 +61,9 @@ function parseStableFailure(data: string) {
 
 const KEY_SUMMARY_WAITING = "chat.summary.waiting";
 const KEY_CHAT_ERROR_PARSE = "chat.error.parse";
+const KEY_SOURCES_TITLE = "chat.sources.title";
+const SOURCE_LINK_CLASS =
+  "flex items-center gap-2 text-primary hover:underline";
 
 type ChatInterfaceProps = {
   pendingQuery?: string | null;
@@ -224,7 +234,7 @@ export function ChatInterface({
                 type="button"
                 disabled={isStreaming}
                 onClick={() => submitQuery(question)}
-                className="inline-flex h-8 items-center rounded-full border border-border bg-background px-3 text-xs font-medium hover:bg-muted disabled:opacity-50"
+                className={`${CHIP_CLASS} hover:bg-muted disabled:opacity-50`}
                 data-testid="golden-question"
               >
                 {question}
@@ -341,22 +351,84 @@ export function ChatInterface({
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("chat.sources.title")}</CardTitle>
+          <CardTitle>{t(KEY_SOURCES_TITLE)}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
           {(meta.sources ?? []).length === 0 && <p>{t(KEY_SUMMARY_WAITING)}</p>}
-          {(meta.sources ?? []).map((source) => (
-            <a
-              key={source.url}
-              href={source.url}
-              className="flex items-center gap-2 text-primary hover:underline"
-              rel="noreferrer"
-              target="_blank"
-              aria-label={`${source.title} (${t("chat.sources.title")})`}
+          {(meta.sources ?? []).map((source) => {
+            const internal = source.url.startsWith("/");
+            return internal ? (
+              <Link
+                key={source.url}
+                to={source.url}
+                className={SOURCE_LINK_CLASS}
+                aria-label={`${source.title} (${t(KEY_SOURCES_TITLE)})`}
+              >
+                {source.title}
+              </Link>
+            ) : (
+              <a
+                key={source.url}
+                href={source.url}
+                className={SOURCE_LINK_CLASS}
+                rel="noreferrer"
+                target="_blank"
+                aria-label={`${source.title} (${t(KEY_SOURCES_TITLE)})`}
+              >
+                {source.title}
+              </a>
+            );
+          })}
+          {!isStreaming && !error && lastQuery.trim() ? (
+            <div
+              className="flex flex-wrap gap-2 border-t border-border pt-3"
+              data-testid="chat-continue-facets"
             >
-              {source.title}
-            </a>
-          ))}
+              {(() => {
+                const inferred = inferIndustryFacetsFromText(lastQuery);
+                const facetLabel = [
+                  inferred.standard,
+                  inferred.productType,
+                  inferred.auctionEligible ? "auction" : undefined,
+                ]
+                  .filter(Boolean)
+                  .join(" · ");
+                return (
+                  <>
+                    <Link
+                      to={buildCatalogSearchUrl({
+                        q: lastQuery,
+                        material: inferred.material,
+                        standard: inferred.standard,
+                        productType: inferred.productType,
+                        auctionEligible: inferred.auctionEligible,
+                        intent: "manual",
+                      })}
+                      className={`${CHIP_CLASS} text-foreground hover:bg-muted`}
+                      data-testid="chat-continue-catalog"
+                    >
+                      {t("chat.continue.catalog")}
+                      {facetLabel ? ` · ${facetLabel}` : ""}
+                    </Link>
+                    <Link
+                      to={buildMetadataSearchUrl({
+                        q: lastQuery,
+                        material: inferred.material,
+                        standard: inferred.standard,
+                        productType: inferred.productType,
+                        auctionEligible: inferred.auctionEligible,
+                        intent: "manual",
+                      })}
+                      className={`${CHIP_CLASS} text-foreground hover:bg-muted`}
+                      data-testid="chat-continue-metadata"
+                    >
+                      {t("chat.continue.metadata")}
+                    </Link>
+                  </>
+                );
+              })()}
+            </div>
+          ) : null}
         </CardContent>
       </Card>
     </div>

@@ -9,8 +9,8 @@ import { z } from "zod";
 export const chatQueryParamsSchema = z.object({
   q: z
     .string()
-    .min(1)
-    .transform((s) => s.trim()),
+    .transform((s) => s.trim())
+    .pipe(z.string().min(1)),
   sessionId: z.string().min(1).optional(),
 });
 

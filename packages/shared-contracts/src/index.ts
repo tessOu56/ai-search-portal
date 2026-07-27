@@ -106,6 +106,18 @@ export {
   metadataColumnsTablePropsSchema,
   metadataSummaryCardPropsSchema,
 } from "./genui.contract.js";
+export type {
+  IndustryStandardEntry,
+  KnowledgeIndustryStandardCode,
+} from "./industry-codes.js";
+export {
+  INDUSTRY_STANDARD_REGISTRY,
+  inferIndustryFacetsFromText,
+  knowledgeIndustryStandardCodeSchema,
+  listIndustryStandards,
+  normalizeIndustryStandard,
+  standardsMatch,
+} from "./industry-codes.js";
 export type { MockItemContract } from "./items.contract.js";
 export {
   createItemRequestSchema,
@@ -115,6 +127,35 @@ export {
   mockItemSchema,
   updateItemRequestSchema,
 } from "./items.contract.js";
+export type {
+  KnowledgeChunkContract,
+  KnowledgeChunkKind,
+  KnowledgeClassification,
+  KnowledgeGlossaryEntryContract,
+  KnowledgeIndustryFacets,
+  KnowledgeMaterial,
+  KnowledgeNarrativeEntryContract,
+  KnowledgeOpsEntryContract,
+  KnowledgeProductType,
+  KnowledgeSearchQuery,
+  KnowledgeSearchResponse,
+  KnowledgeTechnique,
+} from "./knowledge.contract.js";
+export {
+  knowledgeChunkKindSchema,
+  knowledgeChunkSchema,
+  knowledgeClassificationSchema,
+  knowledgeGlossaryEntrySchema,
+  knowledgeIndustryFacetsSchema,
+  knowledgeMaterialSchema,
+  knowledgeNarrativeEntrySchema,
+  knowledgeOpsEntrySchema,
+  knowledgeProductTypeSchema,
+  knowledgeSearchFacetsSchema,
+  knowledgeSearchQuerySchema,
+  knowledgeSearchResponseSchema,
+  knowledgeTechniqueSchema,
+} from "./knowledge.contract.js";
 export type { McpArgsParseResult, McpToolName } from "./mcp.contract.js";
 export {
   MCP_TOOL_ARG_SCHEMAS,
@@ -180,6 +221,7 @@ export {
   toolMetadataLookupInputSchema,
   toolMetadataLookupOutputSchema,
   toolMetadataSchema,
+  toolRagSearchHitSchema,
   toolRagSearchInputSchema,
   toolRagSearchOutputSchema,
   toolRiskLevelSchema,

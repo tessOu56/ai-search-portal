@@ -1,0 +1,90 @@
+[
+  {
+    "code": "925",
+    "aliases": ["Ag925", "sterling"],
+    "material": "sterling_silver",
+    "labelEn": "Sterling silver 925",
+    "labelZhTw": "925 銀",
+    "family": "purity"
+  },
+  {
+    "code": "999",
+    "aliases": ["Ag999", "fine"],
+    "material": "fine_silver",
+    "labelEn": "Fine silver 999",
+    "labelZhTw": "純銀 999",
+    "family": "purity"
+  },
+  {
+    "code": "958",
+    "aliases": ["Britannia", "Ag958"],
+    "material": "sterling_silver",
+    "labelEn": "Britannia silver 958",
+    "labelZhTw": "Britannia 958",
+    "family": "purity"
+  },
+  {
+    "code": "800",
+    "aliases": ["Ag800"],
+    "material": "sterling_silver",
+    "labelEn": "Coin silver 800",
+    "labelZhTw": "800 銀",
+    "family": "purity"
+  },
+  {
+    "code": "10K",
+    "aliases": ["Au417", "417"],
+    "material": "gold",
+    "labelEn": "10 karat gold",
+    "labelZhTw": "10K 金",
+    "family": "karat"
+  },
+  {
+    "code": "14K",
+    "aliases": ["Au585", "585"],
+    "material": "gold",
+    "labelEn": "14 karat gold",
+    "labelZhTw": "14K 金",
+    "family": "karat"
+  },
+  {
+    "code": "18K",
+    "aliases": ["Au750", "750"],
+    "material": "gold",
+    "labelEn": "18 karat gold",
+    "labelZhTw": "18K 金",
+    "family": "karat"
+  },
+  {
+    "code": "22K",
+    "aliases": ["Au916", "916"],
+    "material": "gold",
+    "labelEn": "22 karat gold",
+    "labelZhTw": "22K 金",
+    "family": "karat"
+  },
+  {
+    "code": "24K",
+    "aliases": ["Au999", "24k"],
+    "material": "gold",
+    "labelEn": "24 karat gold (fine)",
+    "labelZhTw": "24K 純金",
+    "family": "karat"
+  },
+  {
+    "code": "950",
+    "aliases": ["Pt950"],
+    "material": "other",
+    "labelEn": "Platinum 950",
+    "labelZhTw": "鉑金 950",
+    "family": "platinum"
+  },
+  {
+    "code": "900",
+    "aliases": ["Pt900"],
+    "material": "other",
+    "labelEn": "Platinum 900",
+    "labelZhTw": "鉑金 900",
+    "family": "platinum"
+  }
+]

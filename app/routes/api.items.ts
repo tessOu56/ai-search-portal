@@ -2,17 +2,14 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
 import { createMockItem, listMockItems } from "~/services/mock-items.server";
-
-type CreatePayload = {
-  name?: unknown;
-  description?: unknown;
-};
-
-const isNonEmptyString = (value: unknown): value is string =>
-  typeof value === "string" && value.trim().length > 0;
+import {
+  createItemRequestSchema,
+  getItemResponseSchema,
+  listItemsResponseSchema,
+} from "~/shared/contracts";
 
 export function loader(_args: LoaderFunctionArgs) {
-  return json({ data: listMockItems() });
+  return json(listItemsResponseSchema.parse({ data: listMockItems() }));
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -23,23 +20,22 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  let payload: CreatePayload;
+  let raw: unknown;
   try {
-    payload = (await request.json()) as CreatePayload;
+    raw = await request.json();
   } catch {
     return json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
-  if (!isNonEmptyString(payload.name)) {
+  const parsed = createItemRequestSchema.safeParse(raw);
+  if (!parsed.success) {
     return json({ error: "Name is required" }, { status: 400 });
   }
 
-  const description =
-    typeof payload.description === "string" ? payload.description : null;
   const item = createMockItem({
-    name: payload.name.trim(),
-    description,
+    name: parsed.data.name,
+    description: parsed.data.description ?? null,
   });
 
-  return json({ data: item }, { status: 201 });
+  return json(getItemResponseSchema.parse({ data: item }), { status: 201 });
 }

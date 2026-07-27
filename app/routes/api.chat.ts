@@ -8,6 +8,7 @@ import {
   pipeLocalAgentCoreToStableSse,
   resolveAgentRuntimeUrl,
 } from "~/services/chat-gateway.server";
+import { parsePackIdFromRequest } from "~/services/context-pack.server";
 
 export function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -22,6 +23,7 @@ export function loader({ request }: LoaderFunctionArgs) {
 
   const traceId = getTraceIdFromRequest(request);
   const agentBaseUrl = resolveAgentRuntimeUrl();
+  const packId = parsePackIdFromRequest(request);
 
   return eventStream(request.signal, (send, close) => {
     void (async () => {
@@ -45,6 +47,7 @@ export function loader({ request }: LoaderFunctionArgs) {
             query: parsed.data.q,
             sessionId: parsed.data.sessionId,
             traceId,
+            packId,
             send: stableSend,
           });
         }

@@ -15,6 +15,12 @@ import {
   DEFAULT_CONTEXT_PACK_ID,
   type DomainBindingContract,
   domainBindingsFileSchema,
+  type KnowledgeGlossaryEntryContract,
+  knowledgeGlossaryEntrySchema,
+  type KnowledgeNarrativeEntryContract,
+  knowledgeNarrativeEntrySchema,
+  type KnowledgeOpsEntryContract,
+  knowledgeOpsEntrySchema,
   type MetadataAssetDetailContract,
   metadataAssetDetailSchema,
 } from "@ai-search-portal/contracts";
@@ -38,7 +44,10 @@ type PackCache = {
   assets: Map<string, MetadataAssetDetailContract[]>;
   metrics: Map<string, ContextMetricContract[]>;
   glossary: Map<string, ContextGlossaryTermContract[]>;
+  knowledgeGlossary: Map<string, KnowledgeGlossaryEntryContract[]>;
   bindings: Map<string, DomainBindingContract[]>;
+  narrative: Map<string, KnowledgeNarrativeEntryContract[]>;
+  ops: Map<string, KnowledgeOpsEntryContract[]>;
   manifests: ContextPackManifestContract[] | null;
 };
 
@@ -47,7 +56,10 @@ function createPackCache(): PackCache {
     assets: new Map(),
     metrics: new Map(),
     glossary: new Map(),
+    knowledgeGlossary: new Map(),
     bindings: new Map(),
+    narrative: new Map(),
+    ops: new Map(),
     manifests: null,
   };
 }
@@ -154,6 +166,21 @@ export function loadPackGlossary(
   return terms;
 }
 
+/** Enriched glossary with industry facets (knowledge / RAG corpus). */
+export function loadPackKnowledgeGlossary(
+  packId: string,
+  contentRoot: string
+): KnowledgeGlossaryEntryContract[] {
+  const cached = cache.knowledgeGlossary.get(packId);
+  if (cached) return cached;
+  const filePath = path.join(packDir(contentRoot, packId), "glossary.json");
+  const terms = loadJsonArray(filePath, (item) =>
+    knowledgeGlossaryEntrySchema.parse(item)
+  );
+  cache.knowledgeGlossary.set(packId, terms);
+  return terms;
+}
+
 export function loadPackBindings(
   packId: string,
   contentRoot: string
@@ -168,6 +195,34 @@ export function loadPackBindings(
   const parsed = domainBindingsFileSchema.parse(readJsonFile(filePath));
   cache.bindings.set(packId, parsed.bindings);
   return parsed.bindings;
+}
+
+export function loadPackNarrative(
+  packId: string,
+  contentRoot: string
+): KnowledgeNarrativeEntryContract[] {
+  const cached = cache.narrative.get(packId);
+  if (cached) return cached;
+  const filePath = path.join(packDir(contentRoot, packId), "narrative.json");
+  const entries = loadJsonArray(filePath, (item) =>
+    knowledgeNarrativeEntrySchema.parse(item)
+  );
+  cache.narrative.set(packId, entries);
+  return entries;
+}
+
+export function loadPackOps(
+  packId: string,
+  contentRoot: string
+): KnowledgeOpsEntryContract[] {
+  const cached = cache.ops.get(packId);
+  if (cached) return cached;
+  const filePath = path.join(packDir(contentRoot, packId), "ops.json");
+  const entries = loadJsonArray(filePath, (item) =>
+    knowledgeOpsEntrySchema.parse(item)
+  );
+  cache.ops.set(packId, entries);
+  return entries;
 }
 
 export function getPackMetric(

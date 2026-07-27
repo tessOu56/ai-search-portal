@@ -9,34 +9,310 @@
       "tbl-product",
       "tbl-experience-session",
       "tbl-auction-bid"
-    ]
+    ],
+    "tags": ["chain", "commerce", "facet"],
+    "facets": {
+      "materials": ["mixed"],
+      "techniques": [],
+      "regions": ["TPE", "NTP"],
+      "classification": "commerce",
+      "locale": "en",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
   },
   {
     "id": "term-one-off",
     "term": "孤品 (One-off piece)",
-    "definition": "A unique, non-reproducible piece (stock = 1) sold via timed auction with reserve price and minimum increment.",
-    "relatedAssetIds": ["tbl-product", "tbl-auction-bid"]
+    "definition": "A unique, non-reproducible piece (stock = 1) sold via timed auction with reserve price and minimum increment. Industry catalogs often label these as unique / artist’s proof adjacent offerings.",
+    "relatedAssetIds": ["tbl-product", "tbl-auction-bid"],
+    "tags": ["孤品", "unique", "auction"],
+    "facets": {
+      "materials": ["mixed"],
+      "techniques": ["forging"],
+      "regions": [],
+      "classification": "auction",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
   },
   {
     "id": "term-reserve-price",
     "term": "底價 (Reserve price)",
-    "definition": "Minimum acceptable price for an auction lot; premium metrics are computed against reserve, not starting price.",
-    "relatedAssetIds": ["tbl-auction-bid", "metric-auction-premium"]
+    "definition": "Minimum acceptable price for an auction lot; premium metrics are computed against reserve, not starting price. Aligns with standard auction-house reserve practice.",
+    "relatedAssetIds": ["tbl-auction-bid", "metric-auction-premium"],
+    "tags": ["底價", "reserve", "auction"],
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "auction",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
   },
   {
     "id": "term-925-silver",
     "term": "925 銀 (Sterling silver)",
-    "definition": "92.5% silver alloy; the primary raw material for rings and bracelets. Cost is quoted per gram and linked to the silver spot price.",
+    "definition": "92.5% silver alloy (hallmark 925); the primary raw material for rings and bracelets. Cost is quoted per gram and linked to the silver spot price.",
     "relatedAssetIds": [
       "dim-material",
       "tbl-material-cost",
       "metric-silver-cost"
-    ]
+    ],
+    "tags": ["925", "sterling", "銀", "hallmark"],
+    "facets": {
+      "materials": ["sterling_silver"],
+      "techniques": [],
+      "regions": [],
+      "classification": "material",
+      "locale": "zh-TW",
+      "standards": ["925", "Ag925"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-fine-silver",
+    "term": "純銀 999 (Fine silver)",
+    "definition": "99.9% silver (hallmark 999). Softer than sterling; used for casting blanks and high-purity inlays. Not ideal for thin structural bands without alloying.",
+    "relatedAssetIds": ["dim-material"],
+    "tags": ["999", "fine-silver", "純銀"],
+    "facets": {
+      "materials": ["fine_silver"],
+      "techniques": ["casting"],
+      "regions": [],
+      "classification": "material",
+      "locale": "zh-TW",
+      "standards": ["999", "Ag999"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
   },
   {
     "id": "term-venue-rental",
     "term": "場地租借 (Venue rental)",
     "definition": "Bench-time rental of forging stations by half-day slot; a service product type alongside experience courses.",
-    "relatedAssetIds": ["tbl-rental-slot", "api-booking"]
+    "relatedAssetIds": ["tbl-rental-slot", "api-booking"],
+    "tags": ["venue", "rental", "場地"],
+    "facets": {
+      "materials": [],
+      "techniques": ["forging"],
+      "regions": ["NTP"],
+      "classification": "experience",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-forging",
+    "term": "鍛造 (Forging)",
+    "definition": "Hammering metal (銀／銅) to shape texture and form. Core technique in studio experiences and one-off sculptural work.",
+    "relatedAssetIds": ["tbl-experience-session", "tbl-product"],
+    "tags": ["鍛造", "forging", "hammer"],
+    "facets": {
+      "materials": ["sterling_silver", "copper"],
+      "techniques": ["forging"],
+      "regions": [],
+      "classification": "technique",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-annealing",
+    "term": "退火 (Annealing)",
+    "definition": "Heating metal to relieve work-hardening so further forging or forming is possible. Included in ring-forging intro sessions.",
+    "relatedAssetIds": ["tbl-experience-session", "prod-exp-1"],
+    "tags": ["退火", "annealing"],
+    "facets": {
+      "materials": ["sterling_silver", "copper"],
+      "techniques": ["annealing", "forging"],
+      "regions": [],
+      "classification": "technique",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-polishing",
+    "term": "拋光 (Polishing)",
+    "definition": "Surface finishing step after forging; brings shine and removes scale. Part of experience course deliverables.",
+    "relatedAssetIds": ["tbl-experience-session", "prod-exp-1"],
+    "tags": ["拋光", "polishing", "finishing"],
+    "facets": {
+      "materials": ["sterling_silver", "copper", "gold"],
+      "techniques": ["polishing"],
+      "regions": [],
+      "classification": "technique",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-lost-wax",
+    "term": "失蠟鑄造 (Lost-wax casting)",
+    "definition": "Investment casting process: wax model → mold → burn-out → molten metal pour. Common for complex forms and production jewelry blanks.",
+    "relatedAssetIds": ["tbl-product", "dim-material"],
+    "tags": ["失蠟", "lost-wax", "casting"],
+    "facets": {
+      "materials": ["sterling_silver", "gold", "bronze"],
+      "techniques": ["lost_wax", "casting"],
+      "regions": [],
+      "classification": "technique",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-patination",
+    "term": "化學發色 / 銅綠 (Patination)",
+    "definition": "Controlled surface oxidation or chemical color on copper/bronze to create patina. Used on sculptural cuffs and outdoor-inspired works.",
+    "relatedAssetIds": ["prod-phy-2"],
+    "tags": ["patina", "發色", "銅綠"],
+    "facets": {
+      "materials": ["copper", "bronze"],
+      "techniques": ["patination"],
+      "regions": ["NTP"],
+      "classification": "technique",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-hallmark",
+    "term": "印記 / 成色標 (Hallmark)",
+    "definition": "Assay / purity mark struck or lasered on precious metal (e.g. 925, 999, 18K). Required for trust in retail and auction listings.",
+    "relatedAssetIds": ["dim-material", "tbl-product"],
+    "tags": ["hallmark", "印記", "assay"],
+    "facets": {
+      "materials": ["sterling_silver", "fine_silver", "gold"],
+      "techniques": [],
+      "regions": [],
+      "classification": "provenance",
+      "locale": "zh-TW",
+      "standards": ["925", "999", "18K", "14K", "22K", "950"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-18k-gold",
+    "term": "18K 金 (Au750)",
+    "definition": "75% gold alloy (hallmark 18K / Au750). Common for fine jewelry bands and settings; harder than 24K, richer color than 14K.",
+    "relatedAssetIds": ["dim-material", "tbl-product"],
+    "tags": ["18K", "Au750", "gold", "金"],
+    "facets": {
+      "materials": ["gold"],
+      "techniques": ["soldering", "stone_setting"],
+      "regions": ["TPE"],
+      "classification": "material",
+      "locale": "zh-TW",
+      "standards": ["18K", "Au750"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-14k-gold",
+    "term": "14K 金 (Au585)",
+    "definition": "58.5% gold alloy (hallmark 14K / Au585). Durable everyday wear alloy used in commercial jewelry lines.",
+    "relatedAssetIds": ["dim-material"],
+    "tags": ["14K", "Au585", "gold"],
+    "facets": {
+      "materials": ["gold"],
+      "techniques": ["casting", "polishing"],
+      "regions": [],
+      "classification": "material",
+      "locale": "zh-TW",
+      "standards": ["14K", "Au585"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-britannia-silver",
+    "term": "Britannia 銀 958",
+    "definition": "95.8% silver (hallmark 958 / Britannia). Higher purity than sterling; historically British standard for wrought silver.",
+    "relatedAssetIds": ["dim-material"],
+    "tags": ["958", "Britannia", "銀"],
+    "facets": {
+      "materials": ["sterling_silver"],
+      "techniques": ["forging", "chasing"],
+      "regions": [],
+      "classification": "material",
+      "locale": "zh-TW",
+      "standards": ["958", "Ag958"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-platinum-950",
+    "term": "鉑金 950 (Pt950)",
+    "definition": "95% platinum alloy (hallmark 950 / Pt950). Dense, hypoallergenic; used for premium settings and wedding bands.",
+    "relatedAssetIds": ["dim-material", "designer-1"],
+    "tags": ["950", "Pt950", "鉑金", "platinum"],
+    "facets": {
+      "materials": ["other"],
+      "techniques": ["stone_setting", "polishing"],
+      "regions": ["TPE"],
+      "classification": "material",
+      "locale": "zh-TW",
+      "standards": ["950", "Pt950"],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-soldering",
+    "term": "焊接 (Soldering)",
+    "definition": "Joining metal parts with solder and torch heat. Used for ring sizing, findings, and fabricated structures.",
+    "relatedAssetIds": ["tbl-experience-session"],
+    "tags": ["焊接", "soldering"],
+    "facets": {
+      "materials": ["sterling_silver", "gold", "brass"],
+      "techniques": ["soldering"],
+      "regions": [],
+      "classification": "technique",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "term-stone-setting",
+    "term": "鑲嵌 (Stone setting)",
+    "definition": "Securing gemstones in bezels, prongs, or pavé. Complements forged bands and architectural jewelry lines.",
+    "relatedAssetIds": ["designer-1", "tbl-product"],
+    "tags": ["鑲嵌", "setting", "gem"],
+    "facets": {
+      "materials": ["sterling_silver", "gold"],
+      "techniques": ["stone_setting"],
+      "regions": ["TPE"],
+      "classification": "technique",
+      "locale": "zh-TW",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
   }
 ]

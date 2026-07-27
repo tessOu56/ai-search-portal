@@ -1,5 +1,8 @@
 {"id":"basic-query","query":"什麼是 API gateway？","expectedKeywords":["結論","依據","下一步"],"minEventCount":4}
 {"id":"short-query","query":"hello","expectedKeywords":["理解","問題"],"minEventCount":4}
-{"id":"rag-path","query":"搜尋文件 about authentication","expectedKeywords":["理解"],"minEventCount":5,"expectRag":true}
+{"id":"rag-path","query":"搜尋文件 about authentication","expectedKeywords":["知識","Authentication"],"minEventCount":5,"expectRag":true}
 {"id":"catalog-search","query":"catalog search filter_type API","expectedKeywords":["理解"],"minEventCount":4}
-{"id":"oauth-local-rag","query":"authentication OAuth portal","expectedKeywords":["理解"],"minEventCount":5,"expectRag":true}
+{"id":"oauth-local-rag","query":"authentication OAuth portal","expectedKeywords":["知識","OAuth"],"minEventCount":5,"expectRag":true}
+{"id":"metalcraft-glossary","query":"什麼是孤品","expectedKeywords":["孤品","知識"],"minEventCount":5,"expectRag":true}
+{"id":"metalcraft-product","query":"銀戒鍛造入門體驗","expectedKeywords":["銀戒","知識"],"minEventCount":5,"expectRag":true}
+{"id":"metalcraft-ops","query":"訂單 pending confirmed 狀態","expectedKeywords":["訂單","知識"],"minEventCount":5,"expectRag":true}
