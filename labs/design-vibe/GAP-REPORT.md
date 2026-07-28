@@ -5,8 +5,8 @@ Reference: `fixtures/api-explorer-flows.json` (Downloads API Explorer) → **ai-
 | Flow               | Reference screens                        | Portal target                                      | Figma node (MCP)                      | Priority | Gap / next action                                                |
 | ------------------ | ---------------------------------------- | -------------------------------------------------- | ------------------------------------- | -------- | ---------------------------------------------------------------- |
 | **catalog-search** | search home, filters, results, API row   | `app/features/catalogsearch`, `CatalogSearchPanel` | **waiver** until Figma MCP (STOP-003) | P0       | ✅ URL type filter + pagination on mock; Access filters deferred |
-| **api-detail**     | endpoint list, request builder, response | Catalog API detail, `ThreeColumnExplorerLayout`    | `TBD`                                 | P0       | Map request/response panels; see `docs/product/lui-search.md`    |
-| **my-apis**        | my assets grid, card → API               | My Work Center `/my-apis`                          | `TBD`                                 | P1       | Card pattern from `view-myassets`                                |
+| **api-detail**     | endpoint list, request builder, response | `/metadata/:assetId` data-contract + apply (G1)    | waiver (STOP-003)                     | P0       | ✅ owner／PII／terms＋apply；三欄 explorer 仍可後補              |
+| **my-apis**        | my assets grid, card → API               | `/my-apis` + `/access-requests/review`             | waiver (STOP-003)                     | P1       | ✅ G1 mock cards + session role；Figma card polish later         |
 | **requests**       | request list, status, replay             | _Not in v1_                                        | `n/a`                                 | P2       | Spec-only or defer                                               |
 
 ## Component mapping (initial)

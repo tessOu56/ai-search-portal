@@ -82,16 +82,35 @@ function AccessRequestPanel({
       </CardHeader>
       <CardContent className="space-y-4">
         {submitResult ? (
-          <p
-            className={
-              submitResult.ok
-                ? "text-sm text-green-700"
-                : "text-sm text-destructive"
-            }
-            role="status"
-          >
-            {submitResult.message}
-          </p>
+          <div className="space-y-2">
+            <p
+              className={
+                submitResult.ok
+                  ? "text-sm text-green-700"
+                  : "text-sm text-destructive"
+              }
+              role="status"
+            >
+              {submitResult.message}
+            </p>
+            {submitResult.ok ? (
+              <p className="text-sm">
+                <Link
+                  to="/my-apis?sessionRole=requester"
+                  className="text-primary hover:underline"
+                >
+                  Track in My APIs
+                </Link>
+                {" · "}
+                <Link
+                  to="/access-requests/review?sessionRole=owner"
+                  className="text-primary hover:underline"
+                >
+                  Owner review queue
+                </Link>
+              </p>
+            ) : null}
+          </div>
         ) : null}
 
         {!showConfirm ? (
@@ -281,6 +300,61 @@ export function MetadataAssetDetailView({
       </nav>
 
       <GenUiRenderer document={genUiDocument} />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Data contract</CardTitle>
+          <CardDescription>
+            Owner, classification, PII fields, and terms of use
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <p>
+            <span className="text-muted-foreground">Owner:</span> {asset.owner}
+          </p>
+          <p>
+            <span className="text-muted-foreground">Classification:</span>{" "}
+            <Badge
+              variant={asset.classification === "PII" ? "secondary" : "outline"}
+            >
+              {asset.classification}
+            </Badge>
+            {asset.dataContractId ? (
+              <span className="ml-2 text-muted-foreground">
+                contract: {asset.dataContractId}
+              </span>
+            ) : null}
+          </p>
+          {asset.columns && asset.columns.length > 0 ? (
+            <div>
+              <p className="mb-1 font-medium">Fields</p>
+              <ul className="space-y-1 text-muted-foreground">
+                {asset.columns.map((col) => (
+                  <li key={col.name} className="flex flex-wrap gap-2">
+                    <span className="text-foreground">{col.name}</span>
+                    <span>{col.dataType}</span>
+                    {col.sensitive ? (
+                      <Badge variant="secondary">PII / sensitive</Badge>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {asset.termsOfUse && asset.termsOfUse.length > 0 ? (
+            <div>
+              <p className="mb-1 font-medium">Terms of use</p>
+              <ul className="list-inside list-disc text-muted-foreground">
+                {asset.termsOfUse.map((term) => (
+                  <li key={term}>{term}</li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-muted-foreground">No terms attached.</p>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

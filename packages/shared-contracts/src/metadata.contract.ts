@@ -54,6 +54,9 @@ export const metadataAssetDetailSchema = metadataAssetSummarySchema.extend({
   datasetId: z.string().optional(),
   packId: z.string().optional(),
   metricIds: z.array(z.string()).optional(),
+  /** From specs/datacontracts when available (G1 api-detail). */
+  termsOfUse: z.array(z.string()).optional(),
+  dataContractId: z.string().optional(),
 });
 
 export type MetadataAssetDetailContract = z.infer<

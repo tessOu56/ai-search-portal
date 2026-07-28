@@ -1,19 +1,37 @@
 # Metadata access domain spec (POC)
+# G1 (T-2026-023): lifecycle SSOT for mock governance demo.
 
 roles:
   - analyst
   - data_admin
   - engineer
 
+# UI mock personas (not OPA roles). Switch via ?sessionRole= or cookie.
+session_roles:
+  - requester
+  - owner
+  - admin
+
 purposes:
   - analytics
   - marketing
   - operations
 
+# Lifecycle SSOT. Ticket wording aliases:
+#   submitted → pending_approval
+#   rejected  → denied
 access_request_states:
   - draft
   - pending_approval
   - approved
   - denied
+  - expired
+
+permission_status:
+  - none
+  - pending
+  - granted
+  - revoked
 
 default_role: analyst
+default_session_role: requester

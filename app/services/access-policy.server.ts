@@ -5,6 +5,7 @@ import {
   policyDecisionSchema,
 } from "@ai-search-portal/contracts";
 
+import { createAccessApplication } from "~/services/access-request-store.server";
 import { appendAuditEvent } from "~/services/audit-log.server";
 import { getMetadataAsset } from "~/services/metadata.server";
 
@@ -108,6 +109,7 @@ export function submitMetadataAccessRequest(args: {
   role?: EvaluateAccessInput["role"];
   approved?: boolean;
   packId?: string;
+  requesterId?: string;
 }) {
   const decision = evaluateMetadataAccess({
     assetId: args.assetId,
@@ -142,12 +144,30 @@ export function submitMetadataAccessRequest(args: {
         : ("denied" as const);
 
   const requestId = randomUUID();
+  const asset = getMetadataAsset(args.assetId, args.packId);
+  const role = args.role ?? "analyst";
+  const requesterId = args.requesterId ?? `requester:${role}`;
+
+  if (asset) {
+    createAccessApplication({
+      id: requestId,
+      assetId: args.assetId,
+      assetName: asset.name,
+      purpose: args.purpose,
+      role,
+      requesterId,
+      status,
+      owner: asset.owner,
+      decision,
+      termsAccepted: asset.termsOfUse,
+    });
+  }
 
   // auditLogged = 事件真實寫入與否（原為空頭布林，2026-07-09 起實作最小落盤）。
   const auditLogged = decision.require_audit
     ? appendAuditEvent({
         action: "access_request.submit",
-        actor: { role: args.role ?? "analyst" },
+        actor: { role },
         resource: { type: "metadata_asset", id: args.assetId },
         decisionId: decision.decision_id,
         requestId,

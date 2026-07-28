@@ -1,5 +1,6 @@
 /**
  * Metadata access request + OPA policy decision contracts.
+ * Domain SSOT: specs/domain/metadata-access.yaml (T-2026-023 G1).
  */
 
 import { z } from "zod";
@@ -15,6 +16,41 @@ export type AccessPurpose = z.infer<typeof accessPurposeSchema>;
 export const userRoleSchema = z.enum(["analyst", "data_admin", "engineer"]);
 
 export type UserRole = z.infer<typeof userRoleSchema>;
+
+/** UI mock persona — not an OPA role. */
+export const governanceSessionRoleSchema = z.enum([
+  "requester",
+  "owner",
+  "admin",
+]);
+
+export type GovernanceSessionRole = z.infer<typeof governanceSessionRoleSchema>;
+
+/**
+ * Lifecycle SSOT. Ticket aliases: submitted→pending_approval, rejected→denied.
+ */
+export const accessRequestLifecycleStatusSchema = z.enum([
+  "draft",
+  "pending_approval",
+  "approved",
+  "denied",
+  "expired",
+]);
+
+export type AccessRequestLifecycleStatus = z.infer<
+  typeof accessRequestLifecycleStatusSchema
+>;
+
+export const accessPermissionStatusSchema = z.enum([
+  "none",
+  "pending",
+  "granted",
+  "revoked",
+]);
+
+export type AccessPermissionStatus = z.infer<
+  typeof accessPermissionStatusSchema
+>;
 
 export const policyDecisionSchema = z.object({
   allow: z.boolean(),
@@ -38,6 +74,8 @@ export const metadataAccessRequestSchema = z.object({
   purpose: accessPurposeSchema,
   role: userRoleSchema.optional(),
   approved: z.boolean().optional(),
+  /** Optional requester label for my-apis tracking (mock). */
+  requesterId: z.string().min(1).optional(),
 });
 
 export const evaluateAccessResponseSchema = z.object({
@@ -51,4 +89,35 @@ export const submitAccessResponseSchema = z.object({
     decision: policyDecisionSchema,
     auditLogged: z.boolean(),
   }),
+});
+
+export const accessApplicationSchema = z.object({
+  id: z.string(),
+  assetId: z.string(),
+  assetName: z.string(),
+  purpose: accessPurposeSchema,
+  role: userRoleSchema,
+  requesterId: z.string(),
+  status: accessRequestLifecycleStatusSchema,
+  permissionStatus: accessPermissionStatusSchema,
+  owner: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  decision: policyDecisionSchema.optional(),
+  termsAccepted: z.array(z.string()).optional(),
+});
+
+export type AccessApplicationContract = z.infer<typeof accessApplicationSchema>;
+
+export const listAccessApplicationsResponseSchema = z.object({
+  data: z.array(accessApplicationSchema),
+});
+
+export const reviewAccessRequestSchema = z.object({
+  decision: z.enum(["approved", "denied"]),
+  reviewerId: z.string().min(1).optional(),
+});
+
+export const reviewAccessResponseSchema = z.object({
+  data: accessApplicationSchema,
 });

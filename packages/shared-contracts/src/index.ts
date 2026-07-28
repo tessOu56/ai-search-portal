@@ -5,16 +5,27 @@
  */
 
 export type {
+  AccessApplicationContract,
+  AccessPermissionStatus,
   AccessPurpose,
+  AccessRequestLifecycleStatus,
+  GovernanceSessionRole,
   PolicyDecisionContract,
   UserRole,
 } from "./access-request.contract.js";
 export {
+  accessApplicationSchema,
+  accessPermissionStatusSchema,
   accessPurposeSchema,
+  accessRequestLifecycleStatusSchema,
   evaluateAccessResponseSchema,
+  governanceSessionRoleSchema,
+  listAccessApplicationsResponseSchema,
   metadataAccessEvaluateRequestSchema,
   metadataAccessRequestSchema,
   policyDecisionSchema,
+  reviewAccessRequestSchema,
+  reviewAccessResponseSchema,
   submitAccessResponseSchema,
   userRoleSchema,
 } from "./access-request.contract.js";

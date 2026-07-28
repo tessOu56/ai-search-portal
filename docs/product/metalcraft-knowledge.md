@@ -127,6 +127,8 @@ Seed 讀取優先：`METALCRAFT_SEED_JSON` → `metalcraft-platform/.../seed-sna
 
 目標：把 **industry + commerce knowledge** 這輪變更推到 production，再談下一產品目標。T-2026-092 維持 draft，不上 sprint。
 
+**狀態（2026-07-28）**：✅ **production 驗收通過**（CLI deploy；`/api/knowledge/search?productType=experience&pack=metalcraft-studio` 有資料；catalog knowledge section 可見）。Actions 自動部署仍待 **T-2026-079**。
+
 ### 本機綠燈（已驗證 2026-07-27）
 
 ```bash

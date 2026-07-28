@@ -5,13 +5,20 @@
 import { http, HttpResponse } from "msw";
 
 import {
+  createAccessApplication,
+  listAccessApplications,
+  reviewAccessApplication,
+} from "~/services/access-request-store.server";
+import {
   evaluateAccessResponseSchema,
   getMetadataAssetResponseSchema,
+  listAccessApplicationsResponseSchema,
   listAuditEventsResponseSchema,
   listMetadataResponseSchema,
   mcpDiscoverSchema,
   mcpToolsCallResponseSchema,
   policyDecisionSchema,
+  reviewAccessResponseSchema,
   submitAccessResponseSchema,
 } from "~/shared/contracts";
 import {
@@ -22,6 +29,7 @@ import {
 
 const ERROR_INVALID_BODY = "Invalid request body";
 const ERROR_ASSET_NOT_FOUND = "Asset not found";
+const MOCK_REQUEST_ID = "mock-req-1";
 const PAGE_SIZE = 5;
 const MOCK_AUDIT_EVENTS = [
   {
@@ -31,7 +39,7 @@ const MOCK_AUDIT_EVENTS = [
     actor: { role: "analyst" as const },
     resource: { type: "metadata_asset", id: "tbl-customers" },
     decisionId: "dec-mock-1",
-    requestId: "mock-req-1",
+    requestId: MOCK_REQUEST_ID,
     outcome: "pending_approval" as const,
     requireAudit: true,
     reasons: ["sensitive classification requires approval"],
@@ -199,7 +207,24 @@ export const metadataHandlers = [
     return HttpResponse.json(body);
   }),
 
+  // Must precede `/api/metadata/:assetId` or `access-requests` is captured as an id.
+  http.get("/api/metadata/access-requests", ({ request }) => {
+    const url = new URL(request.url);
+    const requesterId = url.searchParams.get("requesterId") ?? undefined;
+    const pendingOnly = url.searchParams.get("pendingOnly") === "1";
+    const rows = listAccessApplications({ requesterId, pendingOnly });
+    return HttpResponse.json(
+      listAccessApplicationsResponseSchema.parse({ data: rows })
+    );
+  }),
+
   http.get("/api/metadata/:assetId", ({ params, request }) => {
+    if (params.assetId === "access-requests") {
+      return HttpResponse.json(
+        { error: ERROR_ASSET_NOT_FOUND },
+        { status: 404 }
+      );
+    }
     const packId = packFromRequest(request);
     const asset = assetsForPack(packId).find((a) => a.id === params.assetId);
     if (!asset) {
@@ -246,6 +271,7 @@ export const metadataHandlers = [
       purpose?: string;
       role?: string;
       approved?: boolean;
+      requesterId?: string;
     };
     if (!raw.assetId || !raw.purpose) {
       return HttpResponse.json({ error: ERROR_INVALID_BODY }, { status: 400 });
@@ -280,9 +306,32 @@ export const metadataHandlers = [
         : decision.allow
           ? "approved"
           : "denied";
+    const asset = assetsForPack(packId).find((a) => a.id === raw.assetId);
+    const role =
+      raw.role === "data_admin" || raw.role === "engineer"
+        ? raw.role
+        : "analyst";
+    const purpose =
+      raw.purpose === "marketing" || raw.purpose === "operations"
+        ? raw.purpose
+        : "analytics";
+    if (asset) {
+      createAccessApplication({
+        id: MOCK_REQUEST_ID,
+        assetId: raw.assetId,
+        assetName: asset.name,
+        purpose,
+        role,
+        requesterId: raw.requesterId ?? `requester:${role}`,
+        status,
+        owner: asset.owner,
+        decision,
+        termsAccepted: asset.termsOfUse,
+      });
+    }
     const body = submitAccessResponseSchema.parse({
       data: {
-        requestId: "mock-req-1",
+        requestId: MOCK_REQUEST_ID,
         status,
         decision,
         auditLogged: decision.require_audit,
@@ -290,6 +339,32 @@ export const metadataHandlers = [
     });
     return HttpResponse.json(body, { status: 202 });
   }),
+
+  http.post(
+    "/api/metadata/access-requests/:requestId/review",
+    async ({ params, request }) => {
+      const raw = (await request.json()) as { decision?: string };
+      if (raw.decision !== "approved" && raw.decision !== "denied") {
+        return HttpResponse.json(
+          { error: ERROR_INVALID_BODY },
+          { status: 400 }
+        );
+      }
+      const updated = reviewAccessApplication({
+        id: String(params.requestId),
+        decision: raw.decision,
+      });
+      if (!updated) {
+        return HttpResponse.json(
+          { error: "Access request not found" },
+          { status: 404 }
+        );
+      }
+      return HttpResponse.json(
+        reviewAccessResponseSchema.parse({ data: updated })
+      );
+    }
+  ),
 
   http.get("/api/audit", ({ request }) => {
     const url = new URL(request.url);

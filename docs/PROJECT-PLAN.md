@@ -23,15 +23,15 @@
 
 ## 2. 現況（對照階段）
 
-| 階段                | 狀態 | 備註                                        |
-| ------------------- | ---- | ------------------------------------------- |
-| Phase 0 基線        | 🔄   | Vercel、Langfuse UI 驗證、inbox tickets     |
-| Phase 1 契約／管線  | ✅   | agent-core、stable SSE                      |
-| Phase 2 觀測／評測  | 🔄   | eval CI ✅；Langfuse 手動 trace 待勾        |
-| Phase 3 RAG／Tool   | ⬜   | Retriever 抽象、local 強化                  |
-| Phase 4 UI 最小殼   | 🔄   | catalog-search ✅；api-detail、my-apis 待做 |
-| Phase 5 產品化運維  | ⬜   | routing、quota、DLQ 等文件／spike           |
-| Lab on-device-media | ⬜   | 平行軌；不阻塞 Phase 2–4                    |
+| 階段                | 狀態 | 備註                                                         |
+| ------------------- | ---- | ------------------------------------------------------------ |
+| Phase 0 基線        | 🔄   | Production URL 已 live（CLI）；Actions secrets T-079 待補    |
+| Phase 1 契約／管線  | ✅   | agent-core、stable SSE                                       |
+| Phase 2 觀測／評測  | 🔄   | eval CI ✅；Langfuse 手動 trace 待勾；T-069 ready            |
+| Phase 3 RAG／Tool   | ⬜   | Retriever 抽象、local 強化；knowledge pack 已可演示          |
+| Phase 4 UI 最小殼   | 🔄   | catalog-search ✅（含 commerce）；api-detail／my-apis＝T-023 |
+| Phase 5 產品化運維  | ⬜   | routing、quota、DLQ spike（文件為主）                        |
+| Lab on-device-media | ⬜   | 平行軌；不阻塞 Phase 2–4                                     |
 
 ---
 
@@ -154,7 +154,8 @@ flowchart TD
   LAB -.-> P5
 ```
 
-Phase 1 已完成；**當前焦點**：Phase 0 收尾 + Phase 2 閉環 + Phase 4 catalog-search／api-detail。
+Phase 1 已完成；**knowledge commerce ship gate ✅（2026-07-28）**。  
+**當前焦點**：Phase 4 **T-023 G1**（api-detail／my-apis／review）— 已開工；T-092 不插隊。Phase 2 閉環（Langfuse／T-069）次之。
 
 ---
 
@@ -162,19 +163,21 @@ Phase 1 已完成；**當前焦點**：Phase 0 收尾 + Phase 2 閉環 + Phase 4
 
 **Phase 0**
 
-- [ ] T-2026-001 Vercel + registry URL
+- [x] T-2026-001 Vercel + registry URL（CLI prod live；Actions 仍待 T-079）
 - [ ] Agent AC-1：依 [agent-collaboration.md](./agent-collaboration.md) 驗證 session + pr-gate 一輪
 
 **Phase 2**
 
 - [ ] Langfuse UI 一筆 trace
-- [ ] CI green（含 `test:labs`）
+- [ ] T-2026-069 eval 擋 PR（ready）
+- [x] CI green 路徑（含 labs；維持不回歸）
 
 **Phase 4**
 
 - [x] catalog-search `?type=` + pagination（mock）
-- [ ] T-2026-004 CatalogSearchPanel GAP
-- [ ] api-detail GAP 占位文件
+- [x] commerce facets／Domain knowledge（ship gate 2026-07-28）
+- [x] T-2026-004 CatalogSearchPanel GAP（inbox：done）
+- [ ] T-2026-023 api-detail／my-apis／apply／review（G1）
 
 **Backlog（非 sprint；T-2026-092 draft P2）**
 

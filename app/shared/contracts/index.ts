@@ -20,6 +20,10 @@ export type {
   KnowledgeChunkKind,
   KnowledgeSearchResponse,
 } from "@ai-search-portal/contracts";
+export type {
+  AccessApplicationContract,
+  GovernanceSessionRole,
+} from "@ai-search-portal/contracts";
 export {
   contextMetricSchema,
   contextPackManifestSchema,
@@ -30,6 +34,7 @@ export {
   getContextMetricResponseSchema,
   getMetadataAssetResponseSchema,
   lineageGraphPropsSchema,
+  listAccessApplicationsResponseSchema,
   listContextPacksResponseSchema,
   listMetadataResponseSchema,
   mcpDiscoverSchema,
@@ -43,7 +48,13 @@ export {
   metadataLineageResponseSchema,
   metadataSummaryCardPropsSchema,
   policyDecisionSchema,
+  reviewAccessRequestSchema,
+  reviewAccessResponseSchema,
   submitAccessResponseSchema,
+} from "@ai-search-portal/contracts";
+export {
+  accessApplicationSchema,
+  governanceSessionRoleSchema,
 } from "@ai-search-portal/contracts";
 export {
   chatQueryParamsSchema,

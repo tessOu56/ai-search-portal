@@ -72,7 +72,9 @@
     "downstreamIds": ["api-orders", "dash-orders"],
     "datasetId": "customer-profile",
     "packId": "enterprise-mau",
-    "metricIds": ["metric-monthly-active-users"]
+    "metricIds": ["metric-monthly-active-users"],
+    "dataContractId": "customer-profile",
+    "termsOfUse": ["analytics", "operations", "marketing_requires_approval"]
   },
   {
     "id": "tbl-orders",
