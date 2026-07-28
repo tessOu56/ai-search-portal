@@ -31,6 +31,7 @@ vi.mock("@remix-run/react", () => ({
     action?: string;
     className?: string;
   }) => <form {...props}>{children}</form>,
+  useNavigation: () => ({ state: "idle", location: undefined }),
 }));
 
 describe("metadata catalog", () => {

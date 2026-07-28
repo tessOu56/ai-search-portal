@@ -9,12 +9,13 @@ import { expect, test } from "@playwright/test";
  */
 
 const WAIT_DOM = "domcontentloaded";
+const PACK = "pack=metalcraft-studio";
 
 test.describe("catalog commerce facets", () => {
   test("productType=experience shows domain knowledge section", async ({
     page,
   }) => {
-    await page.goto("/catalog-search?productType=experience", {
+    await page.goto(`/catalog-search?productType=experience&${PACK}`, {
       waitUntil: WAIT_DOM,
     });
     await expect(page).toHaveURL(/productType=experience/);
@@ -27,7 +28,7 @@ test.describe("catalog commerce facets", () => {
   test("auctionEligible=true filters knowledge and preserves URL", async ({
     page,
   }) => {
-    await page.goto("/catalog-search?auctionEligible=true", {
+    await page.goto(`/catalog-search?auctionEligible=true&${PACK}`, {
       waitUntil: WAIT_DOM,
     });
     await expect(page).toHaveURL(/auctionEligible=true/);
@@ -40,7 +41,7 @@ test.describe("catalog commerce facets", () => {
   test("invalid productType is stripped with facetWarning", async ({
     page,
   }) => {
-    await page.goto("/catalog-search?productType=not-a-type", {
+    await page.goto(`/catalog-search?productType=not-a-type&${PACK}`, {
       waitUntil: WAIT_DOM,
     });
     await expect(page.getByRole("status")).toContainText(
