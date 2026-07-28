@@ -1,7 +1,3 @@
-export {
-  getCatalogSearchPlaceholder,
-  getCatalogSearchViewModel,
-} from "./catalog-search.server";
 export type {
   CatalogApiRow,
   CatalogResultSource,
