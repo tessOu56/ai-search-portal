@@ -38,18 +38,19 @@ const FILE_OPS_JSON = "ops.json";
 /**
  * Eager Vite glob so Vercel serverless NFT bundles pack JSON (fs reads alone
  * are invisible to the tracer and return empty corpora in production).
+ * Must be a static `import.meta.glob(...)` call — assigning `.glob` to a
+ * variable breaks Vite's transform and yields `viteGlob is not a function`.
  * Keys look like: ../../../content/context-packs/<packId>/<file>.json
  */
-// Vite injects `import.meta.glob`; Remix TS types mark it as an error sentinel.
-const viteGlob = (
+// Remix's ImportMeta types mark `glob` as an error sentinel; Vite rewrites it.
+const BUNDLED_PACK_JSON = (
   import.meta as ImportMeta & {
     glob: (
       pattern: string,
       options: { eager: boolean; import: string }
     ) => Record<string, unknown>;
   }
-).glob;
-const BUNDLED_PACK_JSON = viteGlob("../../../content/context-packs/**/*.json", {
+).glob("../../../content/context-packs/**/*.json", {
   eager: true,
   import: "default",
 });
