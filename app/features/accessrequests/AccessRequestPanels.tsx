@@ -1,4 +1,4 @@
-import { Form, Link } from "@remix-run/react";
+import { Form, Link, useNavigation } from "@remix-run/react";
 
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
@@ -44,9 +44,13 @@ export function SessionRoleSwitcher({
 export function MyApisPanel({
   applications,
   sessionRole,
+  loading = false,
+  actionMessage,
 }: {
   applications: AccessApplicationContract[];
   sessionRole: GovernanceSessionRole;
+  loading?: boolean;
+  actionMessage?: { ok: boolean; text: string };
 }) {
   return (
     <div className="space-y-6" data-surface="product">
@@ -62,6 +66,25 @@ export function MyApisPanel({
         <SessionRoleSwitcher sessionRole={sessionRole} />
       </div>
 
+      {loading ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          Loading…
+        </p>
+      ) : null}
+
+      {actionMessage ? (
+        <p
+          className={
+            actionMessage.ok
+              ? "text-sm text-green-700"
+              : "text-sm text-destructive"
+          }
+          role="status"
+        >
+          {actionMessage.text}
+        </p>
+      ) : null}
+
       {sessionRole !== "requester" ? (
         <p className="text-sm text-muted-foreground" role="status">
           Switch to requester to track applications.{" "}
@@ -72,6 +95,15 @@ export function MyApisPanel({
             Review queue
           </Link>
         </p>
+      ) : null}
+
+      {sessionRole === "requester" && applications.length > 0 ? (
+        <Form method="post">
+          <input type="hidden" name="intent" value="expire-stale" />
+          <Button type="submit" size="sm" variant="outline" disabled={loading}>
+            Expire stale (demo)
+          </Button>
+        </Form>
       ) : null}
 
       {applications.length === 0 ? (
@@ -105,7 +137,7 @@ export function MyApisPanel({
                     {app.purpose} · {app.role}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-wrap gap-2">
+                <CardContent className="flex flex-wrap items-center gap-2">
                   <Badge variant="outline">status: {app.status}</Badge>
                   <Badge
                     variant={
@@ -116,6 +148,15 @@ export function MyApisPanel({
                   >
                     permission: {app.permissionStatus}
                   </Badge>
+                  {app.status === "draft" ? (
+                    <Form method="post" className="inline">
+                      <input type="hidden" name="intent" value="submit-draft" />
+                      <input type="hidden" name="requestId" value={app.id} />
+                      <Button type="submit" size="sm" disabled={loading}>
+                        Submit for approval
+                      </Button>
+                    </Form>
+                  ) : null}
                 </CardContent>
               </Card>
             </li>
@@ -130,12 +171,16 @@ export function AccessRequestReviewPanel({
   pending,
   sessionRole,
   actionMessage,
+  loading = false,
 }: {
   pending: AccessApplicationContract[];
   sessionRole: GovernanceSessionRole;
   actionMessage?: { ok: boolean; text: string };
+  loading?: boolean;
 }) {
   const canReview = sessionRole === "owner" || sessionRole === "admin";
+  const navigation = useNavigation();
+  const busy = loading || navigation.state !== "idle";
 
   return (
     <div className="space-y-6" data-surface="product">
@@ -150,6 +195,12 @@ export function AccessRequestReviewPanel({
         </div>
         <SessionRoleSwitcher sessionRole={sessionRole} />
       </div>
+
+      {busy ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          Loading…
+        </p>
+      ) : null}
 
       {actionMessage ? (
         <p
@@ -200,14 +251,19 @@ export function AccessRequestReviewPanel({
                       <Form method="post" className="inline">
                         <input type="hidden" name="requestId" value={app.id} />
                         <input type="hidden" name="decision" value="approved" />
-                        <Button type="submit" size="sm">
+                        <Button type="submit" size="sm" disabled={busy}>
                           Approve
                         </Button>
                       </Form>
                       <Form method="post" className="inline">
                         <input type="hidden" name="requestId" value={app.id} />
                         <input type="hidden" name="decision" value="denied" />
-                        <Button type="submit" size="sm" variant="outline">
+                        <Button
+                          type="submit"
+                          size="sm"
+                          variant="outline"
+                          disabled={busy}
+                        >
                           Deny
                         </Button>
                       </Form>

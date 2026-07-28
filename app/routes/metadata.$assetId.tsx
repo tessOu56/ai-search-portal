@@ -163,6 +163,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   const purpose = form.get("purpose");
   const role = form.get("role");
   const approved = form.get("approved") === "true";
+  const asDraft = form.get("asDraft") === "true";
 
   if (
     purpose !== "analytics" &&
@@ -181,7 +182,8 @@ export async function action({ params, request }: ActionFunctionArgs) {
       role === "data_admin" || role === "engineer" || role === "analyst"
         ? role
         : "analyst",
-    approved,
+    approved: asDraft ? false : approved,
+    asDraft,
     packId,
   });
 

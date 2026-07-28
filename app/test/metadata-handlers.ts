@@ -272,6 +272,7 @@ export const metadataHandlers = [
       role?: string;
       approved?: boolean;
       requesterId?: string;
+      asDraft?: boolean;
     };
     if (!raw.assetId || !raw.purpose) {
       return HttpResponse.json({ error: ERROR_INVALID_BODY }, { status: 400 });
@@ -287,6 +288,40 @@ export const metadataHandlers = [
         { error: ERROR_ASSET_NOT_FOUND },
         { status: 404 }
       );
+    }
+    if (raw.asDraft) {
+      const asset = assetsForPack(packId).find((a) => a.id === raw.assetId);
+      const role =
+        raw.role === "data_admin" || raw.role === "engineer"
+          ? raw.role
+          : "analyst";
+      const purpose =
+        raw.purpose === "marketing" || raw.purpose === "operations"
+          ? raw.purpose
+          : "analytics";
+      if (asset) {
+        createAccessApplication({
+          id: MOCK_REQUEST_ID,
+          assetId: raw.assetId,
+          assetName: asset.name,
+          purpose,
+          role,
+          requesterId: raw.requesterId ?? `requester:${role}`,
+          status: "draft",
+          owner: asset.owner,
+          decision,
+          termsAccepted: asset.termsOfUse,
+        });
+      }
+      const draftBody = submitAccessResponseSchema.parse({
+        data: {
+          requestId: MOCK_REQUEST_ID,
+          status: "draft",
+          decision,
+          auditLogged: false,
+        },
+      });
+      return HttpResponse.json(draftBody, { status: 201 });
     }
     if (decision.need_approval && !raw.approved) {
       return HttpResponse.json(

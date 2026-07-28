@@ -107,6 +107,22 @@ describe("POST access policy", () => {
     expect(parsed.data.status).toBe("pending_approval");
   });
 
+  it("save as draft returns 201 and lists as draft", async () => {
+    const res = await fetch(API_METADATA_ACCESS_REQUESTS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        assetId: ASSET_CUSTOMERS,
+        purpose: "analytics",
+        role: "analyst",
+        asDraft: true,
+      }),
+    });
+    expect(res.status).toBe(201);
+    const parsed = submitAccessResponseSchema.parse(await res.json());
+    expect(parsed.data.status).toBe("draft");
+  });
+
   it("lists persisted applications and supports review", async () => {
     const listRes = await fetch(
       `${API_METADATA_ACCESS_REQUESTS}?pendingOnly=1`

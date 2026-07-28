@@ -4,10 +4,11 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useActionData, useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 
 import { AccessRequestReviewPanel } from "~/features/accessrequests";
 import {
+  expireStaleAccessApplications,
   listAccessApplications,
   reviewAccessApplication,
 } from "~/services/access-request-store.server";
@@ -31,6 +32,7 @@ function resolveSessionRole(raw: string | null): GovernanceSessionRole {
 }
 
 export function loader({ request }: LoaderFunctionArgs) {
+  expireStaleAccessApplications();
   const url = new URL(request.url);
   const sessionRole = resolveSessionRole(url.searchParams.get("sessionRole"));
   const pending = listAccessApplications({ pendingOnly: true });
@@ -68,12 +70,14 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function AccessRequestsReviewRoute() {
   const { sessionRole, pending } = useLoaderData<typeof loader>();
   const actionMessage = useActionData<typeof action>();
+  const navigation = useNavigation();
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
       <AccessRequestReviewPanel
         pending={pending}
         sessionRole={sessionRole}
         actionMessage={actionMessage}
+        loading={navigation.state !== "idle"}
       />
     </main>
   );

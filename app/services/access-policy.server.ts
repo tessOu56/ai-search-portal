@@ -110,6 +110,8 @@ export function submitMetadataAccessRequest(args: {
   approved?: boolean;
   packId?: string;
   requesterId?: string;
+  /** When true, persist as draft without submitting for approval. */
+  asDraft?: boolean;
 }) {
   const decision = evaluateMetadataAccess({
     assetId: args.assetId,
@@ -117,6 +119,43 @@ export function submitMetadataAccessRequest(args: {
     role: args.role,
     packId: args.packId,
   });
+
+  if (args.asDraft) {
+    const requestId = randomUUID();
+    const asset = getMetadataAsset(args.assetId, args.packId);
+    const role = args.role ?? "analyst";
+    const requesterId = args.requesterId ?? `requester:${role}`;
+    if (!asset) {
+      return {
+        ok: false as const,
+        status: 404,
+        error: "Asset not found",
+        decision,
+      };
+    }
+    createAccessApplication({
+      id: requestId,
+      assetId: args.assetId,
+      assetName: asset.name,
+      purpose: args.purpose,
+      role,
+      requesterId,
+      status: "draft",
+      owner: asset.owner,
+      decision,
+      termsAccepted: asset.termsOfUse,
+    });
+    return {
+      ok: true as const,
+      status: 201,
+      data: {
+        requestId,
+        status: "draft" as const,
+        decision,
+        auditLogged: false,
+      },
+    };
+  }
 
   if (decision.need_approval && !args.approved) {
     return {

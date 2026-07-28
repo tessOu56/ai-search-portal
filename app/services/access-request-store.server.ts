@@ -109,3 +109,44 @@ export function reviewAccessApplication(args: {
   applications.set(updated.id, updated);
   return updated;
 }
+
+/** Mark draft / pending_approval rows older than maxAgeMs as expired (G1 demo). */
+export function expireStaleAccessApplications(
+  maxAgeMs = 7 * 24 * 60 * 60 * 1000,
+  now = Date.now()
+): AccessApplicationContract[] {
+  const expired: AccessApplicationContract[] = [];
+  for (const current of applications.values()) {
+    if (current.status !== "draft" && current.status !== "pending_approval") {
+      continue;
+    }
+    const updatedAt = Date.parse(current.updatedAt);
+    if (Number.isNaN(updatedAt) || now - updatedAt < maxAgeMs) {
+      continue;
+    }
+    const next = accessApplicationSchema.parse({
+      ...current,
+      status: "expired" as const,
+      permissionStatus: permissionFor("expired"),
+      updatedAt: new Date(now).toISOString(),
+    });
+    applications.set(next.id, next);
+    expired.push(next);
+  }
+  return expired;
+}
+
+export function submitDraftAccessApplication(
+  id: string
+): AccessApplicationContract | null {
+  const current = applications.get(id);
+  if (!current || current.status !== "draft") return null;
+  const updated = accessApplicationSchema.parse({
+    ...current,
+    status: "pending_approval" as const,
+    permissionStatus: permissionFor("pending_approval"),
+    updatedAt: new Date().toISOString(),
+  });
+  applications.set(updated.id, updated);
+  return updated;
+}

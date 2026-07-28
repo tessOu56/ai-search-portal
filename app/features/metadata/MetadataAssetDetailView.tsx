@@ -139,13 +139,21 @@ function AccessRequestPanel({
                 ))}
               </ul>
             ) : null}
-            <Form method="post" className="flex gap-2">
+            <Form method="post" className="flex flex-wrap gap-2">
               <input type="hidden" name="intent" value="access-request" />
               <input type="hidden" name="purpose" value={purpose} />
               <input type="hidden" name="role" value={role} />
               <input type="hidden" name="approved" value="true" />
               <Button type="submit">Confirm</Button>
-              <Button asChild variant="outline">
+              <Button
+                type="submit"
+                name="asDraft"
+                value="true"
+                variant="outline"
+              >
+                Save draft
+              </Button>
+              <Button asChild variant="ghost">
                 <Link to={buildConfirmHref(purpose, role, false)}>Cancel</Link>
               </Button>
             </Form>

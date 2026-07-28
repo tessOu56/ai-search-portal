@@ -76,6 +76,8 @@ export const metadataAccessRequestSchema = z.object({
   approved: z.boolean().optional(),
   /** Optional requester label for my-apis tracking (mock). */
   requesterId: z.string().min(1).optional(),
+  /** Persist as draft without submitting for approval (G1 lifecycle). */
+  asDraft: z.boolean().optional(),
 });
 
 export const evaluateAccessResponseSchema = z.object({
@@ -85,7 +87,7 @@ export const evaluateAccessResponseSchema = z.object({
 export const submitAccessResponseSchema = z.object({
   data: z.object({
     requestId: z.string(),
-    status: z.enum(["approved", "pending_approval", "denied"]),
+    status: accessRequestLifecycleStatusSchema,
     decision: policyDecisionSchema,
     auditLogged: z.boolean(),
   }),

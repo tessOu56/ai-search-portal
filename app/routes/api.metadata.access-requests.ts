@@ -47,5 +47,5 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const body = submitAccessResponseSchema.parse({ data: result.data });
-  return json(body, { status: 202 });
+  return json(body, { status: result.status });
 }
