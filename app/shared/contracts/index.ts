@@ -85,6 +85,7 @@ export {
   agentToolNameSchema,
   auditEventSchema,
   listAuditEventsResponseSchema,
+  toolExecutionErrorSchema,
   toolMetadataSchema,
   toolRiskLevelSchema,
 } from "@ai-search-portal/contracts";

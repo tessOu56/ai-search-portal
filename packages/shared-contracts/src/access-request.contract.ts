@@ -115,10 +115,22 @@ export const listAccessApplicationsResponseSchema = z.object({
   data: z.array(accessApplicationSchema),
 });
 
-export const reviewAccessRequestSchema = z.object({
-  decision: z.enum(["approved", "denied"]),
-  reviewerId: z.string().min(1).optional(),
-});
+export const reviewAccessRequestSchema = z
+  .object({
+    decision: z.enum(["approved", "denied", "edited"]),
+    reviewerId: z.string().min(1).optional(),
+    purpose: accessPurposeSchema.optional(),
+    role: userRoleSchema.optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.decision === "edited" && !val.purpose && !val.role) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "edited requires purpose and/or role",
+        path: ["purpose"],
+      });
+    }
+  });
 
 export const reviewAccessResponseSchema = z.object({
   data: accessApplicationSchema,

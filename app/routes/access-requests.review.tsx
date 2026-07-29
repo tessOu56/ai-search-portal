@@ -8,10 +8,12 @@ import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 
 import { AccessRequestReviewPanel } from "~/features/accessrequests";
 import {
+  editAccessApplication,
   expireStaleAccessApplications,
   listAccessApplications,
   reviewAccessApplication,
 } from "~/services/access-request-store.server";
+import { appendAuditEvent } from "~/services/audit-log.server";
 import {
   type GovernanceSessionRole,
   governanceSessionRoleSchema,
@@ -42,8 +44,22 @@ export function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   const form = await request.formData();
   const requestId = String(form.get("requestId") ?? "");
+  const purposeRaw = form.get("purpose");
+  const roleRaw = form.get("role");
   const parsed = reviewAccessRequestSchema.safeParse({
     decision: form.get("decision"),
+    purpose:
+      purposeRaw === "analytics" ||
+      purposeRaw === "marketing" ||
+      purposeRaw === "operations"
+        ? purposeRaw
+        : undefined,
+    role:
+      roleRaw === "analyst" ||
+      roleRaw === "data_admin" ||
+      roleRaw === "engineer"
+        ? roleRaw
+        : undefined,
   });
   if (!requestId || !parsed.success) {
     return json(
@@ -51,19 +67,54 @@ export async function action({ request }: ActionFunctionArgs) {
       { status: 400 }
     );
   }
-  const updated = reviewAccessApplication({
-    id: requestId,
-    decision: parsed.data.decision,
-  });
+
+  const updated =
+    parsed.data.decision === "edited"
+      ? editAccessApplication({
+          id: requestId,
+          purpose: parsed.data.purpose,
+          role: parsed.data.role,
+        })
+      : reviewAccessApplication({
+          id: requestId,
+          decision: parsed.data.decision,
+        });
+
   if (!updated) {
     return json(
       { ok: false as const, text: "Access request not found" },
       { status: 404 }
     );
   }
+
+  const decisionId = updated.decision?.decision_id ?? `review:${requestId}`;
+  appendAuditEvent({
+    action:
+      parsed.data.decision === "edited"
+        ? "access_request.edit"
+        : parsed.data.decision === "approved"
+          ? "access_request.approve"
+          : "access_request.deny",
+    actor: { role: updated.role },
+    resource: { type: "metadata_asset", id: updated.assetId },
+    decisionId,
+    requestId: updated.id,
+    outcome:
+      parsed.data.decision === "edited"
+        ? "edited"
+        : parsed.data.decision === "approved"
+          ? "approved"
+          : "denied",
+    requireAudit: true,
+    reasons: [`review:${parsed.data.decision}`],
+  });
+
   return json({
     ok: true as const,
-    text: `${updated.assetName} → ${updated.status}`,
+    text:
+      parsed.data.decision === "edited"
+        ? `${updated.assetName} edited (still pending)`
+        : `${updated.assetName} → ${updated.status}`,
   });
 }
 

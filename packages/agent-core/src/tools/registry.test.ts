@@ -62,10 +62,10 @@ describe("TOOL_REGISTRY (agentic 階段二)", () => {
   });
 });
 
-describe("GOVERNED_TOOL_REGISTRY (階段二收尾：write 類契約先行)", () => {
-  it("registers governed tools with full contracts but keeps them out of the allowlist", () => {
+describe("GOVERNED_TOOL_REGISTRY (T-068：HITL 解鎖後進 allowlist)", () => {
+  it("registers governed tools with full contracts and includes them in the allowlist", () => {
     for (const name of Object.keys(GOVERNED_TOOL_REGISTRY)) {
-      expect(isAllowedTool(name)).toBe(false);
+      expect(isAllowedTool(name)).toBe(true);
       expect(isGovernedTool(name)).toBe(true);
       const contract =
         GOVERNED_TOOL_REGISTRY[name as keyof typeof GOVERNED_TOOL_REGISTRY];

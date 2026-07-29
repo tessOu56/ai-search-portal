@@ -1,10 +1,16 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
-import { reviewAccessApplication } from "~/services/access-request-store.server";
+import {
+  editAccessApplication,
+  getAccessApplication,
+  reviewAccessApplication,
+} from "~/services/access-request-store.server";
+import { appendAuditEvent } from "~/services/audit-log.server";
 import {
   reviewAccessRequestSchema,
   reviewAccessResponseSchema,
+  toolExecutionErrorSchema,
 } from "~/shared/contracts";
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -29,14 +35,61 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const updated = reviewAccessApplication({
-    id: requestId,
-    decision: parsed.data.decision,
-  });
+  const current = getAccessApplication(requestId);
+  if (!current) {
+    return json({ error: "Access request not found" }, { status: 404 });
+  }
+
+  const updated =
+    parsed.data.decision === "edited"
+      ? editAccessApplication({
+          id: requestId,
+          purpose: parsed.data.purpose,
+          role: parsed.data.role,
+        })
+      : reviewAccessApplication({
+          id: requestId,
+          decision: parsed.data.decision,
+        });
+
   if (!updated) {
     return json({ error: "Access request not found" }, { status: 404 });
   }
 
+  const decisionId = updated.decision?.decision_id ?? `review:${requestId}`;
+  const outcome =
+    parsed.data.decision === "edited"
+      ? ("edited" as const)
+      : parsed.data.decision === "approved"
+        ? ("approved" as const)
+        : ("denied" as const);
+
+  appendAuditEvent({
+    action:
+      parsed.data.decision === "edited"
+        ? "access_request.edit"
+        : parsed.data.decision === "approved"
+          ? "access_request.approve"
+          : "access_request.deny",
+    actor: { role: updated.role },
+    resource: { type: "metadata_asset", id: updated.assetId },
+    decisionId,
+    requestId: updated.id,
+    outcome,
+    requireAudit: true,
+    reasons: [`review:${parsed.data.decision}`],
+  });
+
   const body = reviewAccessResponseSchema.parse({ data: updated });
   return json(body);
+}
+
+/** Stable HITL error shape helper for callers. */
+export function hitlRequiredBody(tool = "access_request.submit") {
+  return toolExecutionErrorSchema.parse({
+    code: "HITL_REQUIRED",
+    message: "Human confirmation required before executing this tool",
+    tool,
+    riskLevel: "high",
+  });
 }

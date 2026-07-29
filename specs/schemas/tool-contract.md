@@ -23,14 +23,14 @@
 2. registry（`packages/agent-core/src/tools/registry.ts`）鍵集 = `agentToolNameSchema` 選項 = `DEFAULT_ALLOWED_TOOLS`，由 `registry.test.ts` 交叉驗證。
 3. 對外行為與 allowlist 時代一致；本規格為階段二地基，不改執行路徑。
 
-## 階段二收尾（2026-07-13）
+## 階段三 HITL（T-2026-068 · 2026-07-29）
 
-- **MCP arguments 契約化**：`mcp.contract.ts` 提供 per-tool args schema + `parseMcpToolArguments()`；gateway 不再使用 `as` 斷言。envelope（`{name, arguments}`）不變，對外非破壞；非法型別由放行改為拒絕（刻意收緊）。
-- **discover 風險註記**：`MCP_TOOL_METADATA` 為單一 SoT，discover tools 附 `riskLevel`/`requiresHitl`（optional 欄位，向後相容）。
-- **Governed tools**：`access_request.draft`（medium）/ `access_request.submit`（high，HITL+audit）契約與 metadata 已註冊於 `GOVERNED_TOOL_REGISTRY`，**不在 DEFAULT_ALLOWED_TOOLS**——進 allowlist 的前置條件 = 階段三 HITL 伺服器端強制落地。I/O 直接複用 access-request 契約（零漂移）。
+- **伺服器端強制**：`packages/agent-core/src/tools/dispatch.ts` — `requiresHitl && !hitlConfirmed` ⇒ `HITL_REQUIRED`（無副作用）。
+- **風險框架**：low 直跑 / medium draft / high 必停；單元測試見 `dispatch.test.ts`。
+- **Allowlist 解鎖**：`access_request.draft` / `access_request.submit` 已進 `DEFAULT_ALLOWED_TOOLS`（前置條件＝上述 HITL gate）。
+- **審核中心**：approve / edit / reject + audit（`decision_id` 貫穿）。
 
-## 後續（規劃，未實作）
+## 後續（規劃）
 
-- 階段三：`access_request.draft`（medium）、`access_request.submit`（high，HITL 必停）包成 tool。
-- 階段四：MCP discover 回傳 `listToolMetadata()`（serializable）+ per-tool schema，取代 `z.record` 寬鬆 arguments。
-- 相關：audit 事件契約 `audit.contract.ts`（`auditLogged` 已於 2026-07-09 實體化為真實寫入結果，見 `app/services/audit-log.server.ts`）。
+- 階段四：MCP discover 回傳 `listToolMetadata()`（serializable）+ per-tool schema；governed write **仍不**進 MCP gateway。
+- 相關：audit 事件契約 `audit.contract.ts`（見 `app/services/audit-log.server.ts`）。

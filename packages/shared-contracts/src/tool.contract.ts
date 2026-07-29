@@ -7,6 +7,7 @@
 import { z } from "zod";
 
 import {
+  accessRequestLifecycleStatusSchema,
   metadataAccessEvaluateRequestSchema,
   metadataAccessRequestSchema,
   policyDecisionSchema,
@@ -49,13 +50,34 @@ export const toolMetadataSchema = z
 
 export type ToolMetadataContract = z.infer<typeof toolMetadataSchema>;
 
-/** 現役 agent tools（與 agent-core DEFAULT_ALLOWED_TOOLS 對齊；registry.test 交叉驗證）。 */
+/** Read-only agent tools（不含 governed write）. */
+const TOOL_ITEMS = "items.lookup";
+const TOOL_METADATA = "metadata.lookup";
+const TOOL_METRIC = "context.resolve_metric";
+const TOOL_BINDINGS = "context.bindings";
+const TOOL_RAG = "rag.search";
+const TOOL_DRAFT = "access_request.draft";
+const TOOL_SUBMIT = "access_request.submit";
+
+export const agentReadToolNameSchema = z.enum([
+  TOOL_ITEMS,
+  TOOL_METADATA,
+  TOOL_METRIC,
+  TOOL_BINDINGS,
+  TOOL_RAG,
+]);
+
+export type AgentReadToolName = z.infer<typeof agentReadToolNameSchema>;
+
+/** 現役 agent tools（與 agent-core DEFAULT_ALLOWED_TOOLS 對齊；含 T-068 governed）。 */
 export const agentToolNameSchema = z.enum([
-  "items.lookup",
-  "metadata.lookup",
-  "context.resolve_metric",
-  "context.bindings",
-  "rag.search",
+  TOOL_ITEMS,
+  TOOL_METADATA,
+  TOOL_METRIC,
+  TOOL_BINDINGS,
+  TOOL_RAG,
+  TOOL_DRAFT,
+  TOOL_SUBMIT,
 ]);
 
 export type AgentToolName = z.infer<typeof agentToolNameSchema>;
@@ -148,57 +170,55 @@ export const toolRagSearchOutputSchema = z.object({
 
 const DEFAULT_TOOL_TIMEOUT_MS = 3000; // 對齊 execute.ts 各 *_TIMEOUT_MS 預設
 
-export const AGENT_TOOL_METADATA: Record<AgentToolName, ToolMetadataContract> =
-  {
-    "items.lookup": toolMetadataSchema.parse({
-      name: "items.lookup",
-      description: "Keyword lookup over Items API (read-only).",
-      riskLevel: "low",
-      requiresHitl: false,
-      forceAudit: false,
-      timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
-    }),
-    "metadata.lookup": toolMetadataSchema.parse({
-      name: "metadata.lookup",
-      description: "Keyword lookup over Metadata API (read-only).",
-      riskLevel: "low",
-      requiresHitl: false,
-      forceAudit: false,
-      timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
-    }),
-    "context.resolve_metric": toolMetadataSchema.parse({
-      name: "context.resolve_metric",
-      description: "Resolve metric definition from active context pack.",
-      riskLevel: "low",
-      requiresHitl: false,
-      forceAudit: false,
-      timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
-    }),
-    "context.bindings": toolMetadataSchema.parse({
-      name: "context.bindings",
-      description: "Resolve domain bindings for a context ref.",
-      riskLevel: "low",
-      requiresHitl: false,
-      forceAudit: false,
-      timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
-    }),
-    "rag.search": toolMetadataSchema.parse({
-      name: "rag.search",
-      description: "Local RAG search over portal knowledge (read-only).",
-      riskLevel: "low",
-      requiresHitl: false,
-      forceAudit: false,
-      timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
-    }),
-  };
+export const AGENT_TOOL_METADATA: Record<
+  AgentReadToolName,
+  ToolMetadataContract
+> = {
+  [TOOL_ITEMS]: toolMetadataSchema.parse({
+    name: TOOL_ITEMS,
+    description: "Keyword lookup over Items API (read-only).",
+    riskLevel: "low",
+    requiresHitl: false,
+    forceAudit: false,
+    timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
+  }),
+  [TOOL_METADATA]: toolMetadataSchema.parse({
+    name: TOOL_METADATA,
+    description: "Keyword lookup over Metadata API (read-only).",
+    riskLevel: "low",
+    requiresHitl: false,
+    forceAudit: false,
+    timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
+  }),
+  [TOOL_METRIC]: toolMetadataSchema.parse({
+    name: TOOL_METRIC,
+    description: "Resolve metric definition from active context pack.",
+    riskLevel: "low",
+    requiresHitl: false,
+    forceAudit: false,
+    timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
+  }),
+  [TOOL_BINDINGS]: toolMetadataSchema.parse({
+    name: TOOL_BINDINGS,
+    description: "Resolve domain bindings for a context ref.",
+    riskLevel: "low",
+    requiresHitl: false,
+    forceAudit: false,
+    timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
+  }),
+  [TOOL_RAG]: toolMetadataSchema.parse({
+    name: TOOL_RAG,
+    description: "Local RAG search over portal knowledge (read-only).",
+    riskLevel: "low",
+    requiresHitl: false,
+    forceAudit: false,
+    timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
+  }),
+};
 
-// ---- Governed tools（write 類；階段二契約先行，**不進 DEFAULT_ALLOWED_TOOLS**）----
-// 進 allowlist 的前置條件 = 階段三「HITL 伺服器端強制」落地；在那之前只有契約與 metadata。
+// ---- Governed tools（write 類；T-068 HITL 伺服器端強制後可進 allowlist）----
 
-export const agentGovernedToolNameSchema = z.enum([
-  "access_request.draft",
-  "access_request.submit",
-]);
+export const agentGovernedToolNameSchema = z.enum([TOOL_DRAFT, TOOL_SUBMIT]);
 
 export type AgentGovernedToolName = z.infer<typeof agentGovernedToolNameSchema>;
 
@@ -216,7 +236,7 @@ export const toolAccessRequestSubmitInputSchema = metadataAccessRequestSchema;
 
 export const toolAccessRequestSubmitOutputSchema = z.object({
   requestId: z.string(),
-  status: z.enum(["approved", "pending_approval", "denied"]),
+  status: accessRequestLifecycleStatusSchema,
   decision: policyDecisionSchema,
   auditLogged: z.boolean(),
 });
@@ -225,8 +245,8 @@ export const AGENT_GOVERNED_TOOL_METADATA: Record<
   AgentGovernedToolName,
   ToolMetadataContract
 > = {
-  "access_request.draft": toolMetadataSchema.parse({
-    name: "access_request.draft",
+  [TOOL_DRAFT]: toolMetadataSchema.parse({
+    name: TOOL_DRAFT,
     description:
       "Evaluate policy and prepare an access request draft (no side effects).",
     riskLevel: "medium",
@@ -234,8 +254,8 @@ export const AGENT_GOVERNED_TOOL_METADATA: Record<
     forceAudit: false,
     timeoutMs: DEFAULT_TOOL_TIMEOUT_MS,
   }),
-  "access_request.submit": toolMetadataSchema.parse({
-    name: "access_request.submit",
+  [TOOL_SUBMIT]: toolMetadataSchema.parse({
+    name: TOOL_SUBMIT,
     description:
       "Submit a metadata access request (side effects; audit required).",
     riskLevel: "high",

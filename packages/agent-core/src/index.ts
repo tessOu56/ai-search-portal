@@ -16,6 +16,11 @@ export { runLocalRag, runRagPipelineEvents } from "./rag/pipeline.js";
 export type { SseEventPart } from "./stream.js";
 export { streamChatInternalEvents } from "./stream.js";
 export {
+  executeRegisteredTool,
+  listDispatchableTools,
+  type ToolExecutor,
+} from "./tools/dispatch.js";
+export {
   executeItemsLookup,
   executeMetadataLookup,
   isItemsLookupEnabled,

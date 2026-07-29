@@ -264,7 +264,42 @@ export function AccessRequestReviewPanel({
                           variant="outline"
                           disabled={busy}
                         >
-                          Deny
+                          Reject
+                        </Button>
+                      </Form>
+                      <Form
+                        method="post"
+                        className="flex flex-wrap items-center gap-2"
+                      >
+                        <input type="hidden" name="requestId" value={app.id} />
+                        <input type="hidden" name="decision" value="edited" />
+                        <select
+                          name="purpose"
+                          defaultValue={app.purpose}
+                          className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+                          aria-label="Edit purpose"
+                        >
+                          <option value="analytics">analytics</option>
+                          <option value="marketing">marketing</option>
+                          <option value="operations">operations</option>
+                        </select>
+                        <select
+                          name="role"
+                          defaultValue={app.role}
+                          className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+                          aria-label="Edit role"
+                        >
+                          <option value="analyst">analyst</option>
+                          <option value="engineer">engineer</option>
+                          <option value="data_admin">data_admin</option>
+                        </select>
+                        <Button
+                          type="submit"
+                          size="sm"
+                          variant="secondary"
+                          disabled={busy}
+                        >
+                          Edit
                         </Button>
                       </Form>
                     </>

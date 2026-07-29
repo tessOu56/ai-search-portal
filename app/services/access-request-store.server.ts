@@ -150,3 +150,20 @@ export function submitDraftAccessApplication(
   applications.set(updated.id, updated);
   return updated;
 }
+
+export function editAccessApplication(args: {
+  id: string;
+  purpose?: AccessApplicationContract["purpose"];
+  role?: AccessApplicationContract["role"];
+}): AccessApplicationContract | null {
+  const current = applications.get(args.id);
+  if (!current || current.status !== "pending_approval") return null;
+  const updated = accessApplicationSchema.parse({
+    ...current,
+    purpose: args.purpose ?? current.purpose,
+    role: args.role ?? current.role,
+    updatedAt: new Date().toISOString(),
+  });
+  applications.set(updated.id, updated);
+  return updated;
+}

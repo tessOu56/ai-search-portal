@@ -40,8 +40,21 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const result = submitMetadataAccessRequest(parsed.data);
   if (!result.ok) {
+    const hitl =
+      result.error === "Human approval required"
+        ? {
+            code: "HITL_REQUIRED" as const,
+            message: result.error,
+            tool: "access_request.submit",
+            riskLevel: "high" as const,
+          }
+        : undefined;
     return json(
-      { error: result.error, decision: result.decision },
+      {
+        error: result.error,
+        decision: result.decision,
+        ...(hitl ? { code: hitl.code, toolError: hitl } : {}),
+      },
       { status: result.status }
     );
   }

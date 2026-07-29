@@ -6,6 +6,7 @@ import { http, HttpResponse } from "msw";
 
 import {
   createAccessApplication,
+  editAccessApplication,
   listAccessApplications,
   reviewAccessApplication,
 } from "~/services/access-request-store.server";
@@ -378,17 +379,43 @@ export const metadataHandlers = [
   http.post(
     "/api/metadata/access-requests/:requestId/review",
     async ({ params, request }) => {
-      const raw = (await request.json()) as { decision?: string };
-      if (raw.decision !== "approved" && raw.decision !== "denied") {
+      const raw = (await request.json()) as {
+        decision?: string;
+        purpose?: string;
+        role?: string;
+      };
+      if (
+        raw.decision !== "approved" &&
+        raw.decision !== "denied" &&
+        raw.decision !== "edited"
+      ) {
         return HttpResponse.json(
           { error: ERROR_INVALID_BODY },
           { status: 400 }
         );
       }
-      const updated = reviewAccessApplication({
-        id: String(params.requestId),
-        decision: raw.decision,
-      });
+      const id = String(params.requestId);
+      const updated =
+        raw.decision === "edited"
+          ? editAccessApplication({
+              id,
+              purpose:
+                raw.purpose === "analytics" ||
+                raw.purpose === "marketing" ||
+                raw.purpose === "operations"
+                  ? raw.purpose
+                  : undefined,
+              role:
+                raw.role === "analyst" ||
+                raw.role === "engineer" ||
+                raw.role === "data_admin"
+                  ? raw.role
+                  : undefined,
+            })
+          : reviewAccessApplication({
+              id,
+              decision: raw.decision,
+            });
       if (!updated) {
         return HttpResponse.json(
           { error: "Access request not found" },

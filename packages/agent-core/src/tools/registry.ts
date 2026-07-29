@@ -1,8 +1,6 @@
 /**
- * Tool registry（agentic 階段二）：allowlist 升級為契約驅動 registry。
- * 每個 tool 綁 metadata（風險層級/HITL/audit/timeout）+ I/O schema，
- * 無 schema 無法註冊（defineToolContract 型別層強制）。
- * 對外行為不變：DEFAULT_ALLOWED_TOOLS / isAllowedTool 語意同前。
+ * Tool registry（agentic 階段二＋T-068）：allowlist 含 governed write tools，
+ * 執行時由 dispatch.ts 強制 HITL。
  */
 
 import {
@@ -28,15 +26,34 @@ import {
   toolRagSearchOutputSchema,
 } from "@ai-search-portal/contracts";
 
+const TOOL_DRAFT = "access_request.draft";
+const TOOL_SUBMIT = "access_request.submit";
+
 export const DEFAULT_ALLOWED_TOOLS = [
   "items.lookup",
   "metadata.lookup",
   "context.resolve_metric",
   "context.bindings",
   "rag.search",
+  TOOL_DRAFT,
+  TOOL_SUBMIT,
 ] as const;
 
 export type AllowedToolName = (typeof DEFAULT_ALLOWED_TOOLS)[number];
+
+export const GOVERNED_TOOL_REGISTRY: Record<
+  AgentGovernedToolName,
+  ToolContractDefinition
+> = {
+  [TOOL_DRAFT]: defineToolContract(AGENT_GOVERNED_TOOL_METADATA[TOOL_DRAFT], {
+    input: toolAccessRequestDraftInputSchema,
+    output: toolAccessRequestDraftOutputSchema,
+  }),
+  [TOOL_SUBMIT]: defineToolContract(AGENT_GOVERNED_TOOL_METADATA[TOOL_SUBMIT], {
+    input: toolAccessRequestSubmitInputSchema,
+    output: toolAccessRequestSubmitOutputSchema,
+  }),
+};
 
 export const TOOL_REGISTRY: Record<AllowedToolName, ToolContractDefinition> = {
   "items.lookup": defineToolContract(AGENT_TOOL_METADATA["items.lookup"], {
@@ -68,6 +85,8 @@ export const TOOL_REGISTRY: Record<AllowedToolName, ToolContractDefinition> = {
     input: toolRagSearchInputSchema,
     output: toolRagSearchOutputSchema,
   }),
+  [TOOL_DRAFT]: GOVERNED_TOOL_REGISTRY[TOOL_DRAFT],
+  [TOOL_SUBMIT]: GOVERNED_TOOL_REGISTRY[TOOL_SUBMIT],
 };
 
 export function isAllowedTool(name: string): name is AllowedToolName {
@@ -75,7 +94,6 @@ export function isAllowedTool(name: string): name is AllowedToolName {
 }
 
 export function getToolContract(name: AllowedToolName): ToolContractDefinition {
-  // name is a closed AllowedToolName union, not arbitrary user input.
   // eslint-disable-next-line security/detect-object-injection -- typed registry key
   return TOOL_REGISTRY[name];
 }
@@ -87,30 +105,6 @@ export function listToolMetadata(): ToolMetadataContract[] {
     return TOOL_REGISTRY[name].metadata;
   });
 }
-
-/**
- * Governed tools（write 類）：契約已註冊、**不在 DEFAULT_ALLOWED_TOOLS**。
- * 進 allowlist 前置條件 = 階段三 HITL 伺服器端強制落地（見 specs/schemas/tool-contract.md）。
- */
-export const GOVERNED_TOOL_REGISTRY: Record<
-  AgentGovernedToolName,
-  ToolContractDefinition
-> = {
-  "access_request.draft": defineToolContract(
-    AGENT_GOVERNED_TOOL_METADATA["access_request.draft"],
-    {
-      input: toolAccessRequestDraftInputSchema,
-      output: toolAccessRequestDraftOutputSchema,
-    }
-  ),
-  "access_request.submit": defineToolContract(
-    AGENT_GOVERNED_TOOL_METADATA["access_request.submit"],
-    {
-      input: toolAccessRequestSubmitInputSchema,
-      output: toolAccessRequestSubmitOutputSchema,
-    }
-  ),
-};
 
 export function isGovernedTool(name: string): name is AgentGovernedToolName {
   return name in GOVERNED_TOOL_REGISTRY;

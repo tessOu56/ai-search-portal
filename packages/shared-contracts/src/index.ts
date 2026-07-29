@@ -237,3 +237,15 @@ export {
   toolRagSearchOutputSchema,
   toolRiskLevelSchema,
 } from "./tool.contract.js";
+export type {
+  ToolExecutionContext,
+  ToolExecutionError,
+  ToolExecutionErrorCode,
+  ToolExecutionResult,
+} from "./tool-execution.contract.js";
+export {
+  toolExecutionContextSchema,
+  toolExecutionErrorCodeSchema,
+  toolExecutionErrorSchema,
+  toolExecutionResultSchema,
+} from "./tool-execution.contract.js";
