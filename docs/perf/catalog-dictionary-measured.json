@@ -1,11 +1,32 @@
 {
-  "measuredAt": "2026-07-09T07:03:38.662Z",
+  "measuredAt": "2026-07-29T10:11:07.296Z",
+  "ticket": "T-2026-096",
+  "method": "Playwright Chromium — DOM counts + performance.memory + Long Task API during scroll",
+  "note": "performance.memory is usedJSHeapSize (not DevTools heap snapshot). Chrome Memory panel still optional polish.",
   "off": {
     "domRows": 10000,
-    "waitForRowsMs": 70
+    "waitForRowsMs": 282,
+    "heap": {
+      "usedJSHeapSizeMb": 11.35,
+      "totalJSHeapSizeMb": 64.85
+    },
+    "longTasks": {
+      "count": 4,
+      "worstMs": 315,
+      "over50ms": 4
+    }
   },
   "on": {
-    "domRows": 23
+    "domRows": 23,
+    "heap": {
+      "usedJSHeapSizeMb": 11.35,
+      "totalJSHeapSizeMb": 64.85
+    },
+    "longTasks": {
+      "count": 0,
+      "worstMs": 0,
+      "over50ms": 0
+    }
   },
   "deltaDom": 9977
 }

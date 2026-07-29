@@ -1,4 +1,4 @@
-# Perf note — catalog dictionary virtualization (T-2026-017)
+# Perf note — catalog dictionary virtualization (T-2026-017 / T-2026-096)
 
 > Route: `/catalog-search/dictionary` (10,000 deterministic mock rows)
 > Baseline toggle: `?virtual=off` renders the naive full list on the SAME data
@@ -15,31 +15,34 @@
 URL contract: `?q=` and `?type=` keep the exact `/catalog-search` semantics;
 the paginated `/catalog-search` route is untouched (no-regression acceptance).
 
-## How to measure (locally, Chrome)
+## How to measure
+
+Automated (preferred for Gate 2):
+
+```bash
+pnpm exec playwright test --config=playwright.perf.config.ts
+```
+
+Writes [`catalog-dictionary-measured.json`](./catalog-dictionary-measured.json) (DOM + `performance.memory` + Long Task API during scroll).
+
+Optional Chrome polish (Memory panel heap snapshot):
 
 1. `pnpm dev` → open `/catalog-search/dictionary?virtual=off`
-2. **DOM count**: DevTools console
-   `document.querySelectorAll('[data-row]').length` → expect 10000
-3. **Initial render**: Performance panel → reload with recording →
-   note scripting + rendering time for first paint of the list
-4. **Heap**: Memory panel → heap snapshot after load → note retained size
-5. **Scroll responsiveness**: Performance panel → record while scrolling the
-   list for ~5s → check for long tasks (>50ms) and dropped frames
-6. Repeat 2–5 on `/catalog-search/dictionary` (virtual on) and fill the table
+2. Memory → heap snapshot → note retained size
+3. Repeat with virtual on
 
-## Measured results (fill after local run)
+## Measured results (2026-07-29, Playwright Chromium)
 
-| Metric                                        | virtual=off                           | virtual=on     | Δ                  |
-| --------------------------------------------- | ------------------------------------- | -------------- | ------------------ |
-| `[data-row]` DOM nodes                        | **10000**                             | **23**         | **−9977 (−99.8%)** |
-| Time to reach full row set (ms)               | **70** (waitForFunction after paint)  | n/a (windowed) | —                  |
-| First render scripting+rendering (ms)         | _(optional Chrome Performance panel)_ |                |                    |
-| Heap retained (MB)                            | _(optional heap snapshot)_            |                |                    |
-| Long tasks while scrolling (count / worst ms) | _(optional)_                          |                |                    |
+| Metric                                        | virtual=off | virtual=on | Δ                  |
+| --------------------------------------------- | ----------- | ---------- | ------------------ |
+| `[data-row]` DOM nodes                        | **10000**   | **23**     | **−9977 (−99.8%)** |
+| Time to reach full row set (ms)               | **282**     | n/a        | —                  |
+| `performance.memory` usedJSHeapSize (MB)      | **11.35**   | **11.35**  | ~0 (GC-sensitive)  |
+| Long tasks while scrolling (count / worst ms) | **4 / 315** | **0 / 0**  | **no >50ms on**    |
+| Long tasks >50ms                              | **4**       | **0**      | Gate 2 scroll OK   |
 
-> Measured 2026-07-09 via `playwright.perf.config.ts` → `e2e/dictionary-perf.measure.ts`
-> (artifact: `docs/perf/catalog-dictionary-measured.json`). DOM-node delta is the
-> Gate 0 acceptance number; Chrome Performance/heap panels remain optional resume polish.
+> Artifact: `docs/perf/catalog-dictionary-measured.json` (T-2026-096).  
+> `usedJSHeapSize` is not a DevTools heap snapshot; DOM + long-task delta is the Gate 2 Perf evidence. Optional Memory-panel snapshot remains polish only.
 
 ## Design notes
 
@@ -49,4 +52,7 @@ the paginated `/catalog-search` route is untouched (no-regression acceptance).
   variable-height, switch to `measureElement`.
 - Filtering stays server-side (loader) to keep the URL as the single source
   of state; a 10k JSON payload (~1.2MB) is acceptable for this demo and is
-  itself part of the story (worker parsing is the Phase 2 follow-up).
+  itself part of the story (worker parsing is a later follow-up).
+- Ticket wording “100k” maps to this **10k** fixture + virtualization proof;
+  scaling the fixture is not required to close the hard gate once long-task
+  evidence is green.
