@@ -30,8 +30,14 @@ import {
 
 const ERROR_INVALID_BODY = "Invalid request body";
 const ERROR_ASSET_NOT_FOUND = "Asset not found";
-const MOCK_REQUEST_ID = "mock-req-1";
 const PAGE_SIZE = 5;
+let mockRequestSeq = 0;
+
+function nextMockRequestId(): string {
+  mockRequestSeq += 1;
+  return `mock-req-${mockRequestSeq}`;
+}
+
 const MOCK_AUDIT_EVENTS = [
   {
     id: "aud-mock-1",
@@ -40,7 +46,7 @@ const MOCK_AUDIT_EVENTS = [
     actor: { role: "analyst" as const },
     resource: { type: "metadata_asset", id: "tbl-customers" },
     decisionId: "dec-mock-1",
-    requestId: MOCK_REQUEST_ID,
+    requestId: "mock-req-seed",
     outcome: "pending_approval" as const,
     requireAudit: true,
     reasons: ["sensitive classification requires approval"],
@@ -300,9 +306,10 @@ export const metadataHandlers = [
         raw.purpose === "marketing" || raw.purpose === "operations"
           ? raw.purpose
           : "analytics";
+      const requestId = nextMockRequestId();
       if (asset) {
         createAccessApplication({
-          id: MOCK_REQUEST_ID,
+          id: requestId,
           assetId: raw.assetId,
           assetName: asset.name,
           purpose,
@@ -316,7 +323,7 @@ export const metadataHandlers = [
       }
       const draftBody = submitAccessResponseSchema.parse({
         data: {
-          requestId: MOCK_REQUEST_ID,
+          requestId,
           status: "draft",
           decision,
           auditLogged: false,
@@ -351,9 +358,10 @@ export const metadataHandlers = [
       raw.purpose === "marketing" || raw.purpose === "operations"
         ? raw.purpose
         : "analytics";
+    const requestId = nextMockRequestId();
     if (asset) {
       createAccessApplication({
-        id: MOCK_REQUEST_ID,
+        id: requestId,
         assetId: raw.assetId,
         assetName: asset.name,
         purpose,
@@ -367,7 +375,7 @@ export const metadataHandlers = [
     }
     const body = submitAccessResponseSchema.parse({
       data: {
-        requestId: MOCK_REQUEST_ID,
+        requestId,
         status,
         decision,
         auditLogged: decision.require_audit,

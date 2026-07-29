@@ -25,12 +25,13 @@
 
 ## Portfolio / 履歷
 
-| 資源                                                                     | 說明                               |
-| ------------------------------------------------------------------------ | ---------------------------------- |
-| [docs/RESUME-DEMO.md](docs/RESUME-DEMO.md)                               | 3 分鐘 demo 腳本、檢查清單、履歷句 |
-| [docs/product/ai-experience-plan.md](docs/product/ai-experience-plan.md) | AI 體驗流程 × 手動畫面規劃 SSOT    |
+| 資源                                                                                                               | 說明                                              |
+| ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| [docs/RESUME-DEMO.md](docs/RESUME-DEMO.md)                                                                         | 3–5 分鐘 demo／旅程 C 20 秒主戲、檢查清單、履歷句 |
+| [docs/product/experience-notes/governance-abstraction.md](docs/product/experience-notes/governance-abstraction.md) | 治理抽象 STAR（同步 develop-md ledger）           |
+| [docs/product/ai-experience-plan.md](docs/product/ai-experience-plan.md)                                           | AI 體驗流程 × 手動畫面規劃 SSOT                   |
 
-**本地 demo**：`pnpm dev` → `/`（chat＋3 題 golden demo）→ `/catalog-search`（`?type=`＋分頁）→ `/catalog-search/dictionary`（10k 虛擬列表）→ `/metadata/tbl-customers?purpose=marketing&role=analyst`（治理申請 HITL）。
+**本地 demo**：`pnpm dev` → `/catalog-search` → `/metadata/tbl-customers?purpose=marketing&role=analyst`（申請 HITL）→ `/access-requests/review?sessionRole=owner` → `/my-apis?sessionRole=requester`（旅程 C）。次要：`/` golden chat、`/catalog-search/dictionary`（10k 虛擬列表）。
 
 ## 技術棧
 

@@ -23,15 +23,15 @@
 
 ## 2. 現況（對照階段）
 
-| 階段                | 狀態 | 備註                                                         |
-| ------------------- | ---- | ------------------------------------------------------------ |
-| Phase 0 基線        | 🔄   | Production URL 已 live（CLI）；Actions secrets T-079 待補    |
-| Phase 1 契約／管線  | ✅   | agent-core、stable SSE                                       |
-| Phase 2 觀測／評測  | 🔄   | eval CI ✅；Langfuse 手動 trace 待勾；T-069 ready            |
-| Phase 3 RAG／Tool   | ⬜   | Retriever 抽象、local 強化；knowledge pack 已可演示          |
-| Phase 4 UI 最小殼   | 🔄   | catalog-search ✅（含 commerce）；api-detail／my-apis＝T-023 |
-| Phase 5 產品化運維  | ⬜   | routing、quota、DLQ spike（文件為主）                        |
-| Lab on-device-media | ⬜   | 平行軌；不阻塞 Phase 2–4                                     |
+| 階段                | 狀態 | 備註                                                              |
+| ------------------- | ---- | ----------------------------------------------------------------- |
+| Phase 0 基線        | 🔄   | Production URL 已 live（CLI）；Actions secrets T-079 待補         |
+| Phase 1 契約／管線  | ✅   | agent-core、stable SSE                                            |
+| Phase 2 觀測／評測  | 🔄   | eval CI ✅；Langfuse 手動 trace 待勾；T-069 ready                 |
+| Phase 3 RAG／Tool   | ⬜   | Retriever 抽象、local 強化；knowledge pack 已可演示               |
+| Phase 4 UI 最小殼   | ✅   | catalog-search ✅（含 commerce）；api-detail／my-apis＝T-023 done |
+| Phase 5 產品化運維  | ⬜   | routing、quota、DLQ spike（文件為主）                             |
+| Lab on-device-media | ⬜   | 平行軌；不阻塞 Phase 2–4                                          |
 
 ---
 
@@ -177,7 +177,7 @@ Phase 1 已完成；**knowledge commerce ship gate ✅（2026-07-28）**。
 - [x] catalog-search `?type=` + pagination（mock）
 - [x] commerce facets／Domain knowledge（ship gate 2026-07-28）
 - [x] T-2026-004 CatalogSearchPanel GAP（inbox：done）
-- [ ] T-2026-023 api-detail／my-apis／apply／review（G1）
+- [x] T-2026-023 api-detail／my-apis／apply／review（G1）
 
 **Backlog（非 sprint；T-2026-092 draft P2）**
 
