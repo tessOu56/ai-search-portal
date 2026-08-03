@@ -62,7 +62,7 @@ importers:
         version: 3.9.2(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react-is@17.0.2)(react@18.3.1)(redux@5.0.1)
       remix-utils:
         specifier: ^7.7.0
-        version: 7.7.0(@remix-run/node@2.17.5(typescript@5.9.3))(@remix-run/react@2.17.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(@remix-run/router@1.23.3)(react@18.3.1)(zod@4.3.6)
+        version: 7.7.0(@remix-run/node@2.17.5(typescript@5.9.3))(@remix-run/react@2.17.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(@remix-run/router@1.23.3)(react@18.3.1)(zod@4.4.3)
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.6.0
@@ -73,8 +73,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       zod:
-        specifier: ^4.3.6
-        version: 4.3.6
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@changesets/cli':
         specifier: ^2.27.8
@@ -287,8 +287,8 @@ importers:
   packages/shared-contracts:
     dependencies:
       zod:
-        specifier: ^4.3.6
-        version: 4.3.6
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       typescript:
         specifier: ^5.6.2
@@ -6798,8 +6798,8 @@ packages:
     resolution: {integrity: sha512-4LCcse/U2MHZ63HAJVE+v71o7yOdIe4cZ70Wpf8D/IyjDKYQLV5GD46B+hSTjJsvV5PztjvHoU580EftxjDZFQ==}
     engines: {node: '>=12.20'}
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -8984,14 +8984,14 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))':
+  '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@20.19.39)(lightningcss@1.32.0))':
     dependencies:
       '@vitest/spy': 2.1.9
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
       msw: 2.15.0(@types/node@20.19.39)(typescript@5.9.3)
-      vite: 5.4.21(@types/node@26.1.1)(lightningcss@1.32.0)
+      vite: 5.4.21(@types/node@20.19.39)(lightningcss@1.32.0)
 
   '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@26.1.1)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))':
     dependencies:
@@ -11359,7 +11359,7 @@ snapshots:
       typescript: 5.9.3
       unbash: 2.2.0
       yaml: 2.9.0
-      zod: 4.3.6
+      zod: 4.4.3
 
   langfuse-core@3.38.20:
     dependencies:
@@ -12813,7 +12813,7 @@ snapshots:
       mdast-util-to-hast: 12.3.0
       unified: 10.1.2
 
-  remix-utils@7.7.0(@remix-run/node@2.17.5(typescript@5.9.3))(@remix-run/react@2.17.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(@remix-run/router@1.23.3)(react@18.3.1)(zod@4.3.6):
+  remix-utils@7.7.0(@remix-run/node@2.17.5(typescript@5.9.3))(@remix-run/react@2.17.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(@remix-run/router@1.23.3)(react@18.3.1)(zod@4.4.3):
     dependencies:
       type-fest: 4.41.0
     optionalDependencies:
@@ -12821,7 +12821,7 @@ snapshots:
       '@remix-run/react': 2.17.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       '@remix-run/router': 1.23.3
       react: 18.3.1
-      zod: 4.3.6
+      zod: 4.4.3
 
   require-directory@2.1.1: {}
 
@@ -13918,7 +13918,7 @@ snapshots:
   vitest@2.1.9(@types/node@20.19.39)(jsdom@29.1.1)(lightningcss@1.32.0)(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3)):
     dependencies:
       '@vitest/expect': 2.1.9
-      '@vitest/mocker': 2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))
+      '@vitest/mocker': 2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@20.19.39)(lightningcss@1.32.0))
       '@vitest/pretty-format': 2.1.9
       '@vitest/runner': 2.1.9
       '@vitest/snapshot': 2.1.9
@@ -14147,6 +14147,6 @@ snapshots:
 
   yocto-queue@1.2.2: {}
 
-  zod@4.3.6: {}
+  zod@4.4.3: {}
 
   zwitch@2.0.4: {}
