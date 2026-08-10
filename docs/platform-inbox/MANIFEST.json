@@ -1,7 +1,7 @@
-﻿{
-  "distributedAt": "2026-07-16T19:23:52.3709935+08:00",
-  "project": "ai-search-portal",
+{
+  "distributedAt": "2026-08-07T05:37:13.903Z",
   "source": "platform-command",
+  "project": "ai-search-portal",
   "ticketIds": [
     "T-2026-001",
     "T-2026-004",
@@ -27,7 +27,12 @@
     "T-2026-077",
     "T-2026-078",
     "T-2026-079",
-    "T-ds-2026-007",
+    "T-2026-092",
+    "T-2026-096",
+    "T-2026-114",
+    "T-2026-115",
     "T-ds-2026-008"
-  ]
+  ],
+  "resolvedPathSource": "host:macbook-pro-tessou",
+  "hostId": "macbook-pro-tessou"
 }
