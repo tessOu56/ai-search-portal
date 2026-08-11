@@ -11,8 +11,9 @@
     "build:contracts": "pnpm run codegen:openapi && pnpm --filter @ai-search-portal/contracts run build",
     "build:governance-domain": "pnpm --filter @ai-search-portal/governance-domain run build",
 
-    "codegen:openapi": "npx --yes openapi-typescript@7.6.1 specs/openapi/openapi.yaml -o packages/shared-contracts/src/generated/openapi-types.ts",
-    "lint:openapi": "npx --yes @stoplight/spectral-cli@6.14.3 lint specs/openapi/openapi.yaml",
+    "codegen:openapi": "openapi-typescript specs/openapi/openapi.yaml -o packages/shared-contracts/src/generated/openapi-types.ts",
+    "lint:openapi": "spectral lint specs/openapi/openapi.yaml",
+    "check:node": "node -e \"const M=process.versions.node.split('.')[0]; if(M!=='22'){console.error('Portal requires Node 22.x (got '+process.versions.node+'). Use .nvmrc / brew node@22.'); process.exit(1)}\"",
     "verify:openapi-codegen": "pnpm run codegen:openapi && git diff --exit-code -- packages/shared-contracts/src/generated/openapi-types.ts",
     "dev": "remix vite:dev",
     "dev:api": "pnpm --filter ai-search-api dev",
@@ -72,6 +73,9 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "size": "size-limit",
+    "size:routes": "size-limit --json",
+    "pretest": "pnpm run check:node",
+    "prebuild": "pnpm run check:node",
     "observability:posthog:up": "docker compose -f labs/observability/docker-compose.posthog.yml up -d",
     "observability:posthog:down": "docker compose -f labs/observability/docker-compose.posthog.yml down"
   },
@@ -140,10 +144,12 @@
     "knip": "^5.80.0",
     "lint-staged": "^15.2.2",
     "msw": "^2.15.0",
+    "openapi-typescript": "7.6.1",
     "postcss": "^8.4.47",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.6.8",
     "size-limit": "^12.1.0",
+    "@stoplight/spectral-cli": "6.14.3",
     "tailwindcss": "^3.4.17",
     "turbo": "^2.10.5",
     "typescript": "^5.6.2",
@@ -160,7 +166,43 @@
     {
       "name": "remix-client-assets",
       "path": "build/client/assets/*.js",
-      "limit": "900 kB",
+      "limit": "500 kB",
+      "gzip": true
+    },
+    {
+      "name": "route-home",
+      "path": "build/client/assets/_index-*.js",
+      "limit": "40 kB",
+      "gzip": true
+    },
+    {
+      "name": "route-insights",
+      "path": "build/client/assets/insights._index-*.js",
+      "limit": "180 kB",
+      "gzip": true
+    },
+    {
+      "name": "route-catalog-search",
+      "path": "build/client/assets/catalog-search._index-*.js",
+      "limit": "20 kB",
+      "gzip": true
+    },
+    {
+      "name": "route-metadata",
+      "path": "build/client/assets/metadata._index-*.js",
+      "limit": "20 kB",
+      "gzip": true
+    },
+    {
+      "name": "route-vitals",
+      "path": "build/client/assets/vitals-*.js",
+      "limit": "15 kB",
+      "gzip": true
+    },
+    {
+      "name": "shared-ui-components",
+      "path": "build/client/assets/components-*.js",
+      "limit": "80 kB",
       "gzip": true
     }
   ],
