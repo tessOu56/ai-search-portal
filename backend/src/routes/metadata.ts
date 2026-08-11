@@ -24,6 +24,8 @@ import { evaluateAccess } from "../policies/evaluate-access.js";
 import {
   cancelApplication,
   createApplication,
+  editApplication,
+  getApplication,
   listApplications,
   rememberIdempotency,
   resolveIdempotency,
@@ -247,13 +249,29 @@ accessRequestsApi.post("/:requestId/review", async (c) => {
   if (!parsed.success) {
     return c.json({ error: ERROR_INVALID_BODY }, 400);
   }
-  if (parsed.data.decision === "edited") {
-    return c.json({ error: "edited not implemented on Hono reference" }, 501);
+  const current = getApplication(requestId);
+  if (!current) {
+    return c.json(
+      governancePolicyErrorSchema.parse({
+        error: ERROR_ACCESS_REQUEST_NOT_FOUND,
+        code: "NOT_FOUND",
+      }),
+      404
+    );
   }
-  const updated = reviewApplication({
-    id: requestId,
-    decision: parsed.data.decision,
-  });
+
+  const updated =
+    parsed.data.decision === "edited"
+      ? editApplication({
+          id: requestId,
+          purpose: parsed.data.purpose,
+          role: parsed.data.role,
+        })
+      : reviewApplication({
+          id: requestId,
+          decision: parsed.data.decision,
+        });
+
   if (!updated.ok) {
     if (updated.reason === "not_found") {
       return c.json(
@@ -265,7 +283,9 @@ accessRequestsApi.post("/:requestId/review", async (c) => {
       );
     }
     return c.json(
-      governanceInvalidTransitionError("Invalid review transition"),
+      governanceInvalidTransitionError(
+        `Cannot ${parsed.data.decision} when status is ${current.status}`
+      ),
       409
     );
   }

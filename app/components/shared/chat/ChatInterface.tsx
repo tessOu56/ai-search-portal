@@ -1,6 +1,12 @@
 import { inferIndustryFacetsFromText } from "@ai-search-portal/contracts";
 import { Link } from "@remix-run/react";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import {
+  type ChangeEvent,
+  type FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { ChatBubble } from "~/components/shared/lui/ChatBubble";
@@ -10,8 +16,6 @@ import { Button } from "~/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
 import { ScrollArea } from "~/components/ui/ScrollArea";
 import { Textarea } from "~/components/ui/Textarea";
-import { buildCatalogSearchUrl } from "~/features/catalogsearch/catalog-search-url";
-import { buildMetadataSearchUrl } from "~/features/metadata/metadata-search-url";
 import { apiChatQuery } from "~/shared/api/paths";
 import {
   stableChatErrorSchema,
@@ -19,6 +23,10 @@ import {
   stableChatMetaSchema,
 } from "~/shared/contracts";
 import { useI18n } from "~/shared/i18n/context";
+import {
+  buildCatalogSearchUrl,
+  buildMetadataSearchUrl,
+} from "~/shared/navigation";
 
 type Message = {
   id: string;
@@ -244,7 +252,9 @@ export function ChatInterface({
           <form onSubmit={handleSubmit} className="grid gap-3">
             <Textarea
               value={input}
-              onChange={(event) => setInput(event.target.value)}
+              onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                setInput(event.target.value)
+              }
               placeholder={t("chat.placeholder")}
               disabled={isStreaming}
               aria-label={t("chat.placeholder")}

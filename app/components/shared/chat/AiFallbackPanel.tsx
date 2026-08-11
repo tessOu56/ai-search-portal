@@ -11,9 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
-import { buildCatalogSearchUrl } from "~/features/catalogsearch/catalog-search-url";
-import { buildMetadataSearchUrl } from "~/features/metadata/metadata-search-url";
 import { useI18n } from "~/shared/i18n/context";
+import {
+  buildCatalogSearchUrl,
+  buildMetadataSearchUrl,
+} from "~/shared/navigation";
 
 export type AiFallbackPanelProps = {
   /** The user's last query — preserved so the manual path can take over. */

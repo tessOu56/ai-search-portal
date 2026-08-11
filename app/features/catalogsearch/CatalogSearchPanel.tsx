@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "~/components/ui/Card";
 import { Input } from "~/components/ui/Input";
-import { buildMetadataSearchUrl } from "~/features/metadata/metadata-search-url";
+import { buildMetadataSearchUrl } from "~/shared/navigation";
 
 import type { CatalogSearchViewModel } from "./catalog-search.types";
 import { buildCatalogSearchUrl } from "./catalog-search-url";

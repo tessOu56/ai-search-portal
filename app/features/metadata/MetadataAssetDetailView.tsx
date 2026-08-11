@@ -4,6 +4,7 @@ import type { FormEvent } from "react";
 
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { GenUiRenderer } from "~/components/shared/genui";
+import { AccessRequestLifecycleStepper } from "~/components/shared/governance";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
 import {
@@ -13,16 +14,13 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
-import {
-  AccessRequestLifecycleStepper,
-  myApisHighlightHref,
-} from "~/features/accessrequests";
 import type {
   AccessApplicationContract,
   GenUiDocumentContract,
   MetadataAssetDetailContract,
   PolicyDecisionContract,
 } from "~/shared/contracts";
+import { myApisHighlightHref } from "~/shared/navigation";
 import { cn } from "~/shared/utils/cn";
 
 export type MetadataAssetSubmitResult = {

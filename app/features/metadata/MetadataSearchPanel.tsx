@@ -12,13 +12,13 @@ import {
   CardTitle,
 } from "~/components/ui/Card";
 import { Input } from "~/components/ui/Input";
-import { buildCatalogSearchUrl } from "~/features/catalogsearch/catalog-search-url";
 import { API_CONTEXT_PACK_SELECT } from "~/shared/api/paths";
 import type {
   ContextPackManifestContract,
   KnowledgeChunkContract,
   MetadataAssetSummaryContract,
 } from "~/shared/contracts";
+import { buildCatalogSearchUrl } from "~/shared/navigation";
 import { buildKnowledgeChunkHref } from "~/shared/utils/knowledge-deeplink";
 
 import { buildMetadataSearchUrl } from "./metadata-search-url";

@@ -1,5 +1,6 @@
 import { Form, Link, useFetcher, useNavigation } from "@remix-run/react";
 
+import { AccessRequestLifecycleStepper } from "~/components/shared/governance";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
 import {
@@ -14,14 +15,10 @@ import type {
   AccessRequestLifecycleStatus,
   GovernanceSessionRole,
 } from "~/shared/contracts";
+import { myApisHighlightHref } from "~/shared/navigation";
 import { cn } from "~/shared/utils/cn";
 
-import { AccessRequestLifecycleStepper } from "./AccessRequestLifecycleStepper";
-
-/** Build the "track it" deep link used after an approve outcome (T-186 #5). */
-export function myApisHighlightHref(requestId: string): string {
-  return `/my-apis?sessionRole=requester&highlight=${encodeURIComponent(requestId)}`;
-}
+export { myApisHighlightHref };
 
 const STATUS_OK_CLASS = "text-sm text-green-700";
 const STATUS_ERROR_CLASS = "text-sm text-destructive";

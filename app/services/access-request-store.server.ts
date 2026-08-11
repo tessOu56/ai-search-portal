@@ -1,33 +1,29 @@
 /**
- * In-memory access application store for G1 governance demo (T-2026-023).
+ * Remix adapter over shared governance-domain store (T-2026-201).
+ * Seed + public API preserved for G1/G2 demo and existing callers.
  */
 
 import type {
   AccessApplicationContract,
-  AccessPermissionStatus,
   AccessRequestLifecycleStatus,
   PolicyDecisionContract,
 } from "@ai-search-portal/contracts";
 import { accessApplicationSchema } from "@ai-search-portal/contracts";
+import {
+  type AccessMutationFailure,
+  type AccessMutationResult,
+  createAccessRequestStore,
+} from "@ai-search-portal/governance-domain";
 
-const applications = new Map<string, AccessApplicationContract>();
-/** Idempotency-Key → requestId for POST submit replay (T-186). */
-const idempotencyKeys = new Map<string, string>();
-
-/**
- * Realistic governance demo seed (T-2026-024 / G2). Lazily applied on first
- * `listAccessApplications()` call so pure unit tests that never list (e.g.
- * governance-contract-parity.test.ts, which resets then only exercises
- * create/submit/review helpers directly) are unaffected. Covers the six
- * required edge cases: pending, rejected, expired, permission denied,
- * deprecated API, missing owner — see
- * code-review/spec-reviews/2026-08-11-t-2026-024-governance-g2-seed.md §4.
- */
-let governanceSeedApplied = false;
+export type { AccessMutationFailure, AccessMutationResult };
 
 /** Shared seed requester id — same analyst persona across most fixture rows. */
 const SEED_REQUESTER_ANALYST = "requester:analyst";
 
+/**
+ * Realistic governance demo seed (T-2026-024 / G2). Lazily applied on first
+ * `listAccessApplications()` call so pure unit tests that never list are unaffected.
+ */
 const GOVERNANCE_SEED_APPLICATIONS: AccessApplicationContract[] = [
   {
     id: "seed-req-pending-1",
@@ -165,56 +161,30 @@ const GOVERNANCE_SEED_APPLICATIONS: AccessApplicationContract[] = [
   },
 ].map((row) => accessApplicationSchema.parse(row));
 
-function ensureGovernanceSeed(): void {
-  if (governanceSeedApplied) return;
-  governanceSeedApplied = true;
-  for (const row of GOVERNANCE_SEED_APPLICATIONS) {
-    applications.set(row.id, row);
-  }
-}
-
 /** Exposed for tests asserting seed coverage of the required edge cases. */
 export { GOVERNANCE_SEED_APPLICATIONS };
 
-function permissionFor(
-  status: AccessRequestLifecycleStatus
-): AccessPermissionStatus {
-  switch (status) {
-    case "approved":
-      return "granted";
-    case "pending_approval":
-    case "draft":
-      return "pending";
-    case "denied":
-    case "expired":
-    case "cancelled":
-      return "revoked";
-    default:
-      return "none";
-  }
-}
+const store = createAccessRequestStore({
+  seed: GOVERNANCE_SEED_APPLICATIONS,
+  lazySeed: true,
+});
 
 /**
  * Test-only reset. Marks the governance seed as already-applied so tests get
- * a genuinely empty store (no silent reseed on the next `listAccessApplications`
- * call) — see spec review §3 "Test isolation".
+ * a genuinely empty store (no silent reseed on the next list).
  */
 export function resetAccessApplicationStore(): void {
-  applications.clear();
-  idempotencyKeys.clear();
-  governanceSeedApplied = true;
+  store.reset({ keepSeedSuppressed: true });
 }
 
 export function rememberIdempotencyKey(key: string, requestId: string): void {
-  idempotencyKeys.set(key, requestId);
+  store.rememberIdempotencyKey(key, requestId);
 }
 
 export function resolveIdempotencyKey(
   key: string
 ): AccessApplicationContract | null {
-  const id = idempotencyKeys.get(key);
-  if (!id) return null;
-  return applications.get(id) ?? null;
+  return store.resolveIdempotencyKey(key);
 }
 
 export function listAccessApplications(filter?: {
@@ -223,27 +193,12 @@ export function listAccessApplications(filter?: {
   status?: AccessRequestLifecycleStatus;
   pendingOnly?: boolean;
 }): AccessApplicationContract[] {
-  ensureGovernanceSeed();
-  let rows = [...applications.values()];
-  if (filter?.requesterId) {
-    rows = rows.filter((r) => r.requesterId === filter.requesterId);
-  }
-  if (filter?.assetId) {
-    rows = rows.filter((r) => r.assetId === filter.assetId);
-  }
-  if (filter?.status) {
-    rows = rows.filter((r) => r.status === filter.status);
-  }
-  if (filter?.pendingOnly) {
-    rows = rows.filter((r) => r.status === "pending_approval");
-  }
-  return rows.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return store.list(filter);
 }
 
 /**
  * Most recent application for a requester on a given asset (metadata detail
- * lifecycle stepper — T-186 tool-density polish). Terminal statuses
- * (denied/cancelled/expired) are ignored once superseded by a newer draft.
+ * lifecycle stepper — T-186 tool-density polish).
  */
 export function getLatestAccessApplicationForAsset(args: {
   assetId: string;
@@ -259,7 +214,7 @@ export function getLatestAccessApplicationForAsset(args: {
 export function getAccessApplication(
   id: string
 ): AccessApplicationContract | null {
-  return applications.get(id) ?? null;
+  return store.get(id);
 }
 
 export function createAccessApplication(args: {
@@ -274,69 +229,20 @@ export function createAccessApplication(args: {
   decision?: PolicyDecisionContract;
   termsAccepted?: string[];
 }): AccessApplicationContract {
-  const now = new Date().toISOString();
-  const record = accessApplicationSchema.parse({
-    id: args.id,
-    assetId: args.assetId,
-    assetName: args.assetName,
-    purpose: args.purpose,
-    role: args.role,
-    requesterId: args.requesterId,
-    status: args.status,
-    permissionStatus: permissionFor(args.status),
-    owner: args.owner,
-    createdAt: now,
-    updatedAt: now,
-    decision: args.decision,
-    termsAccepted: args.termsAccepted,
-  });
-  applications.set(record.id, record);
-  return record;
+  return store.create(args);
 }
-
-export type AccessMutationFailure = "not_found" | "invalid_transition";
-
-export type AccessMutationResult =
-  | { ok: true; data: AccessApplicationContract }
-  | { ok: false; reason: AccessMutationFailure };
 
 export function reviewAccessApplication(args: {
   id: string;
   decision: "approved" | "denied";
 }): AccessMutationResult {
-  const current = applications.get(args.id);
-  if (!current) return { ok: false, reason: "not_found" };
-  if (current.status !== "pending_approval") {
-    return { ok: false, reason: "invalid_transition" };
-  }
-  const status: AccessRequestLifecycleStatus =
-    args.decision === "approved" ? "approved" : "denied";
-  const updated = accessApplicationSchema.parse({
-    ...current,
-    status,
-    permissionStatus: permissionFor(status),
-    updatedAt: new Date().toISOString(),
-  });
-  applications.set(updated.id, updated);
-  return { ok: true, data: updated };
+  return store.review(args);
 }
 
 export function cancelAccessApplication(args: {
   id: string;
 }): AccessMutationResult {
-  const current = applications.get(args.id);
-  if (!current) return { ok: false, reason: "not_found" };
-  if (current.status !== "pending_approval" && current.status !== "draft") {
-    return { ok: false, reason: "invalid_transition" };
-  }
-  const updated = accessApplicationSchema.parse({
-    ...current,
-    status: "cancelled" as const,
-    permissionStatus: permissionFor("cancelled"),
-    updatedAt: new Date().toISOString(),
-  });
-  applications.set(updated.id, updated);
-  return { ok: true, data: updated };
+  return store.cancel(args);
 }
 
 /** Mark draft / pending_approval rows older than maxAgeMs as expired (G1 demo). */
@@ -344,25 +250,7 @@ export function expireStaleAccessApplications(
   maxAgeMs = 7 * 24 * 60 * 60 * 1000,
   now = Date.now()
 ): AccessApplicationContract[] {
-  const expired: AccessApplicationContract[] = [];
-  for (const current of applications.values()) {
-    if (current.status !== "draft" && current.status !== "pending_approval") {
-      continue;
-    }
-    const updatedAt = Date.parse(current.updatedAt);
-    if (Number.isNaN(updatedAt) || now - updatedAt < maxAgeMs) {
-      continue;
-    }
-    const next = accessApplicationSchema.parse({
-      ...current,
-      status: "expired" as const,
-      permissionStatus: permissionFor("expired"),
-      updatedAt: new Date(now).toISOString(),
-    });
-    applications.set(next.id, next);
-    expired.push(next);
-  }
-  return expired;
+  return store.expireStale(maxAgeMs, now);
 }
 
 export function editAccessApplication(args: {
@@ -370,33 +258,9 @@ export function editAccessApplication(args: {
   purpose?: AccessApplicationContract["purpose"];
   role?: AccessApplicationContract["role"];
 }): AccessMutationResult {
-  const current = applications.get(args.id);
-  if (!current) return { ok: false, reason: "not_found" };
-  if (current.status !== "pending_approval") {
-    return { ok: false, reason: "invalid_transition" };
-  }
-  const updated = accessApplicationSchema.parse({
-    ...current,
-    purpose: args.purpose ?? current.purpose,
-    role: args.role ?? current.role,
-    updatedAt: new Date().toISOString(),
-  });
-  applications.set(updated.id, updated);
-  return { ok: true, data: updated };
+  return store.edit(args);
 }
 
 export function submitDraftAccessApplication(id: string): AccessMutationResult {
-  const current = applications.get(id);
-  if (!current) return { ok: false, reason: "not_found" };
-  if (current.status !== "draft") {
-    return { ok: false, reason: "invalid_transition" };
-  }
-  const updated = accessApplicationSchema.parse({
-    ...current,
-    status: "pending_approval" as const,
-    permissionStatus: permissionFor("pending_approval"),
-    updatedAt: new Date().toISOString(),
-  });
-  applications.set(updated.id, updated);
-  return { ok: true, data: updated };
+  return store.submitDraft(id);
 }

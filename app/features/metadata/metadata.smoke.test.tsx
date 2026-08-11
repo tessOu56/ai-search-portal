@@ -5,8 +5,9 @@ import {
   buildDetailGenUiDocument,
   GenUiRenderer,
 } from "~/components/shared/genui";
-import { MetadataSearchPanel } from "~/features/metadata";
 import { listMetadataAssets } from "~/services/metadata.server";
+
+import { MetadataSearchPanel } from "./MetadataSearchPanel";
 
 vi.mock("@remix-run/react", () => ({
   Link: ({

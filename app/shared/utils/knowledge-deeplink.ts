@@ -2,8 +2,10 @@
  * Resolve portal deep links for knowledge chunks (catalog / metadata).
  */
 
-import { buildCatalogSearchUrl } from "~/features/catalogsearch/catalog-search-url";
-import { buildMetadataSearchUrl } from "~/features/metadata/metadata-search-url";
+import {
+  buildCatalogSearchUrl,
+  buildMetadataSearchUrl,
+} from "~/shared/navigation";
 
 export type KnowledgeDeepLinkChunk = {
   id: string;

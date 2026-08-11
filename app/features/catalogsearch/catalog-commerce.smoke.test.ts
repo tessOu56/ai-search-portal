@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { getCatalogSearchViewModel } from "~/features/catalogsearch/catalog-search.server";
 import { parseIndustryFacetsFromSearchParams } from "~/shared/utils/industry-facets-url";
+
+import { getCatalogSearchViewModel } from "./catalog-search.server";
 
 const PACK_ID = "metalcraft-studio";
 

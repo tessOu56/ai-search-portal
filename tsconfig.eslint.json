@@ -21,7 +21,9 @@
     "app/**/*.tsx",
     "backend/**/*.ts",
     "packages/shared-contracts/**/*.ts",
+    "packages/governance-domain/**/*.ts",
     "packages/agent-core/**/*.ts",
+
     "services/agent-runtime/**/*.ts",
     "labs/**/*.ts",
     "labs/**/*.tsx",

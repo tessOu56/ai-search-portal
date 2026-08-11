@@ -13,9 +13,11 @@
   },
   "dependencies": {
     "@ai-search-portal/contracts": "workspace:*",
+    "@ai-search-portal/governance-domain": "workspace:*",
     "@hono/node-server": "^1.13.0",
     "hono": "^4.12.25"
   },
+
   "devDependencies": {
     "@types/node": "^20.14.0",
     "tsx": "^4.23.1",

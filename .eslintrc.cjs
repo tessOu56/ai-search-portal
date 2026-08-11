@@ -255,6 +255,52 @@ module.exports = {
         ],
       },
     },
+    // repo-layers.md：features ↛ features（同 feature 請用相對路徑）
+    {
+      files: ["app/features/**/*.{ts,tsx}"],
+      rules: {
+        "no-restricted-imports": [
+          "error",
+          {
+            patterns: [
+              {
+                group: ["**/backend*", "**/backend/**", "../*backend*", "*/backend/*"],
+                message:
+                  "App must not import backend; use @ai-search-portal/contracts for API shapes only.",
+              },
+              {
+                group: ["~/features/*", "~/features/**"],
+                message:
+                  "Features must not import other features (repo-layers.md). Use relative imports within the same feature, or move shared URLs/UI to app/shared or app/components.",
+              },
+            ],
+          },
+        ],
+      },
+    },
+    // repo-layers.md：components ↛ features
+    {
+      files: ["app/components/**/*.{ts,tsx}"],
+      rules: {
+        "no-restricted-imports": [
+          "error",
+          {
+            patterns: [
+              {
+                group: ["**/backend*", "**/backend/**", "../*backend*", "*/backend/*"],
+                message:
+                  "App must not import backend; use @ai-search-portal/contracts for API shapes only.",
+              },
+              {
+                group: ["~/features/*", "~/features/**"],
+                message:
+                  "Components must not import features (repo-layers.md). Move shared helpers to app/shared (e.g. navigation) or pass data from routes/features.",
+              },
+            ],
+          },
+        ],
+      },
+    },
     {
       files: ["backend/**/*.ts"],
       env: { node: true },
@@ -271,6 +317,13 @@ module.exports = {
             ],
           },
         ],
+      },
+    },
+    // Parity suite intentionally exercises Remix + Hono adapters side-by-side.
+    {
+      files: ["app/test/governance-contract-parity.test.ts"],
+      rules: {
+        "no-restricted-imports": "off",
       },
     },
     // 禁止在 app/shared/contracts 新增 *.contract.ts（契約僅在 packages/shared-contracts）
