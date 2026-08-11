@@ -183,11 +183,13 @@ function AccessContextForm({
             <input type="hidden" name="aiFill" value={aiFillParam} />
           ) : null}
           <FormField
+            id="access-context-purpose"
             label="Purpose"
             aiFilled={Boolean(aiFillParam)}
             aiBadgeLabel="AI suggested"
           >
             <select
+              id="access-context-purpose"
               name="purpose"
               defaultValue={purpose}
               className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
@@ -198,11 +200,13 @@ function AccessContextForm({
             </select>
           </FormField>
           <FormField
+            id="access-context-role"
             label="Role"
             aiFilled={Boolean(aiFillParam)}
             aiBadgeLabel="AI suggested"
           >
             <select
+              id="access-context-role"
               name="role"
               defaultValue={role}
               className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"

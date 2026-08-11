@@ -1,7 +1,7 @@
 # Agent Profile — ai-search-portal
 
 > **GENERATED — do not edit.** 產生器：`scripts/build-agent-profiles.py`；業務維度 SSOT：`registry/business-profiles.json`；其餘由既有 registry 合成。
-> 來源版本：business-profiles 2026-07-09 · agent-assets 2026-07-31 · domain-spec 2026-07-09
+> 來源版本：business-profiles 2026-08-07 · agent-assets 2026-08-07 · domain-spec 2026-07-09
 > ⚠️ 業務維度為 **draft**，owner 確認後轉 confirmed。
 
 ## 業務（為何存在）
