@@ -4,7 +4,12 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import {
+  Link,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 
 import { AccessRequestReviewPanel } from "~/features/accessrequests";
 import {
@@ -80,14 +85,21 @@ export async function action({ request }: ActionFunctionArgs) {
           decision: parsed.data.decision,
         });
 
-  if (!updated) {
+  if (!updated.ok) {
     return json(
-      { ok: false as const, text: "Access request not found" },
-      { status: 404 }
+      {
+        ok: false as const,
+        text:
+          updated.reason === "invalid_transition"
+            ? "Invalid status transition"
+            : "Access request not found",
+      },
+      { status: updated.reason === "invalid_transition" ? 409 : 404 }
     );
   }
 
-  const decisionId = updated.decision?.decision_id ?? `review:${requestId}`;
+  const decisionId =
+    updated.data.decision?.decision_id ?? `review:${requestId}`;
   appendAuditEvent({
     action:
       parsed.data.decision === "edited"
@@ -95,10 +107,10 @@ export async function action({ request }: ActionFunctionArgs) {
         : parsed.data.decision === "approved"
           ? "access_request.approve"
           : "access_request.deny",
-    actor: { role: updated.role },
-    resource: { type: "metadata_asset", id: updated.assetId },
+    actor: { role: updated.data.role },
+    resource: { type: "metadata_asset", id: updated.data.assetId },
     decisionId,
-    requestId: updated.id,
+    requestId: updated.data.id,
     outcome:
       parsed.data.decision === "edited"
         ? "edited"
@@ -113,8 +125,10 @@ export async function action({ request }: ActionFunctionArgs) {
     ok: true as const,
     text:
       parsed.data.decision === "edited"
-        ? `${updated.assetName} edited (still pending)`
-        : `${updated.assetName} → ${updated.status}`,
+        ? `${updated.data.assetName} edited (still pending)`
+        : `${updated.data.assetName} → ${updated.data.status}`,
+    requestId: updated.data.id,
+    status: updated.data.status,
   });
 }
 
@@ -130,6 +144,29 @@ export default function AccessRequestsReviewRoute() {
         actionMessage={actionMessage}
         loading={navigation.state !== "idle"}
       />
+    </main>
+  );
+}
+
+/** Route-level error state (four-state completeness — mirrors catalog-search / metadata). */
+export function ErrorBoundary() {
+  return (
+    <main className="mx-auto max-w-5xl px-4 py-8">
+      <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
+        <h1 className="text-lg font-semibold text-destructive">
+          Access review hit an error
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Something went wrong while loading the pending queue. Reloading
+          usually recovers.
+        </p>
+        <Link
+          to="/access-requests/review?sessionRole=owner"
+          className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
+        >
+          Reset and retry
+        </Link>
+      </div>
     </main>
   );
 }

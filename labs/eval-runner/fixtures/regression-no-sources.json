@@ -1,0 +1,49 @@
+{
+  "description": "T-2026-069 regression fixture: proves the eval gate fails a case when the agent pipeline stops returning grounded sources for a RAG query. Loaded only by score.regression.test.ts (not by the offline eval / must-pass golden set). If checkSources() in src/score.ts ever regresses, this test starts failing and CI catches it before a real 'no sources' bug ships.",
+  "case": {
+    "id": "regression-empty-sources",
+    "query": "metalcraft-studio 銀戒鍛造入門體驗",
+    "expectedKeywords": ["銀戒"],
+    "minEventCount": 4,
+    "expectRag": true
+  },
+  "syntheticEventsNoContext": [
+    { "event": "internal.meta", "data": "{}" },
+    {
+      "event": "internal.rag_step",
+      "data": "{\"step\":\"retrieve\",\"detail\":\"local retrieve: no hits for \\\"metalcraft-studio 銀戒鍛造入門體驗\\\"\"}"
+    },
+    {
+      "event": "internal.rag_step",
+      "data": "{\"step\":\"rerank\",\"detail\":\"rerank top 0\"}"
+    },
+    {
+      "event": "internal.rag_step",
+      "data": "{\"step\":\"compose\",\"detail\":\"no context\"}"
+    },
+    { "event": "internal.chunk", "data": "{\"text\":\"銀戒\"}" },
+    {
+      "event": "internal.final",
+      "data": "{\"sources\":[{\"title\":\"fallback\",\"url\":\"https://example.local/fallback\"}],\"nextSteps\":[]}"
+    },
+    { "event": "internal.done", "data": "{}" }
+  ],
+  "syntheticEventsEmptySources": [
+    { "event": "internal.meta", "data": "{}" },
+    {
+      "event": "internal.rag_step",
+      "data": "{\"step\":\"retrieve\",\"detail\":\"local retrieve: ring-1\"}"
+    },
+    {
+      "event": "internal.rag_step",
+      "data": "{\"step\":\"rerank\",\"detail\":\"rerank top 1\"}"
+    },
+    {
+      "event": "internal.rag_step",
+      "data": "{\"step\":\"compose\",\"detail\":\"銀戒鍛造入門體驗\"}"
+    },
+    { "event": "internal.chunk", "data": "{\"text\":\"銀戒\"}" },
+    { "event": "internal.final", "data": "{\"sources\":[],\"nextSteps\":[]}" },
+    { "event": "internal.done", "data": "{}" }
+  ]
+}

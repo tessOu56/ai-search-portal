@@ -22,9 +22,15 @@ export type {
 } from "@ai-search-portal/contracts";
 export type {
   AccessApplicationContract,
+  AccessPermissionStatus,
+  AccessPurpose,
+  AccessRequestLifecycleStatus,
   GovernanceSessionRole,
+  UserRole,
 } from "@ai-search-portal/contracts";
 export {
+  cancelAccessRequestSchema,
+  cancelAccessResponseSchema,
   contextMetricSchema,
   contextPackManifestSchema,
   DEFAULT_CONTEXT_PACK_ID,
@@ -33,6 +39,10 @@ export {
   getContextBindingsResponseSchema,
   getContextMetricResponseSchema,
   getMetadataAssetResponseSchema,
+  governanceDeniedError,
+  governanceHitlError,
+  governanceInvalidTransitionError,
+  governancePolicyErrorSchema,
   lineageGraphPropsSchema,
   listAccessApplicationsResponseSchema,
   listContextPacksResponseSchema,
@@ -51,10 +61,14 @@ export {
   reviewAccessRequestSchema,
   reviewAccessResponseSchema,
   submitAccessResponseSchema,
+  submitDraftAccessRequestSchema,
 } from "@ai-search-portal/contracts";
 export {
   accessApplicationSchema,
+  accessPurposeSchema,
+  accessRequestLifecycleStatusSchema,
   governanceSessionRoleSchema,
+  userRoleSchema,
 } from "@ai-search-portal/contracts";
 export {
   chatQueryParamsSchema,

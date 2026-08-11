@@ -5,19 +5,27 @@
 import { http, HttpResponse } from "msw";
 
 import {
+  cancelAccessApplication,
   createAccessApplication,
   editAccessApplication,
   listAccessApplications,
   reviewAccessApplication,
+  submitDraftAccessApplication,
 } from "~/services/access-request-store.server";
 import {
+  cancelAccessResponseSchema,
   evaluateAccessResponseSchema,
   getMetadataAssetResponseSchema,
+  governanceDeniedError,
+  governanceHitlError,
+  governanceInvalidTransitionError,
+  governancePolicyErrorSchema,
   listAccessApplicationsResponseSchema,
   listAuditEventsResponseSchema,
   listMetadataResponseSchema,
   mcpDiscoverSchema,
   mcpToolsCallResponseSchema,
+  metadataLineageResponseSchema,
   policyDecisionSchema,
   reviewAccessResponseSchema,
   submitAccessResponseSchema,
@@ -30,6 +38,7 @@ import {
 
 const ERROR_INVALID_BODY = "Invalid request body";
 const ERROR_ASSET_NOT_FOUND = "Asset not found";
+const ERROR_ACCESS_REQUEST_NOT_FOUND = "Access request not found";
 const PAGE_SIZE = 5;
 let mockRequestSeq = 0;
 
@@ -333,13 +342,13 @@ export const metadataHandlers = [
     }
     if (decision.need_approval && !raw.approved) {
       return HttpResponse.json(
-        { error: "Human approval required", decision },
+        governanceHitlError("Human approval required", decision),
         { status: 422 }
       );
     }
     if (!decision.allow && !decision.need_approval) {
       return HttpResponse.json(
-        { error: "Access denied by policy", decision },
+        governanceDeniedError("Access denied by policy", decision),
         { status: 403 }
       );
     }
@@ -424,17 +433,114 @@ export const metadataHandlers = [
               id,
               decision: raw.decision,
             });
-      if (!updated) {
+      if (!updated.ok) {
+        if (updated.reason === "not_found") {
+          return HttpResponse.json(
+            governancePolicyErrorSchema.parse({
+              error: ERROR_ACCESS_REQUEST_NOT_FOUND,
+              code: "NOT_FOUND",
+            }),
+            { status: 404 }
+          );
+        }
         return HttpResponse.json(
-          { error: "Access request not found" },
-          { status: 404 }
+          governanceInvalidTransitionError(
+            `Cannot ${raw.decision} in current status`
+          ),
+          { status: 409 }
         );
       }
       return HttpResponse.json(
-        reviewAccessResponseSchema.parse({ data: updated })
+        reviewAccessResponseSchema.parse({ data: updated.data })
       );
     }
   ),
+
+  http.post("/api/metadata/access-requests/:requestId/submit", ({ params }) => {
+    const id = String(params.requestId);
+    const updated = submitDraftAccessApplication(id);
+    if (!updated.ok) {
+      return HttpResponse.json(
+        updated.reason === "not_found"
+          ? governancePolicyErrorSchema.parse({
+              error: ERROR_ACCESS_REQUEST_NOT_FOUND,
+              code: "NOT_FOUND",
+            })
+          : governanceInvalidTransitionError("Cannot submit non-draft"),
+        { status: updated.reason === "not_found" ? 404 : 409 }
+      );
+    }
+    const decision = updated.data.decision;
+    if (!decision) {
+      return HttpResponse.json(
+        { error: "Missing policy decision on draft" },
+        { status: 500 }
+      );
+    }
+    return HttpResponse.json(
+      submitAccessResponseSchema.parse({
+        data: {
+          requestId: updated.data.id,
+          status: updated.data.status,
+          decision,
+          auditLogged: decision.require_audit,
+        },
+      }),
+      { status: 202 }
+    );
+  }),
+
+  http.post("/api/metadata/access-requests/:requestId/cancel", ({ params }) => {
+    const id = String(params.requestId);
+    const updated = cancelAccessApplication({ id });
+    if (!updated.ok) {
+      return HttpResponse.json(
+        updated.reason === "not_found"
+          ? governancePolicyErrorSchema.parse({
+              error: ERROR_ACCESS_REQUEST_NOT_FOUND,
+              code: "NOT_FOUND",
+            })
+          : governanceInvalidTransitionError("Cannot cancel in current status"),
+        { status: updated.reason === "not_found" ? 404 : 409 }
+      );
+    }
+    return HttpResponse.json(
+      cancelAccessResponseSchema.parse({ data: updated.data })
+    );
+  }),
+
+  http.get("/api/metadata/:assetId/lineage", ({ params, request }) => {
+    if (params.assetId === "access-requests") {
+      return HttpResponse.json(
+        { error: ERROR_ASSET_NOT_FOUND },
+        { status: 404 }
+      );
+    }
+    const packId = packFromRequest(request);
+    const asset = assetsForPack(packId).find((a) => a.id === params.assetId);
+    if (!asset) {
+      return HttpResponse.json(
+        { error: ERROR_ASSET_NOT_FOUND },
+        { status: 404 }
+      );
+    }
+    const type =
+      asset.assetType === "API"
+        ? ("api" as const)
+        : asset.assetType === "Dashboard"
+          ? ("dashboard" as const)
+          : ("table" as const);
+    const body = metadataLineageResponseSchema.parse({
+      data: {
+        assetId: asset.id,
+        upstream: [],
+        downstream: [],
+        nodes: [{ id: asset.id, label: asset.name, type }],
+        edges: [],
+      },
+    });
+    return HttpResponse.json(body);
+  }),
 
   http.get("/api/audit", ({ request }) => {
     const url = new URL(request.url);

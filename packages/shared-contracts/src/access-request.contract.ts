@@ -28,6 +28,7 @@ export type GovernanceSessionRole = z.infer<typeof governanceSessionRoleSchema>;
 
 /**
  * Lifecycle SSOT. Ticket aliases: submitted→pending_approval, rejected→denied.
+ * `cancelled` = requester withdrew while pending (T-186).
  */
 export const accessRequestLifecycleStatusSchema = z.enum([
   "draft",
@@ -35,6 +36,7 @@ export const accessRequestLifecycleStatusSchema = z.enum([
   "approved",
   "denied",
   "expired",
+  "cancelled",
 ]);
 
 export type AccessRequestLifecycleStatus = z.infer<
@@ -135,3 +137,84 @@ export const reviewAccessRequestSchema = z
 export const reviewAccessResponseSchema = z.object({
   data: accessApplicationSchema,
 });
+
+/** Typed governance API errors (validation | deny | HITL | invalid transition). */
+export const governancePolicyErrorCodeSchema = z.enum([
+  "ACCESS_DENIED",
+  "HITL_REQUIRED",
+  "INVALID_TRANSITION",
+  "NOT_FOUND",
+  "VALIDATION_ERROR",
+]);
+
+export type GovernancePolicyErrorCode = z.infer<
+  typeof governancePolicyErrorCodeSchema
+>;
+
+export const governancePolicyErrorSchema = z.object({
+  error: z.string().min(1),
+  code: governancePolicyErrorCodeSchema.optional(),
+  decision: policyDecisionSchema.optional(),
+  toolError: z
+    .object({
+      code: z.literal("HITL_REQUIRED"),
+      message: z.string().min(1),
+      tool: z.string().min(1).optional(),
+      riskLevel: z.enum(["low", "medium", "high"]).optional(),
+    })
+    .optional(),
+});
+
+export type GovernancePolicyError = z.infer<typeof governancePolicyErrorSchema>;
+
+export const submitDraftAccessRequestSchema = z.object({
+  /** Re-evaluate policy before promoting draft → pending_approval. */
+  approved: z.boolean().optional(),
+});
+
+export const cancelAccessRequestSchema = z.object({
+  reason: z.string().min(1).optional(),
+});
+
+export const cancelAccessResponseSchema = z.object({
+  data: accessApplicationSchema,
+});
+
+/** Build a HITL 422 body matching governancePolicyErrorSchema. */
+export function governanceHitlError(
+  message = "Human approval required",
+  decision?: z.infer<typeof policyDecisionSchema>,
+  tool = "access_request.submit"
+): z.infer<typeof governancePolicyErrorSchema> {
+  return governancePolicyErrorSchema.parse({
+    error: message,
+    code: "HITL_REQUIRED",
+    decision,
+    toolError: {
+      code: "HITL_REQUIRED",
+      message,
+      tool,
+      riskLevel: "high",
+    },
+  });
+}
+
+export function governanceDeniedError(
+  message = "Access denied by policy",
+  decision?: z.infer<typeof policyDecisionSchema>
+): z.infer<typeof governancePolicyErrorSchema> {
+  return governancePolicyErrorSchema.parse({
+    error: message,
+    code: "ACCESS_DENIED",
+    decision,
+  });
+}
+
+export function governanceInvalidTransitionError(
+  message: string
+): z.infer<typeof governancePolicyErrorSchema> {
+  return governancePolicyErrorSchema.parse({
+    error: message,
+    code: "INVALID_TRANSITION",
+  });
+}

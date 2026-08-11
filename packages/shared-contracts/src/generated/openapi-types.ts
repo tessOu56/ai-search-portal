@@ -159,10 +159,79 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** List access applications */
+        get: operations["listMetadataAccessRequests"];
         put?: never;
         /** Submit metadata access request */
         post: operations["submitMetadataAccess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/metadata/access-requests/{requestId}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve, deny, or edit a pending access request */
+        post: operations["reviewMetadataAccess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/metadata/access-requests/{requestId}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Promote draft application to pending_approval */
+        post: operations["submitDraftMetadataAccess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/metadata/access-requests/{requestId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a draft or pending access request */
+        post: operations["cancelMetadataAccess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/metadata/{assetId}/lineage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resolve upstream/downstream lineage for an asset */
+        get: operations["getMetadataLineage"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -213,6 +282,20 @@ export interface components {
         };
         ErrorResponse: {
             error: string;
+        };
+        GovernancePolicyError: {
+            error: string;
+            /** @enum {string} */
+            code?: "ACCESS_DENIED" | "HITL_REQUIRED" | "INVALID_TRANSITION" | "NOT_FOUND" | "VALIDATION_ERROR";
+            decision?: components["schemas"]["PolicyDecision"];
+            toolError?: {
+                /** @enum {string} */
+                code: "HITL_REQUIRED";
+                message: string;
+                tool?: string;
+                /** @enum {string} */
+                riskLevel?: "low" | "medium" | "high";
+            };
         };
         MetadataAssetSummary: {
             id: string;
@@ -299,6 +382,8 @@ export interface components {
         };
         MetadataAccessRequest: components["schemas"]["MetadataAccessEvaluateRequest"] & {
             approved?: boolean;
+            requesterId?: string;
+            asDraft?: boolean;
         };
         PolicyDecision: {
             allow: boolean;
@@ -315,9 +400,71 @@ export interface components {
             data: {
                 requestId: string;
                 /** @enum {string} */
-                status: "approved" | "pending_approval" | "denied";
+                status: "draft" | "pending_approval" | "approved" | "denied" | "expired" | "cancelled";
                 decision: components["schemas"]["PolicyDecision"];
                 auditLogged: boolean;
+            };
+        };
+        AccessApplication: {
+            id: string;
+            assetId: string;
+            assetName: string;
+            /** @enum {string} */
+            purpose: "analytics" | "marketing" | "operations";
+            /** @enum {string} */
+            role: "analyst" | "data_admin" | "engineer";
+            requesterId: string;
+            /** @enum {string} */
+            status: "draft" | "pending_approval" | "approved" | "denied" | "expired" | "cancelled";
+            /** @enum {string} */
+            permissionStatus: "none" | "pending" | "granted" | "revoked";
+            owner: string;
+            createdAt: string;
+            updatedAt: string;
+            decision?: components["schemas"]["PolicyDecision"];
+            termsAccepted?: string[];
+        };
+        ListAccessApplicationsResponse: {
+            data: components["schemas"]["AccessApplication"][];
+        };
+        ReviewAccessRequest: {
+            /** @enum {string} */
+            decision: "approved" | "denied" | "edited";
+            reviewerId?: string;
+            /** @enum {string} */
+            purpose?: "analytics" | "marketing" | "operations";
+            /** @enum {string} */
+            role?: "analyst" | "data_admin" | "engineer";
+        };
+        ReviewAccessResponse: {
+            data: components["schemas"]["AccessApplication"];
+        };
+        SubmitDraftAccessRequest: {
+            approved?: boolean;
+        };
+        CancelAccessRequest: {
+            reason?: string;
+        };
+        CancelAccessResponse: {
+            data: components["schemas"]["AccessApplication"];
+        };
+        MetadataLineageNode: {
+            id: string;
+            label: string;
+            /** @enum {string} */
+            type: "table" | "column" | "api" | "dashboard" | "database";
+        };
+        MetadataLineageEdge: {
+            source: string;
+            target: string;
+        };
+        MetadataLineageResponse: {
+            data: {
+                assetId: string;
+                upstream: components["schemas"]["MetadataAssetSummary"][];
+                downstream: components["schemas"]["MetadataAssetSummary"][];
+                nodes: components["schemas"]["MetadataLineageNode"][];
+                edges: components["schemas"]["MetadataLineageEdge"][];
             };
         };
         ContextPackManifest: {
@@ -805,12 +952,55 @@ export interface operations {
                     "application/json": components["schemas"]["EvaluateAccessResponse"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Asset not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listMetadataAccessRequests: {
+        parameters: {
+            query?: {
+                requesterId?: string;
+                pendingOnly?: "0" | "1";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListAccessApplicationsResponse"];
+                };
+            };
         };
     };
     submitMetadataAccess: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -820,6 +1010,15 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Draft created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubmitAccessResponse"];
+                };
+            };
             /** @description Accepted */
             202: {
                 headers: {
@@ -829,8 +1028,182 @@ export interface operations {
                     "application/json": components["schemas"]["SubmitAccessResponse"];
                 };
             };
-            /** @description Approval required */
+            /** @description Access denied by policy */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernancePolicyError"];
+                };
+            };
+            /** @description HITL approval required */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernancePolicyError"];
+                };
+            };
+        };
+    };
+    reviewMetadataAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requestId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewAccessRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewAccessResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernancePolicyError"];
+                };
+            };
+            /** @description Invalid lifecycle transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernancePolicyError"];
+                };
+            };
+        };
+    };
+    submitDraftMetadataAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requestId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SubmitDraftAccessRequest"];
+            };
+        };
+        responses: {
+            /** @description Submitted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubmitAccessResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernancePolicyError"];
+                };
+            };
+            /** @description Invalid lifecycle transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernancePolicyError"];
+                };
+            };
+        };
+    };
+    cancelMetadataAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requestId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CancelAccessRequest"];
+            };
+        };
+        responses: {
+            /** @description Cancelled */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CancelAccessResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernancePolicyError"];
+                };
+            };
+            /** @description Invalid lifecycle transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernancePolicyError"];
+                };
+            };
+        };
+    };
+    getMetadataLineage: {
+        parameters: {
+            query?: {
+                pack?: string;
+            };
+            header?: never;
+            path: {
+                assetId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataLineageResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

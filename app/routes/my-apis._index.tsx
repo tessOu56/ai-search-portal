@@ -4,7 +4,12 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import {
+  Link,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 
 import { MyApisPanel } from "~/features/accessrequests";
 import {
@@ -36,15 +41,15 @@ export async function action({ request }: ActionFunctionArgs) {
   if (intent === "submit-draft") {
     const id = String(form.get("requestId") ?? "");
     const updated = submitDraftAccessApplication(id);
-    if (!updated) {
+    if (!updated.ok) {
       return json(
         { ok: false as const, text: "Draft not found or already submitted" },
-        { status: 404 }
+        { status: updated.reason === "invalid_transition" ? 409 : 404 }
       );
     }
     return json({
       ok: true as const,
-      text: `${updated.assetName} → ${updated.status}`,
+      text: `${updated.data.assetName} → ${updated.data.status}`,
     });
   }
   if (intent === "expire-stale") {
@@ -63,11 +68,13 @@ export function loader({ request }: LoaderFunctionArgs) {
   const sessionRole = resolveSessionRole(url.searchParams.get("sessionRole"));
   const applications =
     sessionRole === "requester" ? listAccessApplications() : [];
-  return json({ sessionRole, applications });
+  const highlightId = url.searchParams.get("highlight") ?? undefined;
+  return json({ sessionRole, applications, highlightId });
 }
 
 export default function MyApisRoute() {
-  const { sessionRole, applications } = useLoaderData<typeof loader>();
+  const { sessionRole, applications, highlightId } =
+    useLoaderData<typeof loader>();
   const actionMessage = useActionData<typeof action>();
   const navigation = useNavigation();
   const loading = navigation.state !== "idle";
@@ -78,7 +85,31 @@ export default function MyApisRoute() {
         sessionRole={sessionRole}
         loading={loading}
         actionMessage={actionMessage}
+        highlightId={highlightId}
       />
+    </main>
+  );
+}
+
+/** Route-level error state (four-state completeness — mirrors catalog-search / metadata). */
+export function ErrorBoundary() {
+  return (
+    <main className="mx-auto max-w-5xl px-4 py-8">
+      <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
+        <h1 className="text-lg font-semibold text-destructive">
+          My APIs hit an error
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Something went wrong while loading your applications. Reloading
+          usually recovers.
+        </p>
+        <Link
+          to="/my-apis?sessionRole=requester"
+          className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
+        >
+          Reset and retry
+        </Link>
+      </div>
     </main>
   );
 }

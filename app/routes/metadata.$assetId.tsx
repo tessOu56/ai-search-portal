@@ -1,14 +1,24 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useActionData, useLoaderData } from "@remix-run/react";
+import {
+  isRouteErrorResponse,
+  Link,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+  useRouteError,
+} from "@remix-run/react";
 import { z } from "zod";
 
+import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { buildDetailGenUiDocument } from "~/components/shared/genui";
+import { Button } from "~/components/ui/Button";
 import { MetadataAssetDetailView } from "~/features/metadata";
 import {
   evaluateMetadataAccess,
   submitMetadataAccessRequest,
 } from "~/services/access-policy.server";
+import { getLatestAccessApplicationForAsset } from "~/services/access-request-store.server";
 import { parsePackIdFromRequest } from "~/services/context-pack.server";
 import {
   getMetadataAsset,
@@ -18,6 +28,7 @@ import {
   genUiDocumentSchema,
   metadataAccessRequestSchema,
 } from "~/shared/contracts";
+import { getRouteErrorDisplay } from "~/shared/utils/errors";
 
 const aiAccessRequestPayloadSchema = z.object({
   request: metadataAccessRequestSchema,
@@ -138,6 +149,11 @@ export function loader({ params, request }: LoaderFunctionArgs) {
     role,
   });
 
+  const existingApplication = getLatestAccessApplicationForAsset({
+    assetId,
+    requesterId: `requester:${role}`,
+  });
+
   return json({
     asset,
     genUiDocument,
@@ -146,6 +162,7 @@ export function loader({ params, request }: LoaderFunctionArgs) {
     purpose: effectivePurpose,
     packId,
     aiAccessRequest,
+    existingApplication,
   });
 }
 
@@ -197,7 +214,25 @@ export async function action({ params, request }: ActionFunctionArgs) {
   return json({
     ok: true,
     message: `Request ${result.data.status} (audit: ${result.data.auditLogged})`,
+    status: result.data.status,
+    requestId: result.data.requestId,
   });
+}
+
+function MetadataAssetDetailSkeleton() {
+  return (
+    <div
+      className="animate-pulse space-y-6"
+      role="status"
+      aria-label="Loading asset"
+    >
+      <div className="h-4 w-48 rounded bg-muted" />
+      <div className="h-40 rounded-2xl bg-muted" />
+      <div className="h-56 rounded-2xl bg-muted" />
+      <div className="h-24 rounded-2xl bg-muted" />
+      <div className="h-32 rounded-2xl bg-muted" />
+    </div>
+  );
 }
 
 export default function MetadataAssetPage() {
@@ -208,8 +243,20 @@ export default function MetadataAssetPage() {
     role,
     purpose,
     aiAccessRequest,
+    existingApplication,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+  // Only show the skeleton when navigating to a *different* asset — same-page
+  // context (purpose/role, confirm=1) changes stay fully interactive.
+  const isLoadingDifferentAsset =
+    navigation.state === "loading" &&
+    navigation.location?.pathname.startsWith("/metadata/") === true &&
+    navigation.location.pathname !== `/metadata/${asset.id}`;
+
+  if (isLoadingDifferentAsset) {
+    return <MetadataAssetDetailSkeleton />;
+  }
 
   return (
     <MetadataAssetDetailView
@@ -219,11 +266,34 @@ export default function MetadataAssetPage() {
       role={role}
       purpose={purpose}
       aiAccessRequest={aiAccessRequest}
+      existingApplication={existingApplication}
       submitResult={
         actionData
           ? { ok: actionData.ok, message: actionData.message }
           : undefined
       }
     />
+  );
+}
+
+/** Route-level error state — asset not found / unexpected errors (T-186 #3). */
+export function ErrorBoundary() {
+  const error = useRouteError();
+  const { title, message, statusCode } = getRouteErrorDisplay(error);
+  const notFound = isRouteErrorResponse(error) && error.status === 404;
+  return (
+    <ErrorBoundaryFallback
+      title={notFound ? "Asset not found" : title}
+      message={
+        notFound
+          ? "This metadata asset doesn't exist or was removed. Try the catalog instead."
+          : message
+      }
+      statusCode={statusCode}
+    >
+      <Button asChild>
+        <Link to="/metadata">Back to metadata catalog</Link>
+      </Button>
+    </ErrorBoundaryFallback>
   );
 }

@@ -2,8 +2,14 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
 import { submitMetadataAccessRequest } from "~/services/access-policy.server";
-import { listAccessApplications } from "~/services/access-request-store.server";
 import {
+  listAccessApplications,
+  rememberIdempotencyKey,
+  resolveIdempotencyKey,
+} from "~/services/access-request-store.server";
+import {
+  governanceDeniedError,
+  governanceHitlError,
   listAccessApplicationsResponseSchema,
   metadataAccessRequestSchema,
   submitAccessResponseSchema,
@@ -26,6 +32,22 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ error: "Method not allowed" }, { status: 405 });
   }
 
+  const idempotencyKey = request.headers.get("Idempotency-Key")?.trim();
+  if (idempotencyKey) {
+    const existing = resolveIdempotencyKey(idempotencyKey);
+    if (existing?.decision) {
+      const body = submitAccessResponseSchema.parse({
+        data: {
+          requestId: existing.id,
+          status: existing.status,
+          decision: existing.decision,
+          auditLogged: existing.decision.require_audit,
+        },
+      });
+      return json(body, { status: existing.status === "draft" ? 201 : 202 });
+    }
+  }
+
   let raw: unknown;
   try {
     raw = await request.json();
@@ -40,23 +62,24 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const result = submitMetadataAccessRequest(parsed.data);
   if (!result.ok) {
-    const hitl =
-      result.error === "Human approval required"
-        ? {
-            code: "HITL_REQUIRED" as const,
-            message: result.error,
-            tool: "access_request.submit",
-            riskLevel: "high" as const,
-          }
-        : undefined;
+    if (result.status === 422) {
+      return json(governanceHitlError(result.error, result.decision), {
+        status: 422,
+      });
+    }
+    if (result.status === 403) {
+      return json(governanceDeniedError(result.error, result.decision), {
+        status: 403,
+      });
+    }
     return json(
-      {
-        error: result.error,
-        decision: result.decision,
-        ...(hitl ? { code: hitl.code, toolError: hitl } : {}),
-      },
+      { error: result.error, decision: result.decision },
       { status: result.status }
     );
+  }
+
+  if (idempotencyKey) {
+    rememberIdempotencyKey(idempotencyKey, result.data.requestId);
   }
 
   const body = submitAccessResponseSchema.parse({ data: result.data });

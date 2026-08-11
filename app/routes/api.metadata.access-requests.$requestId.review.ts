@@ -8,6 +8,8 @@ import {
 } from "~/services/access-request-store.server";
 import { appendAuditEvent } from "~/services/audit-log.server";
 import {
+  governanceInvalidTransitionError,
+  governancePolicyErrorSchema,
   reviewAccessRequestSchema,
   reviewAccessResponseSchema,
   toolExecutionErrorSchema,
@@ -37,7 +39,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const current = getAccessApplication(requestId);
   if (!current) {
-    return json({ error: "Access request not found" }, { status: 404 });
+    return json(
+      governancePolicyErrorSchema.parse({
+        error: "Access request not found",
+        code: "NOT_FOUND",
+      }),
+      { status: 404 }
+    );
   }
 
   const updated =
@@ -52,11 +60,26 @@ export async function action({ request, params }: ActionFunctionArgs) {
           decision: parsed.data.decision,
         });
 
-  if (!updated) {
-    return json({ error: "Access request not found" }, { status: 404 });
+  if (!updated.ok) {
+    if (updated.reason === "not_found") {
+      return json(
+        governancePolicyErrorSchema.parse({
+          error: "Access request not found",
+          code: "NOT_FOUND",
+        }),
+        { status: 404 }
+      );
+    }
+    return json(
+      governanceInvalidTransitionError(
+        `Cannot ${parsed.data.decision} when status is ${current.status}`
+      ),
+      { status: 409 }
+    );
   }
 
-  const decisionId = updated.decision?.decision_id ?? `review:${requestId}`;
+  const decisionId =
+    updated.data.decision?.decision_id ?? `review:${requestId}`;
   const outcome =
     parsed.data.decision === "edited"
       ? ("edited" as const)
@@ -71,16 +94,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
         : parsed.data.decision === "approved"
           ? "access_request.approve"
           : "access_request.deny",
-    actor: { role: updated.role },
-    resource: { type: "metadata_asset", id: updated.assetId },
+    actor: { role: updated.data.role },
+    resource: { type: "metadata_asset", id: updated.data.assetId },
     decisionId,
-    requestId: updated.id,
+    requestId: updated.data.id,
     outcome,
     requireAudit: true,
     reasons: [`review:${parsed.data.decision}`],
   });
 
-  const body = reviewAccessResponseSchema.parse({ data: updated });
+  const body = reviewAccessResponseSchema.parse({ data: updated.data });
   return json(body);
 }
 

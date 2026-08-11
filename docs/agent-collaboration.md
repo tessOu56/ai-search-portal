@@ -53,6 +53,8 @@
 | `obs-smoke`     | `pnpm run observability:smoke`                        | 2+    | trace smoke                  |
 | `design-prompt` | `pnpm run design:prompt`                              | 4     | Figma MCP 工作流（STOP-003） |
 
+> **T-2026-069 eval gate**：`eval:offline`（含 golden 集 + 「no sources」regression guard，見 `labs/eval-runner/src/score.ts`）是 CI `ci` job 的必要步驟（`.github/workflows/ci.yml`，非 `continue-on-error`）；golden 集任一 case 失敗會讓 CI 失敗並擋 PR 合併。
+
 ### 4.2 Agent prompts（複製貼上）
 
 **Phase 0 收尾**

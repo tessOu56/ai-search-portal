@@ -1,4 +1,6 @@
-import { Form, Link, useSearchParams } from "@remix-run/react";
+import { FormField } from "@explore-design/components";
+import { Link, useFetcher, useSearchParams, useSubmit } from "@remix-run/react";
+import type { FormEvent } from "react";
 
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { GenUiRenderer } from "~/components/shared/genui";
@@ -11,11 +13,17 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
+import {
+  AccessRequestLifecycleStepper,
+  myApisHighlightHref,
+} from "~/features/accessrequests";
 import type {
+  AccessApplicationContract,
   GenUiDocumentContract,
   MetadataAssetDetailContract,
   PolicyDecisionContract,
 } from "~/shared/contracts";
+import { cn } from "~/shared/utils/cn";
 
 export type MetadataAssetDetailProps = {
   asset: MetadataAssetDetailContract;
@@ -24,6 +32,9 @@ export type MetadataAssetDetailProps = {
   role: string;
   purpose: string;
   aiAccessRequest: AiAccessRequestState;
+  /** Most recent application by this requester on this asset (lifecycle stepper). */
+  existingApplication?: AccessApplicationContract | null;
+  /** No-JS fallback submit result (real actionData); fetcher.data wins when present. */
   submitResult?: { ok: boolean; message: string };
 };
 
@@ -42,6 +53,13 @@ type AiAccessRequestState =
     }
   | { status: "invalid"; query: string; reason: string };
 
+type AccessSubmitFetcherData = {
+  ok: boolean;
+  message: string;
+  status?: string;
+  requestId?: string;
+};
+
 function buildConfirmHref(
   purpose: string,
   role: string,
@@ -54,6 +72,155 @@ function buildConfirmHref(
   if (confirm) sp.set("confirm", "1");
   if (options?.aiFill) sp.set("aiFill", "1");
   return `?${sp.toString()}`;
+}
+
+function humanPolicySummary(decision: PolicyDecisionContract): string {
+  if (decision.need_approval) {
+    return "This request needs sign-off from the data owner before access is granted.";
+  }
+  if (decision.allow) {
+    return "You meet the requirements for this purpose and role — access can be granted right away.";
+  }
+  return "Access isn't allowed for this purpose and role.";
+}
+
+/** Approve-outcome deep link into My APIs (requester view) — T-186 #5. */
+function ApprovedTrackingLink({ requestId }: { requestId: string }) {
+  return (
+    <p className="text-sm">
+      <Link
+        to={myApisHighlightHref(requestId)}
+        className="text-primary hover:underline"
+      >
+        View in My APIs (requester view) →
+      </Link>
+    </p>
+  );
+}
+
+function SubmitResultBanner({
+  result,
+}: {
+  result?: {
+    ok: boolean;
+    message: string;
+    requestId?: string;
+    status?: string;
+  };
+}) {
+  if (!result) return null;
+  return (
+    <div className="space-y-2">
+      <p
+        className={
+          result.ok ? "text-sm text-green-700" : "text-sm text-destructive"
+        }
+        role="status"
+      >
+        {result.message}
+      </p>
+      {result.ok ? (
+        <p className="text-sm">
+          <Link
+            to="/my-apis?sessionRole=requester"
+            className="text-primary hover:underline"
+          >
+            Track in My APIs
+          </Link>
+          {" · "}
+          <Link
+            to="/access-requests/review?sessionRole=owner"
+            className="text-primary hover:underline"
+          >
+            Owner review queue
+          </Link>
+        </p>
+      ) : null}
+      {result.ok && result.status === "approved" && result.requestId ? (
+        <ApprovedTrackingLink requestId={result.requestId} />
+      ) : null}
+    </div>
+  );
+}
+
+/** GET-driven purpose/role selector — writes to the URL so decisions stay shareable (T-186 #1). */
+function AccessContextForm({
+  purpose,
+  role,
+}: {
+  purpose: string;
+  role: string;
+}) {
+  const submit = useSubmit();
+  const [searchParams] = useSearchParams();
+  const packParam = searchParams.get("pack");
+  const aiFillParam = searchParams.get("aiFill");
+
+  function handleChange(event: FormEvent<HTMLFormElement>) {
+    submit(event.currentTarget, { method: "get" });
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Access context</CardTitle>
+        <CardDescription>
+          Purpose and role drive the policy decision below — changing them
+          updates this page&apos;s URL so the exact scenario stays shareable.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form
+          method="get"
+          onChange={handleChange}
+          className="flex flex-wrap items-end gap-4"
+          aria-label="Access context"
+        >
+          {packParam ? (
+            <input type="hidden" name="pack" value={packParam} />
+          ) : null}
+          {aiFillParam ? (
+            <input type="hidden" name="aiFill" value={aiFillParam} />
+          ) : null}
+          <FormField
+            label="Purpose"
+            aiFilled={Boolean(aiFillParam)}
+            aiBadgeLabel="AI suggested"
+          >
+            <select
+              name="purpose"
+              defaultValue={purpose}
+              className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+            >
+              <option value="analytics">analytics</option>
+              <option value="marketing">marketing</option>
+              <option value="operations">operations</option>
+            </select>
+          </FormField>
+          <FormField
+            label="Role"
+            aiFilled={Boolean(aiFillParam)}
+            aiBadgeLabel="AI suggested"
+          >
+            <select
+              name="role"
+              defaultValue={role}
+              className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+            >
+              <option value="analyst">analyst</option>
+              <option value="engineer">engineer</option>
+              <option value="data_admin">data_admin</option>
+            </select>
+          </FormField>
+          <noscript>
+            <Button type="submit" size="sm" variant="outline">
+              Update
+            </Button>
+          </noscript>
+        </form>
+      </CardContent>
+    </Card>
+  );
 }
 
 function AccessRequestPanel({
@@ -71,6 +238,9 @@ function AccessRequestPanel({
   const [searchParams] = useSearchParams();
   const showConfirm = searchParams.get("confirm") === "1";
   const canRequest = policyDecision.allow || policyDecision.need_approval;
+  const fetcher = useFetcher<AccessSubmitFetcherData>();
+  const effectiveResult = fetcher.data ?? submitResult;
+  const busy = fetcher.state !== "idle";
 
   return (
     <Card>
@@ -81,37 +251,7 @@ function AccessRequestPanel({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {submitResult ? (
-          <div className="space-y-2">
-            <p
-              className={
-                submitResult.ok
-                  ? "text-sm text-green-700"
-                  : "text-sm text-destructive"
-              }
-              role="status"
-            >
-              {submitResult.message}
-            </p>
-            {submitResult.ok ? (
-              <p className="text-sm">
-                <Link
-                  to="/my-apis?sessionRole=requester"
-                  className="text-primary hover:underline"
-                >
-                  Track in My APIs
-                </Link>
-                {" · "}
-                <Link
-                  to="/access-requests/review?sessionRole=owner"
-                  className="text-primary hover:underline"
-                >
-                  Owner review queue
-                </Link>
-              </p>
-            ) : null}
-          </div>
-        ) : null}
+        <SubmitResultBanner result={effectiveResult} />
 
         {!showConfirm ? (
           canRequest ? (
@@ -139,28 +279,41 @@ function AccessRequestPanel({
                 ))}
               </ul>
             ) : null}
-            <Form method="post" className="flex flex-wrap gap-2">
+            <fetcher.Form method="post" className="flex flex-wrap gap-2">
               <input type="hidden" name="intent" value="access-request" />
               <input type="hidden" name="purpose" value={purpose} />
               <input type="hidden" name="role" value={role} />
               <input type="hidden" name="approved" value="true" />
-              <Button type="submit">Confirm</Button>
+              <Button type="submit" disabled={busy}>
+                {busy ? "Submitting…" : "Confirm"}
+              </Button>
               <Button
                 type="submit"
                 name="asDraft"
                 value="true"
                 variant="outline"
+                disabled={busy}
               >
                 Save draft
               </Button>
               <Button asChild variant="ghost">
                 <Link to={buildConfirmHref(purpose, role, false)}>Cancel</Link>
               </Button>
-            </Form>
+            </fetcher.Form>
           </div>
         )}
       </CardContent>
     </Card>
+  );
+}
+
+/** Small marker used on AI-drafted fields — still editable before the human confirms (T-186 #6). */
+function AiSuggestedLabel({ children }: { children: string }) {
+  return (
+    <span className="flex items-center gap-1 text-xs font-medium text-primary">
+      <span aria-hidden="true">✨</span>
+      AI suggested — {children}
+    </span>
   );
 }
 
@@ -175,6 +328,9 @@ function AiAccessRequestPanel({
 }) {
   const [searchParams] = useSearchParams();
   const showConfirm = searchParams.get("confirm") === "1";
+  const fetcher = useFetcher<AccessSubmitFetcherData>();
+  const effectiveResult = fetcher.data ?? submitResult;
+  const busy = fetcher.state !== "idle";
 
   if (aiAccessRequest.status === "invalid") {
     return (
@@ -200,18 +356,7 @@ function AiAccessRequestPanel({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {submitResult ? (
-          <p
-            className={
-              submitResult.ok
-                ? "text-sm text-green-700"
-                : "text-sm text-destructive"
-            }
-            role="status"
-          >
-            {submitResult.message}
-          </p>
-        ) : null}
+        <SubmitResultBanner result={effectiveResult} />
 
         <div className="rounded-lg border border-border p-4">
           <p className="mb-3 text-sm text-muted-foreground">
@@ -258,31 +403,82 @@ function AiAccessRequestPanel({
                 ))}
               </ul>
             ) : null}
-            <Form method="post" className="flex gap-2">
+            <fetcher.Form method="post" className="space-y-3">
               <input type="hidden" name="intent" value="access-request" />
-              <input
-                type="hidden"
-                name="purpose"
-                value={aiAccessRequest.request.purpose}
-              />
-              <input type="hidden" name="role" value={requestRole} />
               <input type="hidden" name="approved" value="true" />
-              <Button type="submit">Confirm AI request</Button>
-              <Button asChild variant="outline">
-                <Link
-                  to={buildConfirmHref(
-                    aiAccessRequest.request.purpose,
-                    requestRole,
-                    false,
-                    { aiFill: true }
-                  )}
-                >
-                  Cancel
-                </Link>
-              </Button>
-            </Form>
+              <div className="flex flex-wrap gap-4">
+                <label className="flex flex-col gap-1">
+                  <AiSuggestedLabel>Purpose</AiSuggestedLabel>
+                  <select
+                    name="purpose"
+                    defaultValue={aiAccessRequest.request.purpose}
+                    className="border-primary/40 bg-primary/5 h-9 rounded-md border px-2 text-sm"
+                  >
+                    <option value="analytics">analytics</option>
+                    <option value="marketing">marketing</option>
+                    <option value="operations">operations</option>
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1">
+                  <AiSuggestedLabel>Role</AiSuggestedLabel>
+                  <select
+                    name="role"
+                    defaultValue={requestRole}
+                    className="border-primary/40 bg-primary/5 h-9 rounded-md border px-2 text-sm"
+                  >
+                    <option value="analyst">analyst</option>
+                    <option value="engineer">engineer</option>
+                    <option value="data_admin">data_admin</option>
+                  </select>
+                </label>
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" disabled={busy}>
+                  {busy ? "Submitting…" : "Confirm AI request"}
+                </Button>
+                <Button asChild variant="outline">
+                  <Link
+                    to={buildConfirmHref(
+                      aiAccessRequest.request.purpose,
+                      requestRole,
+                      false,
+                      { aiFill: true }
+                    )}
+                  >
+                    Cancel
+                  </Link>
+                </Button>
+              </div>
+            </fetcher.Form>
           </div>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ExistingApplicationCard({
+  application,
+}: {
+  application: AccessApplicationContract;
+}) {
+  return (
+    <Card data-testid="existing-application-card">
+      <CardHeader className="space-y-2">
+        <CardTitle className="text-base">Your application</CardTitle>
+        <CardDescription>
+          {application.purpose} · {application.role} · submitted{" "}
+          {new Date(application.createdAt).toLocaleDateString()}
+        </CardDescription>
+        <AccessRequestLifecycleStepper status={application.status} />
+      </CardHeader>
+      <CardContent>
+        <Link
+          to={myApisHighlightHref(application.id)}
+          className="text-sm text-primary hover:underline"
+        >
+          View in My APIs →
+        </Link>
       </CardContent>
     </Card>
   );
@@ -295,6 +491,7 @@ export function MetadataAssetDetailView({
   role,
   purpose,
   aiAccessRequest,
+  existingApplication,
   submitResult,
 }: MetadataAssetDetailProps) {
   return (
@@ -364,6 +561,12 @@ export function MetadataAssetDetailView({
         </CardContent>
       </Card>
 
+      <AccessContextForm purpose={purpose} role={role} />
+
+      {existingApplication ? (
+        <ExistingApplicationCard application={existingApplication} />
+      ) : null}
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Access policy</CardTitle>
@@ -371,25 +574,56 @@ export function MetadataAssetDetailView({
             Policy-driven evaluation (OPA Rego / in-process fallback)
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <div className="flex flex-wrap gap-2">
-            <Badge variant={policyDecision.allow ? "default" : "outline"}>
-              allow: {String(policyDecision.allow)}
-            </Badge>
-            <Badge
-              variant={policyDecision.need_approval ? "secondary" : "outline"}
-            >
-              need_approval: {String(policyDecision.need_approval)}
-            </Badge>
-            {policyDecision.require_audit ? (
-              <Badge variant="outline">audit required</Badge>
-            ) : null}
-          </div>
-          <ul className="list-inside list-disc text-muted-foreground">
-            {policyDecision.reasons.map((r) => (
-              <li key={r}>{r}</li>
-            ))}
-          </ul>
+        <CardContent className="space-y-4 text-sm">
+          <p>{humanPolicySummary(policyDecision)}</p>
+          {policyDecision.require_audit ? (
+            <p className="text-muted-foreground">
+              Accessing this asset is recorded in the audit log.
+            </p>
+          ) : null}
+
+          <details
+            open
+            className={cn(
+              "rounded-lg border border-border p-3",
+              "[&_summary]:cursor-pointer [&_summary]:select-none"
+            )}
+            data-testid="policy-debug-drawer"
+          >
+            <summary className="text-sm font-medium text-muted-foreground">
+              Technical decision details
+            </summary>
+            <div className="mt-3 space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <Badge variant={policyDecision.allow ? "default" : "outline"}>
+                  allow: {String(policyDecision.allow)}
+                </Badge>
+                <Badge
+                  variant={
+                    policyDecision.need_approval ? "secondary" : "outline"
+                  }
+                >
+                  need_approval: {String(policyDecision.need_approval)}
+                </Badge>
+                {policyDecision.require_audit ? (
+                  <Badge variant="outline">audit required</Badge>
+                ) : null}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                decision_id: {policyDecision.decision_id}
+              </p>
+              {policyDecision.mask_fields.length > 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  masked fields: {policyDecision.mask_fields.join(", ")}
+                </p>
+              ) : null}
+              <ul className="list-inside list-disc text-muted-foreground">
+                {policyDecision.reasons.map((r) => (
+                  <li key={r}>{r}</li>
+                ))}
+              </ul>
+            </div>
+          </details>
         </CardContent>
       </Card>
 

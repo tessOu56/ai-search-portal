@@ -105,3 +105,31 @@ export const analyticsEventSchema = z.discriminatedUnion("name", [
 
 export type AnalyticsEventName = z.infer<typeof analyticsEventNameSchema>;
 export type AnalyticsEventContract = z.infer<typeof analyticsEventSchema>;
+
+/**
+ * Web Vitals telemetry (T-2026-115, Pillar 4).
+ *
+ * Deliberately standalone from `analyticsEventSchema` above: it is a
+ * page-performance sample (no eventId/session/surface), not a product
+ * interaction event. Closed schema — no free-form property bag.
+ */
+export const webVitalNameSchema = z.enum(["LCP", "INP", "CLS"]);
+
+export const webVitalRatingSchema = z.enum([
+  "good",
+  "needs-improvement",
+  "poor",
+]);
+
+export const webVitalReportedEventSchema = z
+  .object({
+    name: webVitalNameSchema,
+    value: z.number().nonnegative(),
+    rating: webVitalRatingSchema,
+    route: z.string().min(1).max(256),
+  })
+  .strict();
+
+export type WebVitalName = z.infer<typeof webVitalNameSchema>;
+export type WebVitalRating = z.infer<typeof webVitalRatingSchema>;
+export type WebVitalReportedEvent = z.infer<typeof webVitalReportedEventSchema>;

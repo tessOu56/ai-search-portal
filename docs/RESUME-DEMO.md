@@ -39,6 +39,10 @@ pnpm dev
    streaming, tool status, confidence + sources render live; the "Mock agent"
    badge is honest labelling (pipeline is real, LLM is not).
 8. Mention: SSE chat + shared `stable-sse-client` + guardrails in `labs/` (optional 30s)
+9. **Web Vitals (T-2026-115)**: open `/vitals` — live LCP/INP/CLS for this
+   browser tab, no backend required; cross-reference with the measured
+   catalog-dictionary numbers in `docs/perf/catalog-dictionary-measured.json`
+   and see `docs/perf/vitals-panel.md` for the optional PostHog P75 path.
 
 ## Journey C — 5-minute governance script (T-2026-025)
 

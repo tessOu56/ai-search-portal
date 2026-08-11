@@ -9,6 +9,8 @@ export type {
   AccessPermissionStatus,
   AccessPurpose,
   AccessRequestLifecycleStatus,
+  GovernancePolicyError,
+  GovernancePolicyErrorCode,
   GovernanceSessionRole,
   PolicyDecisionContract,
   UserRole,
@@ -18,7 +20,14 @@ export {
   accessPermissionStatusSchema,
   accessPurposeSchema,
   accessRequestLifecycleStatusSchema,
+  cancelAccessRequestSchema,
+  cancelAccessResponseSchema,
   evaluateAccessResponseSchema,
+  governanceDeniedError,
+  governanceHitlError,
+  governanceInvalidTransitionError,
+  governancePolicyErrorCodeSchema,
+  governancePolicyErrorSchema,
   governanceSessionRoleSchema,
   listAccessApplicationsResponseSchema,
   metadataAccessEvaluateRequestSchema,
@@ -27,11 +36,15 @@ export {
   reviewAccessRequestSchema,
   reviewAccessResponseSchema,
   submitAccessResponseSchema,
+  submitDraftAccessRequestSchema,
   userRoleSchema,
 } from "./access-request.contract.js";
 export type {
   AnalyticsEventContract,
   AnalyticsEventName,
+  WebVitalName,
+  WebVitalRating,
+  WebVitalReportedEvent,
 } from "./analytics.contract.js";
 export {
   accessRequestSubmittedEventSchema,
@@ -41,6 +54,9 @@ export {
   analyticsSurfaceSchema,
   hitlIntervenedEventSchema,
   taskCompletedEventSchema,
+  webVitalNameSchema,
+  webVitalRatingSchema,
+  webVitalReportedEventSchema,
 } from "./analytics.contract.js";
 export type { AuditEventContract } from "./audit.contract.js";
 export {

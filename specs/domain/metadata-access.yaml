@@ -26,6 +26,7 @@ access_request_states:
   - approved
   - denied
   - expired
+  - cancelled
 
 permission_status:
   - none

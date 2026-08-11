@@ -55,6 +55,10 @@ jobs:
         env:
           CI: true
 
+      # T-2026-069 eval gate: intentionally a required (non-continue-on-error) step.
+      # `pnpm run eval:offline` exits non-zero when any golden-set case fails
+      # (see labs/eval-runner/src/run-eval.ts), which fails this `ci` job and
+      # blocks the PR. Do not add `continue-on-error` here.
       - name: Offline eval
         run: pnpm run eval:offline
 

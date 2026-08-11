@@ -20,6 +20,7 @@ export const auditOutcomeSchema = z.enum([
   "draft",
   "expired",
   "edited",
+  "cancelled",
 ]);
 
 export const auditEventSchema = z.object({

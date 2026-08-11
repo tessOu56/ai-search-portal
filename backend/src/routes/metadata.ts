@@ -1,12 +1,20 @@
 import { randomUUID } from "node:crypto";
 
 import {
+  cancelAccessResponseSchema,
   evaluateAccessResponseSchema,
   getMetadataAssetResponseSchema,
+  governanceDeniedError,
+  governanceHitlError,
+  governanceInvalidTransitionError,
+  governancePolicyErrorSchema,
+  listAccessApplicationsResponseSchema,
   listMetadataResponseSchema,
   metadataAccessEvaluateRequestSchema,
   metadataAccessRequestSchema,
   metadataLineageResponseSchema,
+  reviewAccessRequestSchema,
+  reviewAccessResponseSchema,
   submitAccessResponseSchema,
 } from "@ai-search-portal/contracts";
 import { Hono } from "hono";
@@ -14,12 +22,24 @@ import { Hono } from "hono";
 import { resolveActivePackId } from "../lib/context-pack-loader.js";
 import { evaluateAccess } from "../policies/evaluate-access.js";
 import {
+  cancelApplication,
+  createApplication,
+  listApplications,
+  rememberIdempotency,
+  resolveIdempotency,
+  reviewApplication,
+  submitDraft,
+} from "../store/access-requests.js";
+import {
   getMetadataAsset,
   listMetadataAssets,
   resolveMetadataLineage,
 } from "../store/metadata.js";
 
 const ERROR_ASSET_NOT_FOUND = "Asset not found";
+const ERROR_INVALID_JSON = "Invalid JSON payload";
+const ERROR_INVALID_BODY = "Invalid request body";
+const ERROR_ACCESS_REQUEST_NOT_FOUND = "Access request not found";
 
 export const metadataApi = new Hono();
 
@@ -70,20 +90,27 @@ metadataApi.get("/:assetId", (c) => {
 
 export const accessRequestsApi = new Hono();
 
+accessRequestsApi.get("/", (c) => {
+  const requesterId = c.req.query("requesterId") ?? undefined;
+  const pendingOnly = c.req.query("pendingOnly") === "1";
+  const body = listAccessApplicationsResponseSchema.parse({
+    data: listApplications({ requesterId, pendingOnly }),
+  });
+  return c.json(body);
+});
+
 accessRequestsApi.post("/evaluate", async (c) => {
   let raw: unknown;
   try {
     raw = await c.req.json();
   } catch {
-    return c.json({ error: "Invalid JSON payload" }, 400);
+    return c.json({ error: ERROR_INVALID_JSON }, 400);
   }
   const parsed = metadataAccessEvaluateRequestSchema.safeParse(raw);
   if (!parsed.success) {
-    return c.json({ error: "Invalid request body" }, 400);
+    return c.json({ error: ERROR_INVALID_BODY }, 400);
   }
   try {
-    // Pack-aware evaluation: mirror the sibling metadata routes (and the
-    // Remix BFF, which passes packId) so non-default packs can be evaluated.
     const packId = resolveActivePackId(c.req.query("pack"));
     const decision = await evaluateAccess({ ...parsed.data, packId });
     const body = evaluateAccessResponseSchema.parse({ data: decision });
@@ -94,31 +121,86 @@ accessRequestsApi.post("/evaluate", async (c) => {
 });
 
 accessRequestsApi.post("/", async (c) => {
+  const idempotencyKey = c.req.header("Idempotency-Key")?.trim();
+  if (idempotencyKey) {
+    const existing = resolveIdempotency(idempotencyKey);
+    if (existing?.decision) {
+      const body = submitAccessResponseSchema.parse({
+        data: {
+          requestId: existing.id,
+          status: existing.status,
+          decision: existing.decision,
+          auditLogged: existing.decision.require_audit,
+        },
+      });
+      return c.json(body, existing.status === "draft" ? 201 : 202);
+    }
+  }
+
   let raw: unknown;
   try {
     raw = await c.req.json();
   } catch {
-    return c.json({ error: "Invalid JSON payload" }, 400);
+    return c.json({ error: ERROR_INVALID_JSON }, 400);
   }
   const parsed = metadataAccessRequestSchema.safeParse(raw);
   if (!parsed.success) {
-    return c.json({ error: "Invalid request body" }, 400);
+    return c.json({ error: ERROR_INVALID_BODY }, 400);
   }
 
   let decision;
+  let asset;
   try {
     const packId = resolveActivePackId(c.req.query("pack"));
     decision = await evaluateAccess({ ...parsed.data, packId });
+    asset = getMetadataAsset(parsed.data.assetId, packId);
   } catch {
     return c.json({ error: ERROR_ASSET_NOT_FOUND }, 404);
   }
+  if (!asset) {
+    return c.json({ error: ERROR_ASSET_NOT_FOUND }, 404);
+  }
+
+  const role = parsed.data.role ?? "analyst";
+  const requesterId = parsed.data.requesterId ?? `requester:${role}`;
+
+  if (parsed.data.asDraft) {
+    const requestId = randomUUID();
+    createApplication({
+      id: requestId,
+      assetId: parsed.data.assetId,
+      assetName: asset.name,
+      purpose: parsed.data.purpose,
+      role,
+      requesterId,
+      status: "draft",
+      owner: asset.owner,
+      decision,
+    });
+    if (idempotencyKey) rememberIdempotency(idempotencyKey, requestId);
+    const body = submitAccessResponseSchema.parse({
+      data: {
+        requestId,
+        status: "draft",
+        decision,
+        auditLogged: false,
+      },
+    });
+    return c.json(body, 201);
+  }
 
   if (decision.need_approval && !parsed.data.approved) {
-    return c.json({ error: "Human approval required", decision }, 422);
+    return c.json(
+      governanceHitlError("Human approval required", decision),
+      422
+    );
   }
 
   if (!decision.allow && !decision.need_approval) {
-    return c.json({ error: "Access denied by policy", decision }, 403);
+    return c.json(
+      governanceDeniedError("Access denied by policy", decision),
+      403
+    );
   }
 
   const status =
@@ -128,13 +210,120 @@ accessRequestsApi.post("/", async (c) => {
         ? "approved"
         : "denied";
 
+  const requestId = randomUUID();
+  createApplication({
+    id: requestId,
+    assetId: parsed.data.assetId,
+    assetName: asset.name,
+    purpose: parsed.data.purpose,
+    role,
+    requesterId,
+    status,
+    owner: asset.owner,
+    decision,
+  });
+  if (idempotencyKey) rememberIdempotency(idempotencyKey, requestId);
+
   const body = submitAccessResponseSchema.parse({
     data: {
-      requestId: randomUUID(),
+      requestId,
       status,
       decision,
       auditLogged: decision.require_audit,
     },
   });
   return c.json(body, 202);
+});
+
+accessRequestsApi.post("/:requestId/review", async (c) => {
+  const requestId = c.req.param("requestId");
+  let raw: unknown;
+  try {
+    raw = await c.req.json();
+  } catch {
+    return c.json({ error: ERROR_INVALID_JSON }, 400);
+  }
+  const parsed = reviewAccessRequestSchema.safeParse(raw);
+  if (!parsed.success) {
+    return c.json({ error: ERROR_INVALID_BODY }, 400);
+  }
+  if (parsed.data.decision === "edited") {
+    return c.json({ error: "edited not implemented on Hono reference" }, 501);
+  }
+  const updated = reviewApplication({
+    id: requestId,
+    decision: parsed.data.decision,
+  });
+  if (!updated.ok) {
+    if (updated.reason === "not_found") {
+      return c.json(
+        governancePolicyErrorSchema.parse({
+          error: ERROR_ACCESS_REQUEST_NOT_FOUND,
+          code: "NOT_FOUND",
+        }),
+        404
+      );
+    }
+    return c.json(
+      governanceInvalidTransitionError("Invalid review transition"),
+      409
+    );
+  }
+  return c.json(reviewAccessResponseSchema.parse({ data: updated.data }));
+});
+
+accessRequestsApi.post("/:requestId/submit", (c) => {
+  const requestId = c.req.param("requestId");
+  const updated = submitDraft(requestId);
+  if (!updated.ok) {
+    if (updated.reason === "not_found") {
+      return c.json(
+        governancePolicyErrorSchema.parse({
+          error: ERROR_ACCESS_REQUEST_NOT_FOUND,
+          code: "NOT_FOUND",
+        }),
+        404
+      );
+    }
+    return c.json(
+      governanceInvalidTransitionError("Cannot submit non-draft"),
+      409
+    );
+  }
+  const decision = updated.data.decision;
+  if (!decision) {
+    return c.json({ error: "Missing policy decision on draft" }, 500);
+  }
+  return c.json(
+    submitAccessResponseSchema.parse({
+      data: {
+        requestId: updated.data.id,
+        status: updated.data.status,
+        decision,
+        auditLogged: decision.require_audit,
+      },
+    }),
+    202
+  );
+});
+
+accessRequestsApi.post("/:requestId/cancel", (c) => {
+  const requestId = c.req.param("requestId");
+  const updated = cancelApplication(requestId);
+  if (!updated.ok) {
+    if (updated.reason === "not_found") {
+      return c.json(
+        governancePolicyErrorSchema.parse({
+          error: ERROR_ACCESS_REQUEST_NOT_FOUND,
+          code: "NOT_FOUND",
+        }),
+        404
+      );
+    }
+    return c.json(
+      governanceInvalidTransitionError("Cannot cancel in current status"),
+      409
+    );
+  }
+  return c.json(cancelAccessResponseSchema.parse({ data: updated.data }));
 });

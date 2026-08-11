@@ -308,11 +308,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EvaluateAccessResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/metadata/access-requests:
+    get:
+      operationId: listMetadataAccessRequests
+      summary: List access applications
+      parameters:
+        - name: requesterId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: pendingOnly
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ["0", "1"]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListAccessApplicationsResponse"
     post:
       operationId: submitMetadataAccess
       summary: Submit metadata access request
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -320,14 +360,163 @@ paths:
             schema:
               $ref: "#/components/schemas/MetadataAccessRequest"
       responses:
+        "201":
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitAccessResponse"
         "202":
           description: Accepted
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/SubmitAccessResponse"
+        "403":
+          description: Access denied by policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernancePolicyError"
         "422":
-          description: Approval required
+          description: HITL approval required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernancePolicyError"
+
+  /api/metadata/access-requests/{requestId}/review:
+    post:
+      operationId: reviewMetadataAccess
+      summary: Approve, deny, or edit a pending access request
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewAccessRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewAccessResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernancePolicyError"
+        "409":
+          description: Invalid lifecycle transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernancePolicyError"
+
+  /api/metadata/access-requests/{requestId}/submit:
+    post:
+      operationId: submitDraftMetadataAccess
+      summary: Promote draft application to pending_approval
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitDraftAccessRequest"
+      responses:
+        "202":
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitAccessResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernancePolicyError"
+        "409":
+          description: Invalid lifecycle transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernancePolicyError"
+
+  /api/metadata/access-requests/{requestId}/cancel:
+    post:
+      operationId: cancelMetadataAccess
+      summary: Cancel a draft or pending access request
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelAccessRequest"
+      responses:
+        "200":
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CancelAccessResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernancePolicyError"
+        "409":
+          description: Invalid lifecycle transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernancePolicyError"
+
+  /api/metadata/{assetId}/lineage:
+    get:
+      operationId: getMetadataLineage
+      summary: Resolve upstream/downstream lineage for an asset
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: pack
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataLineageResponse"
+        "404":
+          description: Not found
           content:
             application/json:
               schema:
@@ -415,6 +604,39 @@ components:
       properties:
         error:
           type: string
+
+    GovernancePolicyError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+          enum:
+            [
+              ACCESS_DENIED,
+              HITL_REQUIRED,
+              INVALID_TRANSITION,
+              NOT_FOUND,
+              VALIDATION_ERROR,
+            ]
+        decision:
+          $ref: "#/components/schemas/PolicyDecision"
+        toolError:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [HITL_REQUIRED]
+            message:
+              type: string
+            tool:
+              type: string
+            riskLevel:
+              type: string
+              enum: [low, medium, high]
 
     MetadataAssetSummary:
       type: object
@@ -589,6 +811,10 @@ components:
           properties:
             approved:
               type: boolean
+            requesterId:
+              type: string
+            asDraft:
+              type: boolean
 
     PolicyDecision:
       type: object
@@ -631,11 +857,176 @@ components:
               type: string
             status:
               type: string
-              enum: [approved, pending_approval, denied]
+              enum:
+                [
+                  draft,
+                  pending_approval,
+                  approved,
+                  denied,
+                  expired,
+                  cancelled,
+                ]
             decision:
               $ref: "#/components/schemas/PolicyDecision"
             auditLogged:
               type: boolean
+
+    AccessApplication:
+      type: object
+      required:
+        [
+          id,
+          assetId,
+          assetName,
+          purpose,
+          role,
+          requesterId,
+          status,
+          permissionStatus,
+          owner,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: string
+        assetId:
+          type: string
+        assetName:
+          type: string
+        purpose:
+          type: string
+          enum: [analytics, marketing, operations]
+        role:
+          type: string
+          enum: [analyst, data_admin, engineer]
+        requesterId:
+          type: string
+        status:
+          type: string
+          enum:
+            [
+              draft,
+              pending_approval,
+              approved,
+              denied,
+              expired,
+              cancelled,
+            ]
+        permissionStatus:
+          type: string
+          enum: [none, pending, granted, revoked]
+        owner:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        decision:
+          $ref: "#/components/schemas/PolicyDecision"
+        termsAccepted:
+          type: array
+          items:
+            type: string
+
+    ListAccessApplicationsResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccessApplication"
+
+    ReviewAccessRequest:
+      type: object
+      required: [decision]
+      properties:
+        decision:
+          type: string
+          enum: [approved, denied, edited]
+        reviewerId:
+          type: string
+        purpose:
+          type: string
+          enum: [analytics, marketing, operations]
+        role:
+          type: string
+          enum: [analyst, data_admin, engineer]
+
+    ReviewAccessResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: "#/components/schemas/AccessApplication"
+
+    SubmitDraftAccessRequest:
+      type: object
+      properties:
+        approved:
+          type: boolean
+
+    CancelAccessRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+
+    CancelAccessResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: "#/components/schemas/AccessApplication"
+
+    MetadataLineageNode:
+      type: object
+      required: [id, label, type]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum: [table, column, api, dashboard, database]
+
+    MetadataLineageEdge:
+      type: object
+      required: [source, target]
+      properties:
+        source:
+          type: string
+        target:
+          type: string
+
+    MetadataLineageResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [assetId, upstream, downstream, nodes, edges]
+          properties:
+            assetId:
+              type: string
+            upstream:
+              type: array
+              items:
+                $ref: "#/components/schemas/MetadataAssetSummary"
+            downstream:
+              type: array
+              items:
+                $ref: "#/components/schemas/MetadataAssetSummary"
+            nodes:
+              type: array
+              items:
+                $ref: "#/components/schemas/MetadataLineageNode"
+            edges:
+              type: array
+              items:
+                $ref: "#/components/schemas/MetadataLineageEdge"
 
     ContextPackManifest:
       type: object
