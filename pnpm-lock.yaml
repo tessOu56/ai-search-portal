@@ -226,6 +226,9 @@ importers:
       vitest:
         specifier: ^2.1.4
         version: 2.1.9(@types/node@26.1.1)(jsdom@29.1.1)(lightningcss@1.32.0)(msw@2.15.0(@types/node@26.1.1)(typescript@5.9.3))
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
 
   backend:
     dependencies:
@@ -9017,14 +9020,14 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@20.19.39)(lightningcss@1.32.0))':
+  '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))':
     dependencies:
       '@vitest/spy': 2.1.9
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
       msw: 2.15.0(@types/node@20.19.39)(typescript@5.9.3)
-      vite: 5.4.21(@types/node@20.19.39)(lightningcss@1.32.0)
+      vite: 5.4.21(@types/node@26.1.1)(lightningcss@1.32.0)
 
   '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@26.1.1)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))':
     dependencies:
@@ -13953,7 +13956,7 @@ snapshots:
   vitest@2.1.9(@types/node@20.19.39)(jsdom@29.1.1)(lightningcss@1.32.0)(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3)):
     dependencies:
       '@vitest/expect': 2.1.9
-      '@vitest/mocker': 2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@20.19.39)(lightningcss@1.32.0))
+      '@vitest/mocker': 2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))
       '@vitest/pretty-format': 2.1.9
       '@vitest/runner': 2.1.9
       '@vitest/snapshot': 2.1.9

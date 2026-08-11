@@ -1,0 +1,843 @@
+[
+  {
+    "id": "eco-adr",
+    "term": "Architecture Decision Record (ADR)",
+    "definition": "記錄重要架構決策的背景、選項與後果。 Ecosystem mapping (adopted): 各 repo docs/adr/*.md.",
+    "relatedAssetIds": ["eco-spec-driven"],
+    "tags": ["ecosystem", "engineering", "ADR"],
+    "source": "platform-command:specs/domain/engineering.yaml#adr",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-affected-graph",
+    "term": "Affected graph",
+    "definition": "由變更集推導受影響專案，只建置/測試受影響部分。 Ecosystem mapping (adopted): nx affected（lint/typecheck/test:affected）；nx graph.json.",
+    "relatedAssetIds": ["eco-monorepo"],
+    "tags": ["ecosystem", "engineering"],
+    "source": "platform-command:specs/domain/engineering.yaml#affected-graph",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-audit-trail",
+    "term": "Audit trail (稽核軌跡)",
+    "definition": "每個 agent 行動可回答「依據什麼、誰批准、結果如何、失敗怎麼接手」。 Ecosystem mapping (adopted): audit.contract.ts + audit-log.server.ts + api.audit（最小落盤 2026-07-09）.",
+    "relatedAssetIds": ["eco-hitl", "eco-source-citation"],
+    "tags": ["ecosystem", "agentic", "稽核軌跡"],
+    "source": "platform-command:specs/domain/engineering.yaml#audit-trail",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-blocked",
+    "term": "Blocked",
+    "definition": "因外部依賴或決策而無法推進的狀態。 Ecosystem mapping (adopted): ticket status blocked、STOP 機制（external-service-stop-points）.",
+    "relatedAssetIds": ["eco-ticket", "eco-stop-point"],
+    "tags": ["ecosystem", "pm"],
+    "source": "platform-command:specs/domain/pm.yaml#blocked",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-cadence",
+    "term": "Cadence (節奏)",
+    "definition": "重複性活動的固定頻率。 Ecosystem mapping (mapped): registry/update-cadence.json、ecosystem-ritual（週一 scan）.",
+    "relatedAssetIds": ["eco-ritual", "eco-sprint"],
+    "tags": ["ecosystem", "pm", "節奏"],
+    "source": "platform-command:specs/domain/pm.yaml#cadence",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-capacity-split",
+    "term": "Capacity allocation (產能配比)",
+    "definition": "主線與支線的產能百分比約束。 Ecosystem mapping (mapped): current-sprint 主線 80% / 衛星 20%.",
+    "relatedAssetIds": ["eco-wip-limit", "eco-timebox"],
+    "tags": ["ecosystem", "pm", "產能配比"],
+    "source": "platform-command:specs/domain/pm.yaml#capacity-split",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-code-hygiene-rotation",
+    "term": "Code hygiene rotation (整潔循環)",
+    "definition": "按固定節奏輪訪各 repo 做小步整潔與量測的制度（本生態自有詞，反向收錄）。 Ecosystem mapping (mapped): planning/code-hygiene-rotation.md.",
+    "relatedAssetIds": [
+      "eco-tech-debt-register",
+      "eco-timebox",
+      "eco-planning-debt"
+    ],
+    "tags": ["ecosystem", "engineering", "整潔循環"],
+    "source": "platform-command:specs/domain/engineering.yaml#code-hygiene-rotation",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-context-pack",
+    "term": "Context pack",
+    "definition": "供 agent 使用的領域脈絡包（glossary/metrics/bindings），可切換（本生態自有詞，反向收錄）。 Ecosystem mapping (mapped): portal content/context-packs/ + api.context.*（ADR context-pack-domain-binding）.",
+    "relatedAssetIds": ["eco-source-citation", "eco-ssot"],
+    "tags": ["ecosystem", "agentic"],
+    "source": "platform-command:specs/domain/engineering.yaml#context-pack",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-contract-first",
+    "term": "Contract-first development (契約先行)",
+    "definition": "先定義介面契約再實作；UI 與服務皆消費契約。 Ecosystem mapping (mapped): portal「Spec → Contract → Mock → Test → UI」鏈；packages/shared-contracts.",
+    "relatedAssetIds": ["eco-ssot", "eco-spec-driven", "eco-schema-validation"],
+    "tags": ["ecosystem", "engineering", "契約先行"],
+    "source": "platform-command:specs/domain/engineering.yaml#contract-first",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-dead-code",
+    "term": "Dead code / unused dependency (死碼)",
+    "definition": "不再被引用的程式碼或依賴。 Ecosystem mapping (adopted): knip（TS）、deptry/ruff（Py）.",
+    "relatedAssetIds": ["eco-tech-debt-register"],
+    "tags": ["ecosystem", "engineering", "死碼"],
+    "source": "platform-command:specs/domain/engineering.yaml#dead-code",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-definition-of-done",
+    "term": "Definition of Done (DoD, 出口條件)",
+    "definition": "工作項或階段被視為完成的明確且可驗證條件。 Ecosystem mapping (mapped): 各 PROJECT-PLAN「出口條件」、ticket acceptance.",
+    "relatedAssetIds": ["eco-milestone-gate", "eco-ticket"],
+    "tags": ["ecosystem", "pm", "DoD", "出口條件"],
+    "source": "platform-command:specs/domain/pm.yaml#definition-of-done",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-demo-readiness",
+    "term": "Demo readiness",
+    "definition": "專案可對外演示程度的分級評估。 Ecosystem mapping (mapped): EXECUTION-PLAN §6 D1–D4 分級.",
+    "relatedAssetIds": ["eco-definition-of-done"],
+    "tags": ["ecosystem", "pm"],
+    "source": "platform-command:specs/domain/pm.yaml#demo-readiness",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-drift",
+    "term": "Drift (漂移)",
+    "definition": "兩份應一致的產物（spec/code/文件/版本）漸行漸遠。 Ecosystem mapping (adopted): verify:openapi-codegen、T-2026-055 版本漂移閘、spec-review drift 檢查.",
+    "relatedAssetIds": ["eco-ssot", "eco-schema-validation"],
+    "tags": ["ecosystem", "engineering", "漂移"],
+    "source": "platform-command:specs/domain/engineering.yaml#drift",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-dual-path",
+    "term": "Dual-path (雙路徑)",
+    "definition": "每條 AI 流程都有等價手動路徑，AI 失敗可帶狀態接手。 Ecosystem mapping (mapped): portal docs/product/ai-experience-plan.md（SSOT）、AiFallbackPanel.",
+    "relatedAssetIds": ["eco-hitl", "eco-graceful-degradation"],
+    "tags": ["ecosystem", "agentic", "雙路徑"],
+    "source": "platform-command:specs/domain/engineering.yaml#dual-path",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-epic",
+    "term": "Epic (工作分組)",
+    "definition": "跨多個工作項的較大目標分組。",
+    "relatedAssetIds": ["eco-release-increment", "eco-ticket"],
+    "tags": ["ecosystem", "pm", "工作分組"],
+    "source": "platform-command:specs/domain/pm.yaml#epic",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-feature-based-architecture",
+    "term": "Feature-based architecture (功能模組化)",
+    "definition": "以業務功能為邊界組織程式碼，禁止 feature 間直接依賴。 Ecosystem mapping (mapped): portal app/features/*（no feature→feature）；nx event-cms 定為 module→feature 重構練兵場.",
+    "relatedAssetIds": ["eco-monorepo"],
+    "tags": ["ecosystem", "engineering", "功能模組化"],
+    "source": "platform-command:specs/domain/engineering.yaml#feature-based-architecture",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-golden-dataset",
+    "term": "Golden dataset",
+    "definition": "人工確認過的標準測例集，評測的比對基準。 Ecosystem mapping (adopted): labs/eval-runner/fixtures/golden.jsonl.",
+    "relatedAssetIds": ["eco-offline-eval"],
+    "tags": ["ecosystem", "agentic"],
+    "source": "platform-command:specs/domain/engineering.yaml#golden-dataset",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-graceful-degradation",
+    "term": "Graceful degradation (優雅降級)",
+    "definition": "系統部分失效時保留核心功能而非整體失敗。 Ecosystem mapping (mapped): AI 可降級規則（逾時/guardrail/信心不足 → 手動預填）.",
+    "relatedAssetIds": ["eco-dual-path"],
+    "tags": ["ecosystem", "agentic", "優雅降級"],
+    "source": "platform-command:specs/domain/engineering.yaml#graceful-degradation",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-guardrails",
+    "term": "Guardrails",
+    "definition": "輸入/工具/輸出三層的防護（注入偵測、遮罩、限制）。 Ecosystem mapping (adopted): agent-core tools/guardrails.ts（輸入層已有；輸出層 R4 M2 規劃）.",
+    "relatedAssetIds": ["eco-hitl", "eco-audit-trail"],
+    "tags": ["ecosystem", "agentic"],
+    "source": "platform-command:specs/domain/engineering.yaml#guardrails",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-hitl",
+    "term": "Human-in-the-loop (HITL, 人工介入)",
+    "definition": "高風險步驟強制停下等人批准/修改/拒絕，伺服器端強制。 Ecosystem mapping (adopted): access request need_approval 確認流；tool contract requiresHitl.",
+    "relatedAssetIds": [
+      "eco-risk-level",
+      "eco-tool-contract",
+      "eco-audit-trail"
+    ],
+    "tags": ["ecosystem", "agentic", "HITL", "人工介入"],
+    "source": "platform-command:specs/domain/engineering.yaml#hitl",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-icebox",
+    "term": "Icebox / deferred (冷凍清單)",
+    "definition": "刻意暫停、解凍需重審的工作集合。 Ecosystem mapping (mapped): current-sprint 冷凍清單、planning/deferred-automation.md.",
+    "relatedAssetIds": ["eco-product-backlog", "eco-milestone-gate"],
+    "tags": ["ecosystem", "pm", "冷凍清單"],
+    "source": "platform-command:specs/domain/pm.yaml#icebox",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-milestone-gate",
+    "term": "Milestone gate (phase gate, 過門)",
+    "definition": "進入下一階段前必須通過的檢核點。 Ecosystem mapping (mapped): staff-showcase-masterplan Gate 0/1…；「過門判定」.",
+    "relatedAssetIds": [
+      "eco-definition-of-done",
+      "eco-retrospective",
+      "eco-icebox"
+    ],
+    "tags": ["ecosystem", "pm", "phase gate", "過門"],
+    "source": "platform-command:specs/domain/pm.yaml#milestone-gate",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-mirror",
+    "term": "Mirror repo (鏡像)",
+    "definition": "由源頭同步產生的唯讀展示/備份副本，不直接修改。 Ecosystem mapping (mapped): able mirrors（nightly sync）、nx → vue/angular sandbox（sync 腳本）.",
+    "relatedAssetIds": ["eco-promote", "eco-ssot"],
+    "tags": ["ecosystem", "engineering", "鏡像"],
+    "source": "platform-command:specs/domain/engineering.yaml#mirror",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-monorepo",
+    "term": "Monorepo",
+    "definition": "多套件/多應用共倉，統一工具鏈與依賴圖。 Ecosystem mapping (adopted): pnpm workspaces（全生態）、Nx（nx-playground）、turbo（portal）.",
+    "relatedAssetIds": ["eco-affected-graph", "eco-feature-based-architecture"],
+    "tags": ["ecosystem", "engineering"],
+    "source": "platform-command:specs/domain/engineering.yaml#monorepo",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-offline-eval",
+    "term": "Offline evaluation (離線評測)",
+    "definition": "以固定 golden 資料集離線驗證 agent 行為回歸。 Ecosystem mapping (adopted): portal labs/eval-runner + CI eval:offline.",
+    "relatedAssetIds": ["eco-golden-dataset", "eco-source-citation"],
+    "tags": ["ecosystem", "agentic", "離線評測"],
+    "source": "platform-command:specs/domain/engineering.yaml#offline-eval",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-planning-debt",
+    "term": "Planning debt (規劃債)",
+    "definition": "過多並存的規劃文件與編號體系造成的認知負擔（本生態自有詞，反向收錄）。 Ecosystem mapping (mapped): code-hygiene-rotation §8（每 repo 一份 Active SSOT + 一套編號）.",
+    "relatedAssetIds": ["eco-ssot", "eco-code-hygiene-rotation"],
+    "tags": ["ecosystem", "engineering", "規劃債"],
+    "source": "platform-command:specs/domain/engineering.yaml#planning-debt",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-priority-level",
+    "term": "Priority level",
+    "definition": "工作項的相對重要度分級。 Ecosystem mapping (adopted): P0–P3（ticket schema priority 欄）.",
+    "relatedAssetIds": ["eco-triage", "eco-sprint-backlog"],
+    "tags": ["ecosystem", "pm"],
+    "source": "platform-command:specs/domain/pm.yaml#priority-level",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-product-backlog",
+    "term": "Product backlog (backlog, 待辦清單)",
+    "definition": "依價值排序、尚未排入迭代的工作項全集。 Ecosystem mapping (mapped): planning/tickets/T-*.yaml.",
+    "relatedAssetIds": [
+      "eco-sprint-backlog",
+      "eco-ticket",
+      "eco-icebox",
+      "eco-refinement"
+    ],
+    "tags": ["ecosystem", "pm", "backlog", "待辦清單"],
+    "source": "platform-command:specs/domain/pm.yaml#product-backlog",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-promote",
+    "term": "Promotion pipeline (晉升)",
+    "definition": "實驗成果通過門檻後升入正式產品的流程。 Ecosystem mapping (mapped): labs → portal/SDK 晉升管線（capability-alignment §6）；ODM promote 規則.",
+    "relatedAssetIds": ["eco-spike", "eco-milestone-gate"],
+    "tags": ["ecosystem", "engineering", "晉升"],
+    "source": "platform-command:specs/domain/engineering.yaml#promote",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-refinement",
+    "term": "Backlog refinement (grooming)",
+    "definition": "定期整理 backlog——補驗收條件、拆分、重排優先序。",
+    "relatedAssetIds": ["eco-product-backlog", "eco-triage", "eco-ritual"],
+    "tags": ["ecosystem", "pm", "grooming"],
+    "source": "platform-command:specs/domain/pm.yaml#refinement",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-release-increment",
+    "term": "Release increment (release train)",
+    "definition": "一批一起交付、對外可感的成果集合。 Ecosystem mapping (mapped): masterplan Wave A/B.",
+    "relatedAssetIds": ["eco-epic", "eco-milestone-gate"],
+    "tags": ["ecosystem", "pm", "release train"],
+    "source": "platform-command:specs/domain/pm.yaml#release-increment",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-retrospective",
+    "term": "Retrospective (retro, 復盤)",
+    "definition": "週期結束時檢視成效與改進點的儀式。 Ecosystem mapping (mapped): Gate 過門判定 + 成績單（如 Wave A 成績單）.",
+    "relatedAssetIds": ["eco-sprint", "eco-milestone-gate"],
+    "tags": ["ecosystem", "pm", "retro", "復盤"],
+    "source": "platform-command:specs/domain/pm.yaml#retrospective",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-risk-level",
+    "term": "Risk level (風險層級)",
+    "definition": "tool 動作的風險分級（low 直接執行 / medium 產草稿 / high 必停 HITL）。 Ecosystem mapping (adopted): tool.contract.ts riskLevel + superRefine 不變式（high ⇒ HITL）.",
+    "relatedAssetIds": ["eco-tool-contract", "eco-hitl"],
+    "tags": ["ecosystem", "agentic", "風險層級"],
+    "source": "platform-command:specs/domain/engineering.yaml#risk-level",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-ritual",
+    "term": "Ritual (儀式)",
+    "definition": "具名的重複性操作流程（本生態自有詞，反向收錄）。 Ecosystem mapping (mapped): scripts/ecosystem-ritual.ps1、agent-collaboration「Commands=named rituals」.",
+    "relatedAssetIds": ["eco-cadence", "eco-refinement"],
+    "tags": ["ecosystem", "pm", "儀式"],
+    "source": "platform-command:specs/domain/pm.yaml#ritual",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-schema-validation",
+    "term": "Schema validation",
+    "definition": "以機讀 schema 驗證資料與設定的正確性。 Ecosystem mapping (adopted): registry/*.schema.json + validate-registry.py；Zod 契約 parse.",
+    "relatedAssetIds": ["eco-contract-first", "eco-drift"],
+    "tags": ["ecosystem", "engineering"],
+    "source": "platform-command:specs/domain/engineering.yaml#schema-validation",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-source-citation",
+    "term": "Source citation (來源引用)",
+    "definition": "AI 回答必附可驗證來源，無來源即失敗。 Ecosystem mapping (adopted): chat.contract luiSourceSchema、final 事件 sources.",
+    "relatedAssetIds": ["eco-audit-trail", "eco-offline-eval"],
+    "tags": ["ecosystem", "agentic", "來源引用"],
+    "source": "platform-command:specs/domain/engineering.yaml#source-citation",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-spec-driven",
+    "term": "Spec-driven workflow",
+    "definition": "規格為開發起點與驗收依據，程式碼與規格持續對齊。 Ecosystem mapping (adopted): portal docs/spec-review.md、code-review-spec.md；ADR spec-driven-contracts-and-sot.",
+    "relatedAssetIds": ["eco-contract-first", "eco-adr"],
+    "tags": ["ecosystem", "engineering"],
+    "source": "platform-command:specs/domain/engineering.yaml#spec-driven",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-spike",
+    "term": "Spike",
+    "definition": "時間盒內的風險探索實作，產出結論而非產品碼。 Ecosystem mapping (adopted): tech-radar 原則「未 GA 一律 spike」；labs/*.",
+    "relatedAssetIds": ["eco-promote", "eco-timebox"],
+    "tags": ["ecosystem", "engineering"],
+    "source": "platform-command:specs/domain/engineering.yaml#spike",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-sprint",
+    "term": "Sprint (迭代)",
+    "definition": "固定長度的開發週期，結束時檢視成果並滾動。 Ecosystem mapping (adopted): planning/current-sprint.md（一週，滾動封存於 git 歷史）.",
+    "relatedAssetIds": [
+      "eco-sprint-backlog",
+      "eco-retrospective",
+      "eco-cadence"
+    ],
+    "tags": ["ecosystem", "pm", "迭代"],
+    "source": "platform-command:specs/domain/pm.yaml#sprint",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-sprint-backlog",
+    "term": "Sprint backlog",
+    "definition": "當前迭代承諾完成的工作子集。 Ecosystem mapping (mapped): planning/current-sprint.md（P0/P1/P2 段）.",
+    "relatedAssetIds": [
+      "eco-product-backlog",
+      "eco-sprint",
+      "eco-priority-level"
+    ],
+    "tags": ["ecosystem", "pm"],
+    "source": "platform-command:specs/domain/pm.yaml#sprint-backlog",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-ssot",
+    "term": "Single source of truth (SSOT, 唯一真實來源)",
+    "definition": "每項資訊指定唯一權威來源，其餘皆為衍生或引用。 Ecosystem mapping (adopted): docs/spec-conventions.md；各檔頭「SSOT」標註慣例.",
+    "relatedAssetIds": ["eco-drift", "eco-contract-first"],
+    "tags": ["ecosystem", "engineering", "SSOT", "唯一真實來源"],
+    "source": "platform-command:specs/domain/engineering.yaml#ssot",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-stop-point",
+    "term": "External dependency stop point (STOP)",
+    "definition": "引入外部服務前的強制暫停與登記點（本生態自有詞，反向收錄）。 Ecosystem mapping (mapped): docs/external-service-stop-points.md、STOP-xxx 編號.",
+    "relatedAssetIds": ["eco-blocked", "eco-milestone-gate"],
+    "tags": ["ecosystem", "pm", "STOP"],
+    "source": "platform-command:specs/domain/pm.yaml#stop-point",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-tech-debt-register",
+    "term": "Tech debt register (技術債登記)",
+    "definition": "已知技術債的集中登記與量測基線。 Ecosystem mapping (mapped): planning/code-hygiene-rotation.md §7 基線表；portal code-review/issues.md（CR-xxx）.",
+    "relatedAssetIds": ["eco-code-hygiene-rotation", "eco-dead-code"],
+    "tags": ["ecosystem", "engineering", "技術債登記"],
+    "source": "platform-command:specs/domain/engineering.yaml#tech-debt-register",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "engineering",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-ticket",
+    "term": "Ticket / work item (工作項)",
+    "definition": "最小可派發的工作單位，含驗收條件與狀態。 Ecosystem mapping (adopted): planning/tickets/T-2026-0xx.yaml → distribute-inbox 派送至各 repo docs/platform-inbox/.",
+    "relatedAssetIds": ["eco-product-backlog", "eco-blocked", "eco-triage"],
+    "tags": ["ecosystem", "pm", "工作項"],
+    "source": "platform-command:specs/domain/pm.yaml#ticket",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-timebox",
+    "term": "Timebox",
+    "definition": "為活動設定不可延展的時間上限。 Ecosystem mapping (adopted): 整潔循環 ≤2h/sprint、deck-studio 與 mobile 線 ≤4h/週.",
+    "relatedAssetIds": ["eco-wip-limit"],
+    "tags": ["ecosystem", "pm"],
+    "source": "platform-command:specs/domain/pm.yaml#timebox",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-tool-contract",
+    "term": "Tool contract",
+    "definition": "agent tool 的註冊契約——I/O schema、風險層級、HITL、audit、timeout 缺一不可。 Ecosystem mapping (adopted): portal packages/shared-contracts/src/tool.contract.ts、specs/schemas/tool-contract.md.",
+    "relatedAssetIds": ["eco-risk-level", "eco-hitl", "eco-contract-first"],
+    "tags": ["ecosystem", "agentic"],
+    "source": "platform-command:specs/domain/engineering.yaml#tool-contract",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "agentic",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-triage",
+    "term": "Triage (收件分流)",
+    "definition": "對新進工作項快速判斷優先序與去向。 Ecosystem mapping (mapped): 各 repo docs/platform-inbox/CURRENT.md 收件處理.",
+    "relatedAssetIds": ["eco-ticket", "eco-priority-level", "eco-refinement"],
+    "tags": ["ecosystem", "pm", "收件分流"],
+    "source": "platform-command:specs/domain/pm.yaml#triage",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  },
+  {
+    "id": "eco-wip-limit",
+    "term": "WIP limit (在製品上限)",
+    "definition": "限制同時進行的工作數量以保護吞吐。 Ecosystem mapping (mapped): current-sprint WIP 段（產品 PR 1 · 平台 PR 1 · 文件 1）.",
+    "relatedAssetIds": ["eco-capacity-split", "eco-timebox"],
+    "tags": ["ecosystem", "pm", "在製品上限"],
+    "source": "platform-command:specs/domain/pm.yaml#wip-limit",
+    "facets": {
+      "materials": [],
+      "techniques": [],
+      "regions": [],
+      "classification": "pm",
+      "standards": [],
+      "productTypes": [],
+      "auctionEligible": false
+    }
+  }
+]

@@ -29,7 +29,7 @@ type Message = {
 type LuiMeta = {
   summary?: string;
   confidence?: number;
-  sources?: Array<{ title: string; url: string }>;
+  sources?: Array<{ title: string; url: string; source?: string }>;
   nextSteps?: string[];
 };
 
@@ -357,26 +357,33 @@ export function ChatInterface({
           {(meta.sources ?? []).length === 0 && <p>{t(KEY_SUMMARY_WAITING)}</p>}
           {(meta.sources ?? []).map((source) => {
             const internal = source.url.startsWith("/");
-            return internal ? (
-              <Link
-                key={source.url}
-                to={source.url}
-                className={SOURCE_LINK_CLASS}
-                aria-label={`${source.title} (${t(KEY_SOURCES_TITLE)})`}
-              >
-                {source.title}
-              </Link>
-            ) : (
-              <a
-                key={source.url}
-                href={source.url}
-                className={SOURCE_LINK_CLASS}
-                rel="noreferrer"
-                target="_blank"
-                aria-label={`${source.title} (${t(KEY_SOURCES_TITLE)})`}
-              >
-                {source.title}
-              </a>
+            return (
+              <div key={source.url} className="space-y-0.5">
+                {internal ? (
+                  <Link
+                    to={source.url}
+                    className={SOURCE_LINK_CLASS}
+                    aria-label={`${source.title} (${t(KEY_SOURCES_TITLE)})`}
+                  >
+                    {source.title}
+                  </Link>
+                ) : (
+                  <a
+                    href={source.url}
+                    className={SOURCE_LINK_CLASS}
+                    rel="noreferrer"
+                    target="_blank"
+                    aria-label={`${source.title} (${t(KEY_SOURCES_TITLE)})`}
+                  >
+                    {source.title}
+                  </a>
+                )}
+                {source.source && (
+                  <p className="text-muted-foreground/80 pl-6 text-xs">
+                    {source.source}
+                  </p>
+                )}
+              </div>
             );
           })}
           {!isStreaming && !error && lastQuery.trim() ? (

@@ -45,6 +45,7 @@ function toSummary(
     description: asset.description,
     assetType: asset.assetType,
     owner: asset.owner,
+    department: asset.department,
     tags: asset.tags,
     classification: asset.classification,
     updatedAt: asset.updatedAt,

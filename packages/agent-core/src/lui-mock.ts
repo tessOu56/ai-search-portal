@@ -12,6 +12,8 @@ import type { LocalDoc } from "./rag/local-store.js";
 export type LuiSource = {
   title: string;
   url: string;
+  /** Origin citation for grounded hits, e.g. glossary terms (T-2026-071). */
+  source?: string;
 };
 
 export type LuiResponse = {
@@ -52,6 +54,7 @@ export function buildLuiResponse(
     const hitSources: LuiSource[] = hits.map((hit) => ({
       title: hit.title ?? hit.id,
       url: buildKnowledgeSourceUrl(hit, packId),
+      source: hit.source,
     }));
     const continueSources = buildKnowledgeContinueSources(query, top, packId);
     const sources = [...hitSources, ...continueSources].filter(

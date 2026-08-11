@@ -39,6 +39,7 @@ import {
 const ERROR_INVALID_BODY = "Invalid request body";
 const ERROR_ASSET_NOT_FOUND = "Asset not found";
 const ERROR_ACCESS_REQUEST_NOT_FOUND = "Access request not found";
+const AUDIT_ACTION_SUBMIT = "access.request.submit";
 const PAGE_SIZE = 5;
 let mockRequestSeq = 0;
 
@@ -47,11 +48,16 @@ function nextMockRequestId(): string {
   return `mock-req-${mockRequestSeq}`;
 }
 
+/**
+ * Realistic governance audit history (T-2026-024 / G2) — mirrors the seeded
+ * applications in access-request-store.server.ts (MSW-only fixture; the real
+ * audit-log.server.ts intentionally starts empty, see spec review §3).
+ */
 const MOCK_AUDIT_EVENTS = [
   {
     id: "aud-mock-1",
     at: "2026-07-09T00:00:00.000Z",
-    action: "access.request.submit",
+    action: AUDIT_ACTION_SUBMIT,
     actor: { role: "analyst" as const },
     resource: { type: "metadata_asset", id: "tbl-customers" },
     decisionId: "dec-mock-1",
@@ -59,6 +65,84 @@ const MOCK_AUDIT_EVENTS = [
     outcome: "pending_approval" as const,
     requireAudit: true,
     reasons: ["sensitive classification requires approval"],
+  },
+  {
+    id: "aud-seed-pending-1",
+    at: "2026-08-09T02:00:00.000Z",
+    action: AUDIT_ACTION_SUBMIT,
+    actor: { role: "analyst" as const },
+    resource: { type: "metadata_asset", id: "tbl-customer-profile" },
+    decisionId: "dec-seed-pending-1",
+    requestId: "seed-req-pending-1",
+    outcome: "pending_approval" as const,
+    requireAudit: false,
+    reasons: ["policy: marketing purpose on PII requires approval"],
+  },
+  {
+    id: "aud-seed-denied-1",
+    at: "2026-08-06T09:30:00.000Z",
+    action: "access_request.deny",
+    actor: { role: "analyst" as const },
+    resource: { type: "metadata_asset", id: "dash-studio-margin" },
+    decisionId: "dec-seed-denied-1",
+    requestId: "seed-req-denied-1",
+    outcome: "denied" as const,
+    requireAudit: true,
+    reasons: [
+      "review:denied",
+      "policy: confidential classification requires audit log",
+    ],
+  },
+  {
+    id: "aud-seed-expired-1",
+    at: "2026-07-28T01:00:00.000Z",
+    action: "access_request.expire",
+    actor: { role: "analyst" as const },
+    resource: { type: "metadata_asset", id: "tbl-customer-profile" },
+    decisionId: "dec-seed-expired-1",
+    requestId: "seed-req-expired-1",
+    outcome: "expired" as const,
+    requireAudit: false,
+    reasons: ["stale draft/pending_approval past TTL"],
+  },
+  {
+    id: "aud-seed-permission-denied-1",
+    at: "2026-08-07T03:15:00.000Z",
+    action: AUDIT_ACTION_SUBMIT,
+    actor: { role: "analyst" as const },
+    resource: { type: "metadata_asset", id: "tbl-rental-slot" },
+    decisionId: "dec-seed-permission-denied-1",
+    requestId: "seed-req-permission-denied-1",
+    outcome: "denied" as const,
+    requireAudit: false,
+    reasons: ["policy: default deny"],
+  },
+  {
+    id: "aud-seed-deprecated-api-1",
+    at: "2026-08-02T05:05:00.000Z",
+    action: AUDIT_ACTION_SUBMIT,
+    actor: { role: "engineer" as const },
+    resource: { type: "metadata_asset", id: "api-legacy-quote" },
+    decisionId: "dec-seed-deprecated-1",
+    requestId: "seed-req-deprecated-api-1",
+    outcome: "denied" as const,
+    requireAudit: false,
+    reasons: [
+      "policy: asset deprecated — access blocked pending sunset",
+      "see api-material-quote for the supported replacement",
+    ],
+  },
+  {
+    id: "aud-seed-missing-owner-1",
+    at: "2026-08-10T08:00:00.000Z",
+    action: AUDIT_ACTION_SUBMIT,
+    actor: { role: "analyst" as const },
+    resource: { type: "metadata_asset", id: "dim-vendor-directory" },
+    decisionId: "dec-seed-missing-owner-1",
+    requestId: "seed-req-missing-owner-1",
+    outcome: "pending_approval" as const,
+    requireAudit: false,
+    reasons: ["policy: no owner on record — routed to admin escalation queue"],
   },
 ];
 
@@ -99,6 +183,7 @@ function listAssets(packId: string, q: string, type?: string, page = 1) {
       description: a.description,
       assetType: a.assetType,
       owner: a.owner,
+      department: a.department,
       tags: a.tags,
       classification: a.classification,
       updatedAt: a.updatedAt,

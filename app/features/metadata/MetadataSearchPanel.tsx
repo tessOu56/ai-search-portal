@@ -502,7 +502,9 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               className="hover:bg-muted/50 grid grid-cols-[1fr_1fr_2fr_auto] items-center gap-2 px-4 py-3"
             >
               <span className="font-medium text-primary">{row.name}</span>
-              <span className="text-muted-foreground">{row.owner}</span>
+              <span className="text-muted-foreground">
+                {row.owner || "Unassigned"}
+              </span>
               <span className="text-muted-foreground">{row.description}</span>
               <Badge
                 variant="secondary"

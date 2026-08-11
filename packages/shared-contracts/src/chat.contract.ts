@@ -28,6 +28,8 @@ export const stableChatMetaSchema = z.object({
 export const luiSourceSchema = z.object({
   title: z.string(),
   url: z.string(),
+  /** Origin citation for grounded hits, e.g. glossary terms (T-2026-071). */
+  source: z.string().optional(),
 });
 
 export const stableChatFinalSchema = z.object({

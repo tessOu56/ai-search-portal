@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { loadPackDocs, retrieveLocal } from "./local-store.js";
+import {
+  loadPackDocs,
+  resolveRagCorpus,
+  retrieveLocal,
+} from "./local-store.js";
 import { runLocalRag, runRagPipelineEvents } from "./pipeline.js";
 
 const PACK_ID = "metalcraft-studio";
+const ECOSYSTEM_GLOSSARY_PACK_ID = "ecosystem-glossary";
 const INCLUDE_DEFAULTS_OFF = { includeDefaults: false as const };
 const TERM_ONE_OFF = "term-one-off";
 
@@ -90,6 +95,47 @@ describe("runRagPipelineEvents local mode", () => {
     expect(rag.hits.some((h) => h.id === "term-reserve-price")).toBe(true);
     expect(rag.output.hits[0]?.kind).toBe("glossary");
 
+    process.env.AGENT_RAG_MODE = prev;
+  });
+});
+
+describe("ecosystem glossary (T-2026-071)", () => {
+  it("has terms with a source citation, synced from platform-command specs/domain", () => {
+    const docs = loadPackDocs(ECOSYSTEM_GLOSSARY_PACK_ID);
+    expect(docs.length).toBeGreaterThan(0);
+    expect(docs.every((d) => d.kind === "glossary")).toBe(true);
+    const ssot = docs.find((d) => d.id === "eco-ssot");
+    expect(ssot?.source).toBe(
+      "platform-command:specs/domain/engineering.yaml#ssot"
+    );
+  });
+
+  it("is merged into every pack's RAG corpus by default (includeDefaults)", () => {
+    const { docs } = resolveRagCorpus({ packId: PACK_ID });
+    expect(docs.some((d) => d.id.startsWith("eco-"))).toBe(true);
+
+    const noPack = resolveRagCorpus({ packId: null });
+    expect(noPack.docs.some((d) => d.id.startsWith("eco-"))).toBe(true);
+  });
+
+  it("is excluded when includeDefaults is false", () => {
+    const { docs } = resolveRagCorpus({
+      packId: PACK_ID,
+      includeDefaults: false,
+    });
+    expect(docs.some((d) => d.id.startsWith("eco-"))).toBe(false);
+  });
+
+  it("surfaces its source through runLocalRag hits when a glossary term matches", () => {
+    const prev = process.env.AGENT_RAG_MODE;
+    process.env.AGENT_RAG_MODE = "local";
+    const { hits } = runLocalRag("single source of truth SSOT", {
+      packId: PACK_ID,
+    });
+    const ssotHit = hits.find((h) => h.id === "eco-ssot");
+    expect(ssotHit?.source).toBe(
+      "platform-command:specs/domain/engineering.yaml#ssot"
+    );
     process.env.AGENT_RAG_MODE = prev;
   });
 });

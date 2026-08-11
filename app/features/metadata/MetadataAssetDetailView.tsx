@@ -469,8 +469,19 @@ function DataContractCard({ asset }: { asset: MetadataAssetDetailContract }) {
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
         <p>
-          <span className="text-muted-foreground">Owner:</span> {asset.owner}
+          <span className="text-muted-foreground">Owner:</span>{" "}
+          {asset.owner ? (
+            asset.owner
+          ) : (
+            <Badge variant="outline">Unassigned — needs owner</Badge>
+          )}
         </p>
+        {asset.department && (
+          <p>
+            <span className="text-muted-foreground">Department:</span>{" "}
+            {asset.department}
+          </p>
+        )}
         <p>
           <span className="text-muted-foreground">Classification:</span>{" "}
           <Badge

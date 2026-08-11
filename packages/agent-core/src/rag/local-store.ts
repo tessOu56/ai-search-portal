@@ -16,6 +16,8 @@ export type LocalDoc = {
   title?: string;
   kind?: "glossary" | "narrative" | "ops" | "doc";
   refs?: string[];
+  /** Origin citation (e.g. `platform-command:specs/domain/pm.yaml#sprint`) — T-2026-071. */
+  source?: string;
   facets?: {
     materials?: string[];
     techniques?: string[];
@@ -136,6 +138,7 @@ export function loadPackDocs(
       definition?: string;
       relatedAssetIds?: string[];
       tags?: string[];
+      source?: string;
       facets?: unknown;
     };
     if (!row.id || !row.term || !row.definition) continue;
@@ -152,6 +155,7 @@ export function loadPackDocs(
         ...facetTags(facets),
       ],
       refs: row.relatedAssetIds ?? [],
+      source: row.source,
       facets,
     });
   }
@@ -209,6 +213,33 @@ export function loadPackDocs(
   return docs;
 }
 
+/**
+ * Meta/PM/engineering/agentic glossary synced from platform-command
+ * specs/domain/*.yaml (T-2026-071, scripts/sync-domain-glossary.mjs). Has no
+ * pack.json, so it never appears in the user-facing pack switcher — it's
+ * merged into every corpus below purely so LUI can ground and cite it.
+ */
+const ECOSYSTEM_GLOSSARY_PACK_ID = "ecosystem-glossary";
+
+function safeLoadPackDocs(packId: string, contentRoot: string): LocalDoc[] {
+  try {
+    return loadPackDocs(packId, contentRoot);
+  } catch {
+    return [];
+  }
+}
+
+function dedupeById(docs: LocalDoc[]): LocalDoc[] {
+  const seen = new Set<string>();
+  const out: LocalDoc[] = [];
+  for (const doc of docs) {
+    if (seen.has(doc.id)) continue;
+    seen.add(doc.id);
+    out.push(doc);
+  }
+  return out;
+}
+
 export type RetrieveLocalOptions = {
   packId?: string | null;
   contentRoot?: string;
@@ -231,16 +262,20 @@ export function resolveRagCorpus(options: RetrieveLocalOptions = {}): {
     return { docs: options.docs, packId: packId ?? undefined };
   }
 
+  const includeDefaults = options.includeDefaults !== false;
+  const contentRoot = options.contentRoot ?? resolveDefaultContentRoot();
+  const ecosystemDocs = includeDefaults
+    ? safeLoadPackDocs(ECOSYSTEM_GLOSSARY_PACK_ID, contentRoot)
+    : [];
+
   if (packId) {
     try {
-      const packDocs = loadPackDocs(
-        packId,
-        options.contentRoot ?? resolveDefaultContentRoot()
-      );
+      const packDocs = loadPackDocs(packId, contentRoot);
       if (packDocs.length > 0) {
-        const includeDefaults = options.includeDefaults !== false;
         return {
-          docs: includeDefaults ? [...packDocs, ...DEFAULT_DOCS] : packDocs,
+          docs: includeDefaults
+            ? dedupeById([...packDocs, ...ecosystemDocs, ...DEFAULT_DOCS])
+            : packDocs,
           packId,
         };
       }
@@ -249,7 +284,11 @@ export function resolveRagCorpus(options: RetrieveLocalOptions = {}): {
     }
   }
 
-  return { docs: DEFAULT_DOCS };
+  return {
+    docs: includeDefaults
+      ? dedupeById([...DEFAULT_DOCS, ...ecosystemDocs])
+      : DEFAULT_DOCS,
+  };
 }
 
 export function retrieveLocal(

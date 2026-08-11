@@ -34,6 +34,8 @@ export const metadataAssetSummarySchema = z.object({
   description: z.string(),
   assetType: metadataAssetTypeSchema,
   owner: z.string(),
+  /** Owning department/team (G2 governance seed, T-2026-024). Empty owner ⇒ often absent too. */
+  department: z.string().optional(),
   tags: z.array(z.string()),
   classification: z.enum(["public", "internal", "PII", "confidential"]),
   updatedAt: z.string(),
