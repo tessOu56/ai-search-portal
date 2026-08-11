@@ -25,6 +25,13 @@ import type {
 } from "~/shared/contracts";
 import { cn } from "~/shared/utils/cn";
 
+export type MetadataAssetSubmitResult = {
+  ok: boolean;
+  message: string;
+  requestId?: string;
+  status?: string;
+};
+
 export type MetadataAssetDetailProps = {
   asset: MetadataAssetDetailContract;
   genUiDocument: GenUiDocumentContract;
@@ -35,7 +42,7 @@ export type MetadataAssetDetailProps = {
   /** Most recent application by this requester on this asset (lifecycle stepper). */
   existingApplication?: AccessApplicationContract | null;
   /** No-JS fallback submit result (real actionData); fetcher.data wins when present. */
-  submitResult?: { ok: boolean; message: string; requestId?: string };
+  submitResult?: MetadataAssetSubmitResult;
 };
 
 type AiAccessRequestState =
@@ -52,13 +59,6 @@ type AiAccessRequestState =
       rationale: string;
     }
   | { status: "invalid"; query: string; reason: string };
-
-type AccessSubmitFetcherData = {
-  ok: boolean;
-  message: string;
-  status?: string;
-  requestId?: string;
-};
 
 function buildConfirmHref(
   purpose: string,
@@ -101,12 +101,7 @@ function ApprovedTrackingLink({ requestId }: { requestId: string }) {
 function SubmitResultBanner({
   result,
 }: {
-  result?: {
-    ok: boolean;
-    message: string;
-    requestId?: string;
-    status?: string;
-  };
+  result?: MetadataAssetSubmitResult;
 }) {
   if (!result) return null;
   return (
@@ -236,13 +231,13 @@ function AccessRequestPanel({
   policyDecision: PolicyDecisionContract;
   role: string;
   purpose: string;
-  submitResult?: { ok: boolean; message: string; requestId?: string };
+  submitResult?: MetadataAssetSubmitResult;
 }) {
   // URL-driven HITL step (not useState) so E2E / dual-path work without waiting on hydration.
   const [searchParams] = useSearchParams();
   const showConfirm = searchParams.get("confirm") === "1";
   const canRequest = policyDecision.allow || policyDecision.need_approval;
-  const fetcher = useFetcher<AccessSubmitFetcherData>();
+  const fetcher = useFetcher<MetadataAssetSubmitResult>();
   const effectiveResult = fetcher.data ?? submitResult;
   const busy = fetcher.state !== "idle";
 
@@ -311,16 +306,6 @@ function AccessRequestPanel({
   );
 }
 
-/** Small marker used on AI-drafted fields — still editable before the human confirms (T-186 #6). */
-function AiSuggestedLabel({ children }: { children: string }) {
-  return (
-    <span className="flex items-center gap-1 text-xs font-medium text-primary">
-      <span aria-hidden="true">✨</span>
-      AI suggested — {children}
-    </span>
-  );
-}
-
 function AiAccessRequestPanel({
   aiAccessRequest,
   policyDecision,
@@ -328,11 +313,11 @@ function AiAccessRequestPanel({
 }: {
   aiAccessRequest: Exclude<AiAccessRequestState, { status: "idle" }>;
   policyDecision: PolicyDecisionContract;
-  submitResult?: { ok: boolean; message: string; requestId?: string };
+  submitResult?: MetadataAssetSubmitResult;
 }) {
   const [searchParams] = useSearchParams();
   const showConfirm = searchParams.get("confirm") === "1";
-  const fetcher = useFetcher<AccessSubmitFetcherData>();
+  const fetcher = useFetcher<MetadataAssetSubmitResult>();
   const effectiveResult = fetcher.data ?? submitResult;
   const busy = fetcher.state !== "idle";
 
@@ -411,30 +396,42 @@ function AiAccessRequestPanel({
               <input type="hidden" name="intent" value="access-request" />
               <input type="hidden" name="approved" value="true" />
               <div className="flex flex-wrap gap-4">
-                <label className="flex flex-col gap-1">
-                  <AiSuggestedLabel>Purpose</AiSuggestedLabel>
+                <FormField
+                  id="ai-request-purpose"
+                  label="Purpose"
+                  aiFilled
+                  aiBadgeLabel="AI suggested"
+                  className="w-40"
+                >
                   <select
+                    id="ai-request-purpose"
                     name="purpose"
                     defaultValue={aiAccessRequest.request.purpose}
-                    className="border-primary/40 bg-primary/5 h-9 rounded-md border px-2 text-sm"
+                    className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
                   >
                     <option value="analytics">analytics</option>
                     <option value="marketing">marketing</option>
                     <option value="operations">operations</option>
                   </select>
-                </label>
-                <label className="flex flex-col gap-1">
-                  <AiSuggestedLabel>Role</AiSuggestedLabel>
+                </FormField>
+                <FormField
+                  id="ai-request-role"
+                  label="Role"
+                  aiFilled
+                  aiBadgeLabel="AI suggested"
+                  className="w-40"
+                >
                   <select
+                    id="ai-request-role"
                     name="role"
                     defaultValue={requestRole}
-                    className="border-primary/40 bg-primary/5 h-9 rounded-md border px-2 text-sm"
+                    className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
                   >
                     <option value="analyst">analyst</option>
                     <option value="engineer">engineer</option>
                     <option value="data_admin">data_admin</option>
                   </select>
-                </label>
+                </FormField>
               </div>
               <div className="flex gap-2">
                 <Button type="submit" disabled={busy}>
@@ -458,6 +455,170 @@ function AiAccessRequestPanel({
         )}
       </CardContent>
     </Card>
+  );
+}
+
+function DataContractCard({ asset }: { asset: MetadataAssetDetailContract }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Data contract</CardTitle>
+        <CardDescription>
+          Owner, classification, PII fields, and terms of use
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3 text-sm">
+        <p>
+          <span className="text-muted-foreground">Owner:</span> {asset.owner}
+        </p>
+        <p>
+          <span className="text-muted-foreground">Classification:</span>{" "}
+          <Badge
+            variant={asset.classification === "PII" ? "secondary" : "outline"}
+          >
+            {asset.classification}
+          </Badge>
+          {asset.dataContractId ? (
+            <span className="ml-2 text-muted-foreground">
+              contract: {asset.dataContractId}
+            </span>
+          ) : null}
+        </p>
+        {asset.columns && asset.columns.length > 0 ? (
+          <div>
+            <p className="mb-1 font-medium">Fields</p>
+            <ul className="space-y-1 text-muted-foreground">
+              {asset.columns.map((col) => (
+                <li key={col.name} className="flex flex-wrap gap-2">
+                  <span className="text-foreground">{col.name}</span>
+                  <span>{col.dataType}</span>
+                  {col.sensitive ? (
+                    <Badge variant="secondary">PII / sensitive</Badge>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        {asset.termsOfUse && asset.termsOfUse.length > 0 ? (
+          <div>
+            <p className="mb-1 font-medium">Terms of use</p>
+            <ul className="list-inside list-disc text-muted-foreground">
+              {asset.termsOfUse.map((term) => (
+                <li key={term}>{term}</li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="text-muted-foreground">No terms attached.</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function AccessPolicyCard({
+  policyDecision,
+}: {
+  policyDecision: PolicyDecisionContract;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Access policy</CardTitle>
+        <CardDescription>
+          Policy-driven evaluation (OPA Rego / in-process fallback)
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 text-sm">
+        <p>{humanPolicySummary(policyDecision)}</p>
+        {policyDecision.require_audit ? (
+          <p className="text-muted-foreground">
+            Accessing this asset is recorded in the audit log.
+          </p>
+        ) : null}
+
+        <details
+          open
+          className={cn(
+            "rounded-lg border border-border p-3",
+            "[&_summary]:cursor-pointer [&_summary]:select-none"
+          )}
+          data-testid="policy-debug-drawer"
+        >
+          <summary className="text-sm font-medium text-muted-foreground">
+            Technical decision details
+          </summary>
+          <div className="mt-3 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant={policyDecision.allow ? "default" : "outline"}>
+                allow: {String(policyDecision.allow)}
+              </Badge>
+              <Badge
+                variant={policyDecision.need_approval ? "secondary" : "outline"}
+              >
+                need_approval: {String(policyDecision.need_approval)}
+              </Badge>
+              {policyDecision.require_audit ? (
+                <Badge variant="outline">audit required</Badge>
+              ) : null}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              decision_id: {policyDecision.decision_id}
+            </p>
+            {policyDecision.mask_fields.length > 0 ? (
+              <p className="text-xs text-muted-foreground">
+                masked fields: {policyDecision.mask_fields.join(", ")}
+              </p>
+            ) : null}
+            <ul className="list-inside list-disc text-muted-foreground">
+              {policyDecision.reasons.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+          </div>
+        </details>
+      </CardContent>
+    </Card>
+  );
+}
+
+function AssetLineageLists({ asset }: { asset: MetadataAssetDetailContract }) {
+  return (
+    <div className="flex flex-wrap gap-4 text-sm">
+      <div>
+        <h3 className="mb-2 font-medium">Upstream</h3>
+        <ul className="space-y-1 text-muted-foreground">
+          {asset.upstreamIds.map((id) => (
+            <li key={id}>
+              <Link
+                to={`/metadata/${id}`}
+                className="text-primary hover:underline"
+              >
+                {id}
+              </Link>
+            </li>
+          ))}
+          {asset.upstreamIds.length === 0 ? <li>—</li> : null}
+        </ul>
+      </div>
+      <div>
+        <h3 className="mb-2 font-medium">Downstream</h3>
+        <ul className="space-y-1 text-muted-foreground">
+          {asset.downstreamIds.map((id) => (
+            <li key={id}>
+              <Link
+                to={`/metadata/${id}`}
+                className="text-primary hover:underline"
+              >
+                {id}
+              </Link>
+            </li>
+          ))}
+          {asset.downstreamIds.length === 0 ? <li>—</li> : null}
+        </ul>
+      </div>
+    </div>
   );
 }
 
@@ -510,60 +671,7 @@ export function MetadataAssetDetailView({
 
       <GenUiRenderer document={genUiDocument} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Data contract</CardTitle>
-          <CardDescription>
-            Owner, classification, PII fields, and terms of use
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <p>
-            <span className="text-muted-foreground">Owner:</span> {asset.owner}
-          </p>
-          <p>
-            <span className="text-muted-foreground">Classification:</span>{" "}
-            <Badge
-              variant={asset.classification === "PII" ? "secondary" : "outline"}
-            >
-              {asset.classification}
-            </Badge>
-            {asset.dataContractId ? (
-              <span className="ml-2 text-muted-foreground">
-                contract: {asset.dataContractId}
-              </span>
-            ) : null}
-          </p>
-          {asset.columns && asset.columns.length > 0 ? (
-            <div>
-              <p className="mb-1 font-medium">Fields</p>
-              <ul className="space-y-1 text-muted-foreground">
-                {asset.columns.map((col) => (
-                  <li key={col.name} className="flex flex-wrap gap-2">
-                    <span className="text-foreground">{col.name}</span>
-                    <span>{col.dataType}</span>
-                    {col.sensitive ? (
-                      <Badge variant="secondary">PII / sensitive</Badge>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-          {asset.termsOfUse && asset.termsOfUse.length > 0 ? (
-            <div>
-              <p className="mb-1 font-medium">Terms of use</p>
-              <ul className="list-inside list-disc text-muted-foreground">
-                {asset.termsOfUse.map((term) => (
-                  <li key={term}>{term}</li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <p className="text-muted-foreground">No terms attached.</p>
-          )}
-        </CardContent>
-      </Card>
+      <DataContractCard asset={asset} />
 
       <AccessContextForm purpose={purpose} role={role} />
 
@@ -571,65 +679,7 @@ export function MetadataAssetDetailView({
         <ExistingApplicationCard application={existingApplication} />
       ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Access policy</CardTitle>
-          <CardDescription>
-            Policy-driven evaluation (OPA Rego / in-process fallback)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm">
-          <p>{humanPolicySummary(policyDecision)}</p>
-          {policyDecision.require_audit ? (
-            <p className="text-muted-foreground">
-              Accessing this asset is recorded in the audit log.
-            </p>
-          ) : null}
-
-          <details
-            open
-            className={cn(
-              "rounded-lg border border-border p-3",
-              "[&_summary]:cursor-pointer [&_summary]:select-none"
-            )}
-            data-testid="policy-debug-drawer"
-          >
-            <summary className="text-sm font-medium text-muted-foreground">
-              Technical decision details
-            </summary>
-            <div className="mt-3 space-y-3">
-              <div className="flex flex-wrap gap-2">
-                <Badge variant={policyDecision.allow ? "default" : "outline"}>
-                  allow: {String(policyDecision.allow)}
-                </Badge>
-                <Badge
-                  variant={
-                    policyDecision.need_approval ? "secondary" : "outline"
-                  }
-                >
-                  need_approval: {String(policyDecision.need_approval)}
-                </Badge>
-                {policyDecision.require_audit ? (
-                  <Badge variant="outline">audit required</Badge>
-                ) : null}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                decision_id: {policyDecision.decision_id}
-              </p>
-              {policyDecision.mask_fields.length > 0 ? (
-                <p className="text-xs text-muted-foreground">
-                  masked fields: {policyDecision.mask_fields.join(", ")}
-                </p>
-              ) : null}
-              <ul className="list-inside list-disc text-muted-foreground">
-                {policyDecision.reasons.map((r) => (
-                  <li key={r}>{r}</li>
-                ))}
-              </ul>
-            </div>
-          </details>
-        </CardContent>
-      </Card>
+      <AccessPolicyCard policyDecision={policyDecision} />
 
       {aiAccessRequest.status === "idle" ? (
         <AccessRequestPanel
@@ -646,40 +696,7 @@ export function MetadataAssetDetailView({
         />
       )}
 
-      <div className="flex flex-wrap gap-4 text-sm">
-        <div>
-          <h3 className="mb-2 font-medium">Upstream</h3>
-          <ul className="space-y-1 text-muted-foreground">
-            {asset.upstreamIds.map((id) => (
-              <li key={id}>
-                <Link
-                  to={`/metadata/${id}`}
-                  className="text-primary hover:underline"
-                >
-                  {id}
-                </Link>
-              </li>
-            ))}
-            {asset.upstreamIds.length === 0 ? <li>—</li> : null}
-          </ul>
-        </div>
-        <div>
-          <h3 className="mb-2 font-medium">Downstream</h3>
-          <ul className="space-y-1 text-muted-foreground">
-            {asset.downstreamIds.map((id) => (
-              <li key={id}>
-                <Link
-                  to={`/metadata/${id}`}
-                  className="text-primary hover:underline"
-                >
-                  {id}
-                </Link>
-              </li>
-            ))}
-            {asset.downstreamIds.length === 0 ? <li>—</li> : null}
-          </ul>
-        </div>
-      </div>
+      <AssetLineageLists asset={asset} />
     </div>
   );
 }

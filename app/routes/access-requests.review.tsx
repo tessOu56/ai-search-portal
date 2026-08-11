@@ -38,16 +38,7 @@ function resolveSessionRole(raw: string | null): GovernanceSessionRole {
   return parsed.success ? parsed.data : "owner";
 }
 
-export function loader({ request }: LoaderFunctionArgs) {
-  expireStaleAccessApplications();
-  const url = new URL(request.url);
-  const sessionRole = resolveSessionRole(url.searchParams.get("sessionRole"));
-  const pending = listAccessApplications({ pendingOnly: true });
-  return json({ sessionRole, pending });
-}
-
-export async function action({ request }: ActionFunctionArgs) {
-  const form = await request.formData();
+function parseReviewForm(form: FormData) {
   const requestId = String(form.get("requestId") ?? "");
   const purposeRaw = form.get("purpose");
   const roleRaw = form.get("role");
@@ -66,6 +57,27 @@ export async function action({ request }: ActionFunctionArgs) {
         ? roleRaw
         : undefined,
   });
+  return { requestId, parsed };
+}
+
+function auditActionFor(decision: "edited" | "approved" | "denied") {
+  if (decision === "edited") return "access_request.edit" as const;
+  return decision === "approved"
+    ? ("access_request.approve" as const)
+    : ("access_request.deny" as const);
+}
+
+export function loader({ request }: LoaderFunctionArgs) {
+  expireStaleAccessApplications();
+  const url = new URL(request.url);
+  const sessionRole = resolveSessionRole(url.searchParams.get("sessionRole"));
+  const pending = listAccessApplications({ pendingOnly: true });
+  return json({ sessionRole, pending });
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const form = await request.formData();
+  const { requestId, parsed } = parseReviewForm(form);
   if (!requestId || !parsed.success) {
     return json(
       { ok: false as const, text: "Invalid review payload" },
@@ -101,12 +113,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const decisionId =
     updated.data.decision?.decision_id ?? `review:${requestId}`;
   appendAuditEvent({
-    action:
-      parsed.data.decision === "edited"
-        ? "access_request.edit"
-        : parsed.data.decision === "approved"
-          ? "access_request.approve"
-          : "access_request.deny",
+    action: auditActionFor(parsed.data.decision),
     actor: { role: updated.data.role },
     resource: { type: "metadata_asset", id: updated.data.assetId },
     decisionId,

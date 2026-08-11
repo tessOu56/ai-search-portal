@@ -1,4 +1,8 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  TypedResponse,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
   isRouteErrorResponse,
@@ -24,6 +28,7 @@ import {
   getMetadataAsset,
   resolveMetadataLineage,
 } from "~/services/metadata.server";
+import type { AccessRequestLifecycleStatus } from "~/shared/contracts";
 import {
   genUiDocumentSchema,
   metadataAccessRequestSchema,
@@ -166,15 +171,32 @@ export function loader({ params, request }: LoaderFunctionArgs) {
   });
 }
 
-export async function action({ params, request }: ActionFunctionArgs) {
+type MetadataAccessActionData = {
+  ok: boolean;
+  message: string;
+  status?: AccessRequestLifecycleStatus;
+  requestId?: string;
+};
+
+function actionError(
+  message: string,
+  status: number
+): TypedResponse<MetadataAccessActionData> {
+  return json({ ok: false, message }, { status });
+}
+
+export async function action({
+  params,
+  request,
+}: ActionFunctionArgs): Promise<TypedResponse<MetadataAccessActionData>> {
   const assetId = params.assetId;
   if (!assetId) {
-    return json({ ok: false, message: "Missing assetId" }, { status: 400 });
+    return actionError("Missing assetId", 400);
   }
 
   const form = await request.formData();
   if (form.get("intent") !== "access-request") {
-    return json({ ok: false, message: "Unknown intent" }, { status: 400 });
+    return actionError("Unknown intent", 400);
   }
 
   const purpose = form.get("purpose");
@@ -187,7 +209,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
     purpose !== "marketing" &&
     purpose !== "operations"
   ) {
-    return json({ ok: false, message: "Invalid purpose" }, { status: 400 });
+    return actionError("Invalid purpose", 400);
   }
 
   const packId = parsePackIdFromRequest(request);
@@ -205,10 +227,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   });
 
   if (!result.ok) {
-    return json(
-      { ok: false, message: result.error },
-      { status: result.status }
-    );
+    return actionError(result.error, result.status);
   }
 
   return json({
@@ -272,8 +291,8 @@ export default function MetadataAssetPage() {
           ? {
               ok: actionData.ok,
               message: actionData.message,
-              requestId:
-                "requestId" in actionData ? actionData.requestId : undefined,
+              status: actionData.status,
+              requestId: actionData.requestId,
             }
           : undefined
       }

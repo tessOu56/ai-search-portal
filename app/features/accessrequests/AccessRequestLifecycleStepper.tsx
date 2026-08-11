@@ -89,7 +89,11 @@ export function AccessRequestLifecycleStepper({
   const steps: StepDef[] = isNegative
     ? [
         ...HAPPY_PATH.slice(0, 2),
-        { key: status, label: TERMINAL_LABEL[status] ?? status },
+        {
+          key: status,
+          // eslint-disable-next-line security/detect-object-injection -- status is a typed AccessRequestLifecycleStatus
+          label: TERMINAL_LABEL[status] ?? status,
+        },
       ]
     : HAPPY_PATH;
 
@@ -112,6 +116,7 @@ export function AccessRequestLifecycleStepper({
             <span
               className={cn(
                 "flex size-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
+                // eslint-disable-next-line security/detect-object-injection -- state is a typed StepVisualState
                 CIRCLE_CLASS[state]
               )}
               aria-hidden="true"
@@ -119,7 +124,13 @@ export function AccessRequestLifecycleStepper({
               {state === "done" ? "✓" : index + 1}
             </span>
             {!compact ? (
-              <span className={cn("whitespace-nowrap", LABEL_CLASS[state])}>
+              <span
+                className={cn(
+                  "whitespace-nowrap",
+                  // eslint-disable-next-line security/detect-object-injection -- state is a typed StepVisualState
+                  LABEL_CLASS[state]
+                )}
+              >
                 {step.label}
               </span>
             ) : (
@@ -127,7 +138,11 @@ export function AccessRequestLifecycleStepper({
             )}
             {!isLast ? (
               <span
-                className={cn("h-px w-4 shrink-0", LINE_CLASS[state])}
+                className={cn(
+                  "h-px w-4 shrink-0",
+                  // eslint-disable-next-line security/detect-object-injection -- state is a typed StepVisualState
+                  LINE_CLASS[state]
+                )}
                 aria-hidden="true"
               />
             ) : null}
