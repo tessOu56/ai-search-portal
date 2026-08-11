@@ -35,7 +35,7 @@ export type MetadataAssetDetailProps = {
   /** Most recent application by this requester on this asset (lifecycle stepper). */
   existingApplication?: AccessApplicationContract | null;
   /** No-JS fallback submit result (real actionData); fetcher.data wins when present. */
-  submitResult?: { ok: boolean; message: string };
+  submitResult?: { ok: boolean; message: string; requestId?: string };
 };
 
 type AiAccessRequestState =
@@ -232,7 +232,7 @@ function AccessRequestPanel({
   policyDecision: PolicyDecisionContract;
   role: string;
   purpose: string;
-  submitResult?: { ok: boolean; message: string };
+  submitResult?: { ok: boolean; message: string; requestId?: string };
 }) {
   // URL-driven HITL step (not useState) so E2E / dual-path work without waiting on hydration.
   const [searchParams] = useSearchParams();
@@ -324,7 +324,7 @@ function AiAccessRequestPanel({
 }: {
   aiAccessRequest: Exclude<AiAccessRequestState, { status: "idle" }>;
   policyDecision: PolicyDecisionContract;
-  submitResult?: { ok: boolean; message: string };
+  submitResult?: { ok: boolean; message: string; requestId?: string };
 }) {
   const [searchParams] = useSearchParams();
   const showConfirm = searchParams.get("confirm") === "1";

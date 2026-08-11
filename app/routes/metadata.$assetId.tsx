@@ -269,7 +269,12 @@ export default function MetadataAssetPage() {
       existingApplication={existingApplication}
       submitResult={
         actionData
-          ? { ok: actionData.ok, message: actionData.message }
+          ? {
+              ok: actionData.ok,
+              message: actionData.message,
+              requestId:
+                "requestId" in actionData ? actionData.requestId : undefined,
+            }
           : undefined
       }
     />

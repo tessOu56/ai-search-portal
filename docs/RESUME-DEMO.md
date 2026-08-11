@@ -2,6 +2,11 @@
 
 > Portfolio SSOT: [platform-command/planning/career/resume-portfolio.md](https://github.com/tessOu56/platform-command/blob/main/planning/career/resume-portfolio.md)
 
+## Interview framing (Dentscape × Bito)
+
+- **Dentscape**: professional-tool journey — inspect → modify → trust → deliver via HITL dual-path (manual + AI fill with field markers).
+- **Bito**: design-system consumption (`@explore-design/components` file: dep + Storybook/page-archetypes), contract+Mock governance APIs, `/vitals` + catalog-dictionary perf evidence.
+
 ## Problem → solution (30 seconds)
 
 **Problem**: Catalog-style search needs filterable, paginated results without binding UI to a live enterprise API during prototyping.
