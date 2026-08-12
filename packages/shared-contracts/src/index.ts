@@ -66,10 +66,12 @@ export {
   listAuditEventsResponseSchema,
 } from "./audit.contract.js";
 export type {
+  ChatAgentMode,
   ChatQueryParams,
   InternalRagStepPayload,
 } from "./chat.contract.js";
 export {
+  chatAgentModeSchema,
   chatQueryParamsSchema,
   internalChunkPayloadSchema,
   internalRagStepPayloadSchema,

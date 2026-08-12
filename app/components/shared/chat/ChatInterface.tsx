@@ -37,12 +37,13 @@ type Message = {
 type LuiMeta = {
   summary?: string;
   confidence?: number;
+  agentMode?: "live_llm" | "offline_fixture";
   sources?: Array<{ title: string; url: string; source?: string }>;
   nextSteps?: string[];
 };
 
 const CHIP_CLASS =
-  "inline-flex h-8 items-center rounded-full border border-border bg-background px-3 text-xs font-medium";
+  "inline-flex h-auto min-h-8 max-w-full items-center whitespace-normal break-words rounded-full border border-border bg-background px-3 py-1.5 text-left text-xs font-medium";
 
 function parseStableMeta(data: string) {
   const parsed = stableChatMetaSchema.safeParse(JSON.parse(data) as unknown);
@@ -50,6 +51,7 @@ function parseStableMeta(data: string) {
   return {
     summary: parsed.data.summary,
     confidence: parsed.data.confidence,
+    agentMode: parsed.data.agentMode,
   };
 }
 
@@ -133,6 +135,7 @@ export function ChatInterface({
           ...prev,
           summary: data.summary ?? prev.summary,
           confidence: data.confidence ?? prev.confidence,
+          agentMode: data.agentMode ?? prev.agentMode,
         }));
       } catch {
         setError(t(KEY_CHAT_ERROR_PARSE));
@@ -227,7 +230,11 @@ export function ChatInterface({
           <div className="flex flex-wrap items-center gap-2">
             <Badge>{t("chat.badge.live")}</Badge>
             <Badge variant="secondary">{t("chat.badge.sse")}</Badge>
-            <Badge variant="outline">{t("chat.badge.mock")}</Badge>
+            <Badge variant="outline">
+              {meta.agentMode === "live_llm"
+                ? t("chat.badge.live_llm")
+                : t("chat.badge.offline_fixture")}
+            </Badge>
           </div>
           <CardTitle>{t("chat.title")}</CardTitle>
         </CardHeader>

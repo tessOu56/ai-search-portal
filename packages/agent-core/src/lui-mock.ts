@@ -1,11 +1,14 @@
 /**
- * Mock LUI 回應 — 當有 local RAG hits 時，sources／答案引用領域知識 chunk，
- * 並附帶 catalog／metadata 分面 continue CTA。
+ * Mock / fixture LUI 回應 — 當有 local RAG hits 時，sources／答案引用領域知識 chunk，
+ * 並附帶 catalog／metadata 分面 continue CTA。無命中時改走 query-aware golden fixture
+ * （合成資料，非真實 PII），並強制 deep link 到 catalog／metadata。
  */
 
 import {
+  buildCatalogFacetUrl,
   buildKnowledgeContinueSources,
   buildKnowledgeSourceUrl,
+  buildMetadataFacetUrl,
 } from "./knowledge-links.js";
 import type { LocalDoc } from "./rag/local-store.js";
 
@@ -28,6 +31,142 @@ export type BuildLuiOptions = {
   ragHits?: LocalDoc[];
   packId?: string;
 };
+
+type FixtureTopic = "pii" | "lineage" | "orders" | "generic";
+
+function detectTopic(query: string): FixtureTopic {
+  const q = query.toLowerCase();
+  if (/pii|個資|敏感|權限|access|分類/.test(q)) return "pii";
+  if (/lineage|血緣|upstream|customer_profile|譜系/.test(q)) return "lineage";
+  if (/order|訂單|api/.test(q)) return "orders";
+  return "generic";
+}
+
+function syntheticBadgeSources(query: string, packId: string): LuiSource[] {
+  return [
+    {
+      title: "Synthetic fixture — not real PII",
+      url: buildMetadataFacetUrl({ q: query, pack: packId, intent: "manual" }),
+    },
+    {
+      title: "Continue in catalog",
+      url: buildCatalogFacetUrl({ q: query, intent: "manual" }),
+    },
+    {
+      title: "Browse metadata catalog",
+      url: buildMetadataFacetUrl({ q: query, pack: packId, intent: "manual" }),
+    },
+  ];
+}
+
+function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
+  const topic = detectTopic(query);
+  const continueSources = buildKnowledgeContinueSources(
+    query,
+    undefined,
+    packId
+  );
+  const synth = syntheticBadgeSources(query, packId);
+
+  if (topic === "pii") {
+    return {
+      summary: "Synthetic fixture：PII／權限題。展示資料為假資料，非真實個資。",
+      answer:
+        "依合成目錄，含 PII 標籤的示範資產包括 dim_customer_profile 與相關 marketing 用途資料表。分析師角色通常需要 owner 核准；這不是真實授權——請用 Access request 流程（Demo role switcher）體驗 HITL，再從 References 進入 metadata 詳情。",
+      confidence: 0.86,
+      sources: [
+        {
+          title: "dim_customer_profile (synthetic)",
+          url: `/metadata/${encodeURIComponent("dim_customer_profile")}?pack=${encodeURIComponent(packId)}`,
+        },
+        ...continueSources,
+        ...synth,
+      ].filter((s, i, arr) => arr.findIndex((x) => x.url === s.url) === i),
+      nextSteps: [
+        "在 metadata 開啟 dim_customer_profile 查看 classification／terms",
+        "以 requester 送出 access request（合成流程）",
+        "用 ?sessionRole=owner 體驗審核（Demo only — not authentication）",
+      ],
+    };
+  }
+
+  if (topic === "lineage") {
+    return {
+      summary:
+        "Synthetic fixture：customer_profile 上游血緣示範（非生產譜系）。",
+      answer:
+        "依合成 metadata pack，customer_profile／dim_customer_profile 的上游通常來自 staging 訂單與身分維度表。請從 References 進入 metadata 詳情看 Lineage DAG；若出現環則會顯示警告。此為 showcase 合成資料。",
+      confidence: 0.84,
+      sources: [
+        {
+          title: "customer_profile lineage (synthetic)",
+          url: buildMetadataFacetUrl({
+            q: "customer_profile",
+            pack: packId,
+            intent: "manual",
+          }),
+        },
+        {
+          title: "Continue in catalog",
+          url: buildCatalogFacetUrl({
+            q: "customer_profile",
+            intent: "manual",
+          }),
+        },
+        ...continueSources,
+      ].filter((s, i, arr) => arr.findIndex((x) => x.url === s.url) === i),
+      nextSteps: [
+        "開啟 metadata 詳情檢視 lineage",
+        "用 catalog 搜尋同名維度／API",
+        "需要權限時走 access-request 示範路徑",
+      ],
+    };
+  }
+
+  if (topic === "orders") {
+    return {
+      summary: "Synthetic fixture：orders 相關 API／資料集示範。",
+      answer:
+        "依合成目錄，orders 相關資產涵蓋訂單 API、事實表與金流狀態欄位。建議先用 catalog 篩選 API／Dictionary，再從 metadata 對照契約欄位。References 已帶入 deep link。",
+      confidence: 0.82,
+      sources: [
+        {
+          title: "Orders in catalog",
+          url: buildCatalogFacetUrl({ q: "orders", intent: "manual" }),
+        },
+        {
+          title: "Orders in metadata",
+          url: buildMetadataFacetUrl({
+            q: "orders",
+            pack: packId,
+            intent: "manual",
+          }),
+        },
+        ...continueSources,
+      ].filter((s, i, arr) => arr.findIndex((x) => x.url === s.url) === i),
+      nextSteps: [
+        "在 catalog 以 orders 篩選 API",
+        "在 metadata 對照表／欄位",
+        "需要授權時走 My APIs／access request（demo）",
+      ],
+    };
+  }
+
+  return {
+    summary: `已理解你的問題：「${query}」（Offline fixture／合成資料）。`,
+    answer:
+      "目前知識庫沒有直接命中。建議先釐清範圍，再從 catalog 與 metadata 交叉驗證；下方 References 已帶入搜尋 deep link。此為 public showcase——回覆為合成 fixture，不是企業級授權答案。",
+    confidence: 0.72,
+    sources: [...continueSources, ...synth].filter(
+      (s, i, arr) => arr.findIndex((x) => x.url === s.url) === i
+    ),
+    nextSteps: [
+      "補充你目前的情境限制或目標",
+      "從 References 開啟 catalog／metadata",
+      "把答案轉成可執行任務清單",
+    ],
+  };
+}
 
 export function buildLuiResponse(
   query: string,
@@ -87,28 +226,7 @@ export function buildLuiResponse(
     };
   }
 
-  return {
-    summary: `已理解你的問題：「${query}」。我會先給你結論，再補上依據與下一步。`,
-    answer:
-      "建議先釐清需求範圍與限制條件，接著找出 2-3 個可信來源交叉驗證，最後整理成可執行的行動清單。這樣可以在資訊量龐大的情境下，依然快速做出正確判斷。",
-    confidence: 0.78,
-    sources: [
-      {
-        title: "Remix 官方文件",
-        url: "https://remix.run/docs",
-      },
-      {
-        title: "AI 搜尋最佳實務",
-        url: "https://ai-search-portal.local/guide",
-      },
-      ...buildKnowledgeContinueSources(query, undefined, packId),
-    ],
-    nextSteps: [
-      "補充你目前的情境限制或目標",
-      "選擇一個來源作為主要依據",
-      "把答案轉成可執行任務清單",
-    ],
-  };
+  return buildQueryAwareFixture(query, packId);
 }
 
 export function splitToTokens(text: string) {

@@ -32,7 +32,8 @@ const INJECTION_PATTERNS: { pattern: RegExp; label: string }[] = [
   { pattern: /<\s*script[\s>]/i, label: "script_tag" },
 ];
 
-const MAX_QUERY_LENGTH = 16_000;
+/** Public showcase abuse bound — keep short; not a full WAF. */
+const MAX_QUERY_LENGTH = 2_000;
 
 export function scanQueryableText(query: string): GuardrailViolation | null {
   if (query.length > MAX_QUERY_LENGTH) {

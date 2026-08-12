@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import { buildLuiResponse } from "./lui-mock.js";
 import type { LocalDoc } from "./rag/local-store.js";
 
+const PACK_ID = "metalcraft-studio";
+
 describe("buildLuiResponse source citation (T-2026-071)", () => {
   it("propagates a glossary hit's `source` onto the matching LuiSource", () => {
     const hit: LocalDoc = {
@@ -17,7 +19,7 @@ describe("buildLuiResponse source citation (T-2026-071)", () => {
 
     const response = buildLuiResponse("what is SSOT", {
       ragHits: [hit],
-      packId: "metalcraft-studio",
+      packId: PACK_ID,
     });
 
     const cited = response.sources.find((s) => s.title === hit.title);
@@ -38,10 +40,24 @@ describe("buildLuiResponse source citation (T-2026-071)", () => {
 
     const response = buildLuiResponse("什麼是孤品", {
       ragHits: [hit],
-      packId: "metalcraft-studio",
+      packId: PACK_ID,
     });
 
     const cited = response.sources.find((s) => s.title === hit.title);
     expect(cited?.source).toBeUndefined();
+  });
+
+  it("uses query-aware PII fixture with catalog/metadata deep links when RAG misses", () => {
+    const response = buildLuiResponse(
+      "Which datasets contain PII and what access do I need?",
+      { packId: PACK_ID }
+    );
+    expect(response.summary.toLowerCase()).toMatch(/synthetic|pii/);
+    expect(response.sources.some((s) => s.url.includes("/metadata"))).toBe(
+      true
+    );
+    expect(
+      response.sources.some((s) => s.url.includes("/catalog-search"))
+    ).toBe(true);
   });
 });

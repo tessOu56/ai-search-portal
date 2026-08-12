@@ -110,7 +110,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
   const knowledgeHits = model.knowledgeHits ?? [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <header className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline" className="rounded-full text-xs">

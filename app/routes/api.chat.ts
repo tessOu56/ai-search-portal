@@ -10,7 +10,51 @@ import {
 } from "~/services/chat-gateway.server";
 import { parsePackIdFromRequest } from "~/services/context-pack.server";
 
+/** Lightweight in-memory abuse guard for the public showcase API (not a WAF). */
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX = 40;
+const rateBuckets = new Map<string, { count: number; resetAt: number }>();
+
+function clientKey(request: Request): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("cf-connecting-ip") ||
+    "anonymous"
+  );
+}
+
+function allowRequest(request: Request): boolean {
+  const key = clientKey(request);
+  const now = Date.now();
+  const bucket = rateBuckets.get(key);
+  if (!bucket || now >= bucket.resetAt) {
+    rateBuckets.set(key, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (bucket.count >= RATE_MAX) return false;
+  bucket.count += 1;
+  return true;
+}
+
+const STABLE_FAILURE = {
+  message: "Chat temporarily unavailable. Please try again.",
+  code: "chat_gateway_error",
+} as const;
+
 export function loader({ request }: LoaderFunctionArgs) {
+  if (!allowRequest(request)) {
+    return new Response(
+      JSON.stringify({
+        message: "Too many requests. Please slow down.",
+        code: "rate_limited",
+      }),
+      {
+        status: 429,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
   const url = new URL(request.url);
   const parsed = chatQueryParamsSchema.safeParse({
     q: url.searchParams.get("q") ?? "",
@@ -18,7 +62,7 @@ export function loader({ request }: LoaderFunctionArgs) {
   });
 
   if (!parsed.success) {
-    return new Response("Missing query", { status: 400 });
+    return new Response("Missing or invalid query", { status: 400 });
   }
 
   const traceId = getTraceIdFromRequest(request);
@@ -51,12 +95,10 @@ export function loader({ request }: LoaderFunctionArgs) {
             send: stableSend,
           });
         }
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Unknown chat error";
+      } catch {
         send({
           event: "failure",
-          data: JSON.stringify({ message, code: "chat_gateway_error" }),
+          data: JSON.stringify(STABLE_FAILURE),
         });
       } finally {
         close();

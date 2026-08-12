@@ -4,6 +4,7 @@ import {
   stableChatMetaSchema,
 } from "@ai-search-portal/contracts";
 
+import { tryOptionalLlmCompose } from "./llm/optional-openai.js";
 import { buildLuiResponse, splitToTokens } from "./lui-mock.js";
 import { beginChatTrace } from "./observability/langfuse.js";
 import { runLocalRag, runRagPipelineEvents } from "./rag/pipeline.js";
@@ -108,15 +109,23 @@ export async function* streamChatInternalEvents(args: {
   }
 
   const rag = runLocalRag(query, { packId });
-  const response = buildLuiResponse(query, {
+  const fixture = buildLuiResponse(query, {
     ragHits: rag.hits,
     packId: rag.packId ?? packId,
   });
+  const llm = await tryOptionalLlmCompose({
+    query,
+    hits: rag.hits,
+    fixture,
+  });
+  const response = llm?.response ?? fixture;
+  const agentMode = llm?.mode ?? "offline_fixture";
   const metaPayload = stableChatMetaSchema.parse({
     query,
     summary: response.summary,
     confidence: response.confidence,
     traceId,
+    agentMode,
   });
 
   yield {

@@ -41,8 +41,11 @@ pnpm dev
 6. **Lineage DAG (T-016)**: on a metadata detail with lineage, Kahn topological order is
    shown when acyclic; cycles surface an inline warning (`docs/architecture/lineage-kahn.md`).
 7. **Golden demo (Journey A)**: on `/`, click one of the 3 fixed questions —
-   streaming, tool status, confidence + sources render live; the "Mock agent"
-   badge is honest labelling (pipeline is real, LLM is not).
+   streaming, tool status, confidence + sources render live; the mode badge
+   shows **Offline fixture** (default) or **Live LLM** when a server-only
+   `OPENAI_API_KEY` is configured. Fixture answers are query-aware with deep
+   links into catalog／metadata. `?sessionRole=` is a **demo role switcher**,
+   not authentication.
 8. Mention: SSE chat + shared `stable-sse-client` + guardrails in `labs/` (optional 30s)
 9. **Web Vitals (T-2026-115)**: open `/vitals` — live LCP/INP/CLS for this
    browser tab, no backend required; cross-reference with the measured

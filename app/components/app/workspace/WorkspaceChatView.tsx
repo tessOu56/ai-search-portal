@@ -79,6 +79,13 @@ export function WorkspaceChatView({
               {t("footer.version", { version })}
             </Link>
           </p>
+          <p>
+            <Link to="/vitals" className="text-primary hover:underline">
+              {t("footer.vitals")}
+            </Link>
+          </p>
+          <p title={t("footer.synthetic.hint")}>{t("footer.synthetic")}</p>
+          <p title={t("footer.demo_roles.hint")}>{t("footer.demo_roles")}</p>
           <Form
             method="post"
             action={API_LOCALE}

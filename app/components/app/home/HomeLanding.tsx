@@ -24,12 +24,12 @@ export function HomeLanding({ className, onAsk }: HomeLandingProps) {
   return (
     <section
       className={cn(
-        "relative isolate flex min-h-svh flex-col justify-end overflow-hidden",
+        "md:pt-space-48 relative isolate flex min-h-[85svh] flex-col justify-center overflow-hidden pt-space-32",
         className
       )}
       aria-label={t("home.title")}
     >
-      <div className="mx-auto w-full max-w-5xl px-space-16 py-space-32 md:px-space-32">
+      <div className="py-space-24 mx-auto w-full max-w-5xl px-space-16 md:p-space-32">
         <motion.div
           className="mb-space-16"
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}

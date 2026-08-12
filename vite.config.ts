@@ -26,6 +26,11 @@ export default defineConfig(({ mode }) => {
           ]),
       tsconfigPaths(),
     ],
+    // @is_tess/components dist uses extensionless `./ux` re-exports that Node ESM
+    // rejects when left external — bundle into SSR (also pulls tokens CSS deps).
+    ssr: {
+      noExternal: ["@is_tess/components", "@is_tess/tokens"],
+    },
     test: {
       globals: true,
       include: ["app/**/*.{test,spec}.{ts,tsx}"],

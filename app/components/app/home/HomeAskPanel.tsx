@@ -81,7 +81,7 @@ export function HomeAskPanel({ className, onSubmit }: HomeAskPanelProps) {
     <form
       onSubmit={handleSubmit}
       className={cn(
-        "border-border/70 bg-background/70 flex w-full max-w-2xl items-center gap-space-8 rounded-2xl border p-space-8 shadow-sm backdrop-blur-md",
+        "border-border/70 bg-background/70 flex w-full max-w-2xl items-start gap-space-8 rounded-2xl border p-space-8 shadow-sm backdrop-blur-md",
         className
       )}
     >
@@ -97,17 +97,17 @@ export function HomeAskPanel({ className, onSubmit }: HomeAskPanelProps) {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           autoComplete="off"
-          className="h-12 w-full bg-transparent px-space-16 text-type-16 text-foreground outline-none placeholder:text-muted-foreground"
+          className="min-h-12 w-full bg-transparent px-space-16 py-3 text-type-16 leading-snug text-foreground outline-none placeholder:text-muted-foreground"
           placeholder={showTypewriter ? "" : t("chat.placeholder")}
           aria-label={t("home.composer.label")}
         />
         {showTypewriter && (
           <span
-            className="pointer-events-none absolute inset-y-0 left-0 flex items-center px-space-16 text-type-16 text-muted-foreground"
+            className="pointer-events-none absolute inset-x-0 top-0 flex min-h-12 items-start whitespace-normal break-words px-space-16 py-3 text-type-16 leading-snug text-muted-foreground"
             aria-hidden
           >
-            {typed}
-            <span className="bg-muted-foreground/70 ml-0.5 inline-block h-[1.1em] w-px animate-pulse" />
+            <span className="min-w-0">{typed}</span>
+            <span className="bg-muted-foreground/70 ml-0.5 mt-0.5 inline-block h-[1.1em] w-px shrink-0 animate-pulse" />
           </span>
         )}
       </div>

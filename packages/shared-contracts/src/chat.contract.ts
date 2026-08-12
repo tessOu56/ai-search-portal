@@ -10,11 +10,14 @@ export const chatQueryParamsSchema = z.object({
   q: z
     .string()
     .transform((s) => s.trim())
-    .pipe(z.string().min(1)),
+    .pipe(z.string().min(1).max(2000)),
   sessionId: z.string().min(1).optional(),
 });
 
 export type ChatQueryParams = z.infer<typeof chatQueryParamsSchema>;
+
+export const chatAgentModeSchema = z.enum(["live_llm", "offline_fixture"]);
+export type ChatAgentMode = z.infer<typeof chatAgentModeSchema>;
 
 /** 穩定層：meta */
 export const stableChatMetaSchema = z.object({
@@ -22,6 +25,8 @@ export const stableChatMetaSchema = z.object({
   summary: z.string(),
   confidence: z.number(),
   traceId: z.string().optional(),
+  /** Honest UI badge — Live LLM vs Offline fixture (not auth). */
+  agentMode: chatAgentModeSchema.optional(),
 });
 
 /** 穩定層：final */

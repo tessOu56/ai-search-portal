@@ -40,6 +40,9 @@ export function DashboardView() {
             <Button asChild variant="outline" size="sm">
               <Link to="/catalog-search">Catalog search</Link>
             </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/vitals">Web Vitals</Link>
+            </Button>
             <Button asChild size="sm">
               <Link to="/items/new">New item</Link>
             </Button>

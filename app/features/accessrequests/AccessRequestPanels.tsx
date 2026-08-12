@@ -38,22 +38,25 @@ export function SessionRoleSwitcher({
 }) {
   const roles: GovernanceSessionRole[] = ["requester", "owner", "admin"];
   return (
-    <div
-      className="flex flex-wrap items-center gap-2 text-sm"
-      role="group"
-      aria-label="Session role"
-    >
-      <span className="text-muted-foreground">Session:</span>
-      {roles.map((role) => (
-        <Button
-          key={role}
-          asChild
-          size="sm"
-          variant={sessionRole === role ? "default" : "outline"}
-        >
-          <Link to={`?sessionRole=${role}`}>{role}</Link>
-        </Button>
-      ))}
+    <div className="grid gap-2" role="group" aria-label="Demo session role">
+      <p className="text-xs text-muted-foreground">
+        Demo role switcher — not authentication. Query{" "}
+        <code className="rounded bg-muted px-1">?sessionRole=</code> only
+        changes the showcase persona; it is not production RBAC.
+      </p>
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <span className="text-muted-foreground">Demo session:</span>
+        {roles.map((role) => (
+          <Button
+            key={role}
+            asChild
+            size="sm"
+            variant={sessionRole === role ? "default" : "outline"}
+          >
+            <Link to={`?sessionRole=${role}`}>{role}</Link>
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -213,7 +216,8 @@ export function MyApisPanel({
             My APIs
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Requester applications and permission status (G1 mock).
+            Requester applications and permission status (G1 showcase —
+            in-memory store; not production auth).
           </p>
         </div>
         <SessionRoleSwitcher sessionRole={sessionRole} />
@@ -412,7 +416,8 @@ export function AccessRequestReviewPanel({
             Access review
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Owner/admin pending queue — approve or deny (mock).
+            Owner/admin pending queue — approve or deny (showcase demo; not
+            production RBAC).
           </p>
         </div>
         <SessionRoleSwitcher sessionRole={sessionRole} />

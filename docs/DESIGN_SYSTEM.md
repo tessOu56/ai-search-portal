@@ -7,11 +7,11 @@
 
 ## Token Source of Truth
 
-- **S1 起（2026-07-08）：token canonical 在 [explore-design-sdk](https://github.com/tessOu56/explore-design-sdk)**（`@is_tess/tokens`，application map `portal`），不在本 repo、不在 Figma。
-- 消費鏈：SDK `pnpm tokens:css` 產出 `[data-app="portal"]` CSS vars → 同步至本 repo `app/styles/tokens.portal.css`（vendored generated，待套件發布後改 import）→ `app/tailwind.css` 只做「shadcn 變數 ← SDK semantic 變數」橋接 → `tailwind.config.ts` 以 `var(--x)` 完整色值消費。
-- **改色請改 SDK 的 `portal.map.json`**，不要動 portal 內任何 CSS 值；`data-app="portal"` 掛在 `app/root.tsx` 的 `<html>`。
-- Dark theme 暫由 portal 自持（`app/tailwind.css` `.dark` 段），SDK dark map 為 S2 範圍。
-- 理由：CI 可驗證（SDK `tokens:validate`）、version control、跨專案一致（portal / nx / vue 同一 SDK）。
+- **SSOT**：[@is_tess/tokens](https://www.npmjs.com/package/@is_tess/tokens)（explore-design-sdk application map `portal`）。
+- 消費鏈：SDK `pnpm tokens:css` → publish `@is_tess/tokens` → portal `app/styles/tokens.portal.css` **只做 npm CSS `@import`**（不再 vendor 一份色值）→ `app/tailwind.css` 橋接 shadcn 變數 ← SDK semantic → `tailwind.config.ts` 以 `var(--x)` 消費。
+- **改色請改 SDK 的 `portal.map.json`** 後重新 publish；不要在 portal 內手改 token 色值；`data-app="portal"` 掛在 `app/root.tsx` 的 `<html>`。
+- Dark／主題 CSS：`@is_tess/tokens/css/portal*.css`（含 yamabuki／matcha-fuji／wakakusa／untitled）。
+- UI 元件：`app/components/ui/*` re-export `@is_tess/components`。
 - 設計稿與 token 同步流程見 [docs/architecture/figma-mcp.md](architecture/figma-mcp.md)。
 
 ## Design Tokens
@@ -30,7 +30,7 @@
 | 山吹 Yamabuki         | `yamabuki`    | 金 `#F8B500` × 中性灰底 × 橙紐 `#C9703D`               |
 | 抹茶と藤 Matcha-Fuji  | `matcha-fuji` | 抹茶 `#CBD892` × 亞麻底 × 薰衣草 `#E1C2FF`             |
 
-切換：`<html>` 的 `data-theme` + `.dark` class（ThemeSwitcher 元件，localStorage 記憶，root.tsx init script 防 FOUC）。**portal 不自持任何色值**——bridge 只做 shadcn 變數 ← SDK semantic 變數的參照，主題與 dark 全由 `app/styles/tokens.portal.css`（generated）承接。新增 semantic：`surface.highlight`（chips/badge）、`accent.strong`（連結/小字級 accent）。改色一律改 SDK 對應 theme map。紙質感 noise（opacity 0.04）沿用。
+切換：`<html>` 的 `data-theme` + `.dark` class（ThemeSwitcher 元件，localStorage 記憶，root.tsx init script 防 FOUC）。**portal 不自持任何色值**——bridge 只做 shadcn 變數 ← SDK semantic 變數的參照，主題與 dark 全由 `@is_tess/tokens/css/portal*.css` 承接。新增 semantic：`surface.highlight`（chips/badge）、`accent.strong`（連結/小字級 accent）。改色一律改 SDK 對應 theme map。紙質感 noise（opacity 0.04）沿用。
 
 ## 元件 Canonical（S2 起）
 

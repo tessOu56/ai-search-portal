@@ -80,6 +80,12 @@ export default function VitalsRoute() {
     <Container className="py-10">
       <div className="mb-6 flex flex-col gap-2">
         <h1 className="text-2xl font-bold">Web Vitals</h1>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Browser-session metrics only (LCP / INP / CLS). Public DTO — no
+          internal collector, DSN, or probe endpoints are exposed on this page.
+          See <code>web-vitals-reporter.ts</code>. No backend analytics
+          required.
+        </p>
         <p className="max-w-2xl text-sm text-muted-foreground">
           Live LCP / INP / CLS reported by this browser tab, mirrored into an
           in-memory + <code>sessionStorage</code> store fed by{" "}
