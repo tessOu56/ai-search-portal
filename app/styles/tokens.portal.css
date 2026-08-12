@@ -1,7 +1,7 @@
 /* Vendored from explore-design-sdk (pnpm tokens:css) until npm publish — do not edit by hand. */
 /* Applications: portal(+dark) / portal-wakakusa(+dark) / portal-yamabuki(+dark) / portal-matcha-fuji(+dark) / portal-untitled */
 
-/* Generated from @explore-design/tokens — application: portal */
+/* Generated from @is_tess/tokens — application: portal */
 /* Do not edit by hand. Run `pnpm tokens:css`. */
 [data-app="portal"] {
   --accent-brand: #ffda76;
@@ -64,7 +64,7 @@
   --weight-body: 400;
   --weight-heading: 500;
 }
-/* Generated from @explore-design/tokens — application: portal-dark */
+/* Generated from @is_tess/tokens — application: portal-dark */
 /* Do not edit by hand. Run `pnpm tokens:css`. */
 [data-app="portal"].dark {
   --accent-brand: #8a6500;
@@ -127,7 +127,7 @@
   --weight-body: 400;
   --weight-heading: 500;
 }
-/* Generated from @explore-design/tokens — application: portal-wakakusa */
+/* Generated from @is_tess/tokens — application: portal-wakakusa */
 /* Do not edit by hand. Run `pnpm tokens:css`. */
 [data-app="portal"][data-theme="wakakusa"] {
   --accent-brand: #bd8356;
@@ -190,7 +190,7 @@
   --weight-body: 400;
   --weight-heading: 500;
 }
-/* Generated from @explore-design/tokens — application: portal-wakakusa-dark */
+/* Generated from @is_tess/tokens — application: portal-wakakusa-dark */
 /* Do not edit by hand. Run `pnpm tokens:css`. */
 [data-app="portal"][data-theme="wakakusa"].dark {
   --accent-brand: #a96e42;
@@ -253,7 +253,7 @@
   --weight-body: 400;
   --weight-heading: 500;
 }
-/* Generated from @explore-design/tokens — application: portal-yamabuki */
+/* Generated from @is_tess/tokens — application: portal-yamabuki */
 /* Do not edit by hand. Run `pnpm tokens:css`. */
 [data-app="portal"][data-theme="yamabuki"] {
   --accent-brand: #f8b500;
@@ -316,7 +316,7 @@
   --weight-body: 400;
   --weight-heading: 500;
 }
-/* Generated from @explore-design/tokens — application: portal-yamabuki-dark */
+/* Generated from @is_tess/tokens — application: portal-yamabuki-dark */
 /* Do not edit by hand. Run `pnpm tokens:css`. */
 [data-app="portal"][data-theme="yamabuki"].dark {
   --accent-brand: #ffbc05;
@@ -379,7 +379,7 @@
   --weight-body: 400;
   --weight-heading: 500;
 }
-/* Generated from @explore-design/tokens — application: portal-matcha-fuji */
+/* Generated from @is_tess/tokens — application: portal-matcha-fuji */
 /* Do not edit by hand. Run `pnpm tokens:css`. */
 [data-app="portal"][data-theme="matcha-fuji"] {
   --accent-brand: #cbd892;
@@ -442,7 +442,7 @@
   --weight-body: 400;
   --weight-heading: 500;
 }
-/* Generated from @explore-design/tokens — application: portal-matcha-fuji-dark */
+/* Generated from @is_tess/tokens — application: portal-matcha-fuji-dark */
 /* Do not edit by hand. Run `pnpm tokens:css`. */
 [data-app="portal"][data-theme="matcha-fuji"].dark {
   --accent-brand: #75873a;
@@ -505,7 +505,7 @@
   --weight-body: 400;
   --weight-heading: 500;
 }
-/* Generated from @explore-design/tokens — application: portal-untitled */
+/* Generated from @is_tess/tokens — application: portal-untitled */
 /* Do not edit by hand. Run `pnpm tokens:css`. */
 [data-app="portal"] [data-theme="untitled"],
 [data-app="portal"][data-theme="untitled"] {

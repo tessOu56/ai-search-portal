@@ -1,9 +1,9 @@
 /**
- * @explore-design/tokens — photographic-light / multi-layer atmosphere shell
+ * @is_tess/tokens — photographic-light / multi-layer atmosphere shell
  *
  * Token-colored layers only (no hard-coded brand hues).
  * Mount after application CSS:
- *   @import "@explore-design/tokens/css/atmosphere.css";
+ *   @import "@is_tess/tokens/css/atmosphere.css";
  *
  * Markup:
  *   <div class="eds-atmosphere" aria-hidden>

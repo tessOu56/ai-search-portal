@@ -1,1 +1,1 @@
-export { Input } from "@explore-design/components";
+export { Input } from "@is_tess/components";

@@ -84,8 +84,8 @@
     "@ai-search-portal/contracts": "workspace:*",
     "@ai-search-portal/governance-domain": "workspace:*",
 
-    "@explore-design/components": "github:tessOu56/explore-design-sdk#path:packages/components",
-    "@explore-design/tokens": "github:tessOu56/explore-design-sdk#path:packages/tokens",
+    "@is_tess/components": "^0.1.0",
+    "@is_tess/tokens": "^0.1.0",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-slot": "^1.2.4",
     "@remix-run/node": "^2.17.2",

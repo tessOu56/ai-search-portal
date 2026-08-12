@@ -1,4 +1,4 @@
-/* T-186: generated from @explore-design/tokens (file: dep); sync via SDK css/portal*.css */
+/* T-186: generated from @is_tess/tokens (file: dep); sync via SDK css/portal*.css */
 @import "./styles/tokens.portal.css";
 @import "./styles/scale.system.css";
 @import "./styles/brand-mark.css";
@@ -10,7 +10,7 @@
 
 @layer base {
   /*
-   * Token SSOT: explore-design-sdk（@explore-design/tokens, application: portal）
+   * Token SSOT: explore-design-sdk（@is_tess/tokens, application: portal）
    * 此區塊只做「shadcn/ui 變數 ← SDK semantic 變數」橋接，不定義顏色值。
    * 值來源：app/styles/tokens.portal.css（generated，[data-app="portal"] 掛在 <html>）。
    * [data-theme="untitled"] 一併列入：後台主題可掛在巢狀節點（SDK portal-untitled map），

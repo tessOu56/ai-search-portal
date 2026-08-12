@@ -1,1 +1,1 @@
-export { Textarea } from "@explore-design/components";
+export { Textarea } from "@is_tess/components";

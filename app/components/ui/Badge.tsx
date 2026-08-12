@@ -1,1 +1,1 @@
-export { Badge } from "@explore-design/components";
+export { Badge } from "@is_tess/components";

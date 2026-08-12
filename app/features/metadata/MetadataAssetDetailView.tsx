@@ -1,4 +1,4 @@
-import { FormField } from "@explore-design/components";
+import { FormField } from "@is_tess/components";
 import { Link, useFetcher, useSearchParams, useSubmit } from "@remix-run/react";
 import type { FormEvent } from "react";
 

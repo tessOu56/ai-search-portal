@@ -1,2 +1,2 @@
-export type { BrandMarkProps } from "@explore-design/components";
-export { BrandMark } from "@explore-design/components";
+export type { BrandMarkProps } from "@is_tess/components";
+export { BrandMark } from "@is_tess/components";

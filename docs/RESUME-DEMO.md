@@ -5,7 +5,7 @@
 ## Interview framing (Dentscape × Bito)
 
 - **Dentscape**: professional-tool journey — inspect → modify → trust → deliver via HITL dual-path (manual + AI fill with field markers).
-- **Bito**: design-system consumption (`@explore-design/components` file: dep + Storybook/page-archetypes), contract+Mock governance APIs, `/vitals` + catalog-dictionary perf evidence.
+- **Bito**: design-system consumption (`@is_tess/components` file: dep + Storybook/page-archetypes), contract+Mock governance APIs, `/vitals` + catalog-dictionary perf evidence.
 
 ## Problem → solution (30 seconds)
 

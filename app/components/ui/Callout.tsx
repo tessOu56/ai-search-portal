@@ -1,1 +1,1 @@
-export { Callout } from "@explore-design/components";
+export { Callout } from "@is_tess/components";

@@ -4,4 +4,4 @@ export {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@explore-design/components";
+} from "@is_tess/components";

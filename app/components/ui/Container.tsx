@@ -1,1 +1,1 @@
-export { Container } from "@explore-design/components";
+export { Container } from "@is_tess/components";

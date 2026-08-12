@@ -1,5 +1,1 @@
-export {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@explore-design/components";
+export { Alert, AlertDescription, AlertTitle } from "@is_tess/components";

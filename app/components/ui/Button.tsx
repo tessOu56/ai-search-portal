@@ -1,1 +1,1 @@
-export { Button } from "@explore-design/components";
+export { Button } from "@is_tess/components";

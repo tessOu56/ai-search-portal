@@ -1,1 +1,1 @@
-export { ScrollArea } from "@explore-design/components";
+export { ScrollArea } from "@is_tess/components";

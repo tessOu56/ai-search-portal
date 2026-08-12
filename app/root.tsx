@@ -74,7 +74,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const data = useRouteLoaderData("root") as RootData | undefined;
   const locale = data?.locale ?? "zh-TW";
 
-  // data-app：掛載 @explore-design/tokens 的 application scope（見 app/styles/tokens.portal.css）
+  // data-app：掛載 @is_tess/tokens 的 application scope（見 app/styles/tokens.portal.css）
   // data-theme：SSR 預設若草（PALETTE v5）；init script 依 localStorage 覆寫，蜜蝋＝移除 attr 回 [data-app] 基底
   return (
     <html

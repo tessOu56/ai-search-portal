@@ -7,7 +7,7 @@
 
 ## Token Source of Truth
 
-- **S1 起（2026-07-08）：token canonical 在 [explore-design-sdk](https://github.com/tessOu56/explore-design-sdk)**（`@explore-design/tokens`，application map `portal`），不在本 repo、不在 Figma。
+- **S1 起（2026-07-08）：token canonical 在 [explore-design-sdk](https://github.com/tessOu56/explore-design-sdk)**（`@is_tess/tokens`，application map `portal`），不在本 repo、不在 Figma。
 - 消費鏈：SDK `pnpm tokens:css` 產出 `[data-app="portal"]` CSS vars → 同步至本 repo `app/styles/tokens.portal.css`（vendored generated，待套件發布後改 import）→ `app/tailwind.css` 只做「shadcn 變數 ← SDK semantic 變數」橋接 → `tailwind.config.ts` 以 `var(--x)` 完整色值消費。
 - **改色請改 SDK 的 `portal.map.json`**，不要動 portal 內任何 CSS 值；`data-app="portal"` 掛在 `app/root.tsx` 的 `<html>`。
 - Dark theme 暫由 portal 自持（`app/tailwind.css` `.dark` 段），SDK dark map 為 S2 範圍。
@@ -34,7 +34,7 @@
 
 ## 元件 Canonical（S2 起）
 
-基礎元件 canonical 在 **explore-design-sdk `packages/components`**（`@explore-design/components`）；本 repo `app/components/ui/*` 為 vendored 副本（見該目錄 README），發布 npm 後改 import。
+基礎元件 canonical 在 **explore-design-sdk `packages/components`**（`@is_tess/components`）；本 repo `app/components/ui/*` 為 vendored 副本（見該目錄 README），發布 npm 後改 import。
 
 ## Core Components
 
