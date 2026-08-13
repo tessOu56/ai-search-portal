@@ -10,7 +10,6 @@
     "build:agent-core": "pnpm --filter @ai-search-portal/agent-core run build",
     "build:contracts": "pnpm run codegen:openapi && pnpm --filter @ai-search-portal/contracts run build",
     "build:governance-domain": "pnpm --filter @ai-search-portal/governance-domain run build",
-
     "codegen:openapi": "openapi-typescript specs/openapi/openapi.yaml -o packages/shared-contracts/src/generated/openapi-types.ts",
     "lint:openapi": "spectral lint specs/openapi/openapi.yaml",
     "check:node": "node -e \"const M=process.versions.node.split('.')[0]; if(M!=='22'){console.error('Portal requires Node 22.x (got '+process.versions.node+'). Use .nvmrc / brew node@22.'); process.exit(1)}\"",
@@ -20,7 +19,6 @@
     "dev:agent": "pnpm --filter @ai-search-portal/agent-runtime dev",
     "build:api": "pnpm run build:contracts && pnpm run build:governance-domain && pnpm --filter ai-search-api build",
     "test:api": "pnpm run build:contracts && pnpm run build:governance-domain && pnpm --filter ai-search-api test",
-
     "test:policies": "node scripts/test-policies.mjs",
     "test:agent": "pnpm run build:contracts && pnpm run build:agent-core && pnpm --filter @ai-search-portal/agent-core test && pnpm --filter @ai-search-portal/agent-runtime test",
     "test:labs": "pnpm run build:agent-core && pnpm --filter @ai-search-portal/lab-eval-runner test",
@@ -47,7 +45,6 @@
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "start": "remix-serve ./build/server/index.js",
     "test": "pnpm run build:contracts && pnpm run build:governance-domain && pnpm run build:agent-core && vitest run && pnpm --filter @ai-search-portal/governance-domain test && pnpm --filter @ai-search-portal/agent-core test && pnpm --filter @ai-search-portal/agent-runtime test",
-
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:watch": "vitest",
@@ -68,7 +65,6 @@
     "changeset:publish": "changeset publish",
     "prepare": "husky install || true",
     "predev": "pnpm run build:contracts && pnpm run build:governance-domain && pnpm run build:agent-core",
-
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
@@ -84,8 +80,7 @@
     "@ai-search-portal/agent-core": "workspace:*",
     "@ai-search-portal/contracts": "workspace:*",
     "@ai-search-portal/governance-domain": "workspace:*",
-
-    "@is_tess/components": "^0.1.0",
+    "@is_tess/components": "^0.1.1",
     "@is_tess/tokens": "^0.1.0",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-slot": "^1.2.4",
