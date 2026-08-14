@@ -1,9 +1,7 @@
 # ai-search-portal — 專案規劃（階段制）
 
-> **生態 SSOT**：[platform-command/planning/projects/ai-search-portal.md](https://github.com/tessOu56/platform-command/blob/main/planning/projects/ai-search-portal.md)  
 > **架構 SSOT**：[product-architecture-plan-2026-05.md](./architecture/ai-product/product-architecture-plan-2026-05.md)  
-> **Agent 協作**：[agent-collaboration.md](./agent-collaboration.md)（skills／hooks／commands）  
-> **收件**：[platform-inbox/CURRENT.md](./platform-inbox/CURRENT.md)
+> **Agent 協作**：[agent-collaboration.md](./agent-collaboration.md)（skills／hooks／commands）
 
 ---
 
@@ -23,15 +21,15 @@
 
 ## 2. 現況（對照階段）
 
-| 階段                | 狀態 | 備註                                                              |
-| ------------------- | ---- | ----------------------------------------------------------------- |
-| Phase 0 基線        | 🔄   | Production URL 已 live（CLI）；Actions secrets T-079 待補         |
-| Phase 1 契約／管線  | ✅   | agent-core、stable SSE                                            |
-| Phase 2 觀測／評測  | 🔄   | eval CI ✅；Langfuse 手動 trace 待勾；T-069 ready                 |
-| Phase 3 RAG／Tool   | ⬜   | Retriever 抽象、local 強化；knowledge pack 已可演示               |
-| Phase 4 UI 最小殼   | ✅   | catalog-search ✅（含 commerce）；api-detail／my-apis＝T-023 done |
-| Phase 5 產品化運維  | ⬜   | routing、quota、DLQ spike（文件為主）                             |
-| Lab on-device-media | ⬜   | 平行軌；不阻塞 Phase 2–4                                          |
+| 階段                | 狀態 | 備註                                                       |
+| ------------------- | ---- | ---------------------------------------------------------- |
+| Phase 0 基線        | 🔄   | Production URL 已 live（CLI）；Actions secrets 待補        |
+| Phase 1 契約／管線  | ✅   | agent-core、stable SSE                                     |
+| Phase 2 觀測／評測  | 🔄   | eval CI ✅；Langfuse 手動 trace 待勾                       |
+| Phase 3 RAG／Tool   | ⬜   | Retriever 抽象、local 強化；knowledge pack 已可演示        |
+| Phase 4 UI 最小殼   | ✅   | catalog-search ✅（含 commerce）；api-detail／my-apis done |
+| Phase 5 產品化運維  | ⬜   | routing、quota、DLQ spike（文件為主）                      |
+| Lab on-device-media | ⬜   | 平行軌；不阻塞 Phase 2–4                                   |
 
 ---
 
@@ -39,12 +37,12 @@
 
 ### Phase 0 — 基線（可部署、可協作）
 
-**目標**：任何人（含 agent）能依文件跑起 repo，且中央 registry 可追蹤部署。
+**目標**：任何人（含 agent）能依文件跑起 repo，且 production URL 可驗證。
 
 | 工作項     | 出口條件                                                                                            |
 | ---------- | --------------------------------------------------------------------------------------------------- |
 | CI         | `pnpm run build`、`test`、`lint:ci`、`test:labs` 全過                                               |
-| 部署       | Vercel production URL 可開 → 寫入 platform-command `registry/projects.json`（T-2026-001）           |
+| 部署       | Vercel production URL 可開；URL 記錄於 README／deploy notes                                         |
 | 煙測       | `/`、`/catalog-search`、chat health 有 runbook 勾選                                                 |
 | Agent 協作 | `.cursor/skills/`、`.cursor/hooks.json` 就緒；見 [agent-collaboration.md](./agent-collaboration.md) |
 
@@ -94,12 +92,12 @@
 
 **策略**：只做 GAP 表內可演示殼；不擴大成完整企業 catalog 產品。
 
-| Flow           | 優先 | 出口條件                                                                      |
-| -------------- | ---- | ----------------------------------------------------------------------------- |
-| catalog-search | P0   | GAP 列 Figma node **或** waiver；Panel 對齊 toolbar／pagination（T-2026-004） |
-| api-detail     | P0   | 三欄 layout 占位 + 路由；GAP 列更新                                           |
-| my-apis        | P1   | `/my-apis` 卡片列表 + mock                                                    |
-| requests       | P2   | 規格 only，不實作                                                             |
+| Flow           | 優先 | 出口條件                                                        |
+| -------------- | ---- | --------------------------------------------------------------- |
+| catalog-search | P0   | GAP 列 Figma node **或** waiver；Panel 對齊 toolbar／pagination |
+| api-detail     | P0   | 三欄 layout 占位 + 路由；GAP 列更新                             |
+| my-apis        | P1   | `/my-apis` 卡片列表 + mock                                      |
+| requests       | P2   | 規格 only，不實作                                               |
 
 對照：[labs/design-vibe/GAP-REPORT.md](../labs/design-vibe/GAP-REPORT.md)。
 
@@ -155,7 +153,7 @@ flowchart TD
 ```
 
 Phase 1 已完成；**knowledge commerce ship gate ✅（2026-07-28）**。  
-**當前焦點**：Phase 4 **T-023 G1**（api-detail／my-apis／review）— 已開工；T-092 不插隊。Phase 2 閉環（Langfuse／T-069）次之。
+**當前焦點**：Phase 2 閉環（Langfuse／eval gate）；Phase 4 維護不回歸。
 
 ---
 
@@ -163,23 +161,23 @@ Phase 1 已完成；**knowledge commerce ship gate ✅（2026-07-28）**。
 
 **Phase 0**
 
-- [x] T-2026-001 Vercel + registry URL（CLI prod live；Actions 仍待 T-079）
+- [x] Vercel production URL live（CLI prod live；Actions deploy 仍待 secrets）
 - [ ] Agent AC-1：依 [agent-collaboration.md](./agent-collaboration.md) 驗證 session + pr-gate 一輪
 
 **Phase 2**
 
 - [ ] Langfuse UI 一筆 trace
-- [ ] T-2026-069 eval 擋 PR（ready）
+- [ ] eval 擋 PR（ready）
 - [x] CI green 路徑（含 labs；維持不回歸）
 
 **Phase 4**
 
 - [x] catalog-search `?type=` + pagination（mock）
 - [x] commerce facets／Domain knowledge（ship gate 2026-07-28）
-- [x] T-2026-004 CatalogSearchPanel GAP（inbox：done）
-- [x] T-2026-023 api-detail／my-apis／apply／review（G1）
+- [x] CatalogSearchPanel GAP
+- [x] api-detail／my-apis／apply／review（G1）
 
-**Backlog（非 sprint；T-2026-092 draft P2）**
+**Backlog（非 sprint）**
 
 - [ ] CI／ritual：`check:metalcraft-knowledge`（commerce drift）
 - [ ] Node 22：`e2e/catalog-commerce.spec.ts` 綠或 waiver
@@ -211,13 +209,12 @@ pnpm run observability:up && pnpm run observability:smoke
 
 ## 8. 相關 repo
 
-| Repo                      | 關係                               |
-| ------------------------- | ---------------------------------- |
-| platform-command          | registry、tickets、agent 生態 SSOT |
-| 內部 catalog 鏡像（私有） | Catalog 參考（唯讀）               |
-| develop-md                | 長文、願景                         |
-| polyglot-labs             | 後端模式實驗                       |
+| Repo          | 關係                                |
+| ------------- | ----------------------------------- |
+| develop-md    | 長文、願景（link only）             |
+| polyglot-labs | 後端模式實驗                        |
+| nx-playground | 契約鏈、設計 token、動效 promote 源 |
 
 ---
 
-_階段出口條件變更時，同步更新本檔與 platform-command `planning/projects/ai-search-portal.md`。_
+_階段出口條件變更時，同步更新本檔。本 repo 不追蹤中央 tickets。_

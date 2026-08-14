@@ -24,9 +24,10 @@ export function HomeLanding({ className, onAsk }: HomeLandingProps) {
   return (
     <section
       className={cn(
-        "md:pt-space-48 relative isolate flex min-h-[85svh] flex-col justify-center overflow-hidden pt-space-32",
+        "md:pt-space-48 relative isolate flex min-h-0 flex-col justify-center overflow-hidden pt-space-32",
         className
       )}
+      id="home-chat"
       aria-label={t("home.title")}
     >
       <div className="py-space-24 mx-auto w-full max-w-5xl px-space-16 md:p-space-32">
