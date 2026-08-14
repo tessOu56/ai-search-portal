@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "~/components/ui/Button";
+import { Select } from "~/components/ui/Select";
 
 /**
  * 主題切換器 — 語意 token 由 explore-design-sdk 供應（app/styles/tokens.portal.css）。
@@ -35,10 +36,9 @@ export function ThemeSwitcher({
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("portal-theme");
-    if (savedTheme && THEMES.some((t) => t.id === savedTheme)) {
+    if (savedTheme && THEMES.some((item) => item.id === savedTheme)) {
       setTheme(savedTheme as ThemeId);
     }
-    // 未存過偏好 → 維持 DEFAULT_THEME（SSR 已於 <html> 掛 data-theme）
     setDark(window.localStorage.getItem("portal-mode") === "dark");
   }, []);
 
@@ -60,21 +60,18 @@ export function ThemeSwitcher({
 
   return (
     <div className="flex items-center gap-space-8">
-      <select
+      <Select
         value={theme}
-        onChange={(event) => {
-          const next = THEMES.find((item) => item.id === event.target.value);
-          if (next) applyTheme(next.id);
+        options={THEMES.map((item) => ({
+          value: item.id,
+          label: item.label,
+        }))}
+        onValueChange={(next) => {
+          const found = THEMES.find((item) => item.id === next);
+          if (found) applyTheme(found.id);
         }}
-        className="h-9 rounded-full border border-input bg-background px-space-16 text-type-14 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={themeLabel}
-      >
-        {THEMES.map((item) => (
-          <option key={item.id} value={item.id}>
-            {item.label}
-          </option>
-        ))}
-      </select>
+      />
       <Button
         type="button"
         variant="ghost"

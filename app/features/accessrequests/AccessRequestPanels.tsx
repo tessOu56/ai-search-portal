@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
+import { Select } from "~/components/ui/Select";
 import type {
   AccessApplicationContract,
   AccessRequestLifecycleStatus,
@@ -357,26 +358,26 @@ function AccessReviewRequestCard({
             >
               <input type="hidden" name="requestId" value={app.id} />
               <input type="hidden" name="decision" value="edited" />
-              <select
+              <Select
                 name="purpose"
                 defaultValue={app.purpose}
-                className="h-8 rounded-md border border-input bg-background px-2 text-sm"
                 aria-label="Edit purpose"
-              >
-                <option value="analytics">analytics</option>
-                <option value="marketing">marketing</option>
-                <option value="operations">operations</option>
-              </select>
-              <select
+                options={[
+                  { value: "analytics", label: "analytics" },
+                  { value: "marketing", label: "marketing" },
+                  { value: "operations", label: "operations" },
+                ]}
+              />
+              <Select
                 name="role"
                 defaultValue={app.role}
-                className="h-8 rounded-md border border-input bg-background px-2 text-sm"
                 aria-label="Edit role"
-              >
-                <option value="analyst">analyst</option>
-                <option value="engineer">engineer</option>
-                <option value="data_admin">data_admin</option>
-              </select>
+                options={[
+                  { value: "analyst", label: "analyst" },
+                  { value: "engineer", label: "engineer" },
+                  { value: "data_admin", label: "data_admin" },
+                ]}
+              />
               <Button
                 type="submit"
                 size="sm"

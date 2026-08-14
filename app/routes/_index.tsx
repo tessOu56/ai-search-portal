@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useRouteError, useSearchParams } from "@remix-run/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { HomeIntro } from "~/components/app/home/HomeIntro";
@@ -9,10 +9,11 @@ import {
   DashboardView,
   WorkspaceChatView,
   WorkspaceFooter,
-  WorkspaceViewSwitcher,
+  WorkspaceTopbar,
 } from "~/components/app/workspace";
 import { Button } from "~/components/ui/Button";
 import { getLocale, getTranslations } from "~/shared/i18n";
+import { useI18n } from "~/shared/i18n/context";
 import { t } from "~/shared/i18n/server";
 import {
   buildJsonLdWebPage,
@@ -63,38 +64,8 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [...metaTags, ...jsonLdTags];
 };
 
-export default function Index() {
-  const [searchParams] = useSearchParams();
-  const viewParam = searchParams.get("view");
-  const view =
-    viewParam === "dashboard" || viewParam === "saas" ? "dashboard" : "chat";
-  const [conversationActive, setConversationActive] = useState(false);
-  const [pendingQuery, setPendingQuery] = useState<string | null>(null);
-
-  const onAsk = useCallback((query: string) => {
-    setPendingQuery(query);
-    setConversationActive(true);
-  }, []);
-
-  const onNewConversation = useCallback(() => {
-    setConversationActive(false);
-    setPendingQuery(null);
-  }, []);
-
-  if (view === "dashboard") {
-    return (
-      <div className="relative min-h-dvh bg-background">
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
-          <div className="pointer-events-auto mx-auto flex max-w-6xl items-center justify-end p-space-16 md:px-space-32">
-            <WorkspaceViewSwitcher className="bg-background/70 backdrop-blur-md" />
-          </div>
-        </div>
-        <DashboardView />
-      </div>
-    );
-  }
-
-  const atmosphere = (
+function Atmosphere() {
+  return (
     <div
       className="eds-atmosphere eds-atmosphere--home-span pointer-events-none absolute inset-x-0 top-0 -z-10"
       aria-hidden
@@ -105,16 +76,65 @@ export default function Index() {
       <div className="eds-atmosphere-layer eds-atmosphere-layer--veil" />
     </div>
   );
+}
+
+export default function Index() {
+  const { t: translate } = useI18n();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const viewParam = searchParams.get("view");
+  const view =
+    viewParam === "dashboard" || viewParam === "saas" ? "dashboard" : "chat";
+  const askRaw = searchParams.get("q")?.trim();
+  const askParam = askRaw && askRaw.length > 0 ? askRaw : null;
+  const [conversationActive, setConversationActive] = useState(
+    () => view === "chat" && Boolean(askParam)
+  );
+  const [pendingQuery, setPendingQuery] = useState<string | null>(() =>
+    view === "chat" ? askParam : null
+  );
+
+  useEffect(() => {
+    if (view !== "chat" || !askParam) return;
+    setPendingQuery(askParam);
+    setConversationActive(true);
+  }, [askParam, view]);
+
+  const onAsk = useCallback((query: string) => {
+    setPendingQuery(query);
+    setConversationActive(true);
+  }, []);
+
+  const onNewConversation = useCallback(() => {
+    setConversationActive(false);
+    setPendingQuery(null);
+    if (searchParams.has("q") || searchParams.has("view")) {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete("q");
+          next.delete("view");
+          return next;
+        },
+        { replace: true }
+      );
+    }
+  }, [searchParams, setSearchParams]);
+
+  if (view === "dashboard") {
+    return (
+      <div className="relative flex min-h-dvh flex-col">
+        <Atmosphere />
+        <WorkspaceTopbar />
+        <DashboardView />
+      </div>
+    );
+  }
 
   if (!conversationActive) {
     return (
       <div className="relative">
-        {atmosphere}
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
-          <div className="pointer-events-auto mx-auto flex max-w-6xl items-center justify-end p-space-16 md:px-space-32">
-            <WorkspaceViewSwitcher className="bg-background/50 backdrop-blur-md" />
-          </div>
-        </div>
+        <Atmosphere />
+        <WorkspaceTopbar />
         <HomeLanding onAsk={onAsk} />
         <HomeIntro />
         <WorkspaceFooter />
@@ -123,12 +143,24 @@ export default function Index() {
   }
 
   return (
-    <div className="relative">
-      {atmosphere}
+    <div className="relative flex min-h-dvh flex-col">
+      <Atmosphere />
+      <WorkspaceTopbar
+        onBrandClick={onNewConversation}
+        trailing={
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onNewConversation}
+          >
+            {translate("chat.new")}
+          </Button>
+        }
+      />
       <WorkspaceChatView
         pendingQuery={pendingQuery}
         onPendingQueryConsumed={() => setPendingQuery(null)}
-        onNewConversation={onNewConversation}
       />
     </div>
   );

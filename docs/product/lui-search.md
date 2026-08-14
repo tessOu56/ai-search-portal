@@ -19,8 +19,10 @@
 
 - **路由**：`app/routes/_index.tsx`
 - **Loader**：提供 SEO meta、i18n、structured data（JSON-LD）；版號與語系來自 root loader。
-- **空態**：`HomeLanding`（品牌 + 結果句 + 單一 `Composer`）→ `HomeIntro`（訪客介紹三 section）→ `WorkspaceFooter`。Typewriter 用短 hint；完整示範問題在 `data-testid="golden-question"` chips。
-- **對話態**：`WorkspaceChatView`（`min-h-dvh`）— 頂列新對話、transcript（`role="log"`）、置底 `Composer`。`ChatInterface` 消費 SSE；`AssistantTurn` 呈現結構化回覆。
+- **空態**：共用釘選 `WorkspaceTopbar`（Ask / Overview）→ `HomeLanding`（品牌 + 結果句 + 單一 `Composer`，填滿頂欄以下第一屏）→ `HomeIntro`（訪客介紹三 section）→ `WorkspaceFooter`。Typewriter 用短 hint；完整示範問題在 `data-testid="golden-question"` chips。
+- **總覽**：`/?view=dashboard` 為業務查詢地圖（個資與權限、資料從哪來、訂單相關），「問這題」連 `/?q=` 進入對話；可逛路徑連目錄／菜餚。頂欄與 Ask／對話共用，sticky 釘選。
+- **對話態**：同一條頂欄加「新對話」；`WorkspaceChatView` 為 transcript（`role="log"`）與置底 `Composer`。`ChatInterface` 消費 SSE；`AssistantTurn` 呈現結構化回覆。
+- **`/?q=`**：總覽或外部連入時，Index 以該字串作為 `pendingQuery` 直接開對話。
 - **i18n**：首頁文案由 `app/shared/i18n` 與 root 的 `translations` 提供；語系切換經 `POST /api/locale` + cookie。
 
 ---

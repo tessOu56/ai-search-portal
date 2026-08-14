@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "~/components/ui/Card";
 import { Input } from "~/components/ui/Input";
+import { Select } from "~/components/ui/Select";
 import { API_CONTEXT_PACK_SELECT } from "~/shared/api/paths";
 import type {
   ContextPackManifestContract,
@@ -226,18 +227,16 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
             <input type="hidden" name="redirectTo" value={redirectTo} />
             <label className="flex flex-1 flex-col gap-1 text-sm">
               <span className="font-medium text-foreground">Active pack</span>
-              <select
+              <Select
                 name="packId"
                 defaultValue={model.activePackId}
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                className="w-full"
                 aria-label="Context pack"
-              >
-                {model.packs.map((pack) => (
-                  <option key={pack.id} value={pack.id}>
-                    {pack.name}
-                  </option>
-                ))}
-              </select>
+                options={model.packs.map((pack) => ({
+                  value: pack.id,
+                  label: pack.name,
+                }))}
+              />
             </label>
             <Button type="submit">{t("catalog.search.applyPack")}</Button>
           </Form>

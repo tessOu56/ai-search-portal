@@ -20,8 +20,8 @@ const SECTIONS: Array<{
   {
     title: "Primary journeys",
     links: [
-      { to: "/", label: "Home / LUI chat" },
-      { to: "/?view=dashboard", label: "Dashboard overview" },
+      { to: "/", label: "Home / Ask" },
+      { to: "/?view=dashboard", label: "Overview — what you can look up" },
       { to: "/catalog-search", label: "Catalog search" },
       { to: "/catalog-search/dictionary", label: "Catalog dictionary" },
       { to: "/metadata", label: "Metadata catalog" },

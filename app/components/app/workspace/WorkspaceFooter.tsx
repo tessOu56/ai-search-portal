@@ -1,7 +1,9 @@
 import { Form, Link, useRouteLoaderData } from "@remix-run/react";
+import { useRef } from "react";
 
 import { ThemeSwitcher } from "~/components/theme/ThemeSwitcher";
 import { Container } from "~/components/ui/Container";
+import { Select } from "~/components/ui/Select";
 import { API_LOCALE } from "~/shared/api/paths";
 import { useI18n } from "~/shared/i18n/context";
 
@@ -20,6 +22,7 @@ export function WorkspaceFooter({ agentMode }: WorkspaceFooterProps) {
   const locale = root?.locale ?? "zh-TW";
   const version = root?.version ?? "0.0.0";
   const year = String(new Date().getFullYear());
+  const localeFormRef = useRef<HTMLFormElement>(null);
   const modeLabel =
     agentMode === "live_llm"
       ? t("chat.badge.live_llm")
@@ -54,22 +57,23 @@ export function WorkspaceFooter({ agentMode }: WorkspaceFooterProps) {
         <p title={t("footer.synthetic.hint")}>{t("footer.synthetic")}</p>
         <p title={t("footer.demo_roles.hint")}>{t("footer.demo_roles")}</p>
         <Form
+          ref={localeFormRef}
           method="post"
           action={API_LOCALE}
           className="flex items-center gap-space-8"
         >
           <input type="hidden" name="next" value="/" />
           <span className="sr-only">{t("locale.switch")}</span>
-          <select
+          <Select
             name="locale"
             defaultValue={locale}
-            onChange={(event) => event.currentTarget.form?.requestSubmit()}
-            className="h-9 rounded-full border border-input bg-background px-space-16 text-type-14 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            options={[
+              { value: "zh-TW", label: t("locale.zh-TW") },
+              { value: "en", label: t("locale.en") },
+            ]}
             aria-label={t("locale.switch")}
-          >
-            <option value="zh-TW">{t("locale.zh-TW")}</option>
-            <option value="en">{t("locale.en")}</option>
-          </select>
+            onValueChange={() => localeFormRef.current?.requestSubmit()}
+          />
         </Form>
         <ThemeSwitcher
           themeLabel={t("theme.switch")}

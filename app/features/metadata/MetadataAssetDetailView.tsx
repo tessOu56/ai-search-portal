@@ -1,6 +1,6 @@
 import { FormField } from "@is_tess/components";
 import { Link, useFetcher, useSearchParams, useSubmit } from "@remix-run/react";
-import type { FormEvent } from "react";
+import { useRef } from "react";
 
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { GenUiRenderer } from "~/components/shared/genui";
@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
+import { Select } from "~/components/ui/Select";
 import type {
   AccessApplicationContract,
   GenUiDocumentContract,
@@ -22,6 +23,18 @@ import type {
 } from "~/shared/contracts";
 import { myApisHighlightHref } from "~/shared/navigation";
 import { cn } from "~/shared/utils/cn";
+
+const PURPOSE_OPTIONS = [
+  { value: "analytics", label: "analytics" },
+  { value: "marketing", label: "marketing" },
+  { value: "operations", label: "operations" },
+];
+
+const ROLE_OPTIONS = [
+  { value: "analyst", label: "analyst" },
+  { value: "engineer", label: "engineer" },
+  { value: "data_admin", label: "data_admin" },
+];
 
 export type MetadataAssetSubmitResult = {
   ok: boolean;
@@ -145,12 +158,13 @@ function AccessContextForm({
   role: string;
 }) {
   const submit = useSubmit();
+  const formRef = useRef<HTMLFormElement>(null);
   const [searchParams] = useSearchParams();
   const packParam = searchParams.get("pack");
   const aiFillParam = searchParams.get("aiFill");
 
-  function handleChange(event: FormEvent<HTMLFormElement>) {
-    submit(event.currentTarget, { method: "get" });
+  function submitContext() {
+    if (formRef.current) submit(formRef.current, { method: "get" });
   }
 
   return (
@@ -164,8 +178,8 @@ function AccessContextForm({
       </CardHeader>
       <CardContent>
         <form
+          ref={formRef}
           method="get"
-          onChange={handleChange}
           className="flex flex-wrap items-end gap-4"
           aria-label="Access context"
         >
@@ -181,16 +195,14 @@ function AccessContextForm({
             aiFilled={Boolean(aiFillParam)}
             aiBadgeLabel="AI suggested"
           >
-            <select
+            <Select
               id="access-context-purpose"
               name="purpose"
               defaultValue={purpose}
-              className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
-            >
-              <option value="analytics">analytics</option>
-              <option value="marketing">marketing</option>
-              <option value="operations">operations</option>
-            </select>
+              className="w-full"
+              options={PURPOSE_OPTIONS}
+              onValueChange={submitContext}
+            />
           </FormField>
           <FormField
             id="access-context-role"
@@ -198,16 +210,14 @@ function AccessContextForm({
             aiFilled={Boolean(aiFillParam)}
             aiBadgeLabel="AI suggested"
           >
-            <select
+            <Select
               id="access-context-role"
               name="role"
               defaultValue={role}
-              className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
-            >
-              <option value="analyst">analyst</option>
-              <option value="engineer">engineer</option>
-              <option value="data_admin">data_admin</option>
-            </select>
+              className="w-full"
+              options={ROLE_OPTIONS}
+              onValueChange={submitContext}
+            />
           </FormField>
           <noscript>
             <Button type="submit" size="sm" variant="outline">
@@ -401,16 +411,13 @@ function AiAccessRequestPanel({
                   aiBadgeLabel="AI suggested"
                   className="w-40"
                 >
-                  <select
+                  <Select
                     id="ai-request-purpose"
                     name="purpose"
                     defaultValue={aiAccessRequest.request.purpose}
-                    className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
-                  >
-                    <option value="analytics">analytics</option>
-                    <option value="marketing">marketing</option>
-                    <option value="operations">operations</option>
-                  </select>
+                    className="w-full"
+                    options={PURPOSE_OPTIONS}
+                  />
                 </FormField>
                 <FormField
                   id="ai-request-role"
@@ -419,16 +426,13 @@ function AiAccessRequestPanel({
                   aiBadgeLabel="AI suggested"
                   className="w-40"
                 >
-                  <select
+                  <Select
                     id="ai-request-role"
                     name="role"
                     defaultValue={requestRole}
-                    className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
-                  >
-                    <option value="analyst">analyst</option>
-                    <option value="engineer">engineer</option>
-                    <option value="data_admin">data_admin</option>
-                  </select>
+                    className="w-full"
+                    options={ROLE_OPTIONS}
+                  />
                 </FormField>
               </div>
               <div className="flex gap-2">

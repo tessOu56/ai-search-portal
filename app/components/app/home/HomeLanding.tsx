@@ -22,7 +22,7 @@ export function HomeLanding({ className, onAsk }: HomeLandingProps) {
   return (
     <section
       className={cn(
-        "relative isolate flex min-h-dvh flex-col justify-center overflow-hidden pt-space-32 md:pt-space-32",
+        "relative isolate flex min-h-[calc(100dvh-4rem)] flex-1 flex-col justify-center overflow-hidden",
         className
       )}
       id="home-chat"
