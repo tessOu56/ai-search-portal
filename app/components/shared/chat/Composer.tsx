@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { type FormEvent, useEffect, useId, useState } from "react";
 
+import { Button } from "~/components/ui/Button";
 import { useI18n } from "~/shared/i18n/context";
 import { cn } from "~/shared/utils/cn";
 
@@ -9,10 +10,15 @@ type ComposerProps = {
   className?: string;
   onSubmit: (query: string) => void;
   disabled?: boolean;
-  /** Rotating typewriter placeholder (landing empty). */
+  /** Rotating typewriter placeholder (landing empty). Uses `hints`. */
   typewriter?: boolean;
+  /** Short rotating placeholders; keep shorter than a single input line. */
+  hints?: string[];
   suggestions?: string[];
 };
+
+const CHIP_CLASS =
+  "h-auto min-h-8 max-w-full whitespace-normal break-words py-1.5 text-left";
 
 /**
  * Shared ask bar for landing and conversation.
@@ -23,6 +29,7 @@ export function Composer({
   onSubmit,
   disabled = false,
   typewriter = false,
+  hints = [],
   suggestions = [],
 }: ComposerProps) {
   const { t } = useI18n();
@@ -31,20 +38,19 @@ export function Composer({
   const [value, setValue] = useState("");
   const [focused, setFocused] = useState(false);
   const [typed, setTyped] = useState("");
-  const [suggestIndex, setSuggestIndex] = useState(0);
+  const [hintIndex, setHintIndex] = useState(0);
 
-  const suggestCount = suggestions.length;
-  const activeSuggest =
-    suggestCount > 0 ? (suggestions[suggestIndex % suggestCount] ?? "") : "";
+  const hintCount = hints.length;
+  const activeHint = hintCount > 0 ? (hints[hintIndex % hintCount] ?? "") : "";
   const showTypewriter = typewriter && !value && !focused && !disabled;
 
   useEffect(() => {
-    if (!showTypewriter || suggestCount === 0) return;
+    if (!showTypewriter || hintCount === 0) return;
 
     if (reduceMotion) {
-      setTyped(activeSuggest);
+      setTyped(activeHint);
       const timer = window.setTimeout(() => {
-        setSuggestIndex((i) => (i + 1) % suggestCount);
+        setHintIndex((i) => (i + 1) % hintCount);
       }, 3200);
       return () => window.clearTimeout(timer);
     }
@@ -56,13 +62,13 @@ export function Composer({
     const typeTimer = window.setInterval(() => {
       if (cancelled) return;
       char += 1;
-      setTyped(activeSuggest.slice(0, char));
-      if (char >= activeSuggest.length) {
+      setTyped(activeHint.slice(0, char));
+      if (char >= activeHint.length) {
         window.clearInterval(typeTimer);
         window.setTimeout(() => {
           if (cancelled) return;
           setTyped("");
-          setSuggestIndex((i) => (i + 1) % suggestCount);
+          setHintIndex((i) => (i + 1) % hintCount);
         }, 1600);
       }
     }, 38);
@@ -71,7 +77,7 @@ export function Composer({
       cancelled = true;
       window.clearInterval(typeTimer);
     };
-  }, [showTypewriter, reduceMotion, activeSuggest, suggestCount]);
+  }, [showTypewriter, reduceMotion, activeHint, hintCount]);
 
   const submitQuery = (raw: string) => {
     const query = raw.trim();
@@ -82,7 +88,17 @@ export function Composer({
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    submitQuery(value.trim() || (showTypewriter ? activeSuggest.trim() : ""));
+    const typedQuery = value.trim();
+    if (typedQuery) {
+      submitQuery(typedQuery);
+      return;
+    }
+    if (!showTypewriter) return;
+    const mapped =
+      suggestions.length > 0
+        ? (suggestions[hintIndex % suggestions.length] ?? activeHint)
+        : activeHint;
+    submitQuery(mapped);
   };
 
   return (
@@ -114,36 +130,39 @@ export function Composer({
             <span
               className="pointer-events-none absolute inset-x-0 top-0 flex min-h-12 items-start whitespace-normal break-words px-space-16 py-3 text-type-16 leading-snug text-muted-foreground"
               aria-hidden
+              data-testid="composer-hint"
             >
               <span className="min-w-0">{typed}</span>
               <span className="bg-muted-foreground/70 ml-0.5 mt-0.5 inline-block h-[1.1em] w-px shrink-0 animate-pulse motion-reduce:animate-none" />
             </span>
           )}
         </div>
-        <button
+        <Button
           type="submit"
           data-star-hot
           disabled={disabled}
           aria-busy={disabled}
-          className="hover:bg-primary/90 inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98] disabled:opacity-50"
           aria-label={t("chat.submit")}
+          className="size-11 shrink-0 px-0"
         >
           <ArrowRight className="size-5" aria-hidden />
-        </button>
+        </Button>
       </form>
       {suggestions.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {suggestions.map((question) => (
-            <button
+            <Button
               key={question}
               type="button"
+              variant="outline"
+              size="sm"
               disabled={disabled}
               onClick={() => submitQuery(question)}
-              className="inline-flex h-auto min-h-8 max-w-full items-center whitespace-normal break-words rounded-xl border border-border bg-background px-3 py-1.5 text-left text-xs font-medium hover:bg-muted disabled:opacity-50"
+              className={CHIP_CLASS}
               data-testid="golden-question"
             >
               {question}
-            </button>
+            </Button>
           ))}
         </div>
       )}

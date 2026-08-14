@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "~/components/ui/Card";
 import { Input } from "~/components/ui/Input";
+import { useI18n } from "~/shared/i18n/context";
 
 import type { CatalogApiRow } from "./catalog-search.types";
 import { buildCatalogSearchUrl } from "./catalog-search-url";
@@ -61,6 +62,7 @@ function Row({ row }: { row: CatalogApiRow }) {
  * replaced by virtual scrolling on this view only.
  */
 export function DictionaryPanel({ model }: DictionaryPanelProps) {
+  const { t } = useI18n();
   const parentRef = useRef<HTMLDivElement | null>(null);
   const virtualizer = useVirtualizer({
     count: model.results.length,
@@ -120,31 +122,34 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
               aria-label="Dictionary search query"
               className="flex-1"
             />
-            <Button type="submit">Search</Button>
+            <Button type="submit">{t("catalog.search.submit")}</Button>
           </form>
           <div className="flex flex-wrap gap-1">
-            <Link
-              to={buildCatalogSearchUrl({ q: model.query }, BASE_PATH)}
-              className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium ${
-                !model.activeType
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background hover:bg-muted"
-              }`}
+            <Button
+              asChild
+              size="sm"
+              variant={!model.activeType ? "default" : "outline"}
             >
-              All
-            </Link>
-            {TYPES.map((type) => (
-              <Link
-                key={type}
-                to={buildCatalogSearchUrl({ q: model.query, type }, BASE_PATH)}
-                className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium ${
-                  model.activeType === type
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background hover:bg-muted"
-                }`}
-              >
-                {type}
+              <Link to={buildCatalogSearchUrl({ q: model.query }, BASE_PATH)}>
+                All
               </Link>
+            </Button>
+            {TYPES.map((type) => (
+              <Button
+                asChild
+                key={type}
+                size="sm"
+                variant={model.activeType === type ? "default" : "outline"}
+              >
+                <Link
+                  to={buildCatalogSearchUrl(
+                    { q: model.query, type },
+                    BASE_PATH
+                  )}
+                >
+                  {type}
+                </Link>
+              </Button>
             ))}
           </div>
         </CardContent>

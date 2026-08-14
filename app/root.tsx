@@ -19,7 +19,6 @@ import { useEffect } from "react";
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { NavProgress } from "~/components/shared/chrome/NavProgress";
 import { StarCursor } from "~/components/shared/chrome/StarCursor";
-import { ThemeSwitcher } from "~/components/theme/ThemeSwitcher";
 import { startWebVitalsReporting } from "~/lib/analytics/web-vitals-reporter";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
@@ -105,7 +104,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             (locale === "en" ? "Skip to main content" : "跳至主內容")}
         </a>
         {children}
-        <ThemeSwitcher />
         <NavProgress />
         <StarCursor />
         <ScrollRestoration />

@@ -3,6 +3,7 @@ import { Link } from "@remix-run/react";
 
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/Alert";
+import { Button } from "~/components/ui/Button";
 import { useI18n } from "~/shared/i18n/context";
 import {
   buildCatalogSearchUrl,
@@ -28,7 +29,7 @@ export type AssistantTurnProps = {
 };
 
 const CHIP_CLASS =
-  "inline-flex h-auto min-h-8 max-w-full items-center whitespace-normal break-words rounded-xl border border-border bg-background px-3 py-1.5 text-left text-xs font-medium text-foreground hover:bg-muted";
+  "h-auto min-h-8 max-w-full whitespace-normal break-words py-1.5 text-left";
 
 const SOURCE_LINK_CLASS = "text-primary hover:underline";
 const KEY_SOURCES_TITLE = "chat.sources.title";
@@ -184,21 +185,23 @@ function ContinueFacets({ query }: { query: string }) {
       className="flex flex-wrap gap-2 pt-space-8"
       data-testid="chat-continue-facets"
     >
-      <Link
-        to={buildCatalogSearchUrl(facetQuery)}
-        className={CHIP_CLASS}
-        data-testid="chat-continue-catalog"
-      >
-        {t("chat.continue.catalog")}
-        {facetLabel ? ` · ${facetLabel}` : ""}
-      </Link>
-      <Link
-        to={buildMetadataSearchUrl(facetQuery)}
-        className={CHIP_CLASS}
-        data-testid="chat-continue-metadata"
-      >
-        {t("chat.continue.metadata")}
-      </Link>
+      <Button asChild variant="outline" size="sm" className={CHIP_CLASS}>
+        <Link
+          to={buildCatalogSearchUrl(facetQuery)}
+          data-testid="chat-continue-catalog"
+        >
+          {t("chat.continue.catalog")}
+          {facetLabel ? ` · ${facetLabel}` : ""}
+        </Link>
+      </Button>
+      <Button asChild variant="outline" size="sm" className={CHIP_CLASS}>
+        <Link
+          to={buildMetadataSearchUrl(facetQuery)}
+          data-testid="chat-continue-metadata"
+        >
+          {t("chat.continue.metadata")}
+        </Link>
+      </Button>
     </div>
   );
 }

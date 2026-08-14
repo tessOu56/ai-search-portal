@@ -1,5 +1,6 @@
 import { listIndustryStandards } from "@ai-search-portal/contracts";
 import { Form, Link, useNavigation } from "@remix-run/react";
+import type { ReactNode } from "react";
 
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";
 import { Badge } from "~/components/ui/Badge";
@@ -18,6 +19,7 @@ import type {
   KnowledgeChunkContract,
   MetadataAssetSummaryContract,
 } from "~/shared/contracts";
+import { useI18n } from "~/shared/i18n/context";
 import { buildCatalogSearchUrl } from "~/shared/navigation";
 import { buildKnowledgeChunkHref } from "~/shared/utils/knowledge-deeplink";
 
@@ -82,12 +84,20 @@ function buildResultsDescription(model: MetadataSearchViewModel): string {
   return parts.join(" · ");
 }
 
-function facetChipClass(active: boolean): string {
-  return `inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium ${
-    active
-      ? "border-primary bg-primary text-primary-foreground"
-      : "border-border bg-background hover:bg-muted"
-  }`;
+function FacetChip({
+  to,
+  active,
+  children,
+}: {
+  to: string;
+  active: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <Button asChild size="sm" variant={active ? "default" : "outline"}>
+      <Link to={to}>{children}</Link>
+    </Button>
+  );
 }
 
 function MetadataPagination({
@@ -146,6 +156,7 @@ function MetadataPagination({
 }
 
 export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
+  const { t } = useI18n();
   const { pagination } = model;
   const base = {
     q: model.query,
@@ -228,7 +239,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                 ))}
               </select>
             </label>
-            <Button type="submit">Apply pack</Button>
+            <Button type="submit">{t("catalog.search.applyPack")}</Button>
           </Form>
         </CardContent>
       </Card>
@@ -280,7 +291,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               aria-label="Metadata search query"
               className="flex-1"
             />
-            <Button type="submit">Search</Button>
+            <Button type="submit">{t("catalog.search.submit")}</Button>
           </form>
         </CardContent>
       </Card>
@@ -290,7 +301,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
           <CardTitle className="text-base">Type</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-1">
-          <Link
+          <FacetChip
             to={buildMetadataSearchUrl({
               q: model.query,
               pack: model.activePackId,
@@ -298,12 +309,12 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               material: model.activeMaterial,
               standard: model.activeStandard,
             })}
-            className={facetChipClass(!model.activeType)}
+            active={!model.activeType}
           >
             All
-          </Link>
+          </FacetChip>
           {TYPE_OPTIONS.map((opt) => (
-            <Link
+            <FacetChip
               key={opt}
               to={buildMetadataSearchUrl({
                 q: model.query,
@@ -313,10 +324,10 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                 material: model.activeMaterial,
                 standard: model.activeStandard,
               })}
-              className={facetChipClass(model.activeType === opt)}
+              active={model.activeType === opt}
             >
               {opt}
-            </Link>
+            </FacetChip>
           ))}
         </CardContent>
       </Card>
@@ -336,7 +347,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               Material
             </span>
             <div className="flex flex-wrap gap-1">
-              <Link
+              <FacetChip
                 to={buildMetadataSearchUrl({
                   q: model.query,
                   type: model.activeType,
@@ -344,12 +355,12 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                   intent: model.intent,
                   standard: model.activeStandard,
                 })}
-                className={facetChipClass(!model.activeMaterial)}
+                active={!model.activeMaterial}
               >
                 All
-              </Link>
+              </FacetChip>
               {MATERIAL_OPTIONS.map((opt) => (
-                <Link
+                <FacetChip
                   key={opt.value}
                   to={buildMetadataSearchUrl({
                     q: model.query,
@@ -359,10 +370,10 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                     material: opt.value,
                     standard: model.activeStandard,
                   })}
-                  className={facetChipClass(model.activeMaterial === opt.value)}
+                  active={model.activeMaterial === opt.value}
                 >
                   {opt.label}
-                </Link>
+                </FacetChip>
               ))}
             </div>
           </div>
@@ -371,7 +382,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               Industry code
             </span>
             <div className="flex flex-wrap gap-1">
-              <Link
+              <FacetChip
                 to={buildMetadataSearchUrl({
                   q: model.query,
                   type: model.activeType,
@@ -379,12 +390,12 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                   intent: model.intent,
                   material: model.activeMaterial,
                 })}
-                className={facetChipClass(!model.activeStandard)}
+                active={!model.activeStandard}
               >
                 All
-              </Link>
+              </FacetChip>
               {STANDARD_CHIP_CODES.map((code) => (
-                <Link
+                <FacetChip
                   key={code}
                   to={buildMetadataSearchUrl({
                     q: model.query,
@@ -394,10 +405,10 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                     material: model.activeMaterial,
                     standard: code,
                   })}
-                  className={facetChipClass(model.activeStandard === code)}
+                  active={model.activeStandard === code}
                 >
                   {code}
-                </Link>
+                </FacetChip>
               ))}
             </div>
           </div>

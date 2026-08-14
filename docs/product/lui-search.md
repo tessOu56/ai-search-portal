@@ -8,7 +8,7 @@
 
 ## 業務流程（現況）
 
-1. 使用者開啟首頁，看到標語與單一 composer（empty = marketing）。
+1. 使用者開啟首頁，看到品牌、結果句與單一 composer（empty = marketing）；往下捲是訪客介紹。
 2. 使用者輸入問題（query），送出後切換為全幅對話工作區，呼叫 **SSE** `GET /api/chat?q=...`（可選 `sessionId`，見契約 `chatQueryParamsSchema`）。
 3. 伺服器回傳串流事件：先 **meta**（query、summary、confidence，可選 traceId），再 **token**（逐字/詞回答），最後 **final**（sources、nextSteps）與 **done**。應用層錯誤使用 **`failure`**（JSON `message`／`code`），**不用**事件名 `error`，以免與 `EventSource` 連線錯誤混淆。可選 **tool_status**（Phase 3+）。
 4. 前端以 `EventSource` 或等效方式消費 SSE；每則助手回答內嵌摘要／信心、串流正文、來源與下一步（無資料不畫空卡）。
@@ -19,7 +19,7 @@
 
 - **路由**：`app/routes/_index.tsx`
 - **Loader**：提供 SEO meta、i18n、structured data（JSON-LD）；版號與語系來自 root loader。
-- **空態**：`HomeLanding` + 共用 `Composer`（typewriter 建議與 `data-testid="golden-question"` chips）。
+- **空態**：`HomeLanding`（品牌 + 結果句 + 單一 `Composer`）→ `HomeIntro`（訪客介紹三 section）→ `WorkspaceFooter`。Typewriter 用短 hint；完整示範問題在 `data-testid="golden-question"` chips。
 - **對話態**：`WorkspaceChatView`（`min-h-dvh`）— 頂列新對話、transcript（`role="log"`）、置底 `Composer`。`ChatInterface` 消費 SSE；`AssistantTurn` 呈現結構化回覆。
 - **i18n**：首頁文案由 `app/shared/i18n` 與 root 的 `translations` 提供；語系切換經 `POST /api/locale` + cookie。
 

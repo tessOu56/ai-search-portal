@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { Button } from "~/components/ui/Button";
+
 /**
  * 主題切換器 — 語意 token 由 explore-design-sdk 供應（app/styles/tokens.portal.css）。
  * 切換僅改 <html> 的 data-theme 與 .dark，元件與畫面不需知道任何色值。
@@ -17,7 +19,17 @@ const DEFAULT_THEME = "wakakusa";
 
 type ThemeId = (typeof THEMES)[number]["id"];
 
-export function ThemeSwitcher() {
+type ThemeSwitcherProps = {
+  themeLabel: string;
+  toLightLabel: string;
+  toDarkLabel: string;
+};
+
+export function ThemeSwitcher({
+  themeLabel,
+  toLightLabel,
+  toDarkLabel,
+}: ThemeSwitcherProps) {
   const [theme, setTheme] = useState<ThemeId>(DEFAULT_THEME);
   const [dark, setDark] = useState(false);
 
@@ -47,30 +59,31 @@ export function ThemeSwitcher() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex items-center gap-1 rounded-full border border-border bg-card px-2 py-1 shadow-sm">
-      {THEMES.map((t) => (
-        <button
-          key={t.id}
-          type="button"
-          onClick={() => applyTheme(t.id)}
-          aria-pressed={theme === t.id}
-          className={
-            theme === t.id
-              ? "rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground"
-              : "rounded-full px-3 py-1 text-xs text-muted-foreground hover:bg-accent"
-          }
-        >
-          {t.label}
-        </button>
-      ))}
-      <button
+    <div className="flex items-center gap-space-8">
+      <select
+        value={theme}
+        onChange={(event) => {
+          const next = THEMES.find((item) => item.id === event.target.value);
+          if (next) applyTheme(next.id);
+        }}
+        className="h-9 rounded-full border border-input bg-background px-space-16 text-type-14 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={themeLabel}
+      >
+        {THEMES.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.label}
+          </option>
+        ))}
+      </select>
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
         onClick={() => applyMode(!dark)}
-        aria-label={dark ? "切換為亮色" : "切換為暗色"}
-        className="rounded-full px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
+        aria-label={dark ? toLightLabel : toDarkLabel}
       >
         {dark ? "☀" : "☾"}
-      </button>
+      </Button>
     </div>
   );
 }

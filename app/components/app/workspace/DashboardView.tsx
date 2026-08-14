@@ -1,5 +1,6 @@
 import { Link } from "@remix-run/react";
 
+import { WorkspaceFooter } from "~/components/app/workspace/WorkspaceFooter";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
 import {
@@ -10,6 +11,12 @@ import {
   CardTitle,
 } from "~/components/ui/Card";
 import { Container } from "~/components/ui/Container";
+import { cn } from "~/shared/utils/cn";
+
+const NAV_LINK =
+  "block rounded-full px-4 py-2 text-sm text-muted-foreground transition hover:bg-accent hover:text-accent-foreground";
+const NAV_LINK_CURRENT =
+  "block rounded-full bg-primary/5 px-4 py-2 text-sm text-foreground";
 
 /**
  * Dashboard 總覽（輔助路徑，interface-roadmap R1）。
@@ -17,7 +24,7 @@ import { Container } from "~/components/ui/Container";
  */
 export function DashboardView() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <div className="bg-card/60 border-b border-border backdrop-blur-sm">
         <Container className="flex items-center justify-between py-4">
           <div className="space-y-1">
@@ -36,23 +43,9 @@ export function DashboardView() {
               AI search overview — data status, shortcuts, and product lines.
             </p>
           </div>
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link to="/catalog-search">Catalog search</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/metadata">Metadata</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/vitals">Web Vitals</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/site-map">Site map</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link to="/items/new">New item</Link>
-            </Button>
-          </div>
+          <Button asChild size="sm">
+            <Link to="/items/new">New item</Link>
+          </Button>
         </Container>
       </div>
 
@@ -61,21 +54,24 @@ export function DashboardView() {
           className="bg-card/80 flex gap-2 overflow-x-auto border-b border-border px-4 py-3 text-sm md:hidden"
           aria-label="Dashboard mobile"
         >
-          <Button asChild variant="secondary" size="sm" className="shrink-0">
-            <Link to="/?view=dashboard">Overview</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm" className="shrink-0">
-            <Link to="/catalog-search">Catalog</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm" className="shrink-0">
-            <Link to="/metadata">Metadata</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm" className="shrink-0">
-            <Link to="/insights">Insights</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm" className="shrink-0">
-            <Link to="/site-map">Site map</Link>
-          </Button>
+          <Link
+            to="/?view=dashboard"
+            className={cn(NAV_LINK_CURRENT, "shrink-0")}
+          >
+            Overview
+          </Link>
+          <Link to="/catalog-search" className={cn(NAV_LINK, "shrink-0")}>
+            Catalog
+          </Link>
+          <Link to="/metadata" className={cn(NAV_LINK, "shrink-0")}>
+            Metadata
+          </Link>
+          <Link to="/insights" className={cn(NAV_LINK, "shrink-0")}>
+            Insights
+          </Link>
+          <Link to="/site-map" className={cn(NAV_LINK, "shrink-0")}>
+            Site map
+          </Link>
         </nav>
         <aside className="bg-card/80 hidden w-64 shrink-0 border-r border-border px-4 py-6 text-sm text-muted-foreground md:block">
           <nav className="space-y-6">
@@ -85,35 +81,26 @@ export function DashboardView() {
               </p>
               <ul className="space-y-1">
                 <li>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="bg-primary/5 hover:bg-primary/10 w-full justify-start rounded-lg text-foreground"
+                  <Link
+                    to="/?view=dashboard"
+                    className={NAV_LINK_CURRENT}
                     aria-current="page"
                   >
                     Overview
-                  </Button>
+                  </Link>
                 </li>
                 <li>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start rounded-lg"
-                    disabled
+                  <span
+                    className={cn(NAV_LINK, "cursor-not-allowed opacity-50")}
                     title="Coming soon"
                   >
                     Activity
-                  </Button>
+                  </span>
                 </li>
                 <li>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start rounded-lg"
-                  >
-                    <Link to="/insights">Insights</Link>
-                  </Button>
+                  <Link to="/insights" className={NAV_LINK}>
+                    Insights
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -124,54 +111,29 @@ export function DashboardView() {
               </p>
               <ul className="space-y-1">
                 <li>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start rounded-lg"
-                  >
-                    <Link to="/dishes">Dishes</Link>
-                  </Button>
+                  <Link to="/dishes" className={NAV_LINK}>
+                    Dishes
+                  </Link>
                 </li>
                 <li>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start rounded-lg"
-                  >
-                    <Link to="/recipes">Recipes</Link>
-                  </Button>
+                  <Link to="/recipes" className={NAV_LINK}>
+                    Recipes
+                  </Link>
                 </li>
                 <li>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start rounded-lg"
-                  >
-                    <Link to="/items">Items</Link>
-                  </Button>
+                  <Link to="/items" className={NAV_LINK}>
+                    Items
+                  </Link>
                 </li>
                 <li>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start rounded-lg"
-                  >
-                    <Link to="/catalog-search">Catalog search</Link>
-                  </Button>
+                  <Link to="/catalog-search" className={NAV_LINK}>
+                    Catalog search
+                  </Link>
                 </li>
                 <li>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start rounded-lg"
-                  >
-                    <Link to="/metadata">Metadata catalog</Link>
-                  </Button>
+                  <Link to="/metadata" className={NAV_LINK}>
+                    Metadata catalog
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -180,6 +142,23 @@ export function DashboardView() {
 
         <main className="flex-1">
           <Container className="py-8">
+            <p className="mb-6 flex flex-wrap gap-x-space-16 gap-y-space-8 text-sm">
+              <Link
+                to="/catalog-search"
+                className="text-primary hover:underline"
+              >
+                Catalog search
+              </Link>
+              <Link to="/metadata" className="text-primary hover:underline">
+                Metadata
+              </Link>
+              <Link to="/vitals" className="text-primary hover:underline">
+                Web Vitals
+              </Link>
+              <Link to="/site-map" className="text-primary hover:underline">
+                Site map
+              </Link>
+            </p>
             <div className="mb-6 grid gap-4 md:grid-cols-3">
               <MetricCard
                 title="AI queries today"
@@ -224,6 +203,7 @@ export function DashboardView() {
           </Container>
         </main>
       </div>
+      <WorkspaceFooter />
     </div>
   );
 }

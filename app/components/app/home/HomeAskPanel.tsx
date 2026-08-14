@@ -6,6 +6,12 @@ type HomeAskPanelProps = {
   onSubmit: (query: string) => void;
 };
 
+const HINT_KEYS = [
+  "home.composer.hint.1",
+  "home.composer.hint.2",
+  "home.composer.hint.3",
+] as const;
+
 const SUGGEST_KEYS = [
   "home.composer.suggest.1",
   "home.composer.suggest.2",
@@ -13,11 +19,12 @@ const SUGGEST_KEYS = [
 ] as const;
 
 /**
- * Landing ask panel — shared Composer with typewriter + suggestion chips.
+ * Landing ask panel — shared Composer with short typewriter hints + suggestion chips.
  * Surface: marketing.
  */
 export function HomeAskPanel({ className, onSubmit }: HomeAskPanelProps) {
   const { t } = useI18n();
+  const hints = HINT_KEYS.map((key) => t(key));
   const suggestions = SUGGEST_KEYS.map((key) => t(key));
 
   return (
@@ -25,6 +32,7 @@ export function HomeAskPanel({ className, onSubmit }: HomeAskPanelProps) {
       className={className}
       onSubmit={onSubmit}
       typewriter
+      hints={hints}
       suggestions={suggestions}
     />
   );

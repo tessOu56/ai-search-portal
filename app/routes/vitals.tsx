@@ -3,6 +3,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { useSyncExternalStore } from "react";
 
 import { Badge } from "~/components/ui/Badge";
+import { Button } from "~/components/ui/Button";
 import {
   Card,
   CardContent,
@@ -17,6 +18,7 @@ import {
   type StoredVital,
   subscribeVitals,
 } from "~/lib/analytics/vitals-store";
+import { useI18n } from "~/shared/i18n/context";
 
 export const meta: MetaFunction = () => [
   { title: "Web Vitals | AI Search Portal" },
@@ -72,6 +74,7 @@ function useVitals(): StoredVital[] {
 }
 
 export default function VitalsRoute() {
+  const { t } = useI18n();
   const vitals = useVitals();
   const byName = new Map(vitals.map((v) => [v.name, v]));
   const metricNames = Object.keys(METRIC_META) as WebVitalName[];
@@ -147,13 +150,14 @@ export default function VitalsRoute() {
       </div>
 
       <div className="mt-6 flex items-center gap-3">
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={() => clearVitals()}
-          className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-muted"
         >
-          Clear session metrics
-        </button>
+          {t("vitals.clear")}
+        </Button>
         <p className="text-xs text-muted-foreground">
           Metrics persist for this browser tab only (<code>sessionStorage</code>
           ); closing the tab clears them.

@@ -1,5 +1,6 @@
 import { Form, Link, useRouteLoaderData } from "@remix-run/react";
 
+import { ThemeSwitcher } from "~/components/theme/ThemeSwitcher";
 import { Container } from "~/components/ui/Container";
 import { API_LOCALE } from "~/shared/api/paths";
 import { useI18n } from "~/shared/i18n/context";
@@ -46,7 +47,7 @@ export function WorkspaceFooter({ agentMode }: WorkspaceFooterProps) {
         </p>
         <p>
           <Link to="/site-map" className="text-primary hover:underline">
-            Site map
+            {t("footer.sitemap")}
           </Link>
         </p>
         {modeLabel ? <p title={t("chat.badge.sse")}>{modeLabel}</p> : null}
@@ -70,6 +71,11 @@ export function WorkspaceFooter({ agentMode }: WorkspaceFooterProps) {
             <option value="en">{t("locale.en")}</option>
           </select>
         </Form>
+        <ThemeSwitcher
+          themeLabel={t("theme.switch")}
+          toLightLabel={t("theme.toLight")}
+          toDarkLabel={t("theme.toDark")}
+        />
       </Container>
     </footer>
   );

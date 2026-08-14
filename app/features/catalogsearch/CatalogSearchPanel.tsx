@@ -3,6 +3,7 @@ import {
   listIndustryStandards,
 } from "@ai-search-portal/contracts";
 import { Link, useNavigation } from "@remix-run/react";
+import type { ReactNode } from "react";
 
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";
 import { Badge } from "~/components/ui/Badge";
@@ -15,6 +16,7 @@ import {
   CardTitle,
 } from "~/components/ui/Card";
 import { Input } from "~/components/ui/Input";
+import { useI18n } from "~/shared/i18n/context";
 import { buildMetadataSearchUrl } from "~/shared/navigation";
 
 import type { CatalogSearchViewModel } from "./catalog-search.types";
@@ -68,12 +70,24 @@ function buildResultsDescription(model: CatalogSearchViewModel): string {
   return parts.join(" · ");
 }
 
-function facetChipClass(active: boolean): string {
-  return `inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium ${
-    active
-      ? "border-primary bg-primary text-primary-foreground"
-      : "border-border bg-background hover:bg-muted"
-  }`;
+function FacetChip({
+  to,
+  active,
+  children,
+  title,
+}: {
+  to: string;
+  active: boolean;
+  children: ReactNode;
+  title?: string;
+}) {
+  return (
+    <Button asChild size="sm" variant={active ? "default" : "outline"}>
+      <Link to={to} title={title}>
+        {children}
+      </Link>
+    </Button>
+  );
 }
 
 function CatalogFacetFilters({
@@ -103,26 +117,26 @@ function CatalogFacetFilters({
             Type
           </span>
           <div className="flex flex-wrap gap-1">
-            <Link
+            <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
                 type: undefined,
               })}
-              className={facetChipClass(!model.activeType)}
+              active={!model.activeType}
             >
               All
-            </Link>
+            </FacetChip>
             {model.filters[0]?.options.map((opt) => (
-              <Link
+              <FacetChip
                 key={opt.value}
                 to={buildCatalogSearchUrl({
                   ...base,
                   type: opt.value,
                 })}
-                className={facetChipClass(model.activeType === opt.value)}
+                active={model.activeType === opt.value}
               >
                 {opt.label}
-              </Link>
+              </FacetChip>
             ))}
           </div>
         </div>
@@ -132,26 +146,26 @@ function CatalogFacetFilters({
             Material
           </span>
           <div className="flex flex-wrap gap-1">
-            <Link
+            <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
                 material: undefined,
               })}
-              className={facetChipClass(!model.activeMaterial)}
+              active={!model.activeMaterial}
             >
               All
-            </Link>
+            </FacetChip>
             {MATERIAL_OPTIONS.map((opt) => (
-              <Link
+              <FacetChip
                 key={opt.value}
                 to={buildCatalogSearchUrl({
                   ...base,
                   material: opt.value,
                 })}
-                className={facetChipClass(model.activeMaterial === opt.value)}
+                active={model.activeMaterial === opt.value}
               >
                 {opt.label}
-              </Link>
+              </FacetChip>
             ))}
           </div>
         </div>
@@ -161,27 +175,27 @@ function CatalogFacetFilters({
             Industry code
           </span>
           <div className="flex flex-wrap gap-1">
-            <Link
+            <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
                 standard: undefined,
               })}
-              className={facetChipClass(!model.activeStandard)}
+              active={!model.activeStandard}
             >
               All
-            </Link>
+            </FacetChip>
             {STANDARD_CHIP_CODES.map((code) => (
-              <Link
+              <FacetChip
                 key={code}
                 to={buildCatalogSearchUrl({
                   ...base,
                   standard: code,
                 })}
-                className={facetChipClass(model.activeStandard === code)}
+                active={model.activeStandard === code}
                 title={standardLabels.get(code) ?? code}
               >
                 {code}
-              </Link>
+              </FacetChip>
             ))}
           </div>
         </div>
@@ -191,28 +205,26 @@ function CatalogFacetFilters({
             Product type
           </span>
           <div className="flex flex-wrap gap-1">
-            <Link
+            <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
                 productType: undefined,
               })}
-              className={facetChipClass(!model.activeProductType)}
+              active={!model.activeProductType}
             >
               All
-            </Link>
+            </FacetChip>
             {PRODUCT_TYPE_OPTIONS.map((opt) => (
-              <Link
+              <FacetChip
                 key={opt.value}
                 to={buildCatalogSearchUrl({
                   ...base,
                   productType: opt.value,
                 })}
-                className={facetChipClass(
-                  model.activeProductType === opt.value
-                )}
+                active={model.activeProductType === opt.value}
               >
                 {opt.label}
-              </Link>
+              </FacetChip>
             ))}
           </div>
         </div>
@@ -222,24 +234,24 @@ function CatalogFacetFilters({
             Auction
           </span>
           <div className="flex flex-wrap gap-1">
-            <Link
+            <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
                 auctionEligible: undefined,
               })}
-              className={facetChipClass(!model.activeAuctionEligible)}
+              active={!model.activeAuctionEligible}
             >
               All
-            </Link>
-            <Link
+            </FacetChip>
+            <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
                 auctionEligible: true,
               })}
-              className={facetChipClass(Boolean(model.activeAuctionEligible))}
+              active={Boolean(model.activeAuctionEligible)}
             >
               Auction eligible
-            </Link>
+            </FacetChip>
           </div>
         </div>
 
@@ -256,7 +268,6 @@ function CatalogFacetFilters({
                   size="sm"
                   variant="outline"
                   disabled
-                  className="rounded-full"
                   title="Access filter — post-MVP"
                 >
                   {opt.label}
@@ -395,6 +406,7 @@ function CatalogPagination({
 }
 
 function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
+  const { t } = useI18n();
   return (
     <Card>
       <CardHeader>
@@ -432,7 +444,7 @@ function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
             aria-label="Catalog search query"
             className="flex-1"
           />
-          <Button type="submit">Search</Button>
+          <Button type="submit">{t("catalog.search.submit")}</Button>
         </form>
       </CardContent>
     </Card>

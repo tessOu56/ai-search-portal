@@ -4,6 +4,7 @@ import {
 } from "@ai-search-portal/contracts";
 import { Link } from "@remix-run/react";
 
+import { Button } from "~/components/ui/Button";
 import {
   Card,
   CardContent,
@@ -65,73 +66,77 @@ export function AiFallbackPanel({
   };
 
   return (
-    <Card
-      data-testid="ai-fallback-panel"
-      className="border-amber-300/60 bg-amber-50/60"
-    >
+    <Card data-testid="ai-fallback-panel">
       <CardHeader>
         <CardTitle className="text-base">{t("chat.fallback.title")}</CardTitle>
         <CardDescription>{t("chat.fallback.description")}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-wrap items-center gap-2">
-        <Link
-          to={buildCatalogSearchUrl({ q: trimmed, ...fallbackIntent })}
-          className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-          data-testid="ai-fallback-takeover"
-        >
-          {trimmed
-            ? t("chat.fallback.action.query", { query: trimmed })
-            : t("chat.fallback.action")}
-        </Link>
-        <Link
-          to={buildMetadataSearchUrl({ q: trimmed, ...fallbackIntent })}
-          className="inline-flex h-9 items-center rounded-full border border-border bg-background px-4 text-sm font-medium hover:bg-muted"
-          data-testid="ai-fallback-metadata"
-        >
-          {trimmed
-            ? t("chat.fallback.metadata.query", { query: trimmed })
-            : t("chat.fallback.metadata")}
-        </Link>
-        {types.map((type) => (
+        <Button asChild size="sm">
           <Link
-            key={type}
-            to={buildCatalogSearchUrl({ q: trimmed, type, ...fallbackIntent })}
-            className="inline-flex h-8 items-center rounded-full border border-border bg-background px-3 text-xs font-medium hover:bg-muted"
-            data-testid={`ai-fallback-type-${type}`}
+            to={buildCatalogSearchUrl({ q: trimmed, ...fallbackIntent })}
+            data-testid="ai-fallback-takeover"
           >
-            {type}
+            {trimmed
+              ? t("chat.fallback.action.query", { query: trimmed })
+              : t("chat.fallback.action")}
           </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link
+            to={buildMetadataSearchUrl({ q: trimmed, ...fallbackIntent })}
+            data-testid="ai-fallback-metadata"
+          >
+            {trimmed
+              ? t("chat.fallback.metadata.query", { query: trimmed })
+              : t("chat.fallback.metadata")}
+          </Link>
+        </Button>
+        {types.map((type) => (
+          <Button asChild key={type} variant="outline" size="sm">
+            <Link
+              to={buildCatalogSearchUrl({
+                q: trimmed,
+                type,
+                ...fallbackIntent,
+              })}
+              data-testid={`ai-fallback-type-${type}`}
+            >
+              {type}
+            </Link>
+          </Button>
         ))}
         {INDUSTRY_SHORTCUTS.map((chip) => (
-          <Link
-            key={chip.code}
-            to={buildCatalogSearchUrl({
-              q: trimmed,
-              intent: AI_FALLBACK_INTENT,
-              material: chip.material,
-              standard: chip.code,
-            })}
-            className="inline-flex h-8 items-center rounded-full border border-amber-400/50 bg-background px-3 text-xs font-medium hover:bg-muted"
-            data-testid={`ai-fallback-standard-${chip.code}`}
-          >
-            {chip.label}
-          </Link>
+          <Button asChild key={chip.code} variant="outline" size="sm">
+            <Link
+              to={buildCatalogSearchUrl({
+                q: trimmed,
+                intent: AI_FALLBACK_INTENT,
+                material: chip.material,
+                standard: chip.code,
+              })}
+              data-testid={`ai-fallback-standard-${chip.code}`}
+            >
+              {chip.label}
+            </Link>
+          </Button>
         ))}
         {COMMERCE_SHORTCUTS.map((chip) => (
-          <Link
-            key={chip.label}
-            to={buildCatalogSearchUrl({
-              q: trimmed,
-              intent: AI_FALLBACK_INTENT,
-              productType: "productType" in chip ? chip.productType : undefined,
-              auctionEligible:
-                "auctionEligible" in chip ? chip.auctionEligible : undefined,
-            })}
-            className="inline-flex h-8 items-center rounded-full border border-amber-400/50 bg-background px-3 text-xs font-medium hover:bg-muted"
-            data-testid={`ai-fallback-commerce-${chip.label.toLowerCase()}`}
-          >
-            {chip.label}
-          </Link>
+          <Button asChild key={chip.label} variant="outline" size="sm">
+            <Link
+              to={buildCatalogSearchUrl({
+                q: trimmed,
+                intent: AI_FALLBACK_INTENT,
+                productType:
+                  "productType" in chip ? chip.productType : undefined,
+                auctionEligible:
+                  "auctionEligible" in chip ? chip.auctionEligible : undefined,
+              })}
+              data-testid={`ai-fallback-commerce-${chip.label.toLowerCase()}`}
+            >
+              {chip.label}
+            </Link>
+          </Button>
         ))}
       </CardContent>
     </Card>

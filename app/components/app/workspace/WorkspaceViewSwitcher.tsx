@@ -1,6 +1,7 @@
 import { Link, useSearchParams } from "@remix-run/react";
 
 import { Button } from "~/components/ui/Button";
+import { useI18n } from "~/shared/i18n/context";
 import { cn } from "~/shared/utils/cn";
 
 type WorkspaceView = "chat" | "dashboard";
@@ -14,6 +15,7 @@ const VIEW_PARAM = "view";
 export function WorkspaceViewSwitcher({
   className,
 }: WorkspaceViewSwitcherProps) {
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
   const raw = searchParams.get(VIEW_PARAM);
   // `saas` 為舊參數，視同 dashboard
@@ -37,18 +39,18 @@ export function WorkspaceViewSwitcher({
         "inline-flex items-center gap-1 rounded-full bg-muted p-1",
         className
       )}
-      aria-label="Workspace view switcher"
+      aria-label={t("home.nav.switcher")}
       role="tablist"
     >
       <ViewChip
         to={makeHref("chat")}
         isActive={current === "chat"}
-        label="AI Chat"
+        label={t("home.nav.ask")}
       />
       <ViewChip
         to={makeHref("dashboard")}
         isActive={current === "dashboard"}
-        label="Dashboard"
+        label={t("home.nav.overview")}
       />
     </div>
   );

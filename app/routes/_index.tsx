@@ -3,6 +3,7 @@ import { Link, useRouteError, useSearchParams } from "@remix-run/react";
 import { useCallback, useState } from "react";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
+import { HomeIntro } from "~/components/app/home/HomeIntro";
 import { HomeLanding } from "~/components/app/home/HomeLanding";
 import {
   DashboardView,
@@ -82,7 +83,7 @@ export default function Index() {
 
   if (view === "dashboard") {
     return (
-      <div className="relative min-h-screen bg-background">
+      <div className="relative min-h-dvh bg-background">
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
           <div className="pointer-events-auto mx-auto flex max-w-6xl items-center justify-end p-space-16 md:px-space-32">
             <WorkspaceViewSwitcher className="bg-background/70 backdrop-blur-md" />
@@ -107,14 +108,15 @@ export default function Index() {
 
   if (!conversationActive) {
     return (
-      <div className="relative flex min-h-dvh flex-col">
+      <div className="relative">
         {atmosphere}
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
           <div className="pointer-events-auto mx-auto flex max-w-6xl items-center justify-end p-space-16 md:px-space-32">
             <WorkspaceViewSwitcher className="bg-background/50 backdrop-blur-md" />
           </div>
         </div>
-        <HomeLanding className="flex-1" onAsk={onAsk} />
+        <HomeLanding onAsk={onAsk} />
+        <HomeIntro />
         <WorkspaceFooter />
       </div>
     );

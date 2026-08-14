@@ -1,9 +1,7 @@
-import { Link } from "@remix-run/react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { HomeAskPanel } from "~/components/app/home/HomeAskPanel";
 import { BrandMark } from "~/components/ui/BrandMark";
-import { Button } from "~/components/ui/Button";
 import { useI18n } from "~/shared/i18n/context";
 import { cn } from "~/shared/utils/cn";
 
@@ -13,7 +11,7 @@ type HomeLandingProps = {
 };
 
 /**
- * First-viewport shell: brand + one line + ask panel.
+ * First-viewport shell: brand + outcome headline + ask panel.
  * Atmosphere glow is lifted to the page wrapper (spans into second screen).
  * Surface: marketing.
  */
@@ -24,11 +22,11 @@ export function HomeLanding({ className, onAsk }: HomeLandingProps) {
   return (
     <section
       className={cn(
-        "relative isolate flex min-h-0 flex-col justify-center overflow-hidden pt-space-32 md:pt-space-32",
+        "relative isolate flex min-h-dvh flex-col justify-center overflow-hidden pt-space-32 md:pt-space-32",
         className
       )}
       id="home-chat"
-      aria-label={t("home.title")}
+      aria-label={t("app.title")}
     >
       <div className="mx-auto w-full max-w-5xl px-space-16 py-space-32 md:p-space-32">
         <motion.div
@@ -69,9 +67,6 @@ export function HomeLanding({ className, onAsk }: HomeLandingProps) {
           transition={{ duration: 0.55, delay: 0.3 }}
         >
           <HomeAskPanel onSubmit={onAsk} />
-          <Button asChild variant="outline" size="lg" data-star-hot>
-            <Link to="/?view=dashboard">{t("home.cta.dashboard")}</Link>
-          </Button>
         </motion.div>
       </div>
     </section>
