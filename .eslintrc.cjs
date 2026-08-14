@@ -197,6 +197,7 @@ module.exports = {
       files: [
         "app/shared/services/context-pack-loader.server.ts",
         "backend/src/lib/context-pack-loader.ts",
+        "packages/agent-core/src/rag/local-store.ts",
       ],
       rules: {
         "security/detect-non-literal-fs-filename": "off",
@@ -215,6 +216,7 @@ module.exports = {
       files: ["app/test/**/*.{ts,tsx}"],
       rules: {
         "sonarjs/cognitive-complexity": "off",
+        complexity: "off",
       },
     },
     // Guardrail patterns are reviewed regexes, not user input.
@@ -234,6 +236,7 @@ module.exports = {
       files: ["packages/agent-core/src/stream.ts"],
       rules: {
         "sonarjs/cognitive-complexity": "off",
+        complexity: "off",
         "@typescript-eslint/no-unnecessary-condition": "off",
       },
     },

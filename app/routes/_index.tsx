@@ -7,6 +7,7 @@ import { HomeLanding } from "~/components/app/home/HomeLanding";
 import {
   DashboardView,
   WorkspaceChatView,
+  WorkspaceFooter,
   WorkspaceViewSwitcher,
 } from "~/components/app/workspace";
 import { Button } from "~/components/ui/Button";
@@ -66,18 +67,17 @@ export default function Index() {
   const viewParam = searchParams.get("view");
   const view =
     viewParam === "dashboard" || viewParam === "saas" ? "dashboard" : "chat";
-  const [focusChat, setFocusChat] = useState(false);
+  const [conversationActive, setConversationActive] = useState(false);
   const [pendingQuery, setPendingQuery] = useState<string | null>(null);
 
   const onAsk = useCallback((query: string) => {
     setPendingQuery(query);
-    setFocusChat(true);
-    window.requestAnimationFrame(() => {
-      document.getElementById("home-chat")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    });
+    setConversationActive(true);
+  }, []);
+
+  const onNewConversation = useCallback(() => {
+    setConversationActive(false);
+    setPendingQuery(null);
   }, []);
 
   if (view === "dashboard") {
@@ -93,29 +93,40 @@ export default function Index() {
     );
   }
 
+  const atmosphere = (
+    <div
+      className="eds-atmosphere eds-atmosphere--home-span pointer-events-none absolute inset-x-0 top-0 -z-10"
+      aria-hidden
+    >
+      <div className="eds-atmosphere-layer eds-atmosphere-layer--canvas" />
+      <div className="eds-atmosphere-layer eds-atmosphere-layer--glow eds-atmosphere-layer--glow-soft" />
+      <div className="eds-atmosphere-layer eds-atmosphere-layer--leak" />
+      <div className="eds-atmosphere-layer eds-atmosphere-layer--veil" />
+    </div>
+  );
+
+  if (!conversationActive) {
+    return (
+      <div className="relative flex min-h-dvh flex-col">
+        {atmosphere}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
+          <div className="pointer-events-auto mx-auto flex max-w-6xl items-center justify-end p-space-16 md:px-space-32">
+            <WorkspaceViewSwitcher className="bg-background/50 backdrop-blur-md" />
+          </div>
+        </div>
+        <HomeLanding className="flex-1" onAsk={onAsk} />
+        <WorkspaceFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
-      {/* Soft glow spans first viewport + upper half of second screen */}
-      <div
-        className="eds-atmosphere eds-atmosphere--home-span pointer-events-none absolute inset-x-0 top-0 -z-10"
-        aria-hidden
-      >
-        <div className="eds-atmosphere-layer eds-atmosphere-layer--canvas" />
-        <div className="eds-atmosphere-layer eds-atmosphere-layer--glow eds-atmosphere-layer--glow-soft" />
-        <div className="eds-atmosphere-layer eds-atmosphere-layer--leak" />
-        <div className="eds-atmosphere-layer eds-atmosphere-layer--veil" />
-      </div>
-
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
-        <div className="pointer-events-auto mx-auto flex max-w-6xl items-center justify-end p-space-16 md:px-space-32">
-          <WorkspaceViewSwitcher className="bg-background/50 backdrop-blur-md" />
-        </div>
-      </div>
-      <HomeLanding onAsk={onAsk} />
+      {atmosphere}
       <WorkspaceChatView
-        focusChat={focusChat}
         pendingQuery={pendingQuery}
         onPendingQueryConsumed={() => setPendingQuery(null)}
+        onNewConversation={onNewConversation}
       />
     </div>
   );

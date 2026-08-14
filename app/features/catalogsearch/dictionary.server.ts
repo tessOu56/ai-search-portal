@@ -55,6 +55,7 @@ function buildRow(i: number): CatalogApiRow {
         : `${domain}_${verb}_v${i % 7}`,
     description: `Mock ${itemType.toLowerCase()} #${i} for the ${domain} domain (${verb}).`,
     itemType,
+    source: "catalog",
   };
 }
 

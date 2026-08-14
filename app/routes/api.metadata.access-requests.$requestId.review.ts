@@ -15,6 +15,18 @@ import {
   toolExecutionErrorSchema,
 } from "~/shared/contracts";
 
+function reviewOutcome(decision: "edited" | "approved" | "denied") {
+  if (decision === "edited") return "edited" as const;
+  if (decision === "approved") return "approved" as const;
+  return "denied" as const;
+}
+
+function reviewAuditAction(decision: "edited" | "approved" | "denied") {
+  if (decision === "edited") return "access_request.edit" as const;
+  if (decision === "approved") return "access_request.approve" as const;
+  return "access_request.deny" as const;
+}
+
 export async function action({ request, params }: ActionFunctionArgs) {
   if (request.method !== "POST") {
     return json({ error: "Method not allowed" }, { status: 405 });
@@ -80,20 +92,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const decisionId =
     updated.data.decision?.decision_id ?? `review:${requestId}`;
-  const outcome =
-    parsed.data.decision === "edited"
-      ? ("edited" as const)
-      : parsed.data.decision === "approved"
-        ? ("approved" as const)
-        : ("denied" as const);
+  const outcome = reviewOutcome(parsed.data.decision);
 
   appendAuditEvent({
-    action:
-      parsed.data.decision === "edited"
-        ? "access_request.edit"
-        : parsed.data.decision === "approved"
-          ? "access_request.approve"
-          : "access_request.deny",
+    action: reviewAuditAction(parsed.data.decision),
     actor: { role: updated.data.role },
     resource: { type: "metadata_asset", id: updated.data.assetId },
     decisionId,

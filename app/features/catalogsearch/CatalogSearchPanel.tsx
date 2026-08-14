@@ -18,7 +18,10 @@ import { Input } from "~/components/ui/Input";
 import { buildMetadataSearchUrl } from "~/shared/navigation";
 
 import type { CatalogSearchViewModel } from "./catalog-search.types";
-import { buildCatalogSearchUrl } from "./catalog-search-url";
+import {
+  buildCatalogSearchUrl,
+  type CatalogSearchUrlParams,
+} from "./catalog-search-url";
 
 export type CatalogSearchPanelProps = {
   model: CatalogSearchViewModel;
@@ -73,6 +76,407 @@ function facetChipClass(active: boolean): string {
   }`;
 }
 
+function CatalogFacetFilters({
+  model,
+  base,
+  standardLabels,
+}: {
+  model: CatalogSearchViewModel;
+  base: CatalogSearchUrlParams;
+  standardLabels: Map<string, string>;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Filters</CardTitle>
+        <CardDescription>
+          Type + industry / commerce facets via URL (
+          <code className="text-xs">?material=</code> /{" "}
+          <code className="text-xs">?standard=</code> /{" "}
+          <code className="text-xs">?productType=</code> /{" "}
+          <code className="text-xs">?auctionEligible=</code>).
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-wrap gap-4">
+        <div className="space-y-1">
+          <span className="text-xs font-medium text-muted-foreground">
+            Type
+          </span>
+          <div className="flex flex-wrap gap-1">
+            <Link
+              to={buildCatalogSearchUrl({
+                ...base,
+                type: undefined,
+              })}
+              className={facetChipClass(!model.activeType)}
+            >
+              All
+            </Link>
+            {model.filters[0]?.options.map((opt) => (
+              <Link
+                key={opt.value}
+                to={buildCatalogSearchUrl({
+                  ...base,
+                  type: opt.value,
+                })}
+                className={facetChipClass(model.activeType === opt.value)}
+              >
+                {opt.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <span className="text-xs font-medium text-muted-foreground">
+            Material
+          </span>
+          <div className="flex flex-wrap gap-1">
+            <Link
+              to={buildCatalogSearchUrl({
+                ...base,
+                material: undefined,
+              })}
+              className={facetChipClass(!model.activeMaterial)}
+            >
+              All
+            </Link>
+            {MATERIAL_OPTIONS.map((opt) => (
+              <Link
+                key={opt.value}
+                to={buildCatalogSearchUrl({
+                  ...base,
+                  material: opt.value,
+                })}
+                className={facetChipClass(model.activeMaterial === opt.value)}
+              >
+                {opt.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <span className="text-xs font-medium text-muted-foreground">
+            Industry code
+          </span>
+          <div className="flex flex-wrap gap-1">
+            <Link
+              to={buildCatalogSearchUrl({
+                ...base,
+                standard: undefined,
+              })}
+              className={facetChipClass(!model.activeStandard)}
+            >
+              All
+            </Link>
+            {STANDARD_CHIP_CODES.map((code) => (
+              <Link
+                key={code}
+                to={buildCatalogSearchUrl({
+                  ...base,
+                  standard: code,
+                })}
+                className={facetChipClass(model.activeStandard === code)}
+                title={standardLabels.get(code) ?? code}
+              >
+                {code}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <span className="text-xs font-medium text-muted-foreground">
+            Product type
+          </span>
+          <div className="flex flex-wrap gap-1">
+            <Link
+              to={buildCatalogSearchUrl({
+                ...base,
+                productType: undefined,
+              })}
+              className={facetChipClass(!model.activeProductType)}
+            >
+              All
+            </Link>
+            {PRODUCT_TYPE_OPTIONS.map((opt) => (
+              <Link
+                key={opt.value}
+                to={buildCatalogSearchUrl({
+                  ...base,
+                  productType: opt.value,
+                })}
+                className={facetChipClass(
+                  model.activeProductType === opt.value
+                )}
+              >
+                {opt.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <span className="text-xs font-medium text-muted-foreground">
+            Auction
+          </span>
+          <div className="flex flex-wrap gap-1">
+            <Link
+              to={buildCatalogSearchUrl({
+                ...base,
+                auctionEligible: undefined,
+              })}
+              className={facetChipClass(!model.activeAuctionEligible)}
+            >
+              All
+            </Link>
+            <Link
+              to={buildCatalogSearchUrl({
+                ...base,
+                auctionEligible: true,
+              })}
+              className={facetChipClass(Boolean(model.activeAuctionEligible))}
+            >
+              Auction eligible
+            </Link>
+          </div>
+        </div>
+
+        {model.filters.slice(1).map((filter) => (
+          <fieldset key={filter.id} className="space-y-1">
+            <legend className="text-xs font-medium text-muted-foreground">
+              {filter.label}
+            </legend>
+            <div className="flex flex-wrap gap-1">
+              {filter.options.map((opt) => (
+                <Button
+                  key={`${filter.id}-${opt.value}`}
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled
+                  className="rounded-full"
+                  title="Access filter — post-MVP"
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
+          </fieldset>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function CatalogKnowledgeHits({
+  model,
+  base,
+}: {
+  model: CatalogSearchViewModel;
+  base: CatalogSearchUrlParams;
+}) {
+  if ((model.sourceCounts?.knowledge ?? 0) === 0) return null;
+  return (
+    <Card data-testid="catalog-knowledge-section">
+      <CardHeader>
+        <CardTitle className="text-base">Domain knowledge</CardTitle>
+        <CardDescription>
+          Facet-filtered glossary / narrative / ops
+          {model.activeStandard ? ` · standard=${model.activeStandard}` : ""}
+          {model.activeMaterial ? ` · material=${model.activeMaterial}` : ""}
+          {model.activeProductType
+            ? ` · productType=${model.activeProductType}`
+            : ""}
+          {model.activeAuctionEligible ? " · auctionEligible" : ""}. Metadata
+          assets below are not filtered by hallmark.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {model.results
+          .filter((row) => row.source === "knowledge")
+          .map((row) => (
+            <div
+              key={`knowledge-${row.id}`}
+              className="flex flex-wrap items-start justify-between gap-2 rounded-md border border-border px-3 py-2"
+            >
+              <div className="min-w-0 space-y-1">
+                {row.detailHref ? (
+                  <Link
+                    to={row.detailHref}
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    {row.name}
+                  </Link>
+                ) : (
+                  <p className="text-sm font-medium">{row.name}</p>
+                )}
+                <p className="line-clamp-2 text-xs text-muted-foreground">
+                  {row.description}
+                </p>
+                {row.facets &&
+                (row.facets.standards.length > 0 ||
+                  row.facets.materials.length > 0) ? (
+                  <div className="flex flex-wrap gap-1">
+                    {row.facets.standards.map((code) => (
+                      <Link
+                        key={code}
+                        to={buildCatalogSearchUrl({
+                          ...base,
+                          standard: code,
+                          page: 1,
+                        })}
+                        className="inline-flex rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                      >
+                        {code}
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+              <Badge
+                variant="outline"
+                className="rounded-full text-xs capitalize"
+              >
+                {row.itemType}
+              </Badge>
+            </div>
+          ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function CatalogPagination({
+  pagination,
+  base,
+}: {
+  pagination: CatalogSearchViewModel["pagination"];
+  base: CatalogSearchUrlParams;
+}) {
+  if (pagination.totalPages <= 1) return null;
+  return (
+    <nav
+      className="flex items-center justify-between gap-2"
+      aria-label="Results pagination"
+    >
+      {pagination.page > 1 ? (
+        <Link
+          to={buildCatalogSearchUrl({
+            ...base,
+            page: pagination.page - 1,
+          })}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          Previous
+        </Link>
+      ) : (
+        <span className="text-sm text-muted-foreground">Previous</span>
+      )}
+      <span className="text-xs text-muted-foreground">
+        Page {pagination.page} of {pagination.totalPages}
+      </span>
+      {pagination.page < pagination.totalPages ? (
+        <Link
+          to={buildCatalogSearchUrl({
+            ...base,
+            page: pagination.page + 1,
+          })}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          Next
+        </Link>
+      ) : (
+        <span className="text-sm text-muted-foreground">Next</span>
+      )}
+    </nav>
+  );
+}
+
+function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Search</CardTitle>
+        <CardDescription>GET form — filters preserved in URL.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form method="get" className="flex flex-col gap-3 sm:flex-row">
+          {model.intent ? (
+            <input type="hidden" name="intent" value={model.intent} />
+          ) : null}
+          {model.activeType ? (
+            <input type="hidden" name="type" value={model.activeType} />
+          ) : null}
+          {model.activeMaterial ? (
+            <input type="hidden" name="material" value={model.activeMaterial} />
+          ) : null}
+          {model.activeStandard ? (
+            <input type="hidden" name="standard" value={model.activeStandard} />
+          ) : null}
+          {model.activeProductType ? (
+            <input
+              type="hidden"
+              name="productType"
+              value={model.activeProductType}
+            />
+          ) : null}
+          {model.activeAuctionEligible ? (
+            <input type="hidden" name="auctionEligible" value="true" />
+          ) : null}
+          <Input
+            name="q"
+            defaultValue={model.query}
+            placeholder="Filter APIs, tables, 925, 鍛造…"
+            aria-label="Catalog search query"
+            className="flex-1"
+          />
+          <Button type="submit">Search</Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CatalogEmptyAction({ model }: { model: CatalogSearchViewModel }) {
+  const hasFacets =
+    Boolean(model.activeMaterial) ||
+    Boolean(model.activeStandard) ||
+    Boolean(model.activeProductType) ||
+    Boolean(model.activeAuctionEligible);
+  return (
+    <div className="flex flex-col items-center gap-2 sm:flex-row">
+      {hasFacets ? (
+        <Link
+          to={buildCatalogSearchUrl({
+            q: model.query,
+            type: model.activeType,
+            intent: model.intent,
+          })}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          Clear industry filters
+        </Link>
+      ) : null}
+      <Link
+        to={buildMetadataSearchUrl({
+          q: model.query,
+          type: model.activeType,
+          intent: model.intent,
+          material: model.activeMaterial,
+          standard: model.activeStandard,
+          productType: model.activeProductType,
+          auctionEligible: model.activeAuctionEligible,
+        })}
+        className="text-sm font-medium text-primary hover:underline"
+      >
+        Try metadata catalog →
+      </Link>
+    </div>
+  );
+}
+
 export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
   const { pagination } = model;
   const base = {
@@ -89,7 +493,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
     navigation.state === "loading" &&
     navigation.location?.pathname === "/catalog-search";
 
-  const standardLabels = Object.fromEntries(
+  const standardLabels = new Map(
     INDUSTRY_STANDARD_REGISTRY.map((e) => [e.code, e.labelZhTw])
   );
 
@@ -134,311 +538,14 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         ) : null}
       </header>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Search</CardTitle>
-          <CardDescription>
-            GET form — filters preserved in URL.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form method="get" className="flex flex-col gap-3 sm:flex-row">
-            {model.intent ? (
-              <input type="hidden" name="intent" value={model.intent} />
-            ) : null}
-            {model.activeType ? (
-              <input type="hidden" name="type" value={model.activeType} />
-            ) : null}
-            {model.activeMaterial ? (
-              <input
-                type="hidden"
-                name="material"
-                value={model.activeMaterial}
-              />
-            ) : null}
-            {model.activeStandard ? (
-              <input
-                type="hidden"
-                name="standard"
-                value={model.activeStandard}
-              />
-            ) : null}
-            {model.activeProductType ? (
-              <input
-                type="hidden"
-                name="productType"
-                value={model.activeProductType}
-              />
-            ) : null}
-            {model.activeAuctionEligible ? (
-              <input type="hidden" name="auctionEligible" value="true" />
-            ) : null}
-            <Input
-              name="q"
-              defaultValue={model.query}
-              placeholder="Filter APIs, tables, 925, 鍛造…"
-              aria-label="Catalog search query"
-              className="flex-1"
-            />
-            <Button type="submit">Search</Button>
-          </form>
-        </CardContent>
-      </Card>
+      <CatalogSearchForm model={model} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Filters</CardTitle>
-          <CardDescription>
-            Type + industry / commerce facets via URL (
-            <code className="text-xs">?material=</code> /{" "}
-            <code className="text-xs">?standard=</code> /{" "}
-            <code className="text-xs">?productType=</code> /{" "}
-            <code className="text-xs">?auctionEligible=</code>).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-4">
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground">
-              Type
-            </span>
-            <div className="flex flex-wrap gap-1">
-              <Link
-                to={buildCatalogSearchUrl({
-                  ...base,
-                  type: undefined,
-                })}
-                className={facetChipClass(!model.activeType)}
-              >
-                All
-              </Link>
-              {model.filters[0]?.options.map((opt) => (
-                <Link
-                  key={opt.value}
-                  to={buildCatalogSearchUrl({
-                    ...base,
-                    type: opt.value,
-                  })}
-                  className={facetChipClass(model.activeType === opt.value)}
-                >
-                  {opt.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground">
-              Material
-            </span>
-            <div className="flex flex-wrap gap-1">
-              <Link
-                to={buildCatalogSearchUrl({
-                  ...base,
-                  material: undefined,
-                })}
-                className={facetChipClass(!model.activeMaterial)}
-              >
-                All
-              </Link>
-              {MATERIAL_OPTIONS.map((opt) => (
-                <Link
-                  key={opt.value}
-                  to={buildCatalogSearchUrl({
-                    ...base,
-                    material: opt.value,
-                  })}
-                  className={facetChipClass(model.activeMaterial === opt.value)}
-                >
-                  {opt.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground">
-              Industry code
-            </span>
-            <div className="flex flex-wrap gap-1">
-              <Link
-                to={buildCatalogSearchUrl({
-                  ...base,
-                  standard: undefined,
-                })}
-                className={facetChipClass(!model.activeStandard)}
-              >
-                All
-              </Link>
-              {STANDARD_CHIP_CODES.map((code) => (
-                <Link
-                  key={code}
-                  to={buildCatalogSearchUrl({
-                    ...base,
-                    standard: code,
-                  })}
-                  className={facetChipClass(model.activeStandard === code)}
-                  title={standardLabels[code] ?? code}
-                >
-                  {code}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground">
-              Product type
-            </span>
-            <div className="flex flex-wrap gap-1">
-              <Link
-                to={buildCatalogSearchUrl({
-                  ...base,
-                  productType: undefined,
-                })}
-                className={facetChipClass(!model.activeProductType)}
-              >
-                All
-              </Link>
-              {PRODUCT_TYPE_OPTIONS.map((opt) => (
-                <Link
-                  key={opt.value}
-                  to={buildCatalogSearchUrl({
-                    ...base,
-                    productType: opt.value,
-                  })}
-                  className={facetChipClass(
-                    model.activeProductType === opt.value
-                  )}
-                >
-                  {opt.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground">
-              Auction
-            </span>
-            <div className="flex flex-wrap gap-1">
-              <Link
-                to={buildCatalogSearchUrl({
-                  ...base,
-                  auctionEligible: undefined,
-                })}
-                className={facetChipClass(!model.activeAuctionEligible)}
-              >
-                All
-              </Link>
-              <Link
-                to={buildCatalogSearchUrl({
-                  ...base,
-                  auctionEligible: true,
-                })}
-                className={facetChipClass(Boolean(model.activeAuctionEligible))}
-              >
-                Auction eligible
-              </Link>
-            </div>
-          </div>
-
-          {model.filters.slice(1).map((filter) => (
-            <fieldset key={filter.id} className="space-y-1">
-              <legend className="text-xs font-medium text-muted-foreground">
-                {filter.label}
-              </legend>
-              <div className="flex flex-wrap gap-1">
-                {filter.options.map((opt) => (
-                  <Button
-                    key={`${filter.id}-${opt.value}`}
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    disabled
-                    className="rounded-full"
-                    title="Access filter — post-MVP"
-                  >
-                    {opt.label}
-                  </Button>
-                ))}
-              </div>
-            </fieldset>
-          ))}
-        </CardContent>
-      </Card>
-
-      {(model.sourceCounts?.knowledge ?? 0) > 0 ? (
-        <Card data-testid="catalog-knowledge-section">
-          <CardHeader>
-            <CardTitle className="text-base">Domain knowledge</CardTitle>
-            <CardDescription>
-              Facet-filtered glossary / narrative / ops
-              {model.activeStandard
-                ? ` · standard=${model.activeStandard}`
-                : ""}
-              {model.activeMaterial
-                ? ` · material=${model.activeMaterial}`
-                : ""}
-              {model.activeProductType
-                ? ` · productType=${model.activeProductType}`
-                : ""}
-              {model.activeAuctionEligible ? " · auctionEligible" : ""}.
-              Metadata assets below are not filtered by hallmark.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {model.results
-              .filter((row) => row.source === "knowledge")
-              .map((row) => (
-                <div
-                  key={`knowledge-${row.id}`}
-                  className="flex flex-wrap items-start justify-between gap-2 rounded-md border border-border px-3 py-2"
-                >
-                  <div className="min-w-0 space-y-1">
-                    {row.detailHref ? (
-                      <Link
-                        to={row.detailHref}
-                        className="text-sm font-medium text-primary hover:underline"
-                      >
-                        {row.name}
-                      </Link>
-                    ) : (
-                      <p className="text-sm font-medium">{row.name}</p>
-                    )}
-                    <p className="line-clamp-2 text-xs text-muted-foreground">
-                      {row.description}
-                    </p>
-                    {row.facets &&
-                    (row.facets.standards.length > 0 ||
-                      row.facets.materials.length > 0) ? (
-                      <div className="flex flex-wrap gap-1">
-                        {row.facets.standards.map((code) => (
-                          <Link
-                            key={code}
-                            to={buildCatalogSearchUrl({
-                              ...base,
-                              standard: code,
-                              page: 1,
-                            })}
-                            className="inline-flex rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
-                          >
-                            {code}
-                          </Link>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="rounded-full text-xs capitalize"
-                  >
-                    {row.itemType}
-                  </Badge>
-                </div>
-              ))}
-          </CardContent>
-        </Card>
-      ) : null}
+      <CatalogFacetFilters
+        model={model}
+        base={base}
+        standardLabels={standardLabels}
+      />
+      <CatalogKnowledgeHits model={model} base={base} />
 
       <ProductResultsShell
         title={
@@ -458,77 +565,8 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         skeletonGridClass="grid-cols-[1fr_2fr_auto_auto]"
         skeletonRows={3}
         emptyMessage="No asset or catalog rows match your query."
-        emptyAction={
-          <div className="flex flex-col items-center gap-2 sm:flex-row">
-            {model.activeMaterial ||
-            model.activeStandard ||
-            model.activeProductType ||
-            model.activeAuctionEligible ? (
-              <Link
-                to={buildCatalogSearchUrl({
-                  q: model.query,
-                  type: model.activeType,
-                  intent: model.intent,
-                })}
-                className="text-sm font-medium text-primary hover:underline"
-              >
-                Clear industry filters
-              </Link>
-            ) : null}
-            <Link
-              to={buildMetadataSearchUrl({
-                q: model.query,
-                type: model.activeType,
-                intent: model.intent,
-                material: model.activeMaterial,
-                standard: model.activeStandard,
-                productType: model.activeProductType,
-                auctionEligible: model.activeAuctionEligible,
-              })}
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              Try metadata catalog →
-            </Link>
-          </div>
-        }
-        pagination={
-          pagination.totalPages > 1 ? (
-            <nav
-              className="flex items-center justify-between gap-2"
-              aria-label="Results pagination"
-            >
-              {pagination.page > 1 ? (
-                <Link
-                  to={buildCatalogSearchUrl({
-                    ...base,
-                    page: pagination.page - 1,
-                  })}
-                  className="text-sm font-medium text-primary hover:underline"
-                >
-                  Previous
-                </Link>
-              ) : (
-                <span className="text-sm text-muted-foreground">Previous</span>
-              )}
-              <span className="text-xs text-muted-foreground">
-                Page {pagination.page} of {pagination.totalPages}
-              </span>
-              {pagination.page < pagination.totalPages ? (
-                <Link
-                  to={buildCatalogSearchUrl({
-                    ...base,
-                    page: pagination.page + 1,
-                  })}
-                  className="text-sm font-medium text-primary hover:underline"
-                >
-                  Next
-                </Link>
-              ) : (
-                <span className="text-sm text-muted-foreground">Next</span>
-              )}
-            </nav>
-          ) : null
-        }
+        emptyAction={<CatalogEmptyAction model={model} />}
+        pagination={<CatalogPagination pagination={pagination} base={base} />}
       >
         <div className="overflow-x-auto">
           <div className="grid min-w-[40rem] grid-cols-[1fr_2fr_auto_auto] bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">

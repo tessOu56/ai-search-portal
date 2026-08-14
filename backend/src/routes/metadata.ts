@@ -122,34 +122,67 @@ accessRequestsApi.post("/evaluate", async (c) => {
   }
 });
 
-accessRequestsApi.post("/", async (c) => {
-  const idempotencyKey = c.req.header("Idempotency-Key")?.trim();
-  if (idempotencyKey) {
-    const existing = resolveIdempotency(idempotencyKey);
-    if (existing?.decision) {
-      const body = submitAccessResponseSchema.parse({
-        data: {
-          requestId: existing.id,
-          status: existing.status,
-          decision: existing.decision,
-          auditLogged: existing.decision.require_audit,
-        },
-      });
-      return c.json(body, existing.status === "draft" ? 201 : 202);
-    }
-  }
+function replayIdempotentSubmit(
+  c: { json: (body: unknown, status?: number) => Response },
+  idempotencyKey: string | undefined
+) {
+  if (!idempotencyKey) return null;
+  const existing = resolveIdempotency(idempotencyKey);
+  if (!existing?.decision) return null;
+  const body = submitAccessResponseSchema.parse({
+    data: {
+      requestId: existing.id,
+      status: existing.status,
+      decision: existing.decision,
+      auditLogged: existing.decision.require_audit,
+    },
+  });
+  return c.json(body, existing.status === "draft" ? 201 : 202);
+}
 
-  let raw: unknown;
-  try {
-    raw = await c.req.json();
-  } catch {
-    return c.json({ error: ERROR_INVALID_JSON }, 400);
-  }
-  const parsed = metadataAccessRequestSchema.safeParse(raw);
-  if (!parsed.success) {
-    return c.json({ error: ERROR_INVALID_BODY }, 400);
-  }
+function createDraftApplication(args: {
+  assetId: string;
+  assetName: string;
+  purpose: Parameters<typeof createApplication>[0]["purpose"];
+  role: Parameters<typeof createApplication>[0]["role"];
+  requesterId: string;
+  owner: string;
+  decision: NonNullable<ReturnType<typeof resolveIdempotency>>["decision"];
+  idempotencyKey?: string;
+}) {
+  const requestId = randomUUID();
+  createApplication({
+    id: requestId,
+    assetId: args.assetId,
+    assetName: args.assetName,
+    purpose: args.purpose,
+    role: args.role,
+    requesterId: args.requesterId,
+    status: "draft",
+    owner: args.owner,
+    decision: args.decision,
+  });
+  if (args.idempotencyKey) rememberIdempotency(args.idempotencyKey, requestId);
+  return submitAccessResponseSchema.parse({
+    data: {
+      requestId,
+      status: "draft",
+      decision: args.decision,
+      auditLogged: false,
+    },
+  });
+}
 
+async function completeAccessSubmit(
+  c: {
+    json: (body: unknown, status?: number) => Response;
+    req: { query: (name: string) => string | undefined };
+  },
+  parsed: ReturnType<typeof metadataAccessRequestSchema.safeParse> & {
+    success: true;
+  },
+  idempotencyKey: string | undefined
+) {
   let decision;
   let asset;
   try {
@@ -167,26 +200,15 @@ accessRequestsApi.post("/", async (c) => {
   const requesterId = parsed.data.requesterId ?? `requester:${role}`;
 
   if (parsed.data.asDraft) {
-    const requestId = randomUUID();
-    createApplication({
-      id: requestId,
+    const body = createDraftApplication({
       assetId: parsed.data.assetId,
       assetName: asset.name,
       purpose: parsed.data.purpose,
       role,
       requesterId,
-      status: "draft",
       owner: asset.owner,
       decision,
-    });
-    if (idempotencyKey) rememberIdempotency(idempotencyKey, requestId);
-    const body = submitAccessResponseSchema.parse({
-      data: {
-        requestId,
-        status: "draft",
-        decision,
-        auditLogged: false,
-      },
+      idempotencyKey,
     });
     return c.json(body, 201);
   }
@@ -235,6 +257,24 @@ accessRequestsApi.post("/", async (c) => {
     },
   });
   return c.json(body, 202);
+}
+
+accessRequestsApi.post("/", async (c) => {
+  const idempotencyKey = c.req.header("Idempotency-Key")?.trim();
+  const replay = replayIdempotentSubmit(c, idempotencyKey);
+  if (replay) return replay;
+
+  let raw: unknown;
+  try {
+    raw = await c.req.json();
+  } catch {
+    return c.json({ error: ERROR_INVALID_JSON }, 400);
+  }
+  const parsed = metadataAccessRequestSchema.safeParse(raw);
+  if (!parsed.success) {
+    return c.json({ error: ERROR_INVALID_BODY }, 400);
+  }
+  return completeAccessSubmit(c, parsed, idempotencyKey);
 });
 
 accessRequestsApi.post("/:requestId/review", async (c) => {

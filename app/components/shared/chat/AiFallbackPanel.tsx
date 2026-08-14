@@ -15,6 +15,7 @@ import { useI18n } from "~/shared/i18n/context";
 import {
   buildCatalogSearchUrl,
   buildMetadataSearchUrl,
+  type CatalogSearchUrlParams,
 } from "~/shared/navigation";
 
 export type AiFallbackPanelProps = {
@@ -55,7 +56,7 @@ export function AiFallbackPanel({
   const { t } = useI18n();
   const trimmed = query.trim();
   const inferred = inferIndustryFacetsFromText(trimmed);
-  const fallbackIntent = {
+  const fallbackIntent: CatalogSearchUrlParams = {
     intent: AI_FALLBACK_INTENT,
     material: inferred.material,
     standard: inferred.standard,

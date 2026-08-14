@@ -42,6 +42,56 @@ export function evaluateMetadataAccess(
   });
 }
 
+function persistAccessApplication(
+  args: Parameters<typeof createAccessApplication>[0]
+) {
+  createAccessApplication(args);
+}
+
+function submitDraftAccessRequest(args: {
+  assetId: string;
+  purpose: EvaluateAccessInput["purpose"];
+  role?: EvaluateAccessInput["role"];
+  packId?: string;
+  requesterId?: string;
+  decision: PolicyDecisionContract;
+}) {
+  const requestId = randomUUID();
+  const asset = getMetadataAsset(args.assetId, args.packId);
+  const role = args.role ?? "analyst";
+  const requesterId = args.requesterId ?? `requester:${role}`;
+  if (!asset) {
+    return {
+      ok: false as const,
+      status: 404,
+      error: "Asset not found",
+      decision: args.decision,
+    };
+  }
+  persistAccessApplication({
+    id: requestId,
+    assetId: args.assetId,
+    assetName: asset.name,
+    purpose: args.purpose,
+    role,
+    requesterId,
+    status: "draft",
+    owner: asset.owner,
+    decision: args.decision,
+    termsAccepted: asset.termsOfUse,
+  });
+  return {
+    ok: true as const,
+    status: 201,
+    data: {
+      requestId,
+      status: "draft" as const,
+      decision: args.decision,
+      auditLogged: false,
+    },
+  };
+}
+
 export function submitMetadataAccessRequest(args: {
   assetId: string;
   purpose: EvaluateAccessInput["purpose"];
@@ -60,40 +110,14 @@ export function submitMetadataAccessRequest(args: {
   });
 
   if (args.asDraft) {
-    const requestId = randomUUID();
-    const asset = getMetadataAsset(args.assetId, args.packId);
-    const role = args.role ?? "analyst";
-    const requesterId = args.requesterId ?? `requester:${role}`;
-    if (!asset) {
-      return {
-        ok: false as const,
-        status: 404,
-        error: "Asset not found",
-        decision,
-      };
-    }
-    createAccessApplication({
-      id: requestId,
+    return submitDraftAccessRequest({
       assetId: args.assetId,
-      assetName: asset.name,
       purpose: args.purpose,
-      role,
-      requesterId,
-      status: "draft",
-      owner: asset.owner,
+      role: args.role,
+      packId: args.packId,
+      requesterId: args.requesterId,
       decision,
-      termsAccepted: asset.termsOfUse,
     });
-    return {
-      ok: true as const,
-      status: 201,
-      data: {
-        requestId,
-        status: "draft" as const,
-        decision,
-        auditLogged: false,
-      },
-    };
   }
 
   if (decision.need_approval && !args.approved) {
@@ -127,7 +151,7 @@ export function submitMetadataAccessRequest(args: {
   const requesterId = args.requesterId ?? `requester:${role}`;
 
   if (asset) {
-    createAccessApplication({
+    persistAccessApplication({
       id: requestId,
       assetId: args.assetId,
       assetName: asset.name,

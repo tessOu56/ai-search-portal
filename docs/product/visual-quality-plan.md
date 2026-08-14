@@ -23,17 +23,17 @@
 
 依 taste-skill 自身的 out-of-scope 聲明（dashboards、dense product UI、data tables、multi-step forms 明列不適用），先為 sitemap 每頁標注 surface：
 
-| 頁面                                      | Surface                          | taste-skill 適用度                                                |
-| ----------------------------------------- | -------------------------------- | ----------------------------------------------------------------- |
-| `/`（chat 預設）                          | product + marketing 混合         | 中：首屏敘事、empty state、prompt 建議卡可用；chat 互動流不歸它管 |
-| `/?view=dashboard`                        | data surface                     | 低：只取反 fake-UI／反裝飾原則當 review 項                        |
-| `/catalog-search`、`/metadata`            | product/data surface             | 低到中：列表節奏、empty/loading 態可參考；資訊架構不動            |
-| `/items`、表單                            | product surface                  | 低：表單規則已有（label 上、error 下）與其一致                    |
-| `/dishes`、`/recipes`（列表/詳情）        | marketing-ish（dataset landing） | 中：敘事與版面家族多樣性可參考                                    |
-| `/developers` 總覽、SDK quick start       | developer surface                | 中高：最適合套的區域                                              |
-| `/developers/apis/:apiId`（三欄 try-it）  | dense product UI                 | 低：明確 out of scope                                             |
-| `/insights`                               | data surface                     | 低                                                                |
-| `/release-notes`、對外 landing/docs intro | marketing surface                | 高                                                                |
+| 頁面                                      | Surface                          | taste-skill 適用度                                                                               |
+| ----------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `/`（chat 預設）                          | product + marketing 混合         | 中高：empty = marketing 首屏；active conversation 走 product checklist（反空卡／四態／composer） |
+| `/?view=dashboard`                        | data surface                     | 低：只取反 fake-UI／反裝飾原則當 review 項                                                       |
+| `/catalog-search`、`/metadata`            | product/data surface             | 低到中：列表節奏、empty/loading 態可參考；資訊架構不動                                           |
+| `/items`、表單                            | product surface                  | 低：表單規則已有（label 上、error 下）與其一致                                                   |
+| `/dishes`、`/recipes`（列表/詳情）        | marketing-ish（dataset landing） | 中：敘事與版面家族多樣性可參考                                                                   |
+| `/developers` 總覽、SDK quick start       | developer surface                | 中高：最適合套的區域                                                                             |
+| `/developers/apis/:apiId`（三欄 try-it）  | dense product UI                 | 低：明確 out of scope                                                                            |
+| `/insights`                               | data surface                     | 低                                                                                               |
+| `/release-notes`、對外 landing/docs intro | marketing surface                | 高                                                                                               |
 
 ---
 
@@ -88,13 +88,13 @@
 
 不引入 dial 數字，改用語意 preset（值 = SDK token）：
 
-| Surface                                              | 版面變化           | 動效                 | 密度（space.section / stack）                                                    | 備註                                  |
-| ---------------------------------------------------- | ------------------ | -------------------- | -------------------------------------------------------------------------------- | ------------------------------------- |
-| marketing（landing、release-notes、dataset landing） | 中高（非對稱可用） | 中（motivated only） | 寬鬆 4rem / 1.25rem（portal map 現值）                                           | 和紙編輯風完整表達                    |
-| chat 首頁                                            | 中                 | 低中                 | 寬鬆                                                                             | 敘事區塊 + 建議卡；互動流不套         |
-| product（catalog/metadata/items）                    | 低（可預期優先）   | 低                   | 標準 3rem / 1rem（enterprise 值）                                                | 一致性 > 個性                         |
-| data（insights、dashboard 總覽）                     | 低                 | 低                   | 緊湊（提案新增 `space.section` 緊湊檔 2rem；數字 `font-mono`、1px 分線、少卡片） | 取自 density 8-10 檔建議              |
-| developer（/developers 總覽、SDK docs）              | 中                 | 低中                 | 標準                                                                             | 文件可讀性優先，行寬 ≤ 65ch/40 全形字 |
+| Surface                                              | 版面變化           | 動效                 | 密度（space.section / stack）                                                    | 備註                                                       |
+| ---------------------------------------------------- | ------------------ | -------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| marketing（landing、release-notes、dataset landing） | 中高（非對稱可用） | 中（motivated only） | 寬鬆 4rem / 1.25rem（portal map 現值）                                           | 和紙編輯風完整表達                                         |
+| chat 首頁                                            | 中                 | 低中                 | empty 寬鬆；conversation 標準                                                    | empty = 敘事 + 單一 composer；active = 文件寬 turn，無空卡 |
+| product（catalog/metadata/items）                    | 低（可預期優先）   | 低                   | 標準 3rem / 1rem（enterprise 值）                                                | 一致性 > 個性                                              |
+| data（insights、dashboard 總覽）                     | 低                 | 低                   | 緊湊（提案新增 `space.section` 緊湊檔 2rem；數字 `font-mono`、1px 分線、少卡片） | 取自 density 8-10 檔建議                                   |
+| developer（/developers 總覽、SDK docs）              | 中                 | 低中                 | 標準                                                                             | 文件可讀性優先，行寬 ≤ 65ch/40 全形字                      |
 
 → 若同意，落地方式：SDK 增加 `portal-dense`（或 semantic 加 `space.section-dense`）供 data surface 用；不新增 dial 概念。
 
@@ -163,3 +163,4 @@
 | D3  | ~~Design Read 是否進 AGENTS.md？~~        | ✅ 2026-07-08：AGENTS.md「UI 產出規則」段——全 surface 標 tag；marketing/developer 必填一行 Design Read；出貨前過 checklist                                        |
 | D4  | ~~body 字型？~~                           | ✅ 維持 Inter（+ Noto Sans TC fallback）：個性由 serif display 承擔，body 職責是中文混排穩定                                                                      |
 | D5  | ~~taste-skill 本體裝不裝？~~              | ✅ 不裝，用萃取版（ui-review-checklist.md）；v2.0.0 stable 後重新評估一次                                                                                         |
+| D6  | ~~chat 互動流是否納入 checklist？~~       | ✅ 2026-08-14：conversation 為 product surface——無資料不畫空卡；LUI 依據內嵌於 assistant turn（T-2026-219）                                                       |

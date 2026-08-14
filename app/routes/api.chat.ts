@@ -16,11 +16,14 @@ const RATE_MAX = 40;
 const rateBuckets = new Map<string, { count: number; resetAt: number }>();
 
 function clientKey(request: Request): string {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("cf-connecting-ip") ||
-    "anonymous"
-  );
+  const forwarded = request.headers
+    .get("x-forwarded-for")
+    ?.split(",")[0]
+    ?.trim();
+  if (forwarded) return forwarded;
+  const connectingIp = request.headers.get("cf-connecting-ip")?.trim();
+  if (connectingIp) return connectingIp;
+  return "anonymous";
 }
 
 function allowRequest(request: Request): boolean {

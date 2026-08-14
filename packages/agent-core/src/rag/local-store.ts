@@ -123,6 +123,85 @@ function facetTags(facets: LocalDoc["facets"] | undefined): string[] {
   ].filter(Boolean);
 }
 
+function docFromGlossary(item: unknown): LocalDoc | undefined {
+  const row = item as {
+    id?: string;
+    term?: string;
+    definition?: string;
+    relatedAssetIds?: string[];
+    tags?: string[];
+    source?: string;
+    facets?: unknown;
+  };
+  if (!row.id || !row.term || !row.definition) return undefined;
+  const facets = readFacets(row.facets);
+  return {
+    id: row.id,
+    title: row.term,
+    kind: "glossary",
+    text: row.definition,
+    tags: [
+      "glossary",
+      ...(row.tags ?? []),
+      ...row.term.toLowerCase().split(/\s+/).slice(0, 4),
+      ...facetTags(facets),
+    ],
+    refs: row.relatedAssetIds ?? [],
+    source: row.source,
+    facets,
+  };
+}
+
+function docFromNarrative(item: unknown): LocalDoc | undefined {
+  const row = item as {
+    id?: string;
+    title?: string;
+    summary?: string;
+    tags?: string[];
+    refs?: string[];
+    facets?: unknown;
+  };
+  if (!row.id || !row.title || !row.summary) return undefined;
+  const facets = readFacets(row.facets);
+  return {
+    id: row.id,
+    title: row.title,
+    kind: "narrative",
+    text: row.summary,
+    tags: [...(row.tags ?? ["narrative"]), ...facetTags(facets)],
+    refs: row.refs ?? [],
+    facets,
+  };
+}
+
+function docFromOps(item: unknown): LocalDoc | undefined {
+  const row = item as {
+    id?: string;
+    title?: string;
+    summary?: string;
+    statusTerms?: string[];
+    tags?: string[];
+    refs?: string[];
+    facets?: unknown;
+  };
+  if (!row.id || !row.title || !row.summary) return undefined;
+  const status = (row.statusTerms ?? []).join(", ");
+  const facets = readFacets(row.facets);
+  return {
+    id: row.id,
+    title: row.title,
+    kind: "ops",
+    text: status ? `${row.summary} Status terms: ${status}.` : row.summary,
+    tags: [
+      ...(row.tags ?? []),
+      ...(row.statusTerms ?? []),
+      ...facetTags(facets),
+    ],
+    refs: row.refs ?? [],
+    facets,
+  };
+}
+
 /** Build LocalDoc index from a context pack's knowledge fixtures. */
 export function loadPackDocs(
   packId: string,
@@ -130,86 +209,18 @@ export function loadPackDocs(
 ): LocalDoc[] {
   const dir = packDir(contentRoot, packId);
   const docs: LocalDoc[] = [];
-
   for (const item of readJsonArray(path.join(dir, "glossary.json"))) {
-    const row = item as {
-      id?: string;
-      term?: string;
-      definition?: string;
-      relatedAssetIds?: string[];
-      tags?: string[];
-      source?: string;
-      facets?: unknown;
-    };
-    if (!row.id || !row.term || !row.definition) continue;
-    const facets = readFacets(row.facets);
-    docs.push({
-      id: row.id,
-      title: row.term,
-      kind: "glossary",
-      text: row.definition,
-      tags: [
-        "glossary",
-        ...(row.tags ?? []),
-        ...row.term.toLowerCase().split(/\s+/).slice(0, 4),
-        ...facetTags(facets),
-      ],
-      refs: row.relatedAssetIds ?? [],
-      source: row.source,
-      facets,
-    });
+    const doc = docFromGlossary(item);
+    if (doc) docs.push(doc);
   }
-
   for (const item of readJsonArray(path.join(dir, "narrative.json"))) {
-    const row = item as {
-      id?: string;
-      title?: string;
-      summary?: string;
-      tags?: string[];
-      refs?: string[];
-      facets?: unknown;
-    };
-    if (!row.id || !row.title || !row.summary) continue;
-    const facets = readFacets(row.facets);
-    docs.push({
-      id: row.id,
-      title: row.title,
-      kind: "narrative",
-      text: row.summary,
-      tags: [...(row.tags ?? ["narrative"]), ...facetTags(facets)],
-      refs: row.refs ?? [],
-      facets,
-    });
+    const doc = docFromNarrative(item);
+    if (doc) docs.push(doc);
   }
-
   for (const item of readJsonArray(path.join(dir, "ops.json"))) {
-    const row = item as {
-      id?: string;
-      title?: string;
-      summary?: string;
-      statusTerms?: string[];
-      tags?: string[];
-      refs?: string[];
-      facets?: unknown;
-    };
-    if (!row.id || !row.title || !row.summary) continue;
-    const status = (row.statusTerms ?? []).join(", ");
-    const facets = readFacets(row.facets);
-    docs.push({
-      id: row.id,
-      title: row.title,
-      kind: "ops",
-      text: status ? `${row.summary} Status terms: ${status}.` : row.summary,
-      tags: [
-        ...(row.tags ?? []),
-        ...(row.statusTerms ?? []),
-        ...facetTags(facets),
-      ],
-      refs: row.refs ?? [],
-      facets,
-    });
+    const doc = docFromOps(item);
+    if (doc) docs.push(doc);
   }
-
   return docs;
 }
 
@@ -291,6 +302,91 @@ export function resolveRagCorpus(options: RetrieveLocalOptions = {}): {
   };
 }
 
+function docHaystack(doc: LocalDoc): { title: string; hay: string } {
+  const title = (doc.title ?? "").toLowerCase();
+  const facetHay = [
+    ...(doc.facets?.materials ?? []),
+    ...(doc.facets?.techniques ?? []),
+    ...(doc.facets?.standards ?? []),
+    ...(doc.facets?.productTypes ?? []),
+    doc.facets?.classification ?? "",
+    doc.facets?.auctionEligible ? "auction" : "",
+  ]
+    .join(" ")
+    .toLowerCase();
+  const hay = [
+    title,
+    doc.text,
+    doc.tags.join(" "),
+    (doc.refs ?? []).join(" "),
+    facetHay,
+  ]
+    .join(" ")
+    .toLowerCase();
+  return { title, hay };
+}
+
+function scoreLexical(doc: LocalDoc, query: string, tokens: string[]): number {
+  const { title, hay } = docHaystack(doc);
+  let score = 0;
+  for (const t of tokens) {
+    if (t.length <= 1) continue;
+    if (hay.includes(t)) score += 2;
+  }
+  if (title && (query.includes(title) || title.includes(query))) score += 5;
+  for (const part of title
+    .split(/[\s()（）/,，]+/)
+    .filter((p) => p.length >= 2)) {
+    if (query.includes(part)) score += 4;
+  }
+  for (const tag of doc.tags) {
+    const t = tag.toLowerCase();
+    if (t.length >= 2 && query.includes(t)) score += 3;
+  }
+  return score;
+}
+
+function scoreFacets(
+  doc: LocalDoc,
+  inferred: ReturnType<typeof inferIndustryFacetsFromText>
+): number {
+  let score = 0;
+  if (inferred.standard) {
+    const standards = (doc.facets?.standards ?? []).map((s) => s.toLowerCase());
+    const std = inferred.standard.toLowerCase();
+    if (
+      standards.some((s) => s === std || s.includes(std) || std.includes(s))
+    ) {
+      score += 8;
+    }
+  }
+  if (
+    inferred.material &&
+    (doc.facets?.materials ?? []).includes(inferred.material)
+  ) {
+    score += 6;
+  }
+  if (
+    inferred.productType &&
+    (doc.facets?.productTypes ?? []).includes(inferred.productType)
+  ) {
+    score += 7;
+  }
+  if (inferred.auctionEligible && doc.facets?.auctionEligible) {
+    score += 8;
+  }
+  return score;
+}
+
+function scoreDoc(
+  doc: LocalDoc,
+  query: string,
+  tokens: string[],
+  inferred: ReturnType<typeof inferIndustryFacetsFromText>
+): number {
+  return scoreLexical(doc, query, tokens) + scoreFacets(doc, inferred);
+}
+
 export function retrieveLocal(
   query: string,
   options: RetrieveLocalOptions = {}
@@ -299,66 +395,10 @@ export function retrieveLocal(
   const q = query.toLowerCase();
   const tokens = q.split(/\s+/).filter((t) => t.length > 0);
   const inferred = inferIndustryFacetsFromText(query);
-  const scored = docs.map((doc) => {
-    const title = (doc.title ?? "").toLowerCase();
-    const facetHay = [
-      ...(doc.facets?.materials ?? []),
-      ...(doc.facets?.techniques ?? []),
-      ...(doc.facets?.standards ?? []),
-      ...(doc.facets?.productTypes ?? []),
-      doc.facets?.classification ?? "",
-      doc.facets?.auctionEligible ? "auction" : "",
-    ]
-      .join(" ")
-      .toLowerCase();
-    const hay =
-      `${title} ${doc.text} ${doc.tags.join(" ")} ${(doc.refs ?? []).join(" ")} ${facetHay}`.toLowerCase();
-    let score = 0;
-    for (const t of tokens) {
-      if (t.length <= 1) continue;
-      if (hay.includes(t)) score += 2;
-    }
-    if (title && (q.includes(title) || title.includes(q))) score += 5;
-    // CJK / compound queries: match title tokens and tags inside the full query
-    for (const part of title
-      .split(/[\s()（）/,，]+/)
-      .filter((p) => p.length >= 2)) {
-      if (q.includes(part)) score += 4;
-    }
-    for (const tag of doc.tags) {
-      const t = tag.toLowerCase();
-      if (t.length >= 2 && q.includes(t)) score += 3;
-    }
-    // Industry facet boost — prefer hallmark / material aligned docs
-    if (inferred.standard) {
-      const standards = (doc.facets?.standards ?? []).map((s) =>
-        s.toLowerCase()
-      );
-      const std = inferred.standard.toLowerCase();
-      if (
-        standards.some((s) => s === std || s.includes(std) || std.includes(s))
-      ) {
-        score += 8;
-      }
-    }
-    if (
-      inferred.material &&
-      (doc.facets?.materials ?? []).includes(inferred.material)
-    ) {
-      score += 6;
-    }
-    // Commerce facet boost — product type / auction eligibility
-    if (
-      inferred.productType &&
-      (doc.facets?.productTypes ?? []).includes(inferred.productType)
-    ) {
-      score += 7;
-    }
-    if (inferred.auctionEligible && doc.facets?.auctionEligible) {
-      score += 8;
-    }
-    return { doc, score };
-  });
+  const scored = docs.map((doc) => ({
+    doc,
+    score: scoreDoc(doc, q, tokens, inferred),
+  }));
   return scored
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)

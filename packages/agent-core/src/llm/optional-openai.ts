@@ -45,7 +45,8 @@ export async function tryOptionalLlmCompose(args: {
   const apiKey = readApiKey();
   if (!apiKey) return null;
 
-  const model = process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
+  const configuredModel = process.env.OPENAI_MODEL?.trim();
+  const model = configuredModel ? configuredModel : "gpt-4o-mini";
   const timeoutMs = args.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -67,12 +68,20 @@ export async function tryOptionalLlmCompose(args: {
         messages: [
           {
             role: "system",
-            content:
-              "You are a catalog assistant for a public demo portal. Answer ONLY using the retrieved snippets. Do not invent assets, owners, or PII. Keep answers under 120 words. Prefer conclusion → sources → next steps. If snippets are insufficient, say so briefly and suggest catalog/metadata search.",
+            content: [
+              "You are a catalog assistant for a public demo portal.",
+              "Answer ONLY using the retrieved snippets.",
+              "Do not invent assets, owners, or PII. Keep answers under 120 words.",
+              "Prefer conclusion → sources → next steps.",
+              "If snippets are insufficient, say so briefly and suggest catalog/metadata search.",
+            ].join(" "),
           },
           {
             role: "user",
-            content: `Question:\n${args.query}\n\nRetrieved snippets:\n${buildContextBlock(args.hits)}`,
+            content: [
+              `Question:\n${args.query}`,
+              `Retrieved snippets:\n${buildContextBlock(args.hits)}`,
+            ].join("\n\n"),
           },
         ],
       }),

@@ -29,60 +29,27 @@ function parseOptionalEnum<T extends string>(
   return { ok: true, value: parsed.data };
 }
 
-export function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
+function invalid(message: string, status = 400) {
+  return { ok: false as const, response: json({ error: message }, { status }) };
+}
 
-  const kind = parseOptionalEnum(
-    url.searchParams.get("kind"),
-    knowledgeChunkKindSchema
-  );
-  if (!kind.ok) {
-    return json(
-      { error: "Invalid kind; use glossary|narrative|ops" },
-      { status: 400 }
-    );
-  }
+function parseEnumOrInvalid<T extends string>(
+  raw: string | null,
+  schema: { safeParse: (v: unknown) => { success: boolean; data?: T } },
+  error: string
+) {
+  const parsed = parseOptionalEnum(raw, schema);
+  if (!parsed.ok) return invalid(error);
+  return { ok: true as const, value: parsed.value };
+}
 
-  const material = parseOptionalEnum(
-    url.searchParams.get("material"),
-    knowledgeMaterialSchema
-  );
-  if (!material.ok) {
-    return json({ error: "Invalid material facet" }, { status: 400 });
-  }
-
-  const technique = parseOptionalEnum(
-    url.searchParams.get("technique"),
-    knowledgeTechniqueSchema
-  );
-  if (!technique.ok) {
-    return json({ error: "Invalid technique facet" }, { status: 400 });
-  }
-
-  const classification = parseOptionalEnum(
-    url.searchParams.get("classification"),
-    knowledgeClassificationSchema
-  );
-  if (!classification.ok) {
-    return json({ error: "Invalid classification facet" }, { status: 400 });
-  }
-
+function parseStandardAuctionPack(url: URL) {
   const standardRaw = url.searchParams.get("standard");
   let standard: string | undefined;
   if (standardRaw) {
     const std = knowledgeIndustryStandardCodeSchema.safeParse(standardRaw);
-    if (!std.success) {
-      return json({ error: "Invalid industry standard code" }, { status: 400 });
-    }
+    if (!std.success) return invalid("Invalid industry standard code");
     standard = std.data;
-  }
-
-  const productType = parseOptionalEnum(
-    url.searchParams.get("productType"),
-    knowledgeProductTypeSchema
-  );
-  if (!productType.ok) {
-    return json({ error: "Invalid productType facet" }, { status: 400 });
   }
 
   const auctionEligibleRaw = url.searchParams.get("auctionEligible");
@@ -90,37 +57,85 @@ export function loader({ request }: LoaderFunctionArgs) {
     auctionEligibleRaw !== null &&
     !["true", "false", "1", "0"].includes(auctionEligibleRaw)
   ) {
-    return json(
-      { error: "Invalid auctionEligible; use true|false" },
-      { status: 400 }
-    );
+    return invalid("Invalid auctionEligible; use true|false");
   }
 
   const packRaw = url.searchParams.get("pack");
   if (packRaw && !sanitizePackId(packRaw)) {
-    return json({ error: "Invalid pack id" }, { status: 400 });
+    return invalid("Invalid pack id");
   }
+
+  return {
+    ok: true as const,
+    standard,
+    auctionEligibleRaw,
+    packRaw,
+  };
+}
+
+function parseKnowledgeSearchParams(url: URL) {
+  const kind = parseEnumOrInvalid(
+    url.searchParams.get("kind"),
+    knowledgeChunkKindSchema,
+    "Invalid kind; use glossary|narrative|ops"
+  );
+  if (!kind.ok) return kind;
+
+  const material = parseEnumOrInvalid(
+    url.searchParams.get("material"),
+    knowledgeMaterialSchema,
+    "Invalid material facet"
+  );
+  if (!material.ok) return material;
+
+  const technique = parseEnumOrInvalid(
+    url.searchParams.get("technique"),
+    knowledgeTechniqueSchema,
+    "Invalid technique facet"
+  );
+  if (!technique.ok) return technique;
+
+  const classification = parseEnumOrInvalid(
+    url.searchParams.get("classification"),
+    knowledgeClassificationSchema,
+    "Invalid classification facet"
+  );
+  if (!classification.ok) return classification;
+
+  const productType = parseEnumOrInvalid(
+    url.searchParams.get("productType"),
+    knowledgeProductTypeSchema,
+    "Invalid productType facet"
+  );
+  if (!productType.ok) return productType;
+
+  const extra = parseStandardAuctionPack(url);
+  if (!extra.ok) return extra;
 
   const parsed = knowledgeSearchQuerySchema.safeParse({
     q: url.searchParams.get("q") ?? "",
-    pack: sanitizePackId(packRaw) ?? undefined,
+    pack: sanitizePackId(extra.packRaw) ?? undefined,
     kind: kind.value,
     material: material.value,
     technique: technique.value,
     region: url.searchParams.get("region") ?? undefined,
     classification: classification.value,
-    standard,
+    standard: extra.standard,
     productType: productType.value,
-    auctionEligible: auctionEligibleRaw ?? undefined,
+    auctionEligible: extra.auctionEligibleRaw ?? undefined,
     limit: url.searchParams.get("limit") ?? undefined,
   });
 
-  if (!parsed.success) {
-    return json({ error: "Invalid query" }, { status: 400 });
-  }
+  if (!parsed.success) return invalid("Invalid query");
+  return { ok: true as const, data: parsed.data };
+}
+
+export function loader({ request }: LoaderFunctionArgs) {
+  const parsedParams = parseKnowledgeSearchParams(new URL(request.url));
+  if (!parsedParams.ok) return parsedParams.response;
 
   const packId =
-    parsed.data.pack ??
+    parsedParams.data.pack ??
     resolveActivePackId({
       packQuery: null,
       cookieHeader: request.headers.get("Cookie"),
@@ -130,17 +145,17 @@ export function loader({ request }: LoaderFunctionArgs) {
 
   try {
     const body = searchKnowledge({
-      q: parsed.data.q,
+      q: parsedParams.data.q,
       packId,
-      kind: parsed.data.kind,
-      material: parsed.data.material,
-      technique: parsed.data.technique,
-      region: parsed.data.region,
-      classification: parsed.data.classification,
-      standard: parsed.data.standard,
-      productType: parsed.data.productType,
-      auctionEligible: parsed.data.auctionEligible,
-      limit: parsed.data.limit,
+      kind: parsedParams.data.kind,
+      material: parsedParams.data.material,
+      technique: parsedParams.data.technique,
+      region: parsedParams.data.region,
+      classification: parsedParams.data.classification,
+      standard: parsedParams.data.standard,
+      productType: parsedParams.data.productType,
+      auctionEligible: parsedParams.data.auctionEligible,
+      limit: parsedParams.data.limit,
     });
     return json(body);
   } catch {

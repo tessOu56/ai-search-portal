@@ -71,13 +71,21 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
   if (topic === "pii") {
     return {
       summary: "Synthetic fixture：PII／權限題。展示資料為假資料，非真實個資。",
-      answer:
-        "依合成目錄，含 PII 標籤的示範資產包括 dim_customer_profile 與相關 marketing 用途資料表。分析師角色通常需要 owner 核准；這不是真實授權——請用 Access request 流程（Demo role switcher）體驗 HITL，再從 References 進入 metadata 詳情。",
+      answer: [
+        "依合成目錄，含 PII 標籤的示範資產包括 dim_customer_profile 與相關 marketing 用途資料表。",
+        "分析師角色通常需要 owner 核准；這不是真實授權——請用 Access request 流程",
+        "（Demo role switcher）體驗 HITL，再從 References 進入 metadata 詳情。",
+      ].join(""),
       confidence: 0.86,
       sources: [
         {
           title: "dim_customer_profile (synthetic)",
-          url: `/metadata/${encodeURIComponent("dim_customer_profile")}?pack=${encodeURIComponent(packId)}`,
+          url: [
+            "/metadata/",
+            encodeURIComponent("dim_customer_profile"),
+            "?pack=",
+            encodeURIComponent(packId),
+          ].join(""),
         },
         ...continueSources,
         ...synth,
@@ -94,8 +102,11 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
     return {
       summary:
         "Synthetic fixture：customer_profile 上游血緣示範（非生產譜系）。",
-      answer:
-        "依合成 metadata pack，customer_profile／dim_customer_profile 的上游通常來自 staging 訂單與身分維度表。請從 References 進入 metadata 詳情看 Lineage DAG；若出現環則會顯示警告。此為 showcase 合成資料。",
+      answer: [
+        "依合成 metadata pack，customer_profile／dim_customer_profile 的上游通常來自",
+        " staging 訂單與身分維度表。請從 References 進入 metadata 詳情看 Lineage DAG；",
+        "若出現環則會顯示警告。此為 showcase 合成資料。",
+      ].join(""),
       confidence: 0.84,
       sources: [
         {
@@ -126,8 +137,11 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
   if (topic === "orders") {
     return {
       summary: "Synthetic fixture：orders 相關 API／資料集示範。",
-      answer:
-        "依合成目錄，orders 相關資產涵蓋訂單 API、事實表與金流狀態欄位。建議先用 catalog 篩選 API／Dictionary，再從 metadata 對照契約欄位。References 已帶入 deep link。",
+      answer: [
+        "依合成目錄，orders 相關資產涵蓋訂單 API、事實表與金流狀態欄位。",
+        "建議先用 catalog 篩選 API／Dictionary，再從 metadata 對照契約欄位。",
+        "References 已帶入 deep link。",
+      ].join(""),
       confidence: 0.82,
       sources: [
         {
@@ -154,8 +168,11 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
 
   return {
     summary: `已理解你的問題：「${query}」（Offline fixture／合成資料）。`,
-    answer:
-      "目前知識庫沒有直接命中。建議先釐清範圍，再從 catalog 與 metadata 交叉驗證；下方 References 已帶入搜尋 deep link。此為 public showcase——回覆為合成 fixture，不是企業級授權答案。",
+    answer: [
+      "目前知識庫沒有直接命中。建議先釐清範圍，再從 catalog 與 metadata 交叉驗證；",
+      "下方 References 已帶入搜尋 deep link。此為 public showcase——回覆為合成 fixture，",
+      "不是企業級授權答案。",
+    ].join(""),
     confidence: 0.72,
     sources: [...continueSources, ...synth].filter(
       (s, i, arr) => arr.findIndex((x) => x.url === s.url) === i
@@ -168,64 +185,71 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
   };
 }
 
+function buildGroundedLuiResponse(
+  query: string,
+  hits: LocalDoc[],
+  packId: string
+): LuiResponse {
+  const top = hits[0];
+  const extraTitles = hits
+    .slice(1)
+    .map((h) => h.title ?? h.id)
+    .join("、");
+  const groundedAnswer = [
+    `依領域知識（${top.kind ?? "doc"}），關於「${query}」：`,
+    top.text,
+    hits.length > 1 ? `另可參考：${extraTitles}。` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const hitSources: LuiSource[] = hits.map((hit) => ({
+    title: hit.title ?? hit.id,
+    url: buildKnowledgeSourceUrl(hit, packId),
+    source: hit.source,
+  }));
+  const continueSources = buildKnowledgeContinueSources(query, top, packId);
+  const sources = [...hitSources, ...continueSources].filter(
+    (s, i, arr) => arr.findIndex((x) => x.url === s.url) === i
+  );
+
+  const standard = top.facets?.standards?.[0];
+  const material = top.facets?.materials?.[0];
+  const productType = top.facets?.productTypes?.[0];
+  const auctionEligible = top.facets?.auctionEligible === true;
+  let nextStep = "開啟來源連結核對 glossary／敘事細節";
+  if (productType) {
+    nextStep = `在 catalog 以產品類型 ${productType} 繼續篩選`;
+  } else if (auctionEligible) {
+    nextStep = "在 catalog 篩選可拍賣／孤品知識與作品";
+  } else if (standard) {
+    nextStep = `在 catalog 以印記 ${standard} 繼續篩選相關知識與資產`;
+  } else if (material) {
+    nextStep = `在 catalog 以材質 ${material} 繼續篩選`;
+  }
+
+  return {
+    summary: `已依 ${packId} 知識庫檢索「${query}」，找到 ${hits.length} 筆相關依據。`,
+    answer: groundedAnswer,
+    confidence: Math.min(0.92, 0.7 + hits.length * 0.05),
+    sources,
+    nextSteps: [
+      nextStep,
+      "需要實體商品／工作室時，從來源 refs 進入 metadata 或 Plinth Discover",
+      "若涉及權限或拍賣狀態，對照 ops 狀態機 stub",
+    ],
+  };
+}
+
 export function buildLuiResponse(
   query: string,
   options: BuildLuiOptions = {}
 ): LuiResponse {
   const hits = options.ragHits ?? [];
   const packId = options.packId ?? "metalcraft-studio";
-
   if (hits.length > 0) {
-    const top = hits[0];
-    const groundedAnswer = [
-      `依領域知識（${top.kind ?? "doc"}），關於「${query}」：`,
-      top.text,
-      hits.length > 1
-        ? `另可參考：${hits
-            .slice(1)
-            .map((h) => h.title ?? h.id)
-            .join("、")}。`
-        : "",
-    ]
-      .filter(Boolean)
-      .join(" ");
-
-    const hitSources: LuiSource[] = hits.map((hit) => ({
-      title: hit.title ?? hit.id,
-      url: buildKnowledgeSourceUrl(hit, packId),
-      source: hit.source,
-    }));
-    const continueSources = buildKnowledgeContinueSources(query, top, packId);
-    const sources = [...hitSources, ...continueSources].filter(
-      (s, i, arr) => arr.findIndex((x) => x.url === s.url) === i
-    );
-
-    const standard = top.facets?.standards?.[0];
-    const material = top.facets?.materials?.[0];
-    const productType = top.facets?.productTypes?.[0];
-    const auctionEligible = top.facets?.auctionEligible === true;
-
-    return {
-      summary: `已依 ${packId} 知識庫檢索「${query}」，找到 ${hits.length} 筆相關依據。`,
-      answer: groundedAnswer,
-      confidence: Math.min(0.92, 0.7 + hits.length * 0.05),
-      sources,
-      nextSteps: [
-        productType
-          ? `在 catalog 以產品類型 ${productType} 繼續篩選`
-          : auctionEligible
-            ? "在 catalog 篩選可拍賣／孤品知識與作品"
-            : standard
-              ? `在 catalog 以印記 ${standard} 繼續篩選相關知識與資產`
-              : material
-                ? `在 catalog 以材質 ${material} 繼續篩選`
-                : "開啟來源連結核對 glossary／敘事細節",
-        "需要實體商品／工作室時，從來源 refs 進入 metadata 或 Plinth Discover",
-        "若涉及權限或拍賣狀態，對照 ops 狀態機 stub",
-      ],
-    };
+    return buildGroundedLuiResponse(query, hits, packId);
   }
-
   return buildQueryAwareFixture(query, packId);
 }
 

@@ -170,6 +170,31 @@ export function listIndustryStandards(
   return INDUSTRY_STANDARD_REGISTRY.filter((e) => e.family === family);
 }
 
+function inferMaterialFromHay(hay: string): KnowledgeMaterial | undefined {
+  if (/sterling|925\s*銀|純銀/.test(hay)) return "sterling_silver";
+  if (/\bgold\b|黃金|純金/.test(hay)) return "gold";
+  if (/\bcopper\b|黃銅|紅銅|銅/.test(hay) && !/bronze|青銅/.test(hay)) {
+    return "copper";
+  }
+  if (/bronze|青銅/.test(hay)) return "bronze";
+  return undefined;
+}
+
+function inferProductTypeFromHay(
+  hay: string
+): KnowledgeProductType | undefined {
+  if (/場地.?租|台租|venue_?rental|半日台|鍛造台租/.test(hay)) {
+    return "venue_rental";
+  }
+  if (/體驗課|體驗產品|入門體驗|鍛造體驗|\bexperience\b/.test(hay)) {
+    return "experience";
+  }
+  if (/銀板|材料包|原材料|材料產品/.test(hay)) return "material";
+  if (/鎚組|工具組|平鎚|台座鎚|\btool\b/.test(hay)) return "tool";
+  if (/實體作品|實體商品|孤品|\bphysical\b|手鐲/.test(hay)) return "physical";
+  return undefined;
+}
+
 /**
  * Infer material / standard / commerce facets from free text (chat query, search box).
  * Longer alias tokens win to avoid "9" matching inside "925".
@@ -209,33 +234,14 @@ export function inferIndustryFacetsFromText(text: string): {
     const best = candidates[0];
     standard = best.code;
     material = best.material;
-  } else if (/sterling|925\s*銀|純銀/.test(hay)) {
-    material = "sterling_silver";
-  } else if (/\bgold\b|黃金|純金/.test(hay)) {
-    material = "gold";
-  } else if (/\bcopper\b|黃銅|紅銅|銅/.test(hay) && !/bronze|青銅/.test(hay)) {
-    material = "copper";
-  } else if (/bronze|青銅/.test(hay)) {
-    material = "bronze";
+  } else {
+    material = inferMaterialFromHay(hay);
   }
 
-  let productType: KnowledgeProductType | undefined;
-  if (/場地.?租|台租|venue_?rental|半日台|鍛造台租/.test(hay)) {
-    productType = "venue_rental";
-  } else if (/體驗課|體驗產品|入門體驗|鍛造體驗|\bexperience\b/.test(hay)) {
-    productType = "experience";
-  } else if (/銀板|材料包|原材料|材料產品/.test(hay)) {
-    productType = "material";
-  } else if (/鎚組|工具組|平鎚|台座鎚|\btool\b/.test(hay)) {
-    productType = "tool";
-  } else if (/實體作品|實體商品|孤品|\bphysical\b|手鐲/.test(hay)) {
-    productType = "physical";
-  }
-
-  let auctionEligible: boolean | undefined;
-  if (/孤品|拍賣|限時拍|可拍賣|auction/.test(hay)) {
-    auctionEligible = true;
-  }
+  const productType = inferProductTypeFromHay(hay);
+  const auctionEligible = /孤品|拍賣|限時拍|可拍賣|auction/.test(hay)
+    ? true
+    : undefined;
 
   const out: {
     material?: KnowledgeMaterial;
@@ -256,7 +262,13 @@ export const knowledgeIndustryStandardCodeSchema = z
   .refine((v) => normalizeIndustryStandard(v) !== undefined, {
     message: "Unknown industry standard code",
   })
-  .transform((v) => normalizeIndustryStandard(v)!);
+  .transform((v) => {
+    const code = normalizeIndustryStandard(v);
+    if (!code) {
+      throw new Error("Unknown industry standard code");
+    }
+    return code;
+  });
 
 export type KnowledgeIndustryStandardCode = z.infer<
   typeof knowledgeIndustryStandardCodeSchema

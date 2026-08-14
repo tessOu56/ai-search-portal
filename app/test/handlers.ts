@@ -48,11 +48,11 @@ function findItemIndex(itemId: string | readonly string[] | undefined): number {
 
 /** PUT/PATCH 共用更新邏輯：依 body 更新 item，回傳 200 或 404/400。 */
 async function handleItemUpdate(params: { itemId?: string }, request: Request) {
-  const index = findItemIndex(params.itemId);
-  if (index === -1) {
+  const itemId = params.itemId;
+  const item = itemsFixture.find((row) => row.id === itemId);
+  if (!item) {
     return HttpResponse.json({ error: ERROR_ITEM_NOT_FOUND }, { status: 404 });
   }
-  const item = itemsFixture[index];
   const raw = (await request.json()) as unknown;
   const parsed = updateItemRequestSchema.safeParse(raw);
   if (
@@ -73,8 +73,8 @@ async function handleItemUpdate(params: { itemId?: string }, request: Request) {
         : item.description,
     updatedAt: new Date().toISOString(),
   });
-  itemsFixture = itemsFixture.map((current, currentIndex) =>
-    currentIndex === index ? updated : current
+  itemsFixture = itemsFixture.map((current) =>
+    current.id === item.id ? updated : current
   );
   const body = getItemResponseSchema.parse({ data: updated });
   return HttpResponse.json(body);

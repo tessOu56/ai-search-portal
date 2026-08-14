@@ -90,6 +90,61 @@ function facetChipClass(active: boolean): string {
   }`;
 }
 
+function MetadataPagination({
+  pagination,
+  base,
+}: {
+  pagination: MetadataSearchViewModel["pagination"];
+  base: {
+    q: string;
+    type?: string;
+    pack: string;
+    intent?: MetadataSearchIntent;
+    material?: string;
+    standard?: string;
+    productType?: string;
+    auctionEligible?: boolean;
+  };
+}) {
+  if (pagination.totalPages <= 1) return null;
+  return (
+    <nav
+      className="flex items-center justify-between gap-2"
+      aria-label="Results pagination"
+    >
+      {pagination.page > 1 ? (
+        <Link
+          to={buildMetadataSearchUrl({
+            ...base,
+            page: pagination.page - 1,
+          })}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          Previous
+        </Link>
+      ) : (
+        <span className="text-sm text-muted-foreground">Previous</span>
+      )}
+      <span className="text-xs text-muted-foreground">
+        Page {pagination.page} of {pagination.totalPages}
+      </span>
+      {pagination.page < pagination.totalPages ? (
+        <Link
+          to={buildMetadataSearchUrl({
+            ...base,
+            page: pagination.page + 1,
+          })}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          Next
+        </Link>
+      ) : (
+        <span className="text-sm text-muted-foreground">Next</span>
+      )}
+    </nav>
+  );
+}
+
 export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
   const { pagination } = model;
   const base = {
@@ -422,7 +477,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         emptyMessage="No assets match your filters."
         emptyAction={
           <div className="flex flex-col items-center gap-2 sm:flex-row">
-            {model.activeMaterial || model.activeStandard ? (
+            {Boolean(model.activeMaterial) || Boolean(model.activeStandard) ? (
               <Link
                 to={buildMetadataSearchUrl({
                   q: model.query,
@@ -449,44 +504,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
             </Link>
           </div>
         }
-        pagination={
-          pagination.totalPages > 1 ? (
-            <nav
-              className="flex items-center justify-between gap-2"
-              aria-label="Results pagination"
-            >
-              {pagination.page > 1 ? (
-                <Link
-                  to={buildMetadataSearchUrl({
-                    ...base,
-                    page: pagination.page - 1,
-                  })}
-                  className="text-sm font-medium text-primary hover:underline"
-                >
-                  Previous
-                </Link>
-              ) : (
-                <span className="text-sm text-muted-foreground">Previous</span>
-              )}
-              <span className="text-xs text-muted-foreground">
-                Page {pagination.page} of {pagination.totalPages}
-              </span>
-              {pagination.page < pagination.totalPages ? (
-                <Link
-                  to={buildMetadataSearchUrl({
-                    ...base,
-                    page: pagination.page + 1,
-                  })}
-                  className="text-sm font-medium text-primary hover:underline"
-                >
-                  Next
-                </Link>
-              ) : (
-                <span className="text-sm text-muted-foreground">Next</span>
-              )}
-            </nav>
-          ) : null
-        }
+        pagination={<MetadataPagination pagination={pagination} base={base} />}
       >
         <div className="overflow-x-auto">
           <div className="grid min-w-[40rem] grid-cols-[1fr_1fr_2fr_auto] bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">

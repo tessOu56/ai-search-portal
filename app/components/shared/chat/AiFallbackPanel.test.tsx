@@ -28,13 +28,13 @@ vi.mock("~/shared/i18n/context", () => ({
       if (key === "chat.fallback.metadata.query" && params?.query) {
         return `Search metadata for “${params.query}”`;
       }
-      const labels: Record<string, string> = {
-        "chat.fallback.title": "AI is unavailable — continue manually",
-        "chat.fallback.description": "Your input is preserved.",
-        "chat.fallback.action": "Open catalog search",
-        "chat.fallback.metadata": "Browse metadata catalog",
-      };
-      return labels[key] ?? key;
+      const labels = new Map<string, string>([
+        ["chat.fallback.title", "AI is unavailable — continue manually"],
+        ["chat.fallback.description", "Your input is preserved."],
+        ["chat.fallback.action", "Open catalog search"],
+        ["chat.fallback.metadata", "Browse metadata catalog"],
+      ]);
+      return labels.get(key) ?? key;
     },
   }),
 }));

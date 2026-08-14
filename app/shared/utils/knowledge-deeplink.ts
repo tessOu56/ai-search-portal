@@ -43,7 +43,12 @@ export function buildKnowledgeChunkHref(
   const material = chunk.facets?.materials?.[0];
   const productType = chunk.facets?.productTypes?.[0];
   const auctionEligible = chunk.facets?.auctionEligible === true;
-  if (standard || material || productType || auctionEligible) {
+  if (
+    Boolean(standard) ||
+    Boolean(material) ||
+    Boolean(productType) ||
+    Boolean(auctionEligible)
+  ) {
     return buildCatalogSearchUrl({
       q: chunk.title,
       material,

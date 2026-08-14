@@ -230,6 +230,58 @@ export function collectKnowledgeFacets(chunks: KnowledgeChunkContract[]) {
   };
 }
 
+function scoreTokenHits(tokens: string[], hay: string): number {
+  let score = 0;
+  for (const t of tokens) {
+    if (hay.includes(t)) score += t.length > 1 ? 2 : 1;
+  }
+  return score;
+}
+
+function scoreTitleTagHits(
+  query: string,
+  title: string,
+  tags: string[],
+  standards: string[]
+): number {
+  let score = 0;
+  if (title.includes(query) || query.includes(title)) score += 5;
+  for (const part of title
+    .split(/[\s()（）/,，]+/)
+    .filter((p) => p.length >= 2)) {
+    if (query.includes(part)) score += 4;
+  }
+  for (const tag of tags) {
+    const t = tag.toLowerCase();
+    if (t.length >= 2 && query.includes(t)) score += 3;
+  }
+  for (const std of standards) {
+    if (query.includes(std.toLowerCase())) score += 4;
+  }
+  return score;
+}
+
+function scoreKnowledgeChunk(
+  query: string,
+  tokens: string[],
+  chunk: KnowledgeChunkContract
+): number {
+  const title = chunk.title.toLowerCase();
+  const hay = [
+    title,
+    chunk.text,
+    chunk.tags.join(" "),
+    chunk.refs.join(" "),
+    facetHaystack(chunk.facets),
+  ]
+    .join(" ")
+    .toLowerCase();
+  return (
+    scoreTokenHits(tokens, hay) +
+    scoreTitleTagHits(query, title, chunk.tags, chunk.facets.standards)
+  );
+}
+
 export function scoreKnowledgeChunks(
   query: string,
   chunks: KnowledgeChunkContract[],
@@ -239,29 +291,10 @@ export function scoreKnowledgeChunks(
   if (!q) return chunks.slice(0, limit);
 
   const tokens = q.split(/\s+/).filter((t) => t.length > 0);
-  const scored = chunks.map((chunk) => {
-    const title = chunk.title.toLowerCase();
-    const hay =
-      `${title} ${chunk.text} ${chunk.tags.join(" ")} ${chunk.refs.join(" ")} ${facetHaystack(chunk.facets)}`.toLowerCase();
-    let score = 0;
-    for (const t of tokens) {
-      if (hay.includes(t)) score += t.length > 1 ? 2 : 1;
-    }
-    if (title.includes(q) || q.includes(title)) score += 5;
-    for (const part of title
-      .split(/[\s()（）/,，]+/)
-      .filter((p) => p.length >= 2)) {
-      if (q.includes(part)) score += 4;
-    }
-    for (const tag of chunk.tags) {
-      const t = tag.toLowerCase();
-      if (t.length >= 2 && q.includes(t)) score += 3;
-    }
-    for (const std of chunk.facets.standards) {
-      if (q.includes(std.toLowerCase())) score += 4;
-    }
-    return { chunk, score };
-  });
+  const scored = chunks.map((chunk) => ({
+    chunk,
+    score: scoreKnowledgeChunk(q, tokens, chunk),
+  }));
 
   return scored
     .filter((s) => s.score > 0)

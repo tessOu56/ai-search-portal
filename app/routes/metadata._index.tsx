@@ -53,10 +53,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     page: Number.isFinite(page) ? page : 1,
     packId,
   });
+  const trimmedQuery = query.trim();
   const knowledgeHits =
-    material || standard || productType || auctionEligible
+    Boolean(material) ||
+    Boolean(standard) ||
+    Boolean(productType) ||
+    Boolean(auctionEligible)
       ? searchKnowledge({
-          q: query.trim() || undefined,
+          q: trimmedQuery ? trimmedQuery : undefined,
           packId,
           material: material as KnowledgeMaterial | undefined,
           standard,
@@ -80,7 +84,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     locale: ogLocale,
     structuredData,
     model: {
-      query: query.trim(),
+      query: trimmedQuery,
       activeType: type,
       activePackId: packId,
       intent,

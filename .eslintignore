@@ -7,4 +7,5 @@ dist/
 *.min.js
 *.min.css
 *.d.ts
+packages/shared-contracts/src/generated/
 

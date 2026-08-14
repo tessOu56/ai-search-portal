@@ -100,7 +100,12 @@ export function buildKnowledgeSourceUrl(
     return `/metadata/${encodeURIComponent(metaRef)}?pack=${encodeURIComponent(packId)}`;
   }
 
-  if (standard || material || productType || auctionEligible) {
+  if (
+    Boolean(standard) ||
+    Boolean(material) ||
+    Boolean(productType) ||
+    Boolean(auctionEligible)
+  ) {
     return buildCatalogFacetUrl({
       q: title,
       material,

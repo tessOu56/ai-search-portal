@@ -45,10 +45,12 @@ export const GOVERNED_TOOL_REGISTRY: Record<
   AgentGovernedToolName,
   ToolContractDefinition
 > = {
+  // eslint-disable-next-line security/detect-object-injection -- allowlist key
   [TOOL_DRAFT]: defineToolContract(AGENT_GOVERNED_TOOL_METADATA[TOOL_DRAFT], {
     input: toolAccessRequestDraftInputSchema,
     output: toolAccessRequestDraftOutputSchema,
   }),
+  // eslint-disable-next-line security/detect-object-injection -- allowlist key
   [TOOL_SUBMIT]: defineToolContract(AGENT_GOVERNED_TOOL_METADATA[TOOL_SUBMIT], {
     input: toolAccessRequestSubmitInputSchema,
     output: toolAccessRequestSubmitOutputSchema,
@@ -85,7 +87,9 @@ export const TOOL_REGISTRY: Record<AllowedToolName, ToolContractDefinition> = {
     input: toolRagSearchInputSchema,
     output: toolRagSearchOutputSchema,
   }),
+  // eslint-disable-next-line security/detect-object-injection -- allowlist key
   [TOOL_DRAFT]: GOVERNED_TOOL_REGISTRY[TOOL_DRAFT],
+  // eslint-disable-next-line security/detect-object-injection -- allowlist key
   [TOOL_SUBMIT]: GOVERNED_TOOL_REGISTRY[TOOL_SUBMIT],
 };
 

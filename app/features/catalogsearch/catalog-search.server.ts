@@ -76,6 +76,25 @@ function filterPlaceholderRows(
   return rows;
 }
 
+function blankToUndefined(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+function hasActiveFacet(
+  material?: string,
+  standard?: string,
+  productType?: string,
+  auctionEligible?: boolean
+): boolean {
+  return (
+    Boolean(material) ||
+    Boolean(standard) ||
+    Boolean(productType) ||
+    Boolean(auctionEligible)
+  );
+}
+
 function paginateRows<T>(
   rows: T[],
   page: number
@@ -155,9 +174,9 @@ export function getCatalogSearchViewModel(
 ): CatalogSearchViewModel {
   const trimmedQuery = query.trim();
   const typeFilter = params.type?.trim();
-  const material = params.material?.trim() || undefined;
-  const standard = params.standard?.trim() || undefined;
-  const productType = params.productType?.trim() || undefined;
+  const material = blankToUndefined(params.material);
+  const standard = blankToUndefined(params.standard);
+  const productType = blankToUndefined(params.productType);
   const auctionEligible = params.auctionEligible === true ? true : undefined;
   const page = Math.max(1, params.page ?? 1);
   const packId = params.packId ?? DEFAULT_CONTEXT_PACK_ID;
@@ -216,10 +235,14 @@ export function getCatalogSearchViewModel(
   }));
 
   // When industry/commerce facets are active, prefer knowledge + matching metadata only.
-  const catalogRows =
-    material || standard || productType || auctionEligible
-      ? []
-      : filterPlaceholderRows(trimmedQuery, typeFilter);
+  const catalogRows = hasActiveFacet(
+    material,
+    standard,
+    productType,
+    auctionEligible
+  )
+    ? []
+    : filterPlaceholderRows(trimmedQuery, typeFilter);
   const combined = [...knowledgeRows, ...metadataRows, ...catalogRows];
   const { results, pagination } = paginateRows(combined, page);
   const phase =
