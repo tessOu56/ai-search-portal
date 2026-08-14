@@ -37,7 +37,7 @@ flowchart LR
 - Locale: map portal `locale` → `recognition.lang` (`zh-TW`, `en-US`).
 - States (i18n keys `composer.voice.*`): idle · listening · unsupported · denied · error.
 - Phase 1 (this planning wave): document + ticket; mic may be stubbed disabled with tooltip.
-- Phase 2: wire recognition into shared `Composer` (`HomeAskPanel` / conversation); interim results optional.
+- Phase 2: wire recognition into `HomeAskPanel` / `ChatInterface` composer; interim results optional.
 - Privacy: browser may send audio to vendor cloud ASR — disclose in help / settings copy.
 - Out of Phase 2: TTS of assistant replies (Phase 3).
 
@@ -51,4 +51,4 @@ flowchart LR
 ## Related
 
 - [`docs/CAPABILITIES.md`](../CAPABILITIES.md)
-- Shared composer: `Composer` (landing typewriter + conversation bottom bar; arrow submit)
+- Home composer: `HomeAskPanel` (typewriter suggestions + arrow submit)

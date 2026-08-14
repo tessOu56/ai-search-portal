@@ -1,8 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { inferIndustryFacetsFromText } from "@ai-search-portal/contracts";
+import { Link } from "@remix-run/react";
+import {
+  type ChangeEvent,
+  type FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-import { AssistantTurn } from "~/components/shared/chat/AssistantTurn";
-import { Composer } from "~/components/shared/chat/Composer";
+import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { ChatBubble } from "~/components/shared/lui/ChatBubble";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/Alert";
+import { Badge } from "~/components/ui/Badge";
+import { Button } from "~/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { ScrollArea } from "~/components/ui/ScrollArea";
+import { Textarea } from "~/components/ui/Textarea";
 import { apiChatQuery } from "~/shared/api/paths";
 import {
   stableChatErrorSchema,
@@ -10,23 +23,27 @@ import {
   stableChatMetaSchema,
 } from "~/shared/contracts";
 import { useI18n } from "~/shared/i18n/context";
-
-type AssistantEvidence = {
-  summary?: string;
-  confidence?: number;
-  sources?: Array<{ title: string; url: string; source?: string }>;
-  nextSteps?: string[];
-  error?: string | null;
-};
+import {
+  buildCatalogSearchUrl,
+  buildMetadataSearchUrl,
+} from "~/shared/navigation";
 
 type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
-  query?: string;
-} & AssistantEvidence;
+};
 
-type AgentMode = "live_llm" | "offline_fixture";
+type LuiMeta = {
+  summary?: string;
+  confidence?: number;
+  agentMode?: "live_llm" | "offline_fixture";
+  sources?: Array<{ title: string; url: string; source?: string }>;
+  nextSteps?: string[];
+};
+
+const CHIP_CLASS =
+  "inline-flex h-auto min-h-8 max-w-full items-center whitespace-normal break-words rounded-full border border-border bg-background px-3 py-1.5 text-left text-xs font-medium";
 
 function parseStableMeta(data: string) {
   const parsed = stableChatMetaSchema.safeParse(JSON.parse(data) as unknown);
@@ -54,35 +71,29 @@ function parseStableFailure(data: string) {
 
 const KEY_SUMMARY_WAITING = "chat.summary.waiting";
 const KEY_CHAT_ERROR_PARSE = "chat.error.parse";
+const KEY_SOURCES_TITLE = "chat.sources.title";
+const SOURCE_LINK_CLASS =
+  "flex items-center gap-2 text-primary hover:underline";
 
 type ChatInterfaceProps = {
   pendingQuery?: string | null;
   onPendingQueryConsumed?: () => void;
-  onAgentModeChange?: (mode: AgentMode) => void;
 };
 
 export function ChatInterface({
   pendingQuery = null,
   onPendingQueryConsumed,
-  onAgentModeChange,
 }: ChatInterfaceProps) {
   const { t } = useI18n();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [meta, setMeta] = useState<LuiMeta>({});
+  const [error, setError] = useState<string | null>(null);
+  const [lastQuery, setLastQuery] = useState("");
   const lastAssistantId = useRef<string | null>(null);
   const streamRef = useRef<EventSource | null>(null);
   const submitQueryRef = useRef<(raw: string) => void>(() => undefined);
-  const logEndRef = useRef<HTMLDivElement>(null);
-  const onAgentModeChangeRef = useRef(onAgentModeChange);
-  onAgentModeChangeRef.current = onAgentModeChange;
-
-  const patchAssistant = (id: string, patch: Partial<Message>) => {
-    setMessages((prev) =>
-      prev.map((message) =>
-        message.id === id ? { ...message, ...patch } : message
-      )
-    );
-  };
 
   useEffect(() => {
     return () => {
@@ -90,14 +101,12 @@ export function ChatInterface({
     };
   }, []);
 
-  useEffect(() => {
-    logEndRef.current?.scrollIntoView({ block: "end" });
-  }, [messages, isStreaming]);
-
   const submitQuery = (raw: string) => {
     const query = raw.trim();
     if (!query || isStreaming) return;
 
+    setError(null);
+    setLastQuery(query);
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: "user",
@@ -107,33 +116,29 @@ export function ChatInterface({
       id: crypto.randomUUID(),
       role: "assistant",
       content: "",
-      query,
     };
     lastAssistantId.current = assistantMessage.id;
     setMessages((prev) => [...prev, userMessage, assistantMessage]);
+    setInput("");
+    setMeta({});
     setIsStreaming(true);
 
     const stream = new EventSource(apiChatQuery(query));
     streamRef.current = stream;
-    const assistantId = assistantMessage.id;
 
     stream.addEventListener("meta", (event) => {
       try {
         const messageEvent = event as MessageEvent<string>;
         const data = parseStableMeta(messageEvent.data);
         if (!data) return;
-        patchAssistant(assistantId, {
-          summary: data.summary,
-          confidence: data.confidence,
-        });
-        if (
-          data.agentMode === "live_llm" ||
-          data.agentMode === "offline_fixture"
-        ) {
-          onAgentModeChangeRef.current?.(data.agentMode);
-        }
+        setMeta((prev) => ({
+          ...prev,
+          summary: data.summary ?? prev.summary,
+          confidence: data.confidence ?? prev.confidence,
+          agentMode: data.agentMode ?? prev.agentMode,
+        }));
       } catch {
-        patchAssistant(assistantId, { error: t(KEY_CHAT_ERROR_PARSE) });
+        setError(t(KEY_CHAT_ERROR_PARSE));
       }
     });
 
@@ -142,7 +147,7 @@ export function ChatInterface({
       const token = messageEvent.data;
       setMessages((prev) =>
         prev.map((message) => {
-          if (message.id !== assistantId) return message;
+          if (message.id !== lastAssistantId.current) return message;
           const suffix = message.content ? " " : "";
           return {
             ...message,
@@ -157,12 +162,13 @@ export function ChatInterface({
         const messageEvent = event as MessageEvent<string>;
         const data = parseStableFinal(messageEvent.data);
         if (!data) return;
-        patchAssistant(assistantId, {
-          sources: data.sources,
-          nextSteps: data.nextSteps,
-        });
+        setMeta((prev) => ({
+          ...prev,
+          sources: data.sources ?? prev.sources,
+          nextSteps: data.nextSteps ?? prev.nextSteps,
+        }));
       } catch {
-        patchAssistant(assistantId, { error: t(KEY_CHAT_ERROR_PARSE) });
+        setError(t(KEY_CHAT_ERROR_PARSE));
       }
     });
 
@@ -170,11 +176,9 @@ export function ChatInterface({
       try {
         const messageEvent = event as MessageEvent<string>;
         const message = parseStableFailure(messageEvent.data);
-        patchAssistant(assistantId, {
-          error: message ?? t(KEY_CHAT_ERROR_PARSE),
-        });
+        setError(message ?? t(KEY_CHAT_ERROR_PARSE));
       } catch {
-        patchAssistant(assistantId, { error: t(KEY_CHAT_ERROR_PARSE) });
+        setError(t(KEY_CHAT_ERROR_PARSE));
       }
       setIsStreaming(false);
       stream.close();
@@ -187,7 +191,7 @@ export function ChatInterface({
 
     stream.onerror = () => {
       setIsStreaming(false);
-      patchAssistant(assistantId, { error: t("chat.error.connection") });
+      setError(t("chat.error.connection"));
       stream.close();
     };
   };
@@ -200,6 +204,17 @@ export function ChatInterface({
     onPendingQueryConsumed?.();
   }, [pendingQuery, onPendingQueryConsumed]);
 
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    submitQuery(input);
+  };
+
+  const goldenQuestions = [
+    t("chat.golden.q1"),
+    t("chat.golden.q2"),
+    t("chat.golden.q3"),
+  ];
+
   const liveAnnouncement = (() => {
     const last = messages[messages.length - 1];
     if (!last || last.role !== "assistant") return "";
@@ -208,55 +223,238 @@ export function ChatInterface({
     return isStreaming ? t(KEY_SUMMARY_WAITING) : "";
   })();
 
-  const lastAssistantIdValue = lastAssistantId.current;
-
   return (
-    <div
-      className="flex min-h-0 flex-1 flex-col"
-      data-testid="conversation-workspace"
-    >
-      <div className="sr-only" aria-live="polite" aria-atomic="false">
-        {liveAnnouncement}
-      </div>
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
-        <div
-          id="home-chat"
-          className="gap-space-24 py-space-24 mx-auto flex w-full max-w-3xl flex-col px-space-16"
-          role="log"
-          aria-relevant="additions"
-          aria-label={t("chat.history.title")}
-        >
-          {messages.map((message) =>
-            message.role === "user" ? (
-              <ChatBubble key={message.id} variant="user">
-                {message.content}
-              </ChatBubble>
-            ) : (
-              <AssistantTurn
-                key={message.id}
-                content={message.content}
-                isStreaming={isStreaming && message.id === lastAssistantIdValue}
-                summary={message.summary}
-                confidence={message.confidence}
-                sources={message.sources}
-                nextSteps={message.nextSteps}
-                query={message.query}
-                showContinue={
-                  !isStreaming && message.id === lastAssistantIdValue
-                }
-                error={message.error}
-              />
-            )
+    <div className="grid gap-6">
+      <Card>
+        <CardHeader className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge>{t("chat.badge.live")}</Badge>
+            <Badge variant="secondary">{t("chat.badge.sse")}</Badge>
+            <Badge variant="outline">
+              {meta.agentMode === "live_llm"
+                ? t("chat.badge.live_llm")
+                : t("chat.badge.offline_fixture")}
+            </Badge>
+          </div>
+          <CardTitle>{t("chat.title")}</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">
+              {t("chat.golden.label")}
+            </span>
+            {goldenQuestions.map((question) => (
+              <button
+                key={question}
+                type="button"
+                disabled={isStreaming}
+                onClick={() => submitQuery(question)}
+                className={`${CHIP_CLASS} hover:bg-muted disabled:opacity-50`}
+                data-testid="golden-question"
+              >
+                {question}
+              </button>
+            ))}
+          </div>
+          <form onSubmit={handleSubmit} className="grid gap-3">
+            <Textarea
+              value={input}
+              onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                setInput(event.target.value)
+              }
+              placeholder={t("chat.placeholder")}
+              disabled={isStreaming}
+              aria-label={t("chat.placeholder")}
+            />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-sm text-muted-foreground">
+                {t("chat.hint")}
+              </div>
+              <Button
+                type="submit"
+                size="lg"
+                variant="lui"
+                disabled={isStreaming || !input.trim()}
+                aria-busy={isStreaming}
+              >
+                {isStreaming ? t("chat.submitting") : t("chat.submit")}
+              </Button>
+            </div>
+          </form>
+
+          {error && (
+            <>
+              <Alert className="border-destructive/20 bg-destructive/5 text-destructive">
+                <AlertTitle>{t("chat.error.title")}</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+              <AiFallbackPanel query={lastQuery} />
+            </>
           )}
-          <div ref={logEndRef} />
-        </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle id="chat-history-heading">
+            {t("chat.history.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="sr-only" aria-live="polite" aria-atomic="false">
+            {liveAnnouncement}
+          </div>
+          <ScrollArea className="h-[320px] rounded-2xl border border-border px-4 py-3">
+            <div
+              className="space-y-4"
+              role="log"
+              aria-relevant="additions"
+              aria-labelledby="chat-history-heading"
+            >
+              {messages.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {t("chat.history.empty")}
+                </p>
+              )}
+              {messages.map((message) => (
+                <ChatBubble
+                  key={message.id}
+                  variant={message.role === "user" ? "user" : "assistant"}
+                >
+                  {message.content ||
+                    (message.role === "assistant" ? "..." : "")}
+                </ChatBubble>
+              ))}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("chat.summary.title")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <p>{meta.summary ?? t(KEY_SUMMARY_WAITING)}</p>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline">{t("chat.confidence")}</Badge>
+              <span>
+                {meta.confidence !== undefined
+                  ? `${Math.round(meta.confidence * 100)}%`
+                  : "—"}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("chat.next.title")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            {(meta.nextSteps ?? []).length === 0 && (
+              <p>{t(KEY_SUMMARY_WAITING)}</p>
+            )}
+            {(meta.nextSteps ?? []).map((step) => (
+              <div key={step} className="flex items-start gap-2">
+                <span className="mt-1 size-2 rounded-full bg-primary" />
+                <p>{step}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
-      <div className="bg-background/80 border-t border-border p-space-16 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-space-8">
-          <p className="text-type-12 text-muted-foreground">{t("chat.hint")}</p>
-          <Composer onSubmit={submitQuery} disabled={isStreaming} />
-        </div>
-      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t(KEY_SOURCES_TITLE)}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          {(meta.sources ?? []).length === 0 && <p>{t(KEY_SUMMARY_WAITING)}</p>}
+          {(meta.sources ?? []).map((source) => {
+            const internal = source.url.startsWith("/");
+            return (
+              <div key={source.url} className="space-y-0.5">
+                {internal ? (
+                  <Link
+                    to={source.url}
+                    className={SOURCE_LINK_CLASS}
+                    aria-label={`${source.title} (${t(KEY_SOURCES_TITLE)})`}
+                  >
+                    {source.title}
+                  </Link>
+                ) : (
+                  <a
+                    href={source.url}
+                    className={SOURCE_LINK_CLASS}
+                    rel="noreferrer"
+                    target="_blank"
+                    aria-label={`${source.title} (${t(KEY_SOURCES_TITLE)})`}
+                  >
+                    {source.title}
+                  </a>
+                )}
+                {source.source && (
+                  <p className="text-muted-foreground/80 pl-6 text-xs">
+                    {source.source}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+          {!isStreaming && !error && lastQuery.trim() ? (
+            <div
+              className="flex flex-wrap gap-2 border-t border-border pt-3"
+              data-testid="chat-continue-facets"
+            >
+              {(() => {
+                const inferred = inferIndustryFacetsFromText(lastQuery);
+                const facetLabel = [
+                  inferred.standard,
+                  inferred.productType,
+                  inferred.auctionEligible ? "auction" : undefined,
+                ]
+                  .filter(Boolean)
+                  .join(" · ");
+                return (
+                  <>
+                    <Link
+                      to={buildCatalogSearchUrl({
+                        q: lastQuery,
+                        material: inferred.material,
+                        standard: inferred.standard,
+                        productType: inferred.productType,
+                        auctionEligible: inferred.auctionEligible,
+                        intent: "manual",
+                      })}
+                      className={`${CHIP_CLASS} text-foreground hover:bg-muted`}
+                      data-testid="chat-continue-catalog"
+                    >
+                      {t("chat.continue.catalog")}
+                      {facetLabel ? ` · ${facetLabel}` : ""}
+                    </Link>
+                    <Link
+                      to={buildMetadataSearchUrl({
+                        q: lastQuery,
+                        material: inferred.material,
+                        standard: inferred.standard,
+                        productType: inferred.productType,
+                        auctionEligible: inferred.auctionEligible,
+                        intent: "manual",
+                      })}
+                      className={`${CHIP_CLASS} text-foreground hover:bg-muted`}
+                      data-testid="chat-continue-metadata"
+                    >
+                      {t("chat.continue.metadata")}
+                    </Link>
+                  </>
+                );
+              })()}
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
     </div>
   );
 }
