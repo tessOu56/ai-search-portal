@@ -488,32 +488,34 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
           ) : null
         }
       >
-        <div className="grid grid-cols-[1fr_1fr_2fr_auto] bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">
-          <span>Name</span>
-          <span>Owner</span>
-          <span>Description</span>
-          <span className="text-right">Type</span>
-        </div>
-        <div className="divide-y divide-border text-sm">
-          {model.results.map((row) => (
-            <Link
-              key={row.id}
-              to={`/metadata/${row.id}?pack=${encodeURIComponent(model.activePackId)}`}
-              className="hover:bg-muted/50 grid grid-cols-[1fr_1fr_2fr_auto] items-center gap-2 px-4 py-3"
-            >
-              <span className="font-medium text-primary">{row.name}</span>
-              <span className="text-muted-foreground">
-                {row.owner || "Unassigned"}
-              </span>
-              <span className="text-muted-foreground">{row.description}</span>
-              <Badge
-                variant="secondary"
-                className="justify-self-end rounded-full text-xs"
+        <div className="overflow-x-auto">
+          <div className="grid min-w-[40rem] grid-cols-[1fr_1fr_2fr_auto] bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">
+            <span>Name</span>
+            <span>Owner</span>
+            <span>Description</span>
+            <span className="text-right">Type</span>
+          </div>
+          <div className="min-w-[40rem] divide-y divide-border text-sm">
+            {model.results.map((row) => (
+              <Link
+                key={row.id}
+                to={`/metadata/${row.id}?pack=${encodeURIComponent(model.activePackId)}`}
+                className="hover:bg-muted/50 grid grid-cols-[1fr_1fr_2fr_auto] items-center gap-2 px-4 py-3"
               >
-                {row.assetType}
-              </Badge>
-            </Link>
-          ))}
+                <span className="font-medium text-primary">{row.name}</span>
+                <span className="text-muted-foreground">
+                  {row.owner || "Unassigned"}
+                </span>
+                <span className="text-muted-foreground">{row.description}</span>
+                <Badge
+                  variant="secondary"
+                  className="justify-self-end rounded-full text-xs"
+                >
+                  {row.assetType}
+                </Badge>
+              </Link>
+            ))}
+          </div>
         </div>
       </ProductResultsShell>
     </div>

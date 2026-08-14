@@ -530,83 +530,85 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
           ) : null
         }
       >
-        <div className="grid grid-cols-[1fr_2fr_auto_auto] bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">
-          <span>Name</span>
-          <span>Description</span>
-          <span className="text-right">Source</span>
-          <span className="text-right">Type</span>
-        </div>
-        <div className="divide-y divide-border text-sm">
-          {model.results
-            .filter((row) => row.source !== "knowledge")
-            .map((row) => (
-              <div
-                key={`${row.source}-${row.id}`}
-                className="grid grid-cols-[1fr_2fr_auto_auto] items-start gap-2 px-4 py-3"
-              >
-                <div className="space-y-1">
-                  {row.detailHref ? (
-                    <Link
-                      to={row.detailHref}
-                      className="font-medium text-primary hover:underline"
-                    >
-                      {row.name}
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-foreground">
-                      {row.name}
-                    </span>
-                  )}
-                  {row.facets &&
-                  (row.facets.standards.length > 0 ||
-                    row.facets.materials.length > 0) ? (
-                    <div className="flex flex-wrap gap-1">
-                      {row.facets.standards.map((code) => (
-                        <Link
-                          key={code}
-                          to={buildCatalogSearchUrl({
-                            ...base,
-                            standard: code,
-                            page: 1,
-                          })}
-                          className="inline-flex rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
-                        >
-                          {code}
-                        </Link>
-                      ))}
-                      {row.facets.materials.slice(0, 2).map((m) => (
-                        <Link
-                          key={m}
-                          to={buildCatalogSearchUrl({
-                            ...base,
-                            material: m,
-                            page: 1,
-                          })}
-                          className="border-border/60 inline-flex rounded border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
-                        >
-                          {m.replace(/_/g, " ")}
-                        </Link>
-                      ))}
-                    </div>
-                  ) : null}
+        <div className="overflow-x-auto">
+          <div className="grid min-w-[40rem] grid-cols-[1fr_2fr_auto_auto] bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">
+            <span>Name</span>
+            <span>Description</span>
+            <span className="text-right">Source</span>
+            <span className="text-right">Type</span>
+          </div>
+          <div className="min-w-[40rem] divide-y divide-border text-sm">
+            {model.results
+              .filter((row) => row.source !== "knowledge")
+              .map((row) => (
+                <div
+                  key={`${row.source}-${row.id}`}
+                  className="grid grid-cols-[1fr_2fr_auto_auto] items-start gap-2 px-4 py-3"
+                >
+                  <div className="space-y-1">
+                    {row.detailHref ? (
+                      <Link
+                        to={row.detailHref}
+                        className="font-medium text-primary hover:underline"
+                      >
+                        {row.name}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-foreground">
+                        {row.name}
+                      </span>
+                    )}
+                    {row.facets &&
+                    (row.facets.standards.length > 0 ||
+                      row.facets.materials.length > 0) ? (
+                      <div className="flex flex-wrap gap-1">
+                        {row.facets.standards.map((code) => (
+                          <Link
+                            key={code}
+                            to={buildCatalogSearchUrl({
+                              ...base,
+                              standard: code,
+                              page: 1,
+                            })}
+                            className="inline-flex rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                          >
+                            {code}
+                          </Link>
+                        ))}
+                        {row.facets.materials.slice(0, 2).map((m) => (
+                          <Link
+                            key={m}
+                            to={buildCatalogSearchUrl({
+                              ...base,
+                              material: m,
+                              page: 1,
+                            })}
+                            className="border-border/60 inline-flex rounded border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                          >
+                            {m.replace(/_/g, " ")}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                  <span className="line-clamp-2 text-muted-foreground">
+                    {row.description}
+                  </span>
+                  <Badge
+                    variant="outline"
+                    className="justify-self-end rounded-full text-xs capitalize"
+                  >
+                    {row.source}
+                  </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="justify-self-end rounded-full text-xs"
+                  >
+                    {row.itemType}
+                  </Badge>
                 </div>
-                <span className="line-clamp-2 text-muted-foreground">
-                  {row.description}
-                </span>
-                <Badge
-                  variant="outline"
-                  className="justify-self-end rounded-full text-xs capitalize"
-                >
-                  {row.source}
-                </Badge>
-                <Badge
-                  variant="secondary"
-                  className="justify-self-end rounded-full text-xs"
-                >
-                  {row.itemType}
-                </Badge>
-              </div>
-            ))}
+              ))}
+          </div>
         </div>
       </ProductResultsShell>
     </div>

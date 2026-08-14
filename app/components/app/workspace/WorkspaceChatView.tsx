@@ -84,6 +84,11 @@ export function WorkspaceChatView({
               {t("footer.vitals")}
             </Link>
           </p>
+          <p>
+            <Link to="/site-map" className="text-primary hover:underline">
+              Site map
+            </Link>
+          </p>
           <p title={t("footer.synthetic.hint")}>{t("footer.synthetic")}</p>
           <p title={t("footer.demo_roles.hint")}>{t("footer.demo_roles")}</p>
           <Form
