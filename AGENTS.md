@@ -13,10 +13,10 @@
 
 ## End-to-End Workflow
 
-0. **Session context**：讀 [`docs/platform-inbox/PROFILE.md`](docs/platform-inbox/PROFILE.md)（業務×技術×目標；platform-command 派送）。
+0. **Session context**：若本機有 `docs/platform-inbox/PROFILE.md` 可讀（**local-only / gitignored**；勿 commit）。公開敘述見 [docs/PUBLIC-NARRATIVE.md](docs/PUBLIC-NARRATIVE.md)。
 1. **Setup**：`pnpm install` → `pnpm run dev`（建議 `corepack enable` 對齊 `packageManager`）
 2. **Code**：修改 app/features、app/components、app/services、app/shared 等
-3. **Before PR / push（硬性）**：`pnpm run pr-gate`（= build + test + lint:ci）。**Cowork 沙箱無法跑 pnpm**（見 [platform-command cowork-sandbox](https://github.com/tessOu56/platform-command/blob/main/docs/cowork-sandbox.md) §8）——沙箱內改碼後必須在本機跑 pr-gate，全綠才可 push；不得用 `--no-verify` 略過 hook。
+3. **Before PR / push（硬性）**：`pnpm run pr-gate`（= build + test + lint:ci）。沙箱無法跑 pnpm 時，改碼後必須在本機跑 pr-gate，全綠才可 push；不得用 `--no-verify` 略過 hook。
 4. **Commit**：Conventional Commits（feat / fix / docs / chore / refactor / test）
 5. **Delete files**：用 `git rm <path>` 以保留操作紀錄；空資料夾 Git 不追蹤，可手動刪除。見 [docs/conventions/git-version-control.md](docs/conventions/git-version-control.md)
 
@@ -54,7 +54,8 @@
 - **階段 SSOT**：[docs/PROJECT-PLAN.md](docs/PROJECT-PLAN.md) — Phase 0–5 出口條件（無日曆）
 - **Skills**：`.cursor/skills/portal-phase-work`、`portal-contract-change`、`portal-lab-boundary`
 - **Hooks**：`.cursor/hooks.json`（session 指向 PROJECT-PLAN；git 守門）
-- **生態**： [platform-command/docs/agent-collaboration.md](https://github.com/tessOu56/platform-command/blob/main/docs/agent-collaboration.md)
+- **生態**：optional private orchestration playbook（若本機有編排 repo）
+- **公開規範**：[SECURITY.md](SECURITY.md)、[docs/PUBLIC-NARRATIVE.md](docs/PUBLIC-NARRATIVE.md)
 
 ## Labs（實驗；promote 前勿破壞 v1 契約）
 
@@ -62,9 +63,8 @@
 - **eval-runner**：`pnpm run test:labs` / `pnpm run eval:offline` — 離線 golden 評測 agent-core stream
 - **design-vibe**：`pnpm run design:prompt` — Downloads explorer → Figma MCP 工作流
 - **deck-studio**（已 promote）：獨立 repo [tessOu56/deck-studio](https://github.com/tessOu56/deck-studio)，不再位於 `labs/`
-- 個人生態 SSOT：[develop-md/vision/platform-2026.md](https://github.com/tessOu56/develop-md/blob/main/vision/platform-2026.md)
-- **免費雲端部署**：[develop-md/vision/platform-2026-cloud-deploy.md](https://github.com/tessOu56/develop-md/blob/main/vision/platform-2026-cloud-deploy.md)（本產品 → Vercel）
-- **規劃收件**：`docs/platform-inbox/CURRENT.md`（由 [platform-command](https://github.com/tessOu56/platform-command) 派送 tickets）
+- 個人生態長文：可另開 private notes／vision docs（勿把雇主／公司 mirror 名寫進 public commit）
+- **規劃收件**：`docs/platform-inbox/` 為本機派送目錄（**gitignored**；禁止加進 public commit）
 
 ---
 
@@ -119,8 +119,8 @@
 
 ## 開發環境（2026-07 統一）
 
-- Node 22（`.nvmrc`，CI 對齊；注意 Dockerfile 仍為 node:20 → 收斂 ticket 見 platform-command）· pnpm 10.34.3（`packageManager`）
-- 生態矩陣：`platform-command/docs/dev-environment.md` · Cowork sandbox 限制：`platform-command/docs/cowork-sandbox.md`
+- Node 22（`.nvmrc`，CI 對齊；注意 Dockerfile 仍為 node:20）· pnpm 10.34.3（`packageManager`）
+- 生態環境／沙箱限制：見 optional private orchestration docs（若本機有）
 
 ---
 

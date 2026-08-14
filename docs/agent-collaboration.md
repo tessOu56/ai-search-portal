@@ -1,8 +1,9 @@
 # Agent 協作 — ai-search-portal
 
-> 生態 SSOT：[platform-command/docs/agent-collaboration.md](https://github.com/tessOu56/platform-command/blob/main/docs/agent-collaboration.md)  
 > 產品階段：[PROJECT-PLAN.md](./PROJECT-PLAN.md)  
-> 能力邊界：[AGENT_CAPABILITIES.md](../AGENT_CAPABILITIES.md)
+> 能力邊界：[AGENT_CAPABILITIES.md](../AGENT_CAPABILITIES.md)  
+> 公開敘述：[PUBLIC-NARRATIVE.md](./PUBLIC-NARRATIVE.md)  
+> Optional private orchestration playbook may exist outside this public repo — do not hard-require it.
 
 ---
 
@@ -10,7 +11,7 @@
 
 1. [AGENTS.md](../AGENTS.md)
 2. [PROJECT-PLAN.md](./PROJECT-PLAN.md) — **確認當前 Phase 與出口條件**
-3. [platform-inbox/CURRENT.md](./platform-inbox/CURRENT.md) — P0／P1 ticket
+3. [platform-inbox/CURRENT.md](./platform-inbox/CURRENT.md) — P0／P1 ticket（**local-only / gitignored**；若無則跳過）
 4. 任務相關：`specs/`、`docs/architecture/ai-product/`
 5. 載入 skill（見 §2）— 僅在任務匹配時
 
@@ -60,7 +61,7 @@
 **Phase 0 收尾**
 
 ```text
-依 docs/PROJECT-PLAN.md Phase 0。完成 T-2026-001 檢查清單（Vercel URL → platform-command registry），跑 pr-gate，不新增範圍。
+依 docs/PROJECT-PLAN.md Phase 0。完成 T-2026-001 檢查清單（公開 live URL 寫進 README／deploy notes），跑 pr-gate，不新增範圍。
 ```
 
 **Phase 2 Langfuse 閉環**
@@ -104,12 +105,12 @@ Rules = always-on；Skills = 任務型。衝突時 **AGENTS.md > AGENT_CAPABILIT
 
 ## 6. 與其他 repo 協作
 
-| 情境              | 做法                                                                      |
-| ----------------- | ------------------------------------------------------------------------- |
-| 收中央 ticket     | 讀 `docs/platform-inbox/tickets/T-*.md`，完成後 `status: done`            |
-| 需要 Catalog 行為 | 唯讀參考內部 catalog 鏡像（platform-command registry 記載），不 copy 全量 |
-| 更新中央 registry | 在 **platform-command** 開 session，跑 `ecosystem-inbox`                  |
-| 長文規格          | 寫 **develop-md**，本 repo 只連結                                         |
+| 情境              | 做法                                                                                      |
+| ----------------- | ----------------------------------------------------------------------------------------- |
+| 收中央 ticket     | 若有本機 `docs/platform-inbox/tickets/T-*.md` 可讀；完成後更新本機狀態（勿 commit inbox） |
+| 需要 Catalog 行為 | 以本 repo mock／契約為準；勿把外部雇主產品內容複製進來                                    |
+| 更新中央 registry | optional private orchestration session（若有）                                            |
+| 長文規格          | 寫外部 vision notes，本 repo 只連結公開可分享內容                                         |
 
 ---
 
@@ -128,4 +129,6 @@ Rules = always-on；Skills = 任務型。衝突時 **AGENTS.md > AGENT_CAPABILIT
 - 在 `app/` 直接引入 WebGPU／本機 LLM（未過 lab + promote）
 - 在 component 內 `fetch` 非契約 URL
 - 覆寫 `packages/shared-contracts` 語意而不更新 `specs/`
-- 在 platform-command 實作 portal 產品碼
+- 在 optional private orchestration repo 實作 portal 產品碼
+- 將 `docs/platform-inbox/` 加入 git commit（public repo）
+- 違反 [PUBLIC-NARRATIVE.md](./PUBLIC-NARRATIVE.md) 的雇主／mirror／secret 敘述

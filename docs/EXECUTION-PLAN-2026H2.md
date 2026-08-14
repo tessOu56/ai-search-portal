@@ -1,14 +1,12 @@
 # ai-search-portal — 執行計畫 2026 H2（互動產品主軸）
 
-> 策略 SSOT：[platform-command/planning/EXECUTION-PLAN-2026H2.md](https://github.com/tessOu56/platform-command/blob/main/planning/EXECUTION-PLAN-2026H2.md)
 > 階段出口條件 SSOT：本 repo [`docs/PROJECT-PLAN.md`](./PROJECT-PLAN.md)（Phase 0–5，不變）
-> 技術雷達：[platform-command/planning/EXECUTION-PLAN-2026H2-tech-radar.md](https://github.com/tessOu56/platform-command/blob/main/planning/EXECUTION-PLAN-2026H2-tech-radar.md)
 
-本檔不取代 PROJECT-PLAN 的 Phase 出口條件，而是在其上疊一條**「對外可互動產品」主軸**，把既有資產（21 測試、7 Zod 契約、agent-core、eval 管線）變成面試官能實際操作的 demo。
+本檔不取代 PROJECT-PLAN 的 Phase 出口條件，而是在其上疊一條**「對外可互動產品」主軸**，把既有資產（測試、Zod 契約、agent-core、eval 管線）變成可實際操作的 public demo。
 
 ## 1. 在產品線中的角色
 
-**主軸 A 旗艦產品**。對外唯一的「完整可互動 AI 搜尋產品」。後端（py-able-labs / polyglot-labs）、動效（vue-motion）、學習（ai-dev-studio）的成果都往這裡匯流。
+**旗艦 showcase**：完整可互動的 AI 搜尋／治理參考產品。相關 labs／姐妹專案的成果可選擇 promote 進來；本檔不依賴私有編排面。
 
 ## 2. 互動作品里程碑（新增主軸，全部走 `labs/` 不破壞 v1 契約）
 
@@ -34,9 +32,9 @@
 
 ## 4. 串接點
 
-- **上游**：py-able-labs（itemType/pageSize、catalog 契約 parity）；polyglot-labs（多語言/SRE 敘事，唯讀參考）；vue-motion（promote 動效進 `labs/motion/`）。
-- **設計**：消費共用 **DTCG token → Tailwind v4 `@theme`**（與 vue 線視覺統一）。
-- **下游**：完成後登錄 `platform-command/registry/projects.json` 的 `deploy.url`，由 command-center 對外展示。
+- **契約／labs**：catalog 欄位契約（如 `itemType` / `pageSize`）與 labs promote（動效進 `labs/motion/` 等）以本 repo specs 為準。
+- **設計**：消費共用 **DTCG token → Tailwind**（explore-design-sdk）。
+- **部署**：公開 live URL 見 README；私有編排 registry 更新屬 optional private notes，不寫死於此。
 
 ## 5. 部署（STOP 期間 / 解 STOP 後）
 

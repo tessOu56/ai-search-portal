@@ -49,3 +49,4 @@ pnpm run knip
 - 描述變更動機與影響
 - 提供測試方式或說明無測試原因
 - 若有 UI 變更請附截圖
+- 本 repo 為 **public**：遵循 [SECURITY.md](SECURITY.md) 與 [docs/PUBLIC-NARRATIVE.md](docs/PUBLIC-NARRATIVE.md)（勿提交 secrets／業務外流敘述／`docs/platform-inbox`）

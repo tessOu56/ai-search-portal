@@ -92,7 +92,7 @@
 
 ### Phase 4 — 產品 UI（design-vibe 對齊）
 
-**策略**：不複製 able 全量；只做 GAP 表內可演示殼。
+**策略**：只做 GAP 表內可演示殼；不擴大成完整企業 catalog 產品。
 
 | Flow           | 優先 | 出口條件                                                                      |
 | -------------- | ---- | ----------------------------------------------------------------------------- |
@@ -195,7 +195,7 @@ Phase 1 已完成；**knowledge commerce ship gate ✅（2026-07-28）**。
 | STOP-001 | Vercel → [STOP-EXTERNAL.md](./STOP-EXTERNAL.md) |
 | STOP-003 | Figma MCP → GAP waiver                          |
 
-**不做**：複製 able 五主線、Azure 部署、全站 i18n、在 `app/` 直接掛 WebGPU／本機 LLM。
+**不做**：複製完整企業 catalog 五主線 UX、雲端企業部署鏡像、全站 i18n、在 `app/` 直接掛 WebGPU／本機 LLM。
 
 ---
 

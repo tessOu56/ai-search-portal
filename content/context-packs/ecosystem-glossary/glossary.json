@@ -388,10 +388,10 @@
   {
     "id": "eco-mirror",
     "term": "Mirror repo (鏡像)",
-    "definition": "由源頭同步產生的唯讀展示/備份副本，不直接修改。 Ecosystem mapping (mapped): able mirrors（nightly sync）、nx → vue/angular sandbox（sync 腳本）.",
+    "definition": "Read-only copy synced from a source for display/backup; do not edit the copy as SSOT. (Private orchestration notes may track sync jobs; do not name employer mirrors in public docs.)",
     "relatedAssetIds": ["eco-promote", "eco-ssot"],
     "tags": ["ecosystem", "engineering", "鏡像"],
-    "source": "platform-command:specs/domain/engineering.yaml#mirror",
+    "source": "local:engineering#mirror",
     "facets": {
       "materials": [],
       "techniques": [],

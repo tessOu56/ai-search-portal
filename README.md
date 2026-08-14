@@ -1,110 +1,69 @@
 # AI Search Portal
 
-> **用 AI 找資料與申請存取——可加速，但永遠能降級成手動，且每步可稽核。**
+Reference product for **trusted AI data discovery**: accelerate search and access requests with an always-available manual path and an auditable human-in-the-loop flow.
 
-**痛點**：企業導入 AI 搜尋後最常見的失敗不是「AI 不夠聰明」，而是 AI 出錯時使用者無路可退、治理流程不可稽核——資料團隊因此不敢把 AI 放進資料存取的關鍵路徑。
+**Live demo:** [https://ai-search-portal.vercel.app](https://ai-search-portal.vercel.app)
 
-**承諾（本產品證明的三件事）**：
+## What this proves
 
-1. **Dual-path**：每條 AI 流程都有對應的手動畫面；AI 串流失敗時 `AiFallbackPanel` 保留你的輸入、預填 `?q=` 交給手動目錄搜尋接手
-2. **HITL 可稽核**：存取申請走 policy 評估 → 人工確認 → 狀態機（`approved / pending_approval / denied`）＋稽核旗標；這條手動路徑有 Playwright E2E 把關（`e2e/access-request.spec.ts`，PR 必跑）
-3. **來源／信心度**：AI 回覆附 confidence 與 sources，mock 誠實標示——不假裝有真 LLM
+1. **Dual-path** — Every AI flow has a matching manual UI. If streaming fails, `AiFallbackPanel` keeps the user query and hands off to catalog search (`?q=`).
+2. **HITL governance** — Access requests: policy evaluation → human review → state machine (`approved` / `pending_approval` / `denied`) with audit flags. Covered by Playwright (`e2e/access-request.spec.ts`, required on PRs).
+3. **Honest AI labels** — Replies include confidence and sources; default mode uses **offline fixtures** (optional live LLM only when a server-side key is set).
 
-**非目標**：這不是完整的企業 Catalog SaaS（不做連線器、多租戶、合規認證、銷售通路）。這是「可信 AI 資料發現」的**參考產品**——證明體驗與治理模式，domain 知識放在可換裝的 context pack，不寫死在核心。
+**Non-goals:** Not a full enterprise catalog SaaS (no connectors, multi-tenant billing, or compliance certifications). Domain knowledge lives in swappable context packs.
 
-## 數字卡（證據）
+## Evidence
 
-| 證據                                   | 數字                                                                                              |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| 治理申請 E2E（狀態機斷言，非 UI 文案） | 4 tests，PR 必跑，離線自足                                                                        |
-| 10k 列虛擬列表 vs naive 渲染           | **10000 → 23 DOM nodes（−99.8%）**（[perf note](docs/perf/catalog-dictionary-virtualization.md)） |
-| Contract 管線                          | OpenAPI codegen＋Spectral lint＋drift check＋zod v4，CI 亮紅可擋                                  |
-| 離線 AI 評測                           | `eval:offline` 於 CI 執行（lab-eval-runner）                                                      |
+| Proof                  | Detail                                                                                          |
+| ---------------------- | ----------------------------------------------------------------------------------------------- |
+| Governance E2E         | 4 tests, PR-required, offline-capable                                                           |
+| 10k-row virtualization | **10000 → 23 DOM nodes (−99.8%)** — [perf note](docs/perf/catalog-dictionary-virtualization.md) |
+| Contracts              | OpenAPI codegen + Spectral + drift check + zod v4 in CI                                         |
+| Offline AI eval        | `eval:offline` in CI (lab-eval-runner)                                                          |
 
-視覺層採外接元件系統 [explore-design-sdk](https://github.com/tessOu56/explore-design-sdk)（semantic tokens × application maps），portal 不自持 design tokens。
+UI tokens come from [explore-design-sdk](https://github.com/tessOu56/explore-design-sdk); this app does not own a separate design-token package.
 
-## Portfolio / 履歷
+## Try the main journey (local or live)
 
-| 資源                                                                                                               | 說明                                              |
-| ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| [docs/RESUME-DEMO.md](docs/RESUME-DEMO.md)                                                                         | 3–5 分鐘 demo／旅程 C 20 秒主戲、檢查清單、履歷句 |
-| [docs/product/experience-notes/governance-abstraction.md](docs/product/experience-notes/governance-abstraction.md) | 治理抽象 STAR（同步 develop-md ledger）           |
-| [docs/product/ai-experience-plan.md](docs/product/ai-experience-plan.md)                                           | AI 體驗流程 × 手動畫面規劃 SSOT                   |
+1. Catalog: `/catalog-search`
+2. Request access: `/metadata/tbl-customers?purpose=marketing&role=analyst`
+3. Review (demo role, **not** real auth): `/access-requests/review?sessionRole=owner`
+4. Track: `/my-apis?sessionRole=requester`
 
-**本地 demo**：`pnpm dev` → `/catalog-search` → `/metadata/tbl-customers?purpose=marketing&role=analyst`（申請 HITL）→ `/access-requests/review?sessionRole=owner` → `/my-apis?sessionRole=requester`（旅程 C）。次要：`/` golden chat、`/catalog-search/dictionary`（10k 虛擬列表）。
+Also: `/` (golden chat with offline fixture), `/catalog-search/dictionary` (virtualized list), `/site-map` (human IA map).
 
-## 技術棧
+## Stack
 
-- **框架**: Remix v2 + React 18
-- **語言**: TypeScript
-- **建置**: Vite
-- **樣式**: Tailwind CSS
-- **部署**: Vercel (推薦) / 其他 Node.js 平台 / Docker
+- Remix v2 + React 18 + TypeScript + Vite
+- Tailwind CSS
+- Deploy: Vercel (or any Node host / Docker)
 
-## 架構概覽（大型協作向）
-
-此專案以「features 模組化」為核心，降低跨功能耦合。
-
-- `app/features/*`: 功能模組（hook/server/types）
-- `app/shared`: 跨模組共用邏輯（service/types/utils）
-- `app/services`: 應用層 service（整合或計算）
-- `app/routes`: Remix 路由層
-
-完整架構與協作規範請見 `docs/ARCHITECTURE.md`、`docs/DESIGN_SYSTEM.md` 與 `CONTRIBUTING.md`。
-
-**架構範本與可套用性**：本專案之 specs/docs、AGENTS.md、AGENT_CAPABILITIES.md 分層、契約與依賴規則、tool adapter 設計，可作為它專案之參考或複用；詳細對應見 [docs/README.md](docs/README.md)、[AGENTS.md](AGENTS.md)、[AGENT_CAPABILITIES.md](AGENT_CAPABILITIES.md)。每階段工作後保持規格與現況一致請依 [docs/code-review-spec.md](docs/code-review-spec.md)（Code Review 規範）。
-
-## 開發
+## Quickstart
 
 ```bash
-# 安裝依賴（需先 corepack enable，見 CONTRIBUTING.md）
+corepack enable   # pnpm from packageManager field
 pnpm install
-
-# 啟動開發伺服器
 pnpm run dev
-
-# 建置生產版本
-pnpm run build
-
-# 啟動生產伺服器
-pnpm start
 ```
 
-## 開發流程（協作規範）
+Optional: set **server-side only** `OPENAI_API_KEY` for live LLM; without it the app stays on offline fixtures. Never commit `.env` or secret values — see [SECURITY.md](SECURITY.md).
 
-- 本地檢查：`pnpm run lint`、`pnpm run typecheck`
-- 預提交：`lint-staged` 自動修正 ESLint/Prettier
-- CI：PR 必跑 `lint:strict` + `typecheck` + `knip`
+Quality: `pnpm run lint` · `pnpm run typecheck` · `pnpm run test` · CI runs `lint:strict` + typecheck + knip + E2E.
 
-## Cursor 開發規範
+## Architecture (short)
 
-- 以最小變更完成需求，避免無關重構或格式化
-- 變更前先讀相關檔案並說明影響範圍
-- 修改後確認型別/編譯/格式/測試（視專案腳本而定）
-- 不提交任何機敏資訊（`.env`、金鑰、憑證）
-- 提交訊息需描述原因與影響，不只描述表面改動
+- `app/features/*` — feature modules
+- `app/shared` — cross-feature helpers
+- `app/services` — application services
+- `app/routes` — Remix routes
+- `packages/agent-core` — mock-first agent path
 
-## 部署到 GitHub
+More: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md), [CONTRIBUTING.md](CONTRIBUTING.md), [docs/PUBLIC-NARRATIVE.md](docs/PUBLIC-NARRATIVE.md).
 
-### 方法 1: 使用 Vercel (推薦)
+## Deploy notes
 
-1. 將專案推送到 GitHub 倉庫
-2. 前往 [Vercel](https://vercel.com) 並登入
-3. 導入 GitHub 倉庫並綁定專案（取得 `VERCEL_TOKEN` / `ORG_ID` / `PROJECT_ID`）
-4. 在 GitHub Actions 使用：
-   - `.github/workflows/release.yml`（手動建立版本 tag + GitHub Release）
-   - `.github/workflows/deploy-vercel.yml`（手動部署 preview/production，可指定 ref）
-5. 建議在 GitHub 設定 `production` environment reviewers，以控制上線權限
+Prefer linking the GitHub repo in your host’s dashboard. If you use GitHub Actions deploy workflows, store host tokens only in **GitHub Actions secrets / environments** — never in the repository. See [docs/runbooks/deployment.md](docs/runbooks/deployment.md) for operator detail.
 
-### 方法 2: 使用其他 Node.js 平台
+## License
 
-- **Railway**: 連接 GitHub 倉庫即可自動部署
-- **Render**: 選擇 Node.js 環境並設定建置命令為 `pnpm run build`（並啟用 pnpm／Corepack 與本 repo 的 `packageManager`）
-- **Fly.io**: 需要額外設定 Dockerfile
-
-## 功能
-
-- 🔍 AI 智能搜尋
-- 🎨 現代化 UI 設計
-- 📱 響應式設計
-- ⚡ 快速載入
+See [LICENSE](LICENSE). Security reports: [SECURITY.md](SECURITY.md).
