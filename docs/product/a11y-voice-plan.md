@@ -1,7 +1,7 @@
 # Portal a11y + voice input plan
 
 **Surface:** product (chat) + marketing (home composer)  
-**Status:** planned (Phase 1 wireframe ready; full voice wiring follow-up)  
+**Status:** Phase 2 shipped (live region + Web Speech composer); TTS still follow-up
 **Ticket:** T-2026-078
 
 ## Goals
@@ -36,17 +36,17 @@ flowchart LR
 - API: `SpeechRecognition` / `webkitSpeechRecognition` (browser).
 - Locale: map portal `locale` → `recognition.lang` (`zh-TW`, `en-US`).
 - States (i18n keys `composer.voice.*`): idle · listening · unsupported · denied · error.
-- Phase 1 (this planning wave): document + ticket; mic may be stubbed disabled with tooltip.
-- Phase 2: wire recognition into shared `Composer` (`HomeAskPanel` / conversation); interim results optional.
+- Phase 1: document + ticket.
+- Phase 2 (shipped): recognition wired into shared `Composer` (`HomeAskPanel` / conversation); unsupported browsers hide the mic; permission/error copy does not block typing; user confirms with Send.
 - Privacy: browser may send audio to vendor cloud ASR — disclose in help / settings copy.
 - Out of Phase 2: TTS of assistant replies (Phase 3).
 
-## Acceptance (T-2026-078 follow-up)
+## Acceptance (T-2026-078)
 
-- [ ] Live region announces meaningful assistant progress without token spam
-- [ ] Arrow / mic controls have accessible names
-- [ ] Unsupported browsers still allow full text ask path
-- [ ] Docs + CAPABILITIES.md stay in sync
+- [x] Live region announces waiting while streaming, then summary/body — not every token
+- [x] Arrow / mic controls have accessible names
+- [x] Unsupported browsers still allow full text ask path (mic hidden)
+- [x] Docs + CAPABILITIES.md stay in sync
 
 ## Related
 

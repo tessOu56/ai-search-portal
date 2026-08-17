@@ -1,7 +1,8 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Mic } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { type FormEvent, useEffect, useId, useState } from "react";
 
+import { useVoiceInput } from "~/components/shared/chat/useVoiceInput";
 import { Button } from "~/components/ui/Button";
 import { useI18n } from "~/shared/i18n/context";
 import { cn } from "~/shared/utils/cn";
@@ -20,6 +21,70 @@ type ComposerProps = {
 const CHIP_CLASS =
   "h-auto min-h-8 max-w-full whitespace-normal break-words py-1.5 text-left";
 
+function VoiceButton({
+  disabled,
+  listening,
+  onToggle,
+  t,
+}: {
+  disabled: boolean;
+  listening: boolean;
+  onToggle: () => void;
+  t: (key: string) => string;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      data-testid="composer-voice"
+      disabled={disabled}
+      aria-pressed={listening}
+      aria-label={
+        listening ? t("composer.voice.stop") : t("composer.voice.start")
+      }
+      className="size-11 shrink-0 px-0"
+      onClick={onToggle}
+    >
+      <Mic className="size-5" aria-hidden />
+    </Button>
+  );
+}
+
+function VoiceStatus({
+  status,
+  t,
+}: {
+  status: "idle" | "listening" | "denied" | "error";
+  t: (key: string) => string;
+}) {
+  const messageKey =
+    status === "listening"
+      ? "composer.voice.listening"
+      : status === "denied"
+        ? "composer.voice.denied"
+        : status === "error"
+          ? "composer.voice.error"
+          : null;
+  return (
+    <>
+      {messageKey ? (
+        <p
+          className="text-type-12 text-muted-foreground"
+          role="status"
+          data-testid={
+            status === "denied" || status === "error"
+              ? "composer-voice-status"
+              : undefined
+          }
+        >
+          {t(messageKey)}
+        </p>
+      ) : null}
+      <p className="sr-only">{t("composer.voice.privacy")}</p>
+    </>
+  );
+}
+
 /**
  * Shared ask bar for landing and conversation.
  * Surface: marketing (landing) / product (conversation).
@@ -32,13 +97,22 @@ export function Composer({
   hints = [],
   suggestions = [],
 }: ComposerProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const reduceMotion = useReducedMotion();
   const inputId = useId();
   const [value, setValue] = useState("");
   const [focused, setFocused] = useState(false);
   const [typed, setTyped] = useState("");
   const [hintIndex, setHintIndex] = useState(0);
+  const {
+    supported: voiceSupported,
+    status: voiceStatus,
+    toggle: toggleVoice,
+  } = useVoiceInput({
+    locale,
+    enabled: !disabled,
+    onTranscript: setValue,
+  });
 
   const hintCount = hints.length;
   const activeHint = hintCount > 0 ? (hints[hintIndex % hintCount] ?? "") : "";
@@ -137,6 +211,14 @@ export function Composer({
             </span>
           )}
         </div>
+        {voiceSupported ? (
+          <VoiceButton
+            disabled={disabled}
+            listening={voiceStatus === "listening"}
+            onToggle={toggleVoice}
+            t={t}
+          />
+        ) : null}
         <Button
           type="submit"
           data-star-hot
@@ -148,6 +230,7 @@ export function Composer({
           <ArrowRight className="size-5" aria-hidden />
         </Button>
       </form>
+      {voiceSupported ? <VoiceStatus status={voiceStatus} t={t} /> : null}
       {suggestions.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {suggestions.map((question) => (
