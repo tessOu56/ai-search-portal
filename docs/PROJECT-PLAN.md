@@ -1,7 +1,13 @@
 # ai-search-portal — 專案規劃（階段制）
 
-> **架構 SSOT**：[product-architecture-plan-2026-05.md](./architecture/ai-product/product-architecture-plan-2026-05.md)  
-> **Agent 協作**：[agent-collaboration.md](./agent-collaboration.md)（skills／hooks／commands）
+> **Superseded as phase SSOT.** Product stages and tickets live in private **platform-command**:
+> [`planning/projects/ai-search-portal.md`](https://github.com/tessOu56/platform-command/blob/main/planning/projects/ai-search-portal.md)
+> (local: `platform-command/planning/projects/ai-search-portal.md`).
+>
+> Keep this file only as historical phase notes. Do not add new roadmap here.
+>
+> **架構參考**：[product-architecture-plan-2026-05.md](./architecture/ai-product/product-architecture-plan-2026-05.md)  
+> **Agent 協作**：[agent-collaboration.md](./agent-collaboration.md)
 
 ---
 

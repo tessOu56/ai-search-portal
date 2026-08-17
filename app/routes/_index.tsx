@@ -143,7 +143,10 @@ export default function Index() {
   }
 
   return (
-    <div className="relative flex min-h-dvh flex-col">
+    <div
+      className="relative flex min-h-dvh flex-col"
+      data-testid="conversation-shell"
+    >
       <Atmosphere />
       <WorkspaceTopbar
         onBrandClick={onNewConversation}

@@ -36,26 +36,18 @@
 
 ## 3. 無障礙（Accessibility / a11y）
 
-### 現況：部分具備 + 規劃中
+### 現況：chat a11y + 語音輸入已上線（T-2026-078）
 
-- **有**：`<html lang>`；`eslint-plugin-jsx-a11y`；部分 Radix / Alert ARIA；chat history `role="log"` + polite live region（起步）；home ask 圖示按鈕含 `aria-label`。
-- **規劃 SSOT**：[docs/product/a11y-voice-plan.md](./product/a11y-voice-plan.md) · ticket **T-2026-078**（語音輸入 Web Speech、chat live region 深化）。
-
-### 目標改進
-
-| 項目          | 說明                                                  |
-| ------------- | ----------------------------------------------------- |
-| **Skip Link** | `a11y.skipToContent` → 主內容 / `#home-chat`          |
-| **Chat live** | 有資料時禮貌公告助理回覆；錯誤用 assertive            |
-| **Voice**     | `SpeechRecognition` 能力偵測 + 權限；失敗不擋文字輸入 |
-| **檢查**      | axe / jsx-a11y；PR 抽檢                               |
+- **有**：`<html lang>`；skip link `a11y.skipToContent` → `#main-content`；`eslint-plugin-jsx-a11y`；Radix / Alert ARIA（錯誤 `role="alert"`）；chat history `role="log"` + polite live region（串流中只公告等待，完成後公告摘要／全文，避免 token 洗版）；composer 送出與麥克風皆有 `aria-label`。
+- **語音**：共用 `Composer` 在 `SpeechRecognition`／`webkitSpeechRecognition` 可用時顯示麥克風；權限拒絕或不支援不擋鍵盤；辨識結果填入輸入框，由使用者按送出。文案鍵 `composer.voice.*`。
+- **規劃**：[docs/product/a11y-voice-plan.md](./product/a11y-voice-plan.md)（Phase 3 TTS 仍未做）。
 
 ---
 
 ## 總結
 
-| 項目       | 現況                        | 建議                            |
-| ---------- | --------------------------- | ------------------------------- |
-| **打版號** | Changesets + footer version | 維持                            |
-| **多語系** | 手動字典 + locale 切換      | 版權與 UI 文案皆走 i18n         |
-| **無障礙** | 部分 ARIA + chat live 起步  | 完成 T-2026-078（a11y + voice） |
+| 項目       | 現況                                | 建議                     |
+| ---------- | ----------------------------------- | ------------------------ |
+| **打版號** | Changesets + footer version         | 維持                     |
+| **多語系** | 手動字典 + locale 切換              | 版權與 UI 文案皆走 i18n  |
+| **無障礙** | skip link、chat live、composer 語音 | TTS 為後續；axe 抽檢維持 |
