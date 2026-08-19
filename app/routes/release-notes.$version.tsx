@@ -2,6 +2,7 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
+import { Button } from "~/components/ui/Button";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
@@ -90,9 +91,9 @@ export default function ReleaseNoteVersion() {
     return (
       <Stack gap="md">
         <EmptyState title={t("release-notes.notFound")} />
-        <Link to="/release-notes" className="text-primary hover:underline">
-          {t("release-notes.back")}
-        </Link>
+        <Button asChild variant="outline">
+          <Link to="/release-notes">{t("release-notes.back")}</Link>
+        </Button>
       </Stack>
     );
   }

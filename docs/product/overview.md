@@ -26,17 +26,17 @@
 
 ## 功能一覽（現況）
 
-| 功能                 | 說明                                                    | 入口 / API                                                                             |
-| -------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| **首頁**             | 標語、LUI Chat、信任說明、版號與語系切換                | `app/routes/_index.tsx`                                                                |
-| **LUI Chat**         | SSE 串流回答；結論、依據、來源、下一步                  | `app/routes/api.chat.ts`，`app/services/lui.server.ts`                                 |
-| **Items 管理頁**     | Items 列表、新增、單筆編輯/刪除                         | `/items`、`/items/new`、`/items/:itemId`                                               |
-| **Items API**        | 通用 CRUD 範例（name, description）；用於示範與整合測試 | `api/items`（GET/POST）、`api/items/:itemId`（GET/PUT/PATCH/DELETE）                   |
-| **領域頁面（v1）**   | Dish / Recipe 列表與詳情頁（以 in-memory mock 呈現）    | `/dishes`、`/dishes/:dishId`、`/recipes`、`/recipes/:recipeId`                         |
-| **領域：食物與食譜** | Ingredient → Dish → Recipe / Vendor；營養與功效計算     | `app/features/{ingredient,dish,recipe,vendor}`，`app/shared/services/domain.server.ts` |
-| **Release Notes**    | 版號與更新說明，來自 `content/release-notes.json`       | `/release-notes`，`api/release-notes`                                                  |
-| **i18n**             | 語系切換（zh-TW / en），cookie + Form POST              | `app/shared/i18n`，`api/locale`                                                        |
-| **SEO / Sitemap**    | meta、JSON-LD、sitemap.xml、robots.txt                  | `app/shared/seo.ts`，`routes/sitemap[.]xml.ts`、`robots[.]txt.ts`                      |
+| 功能                 | 說明                                                 | 入口 / API                                                                             |
+| -------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| **首頁**             | 標語、LUI Chat、信任說明、版號與語系切換             | `app/routes/_index.tsx`                                                                |
+| **LUI Chat**         | SSE 串流回答；結論、依據、來源、下一步               | `app/routes/api.chat.ts`，`app/services/lui.server.ts`                                 |
+| **Items**            | 唯讀 seed 列表／詳情                                 | `/items`、`/items/:itemId`（無 `/items/new`）                                          |
+| **Items API**        | GET list/detail；寫入 405                            | `api/items`（GET）、`api/items/:itemId`（GET）                                         |
+| **領域頁面（v1）**   | Dish / Recipe 列表與詳情頁（以 in-memory mock 呈現） | `/dishes`、`/dishes/:dishId`、`/recipes`、`/recipes/:recipeId`                         |
+| **領域：食物與食譜** | Ingredient → Dish → Recipe / Vendor；營養與功效計算  | `app/features/{ingredient,dish,recipe,vendor}`，`app/shared/services/domain.server.ts` |
+| **Release Notes**    | 版號與更新說明，來自 `content/release-notes.json`    | `/release-notes`，`api/release-notes`                                                  |
+| **i18n**             | 語系切換（zh-TW / en），cookie + Form POST           | `app/shared/i18n`，`api/locale`                                                        |
+| **SEO / Sitemap**    | meta、JSON-LD、sitemap.xml、robots.txt               | `app/shared/seo.ts`，`routes/sitemap[.]xml.ts`、`robots[.]txt.ts`                      |
 
 ---
 

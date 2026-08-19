@@ -3,16 +3,12 @@ import { Form, Link, useFetcher, useNavigation } from "@remix-run/react";
 import { AccessRequestLifecycleStepper } from "~/components/shared/governance";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/Card";
+import { Callout } from "~/components/ui/Callout";
+import { EmptyState } from "~/components/ui/EmptyState";
 import { Panel } from "~/components/ui/Panel";
 import { Select } from "~/components/ui/Select";
 import { Skeleton } from "~/components/ui/Skeleton";
+import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import type {
   AccessApplicationContract,
   AccessRequestLifecycleStatus,
@@ -42,11 +38,11 @@ export function SessionRoleSwitcher({
   const roles: GovernanceSessionRole[] = ["requester", "owner", "admin"];
   return (
     <div className="grid gap-2" role="group" aria-label="Demo session role">
-      <p className="text-xs text-muted-foreground">
-        Demo role switcher — not authentication. Query{" "}
-        <code className="rounded bg-muted px-1">?sessionRole=</code> only
-        changes the showcase persona; it is not production RBAC.
-      </p>
+      <Callout tone="info">
+        Demo persona via{" "}
+        <code className="rounded bg-muted px-1">?sessionRole=</code>— not a
+        login. This is a showcase, not production RBAC.
+      </Callout>
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <span className="text-muted-foreground">Demo session:</span>
         {roles.map((role) => (
@@ -123,7 +119,7 @@ function MyApisApplicationCard({
     : null;
 
   return (
-    <Card
+    <Panel
       className={cn(
         highlighted &&
           "ring-2 ring-primary ring-offset-2 ring-offset-background"
@@ -131,23 +127,23 @@ function MyApisApplicationCard({
       data-testid="my-apis-application-card"
       data-status={app.status}
     >
-      <CardHeader className="space-y-2">
+      <div className="mb-3 space-y-2">
         {highlighted ? (
           <Badge variant="default" className="w-fit">
             Just updated
           </Badge>
         ) : null}
-        <CardTitle className="text-base">
+        <h2 className="text-type-16 font-semibold text-foreground">
           <Link to={`/metadata/${app.assetId}`} className="hover:underline">
             {app.assetName}
           </Link>
-        </CardTitle>
-        <CardDescription>
+        </h2>
+        <p className="text-type-14 text-muted-foreground">
           {app.purpose} · {app.role}
-        </CardDescription>
+        </p>
         <AccessRequestLifecycleStepper status={app.status} />
-      </CardHeader>
-      <CardContent className="space-y-3">
+      </div>
+      <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline">status: {app.status}</Badge>
           <Badge
@@ -189,8 +185,8 @@ function MyApisApplicationCard({
             </cancelFetcher.Form>
           ) : null}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 
@@ -229,7 +225,7 @@ export function MyApisPanel({
           Switch to requester to track applications.{" "}
           <Link
             to="/access-requests/review?sessionRole=owner"
-            className="text-primary hover:underline"
+            className={PRODUCT_TABLE_LINK_CLASS}
           >
             Review queue
           </Link>
@@ -248,24 +244,19 @@ export function MyApisPanel({
       {loading ? (
         <ApplicationCardSkeletonGrid />
       ) : applications.length === 0 ? (
-        <Card>
-          <CardContent
-            className="space-y-2 py-10 text-center text-sm text-muted-foreground"
-            data-testid="my-apis-empty-state"
-          >
-            <p className="font-medium text-foreground">No applications yet</p>
-            <p>
-              Requester applications will appear here once you request access
-              from a metadata asset.
-            </p>
-            <Link
-              to="/metadata/tbl-customers"
-              className="inline-block text-primary hover:underline"
-            >
-              Request access from a metadata asset →
-            </Link>
-          </CardContent>
-        </Card>
+        <div data-testid="my-apis-empty-state">
+          <EmptyState
+            title="No applications yet"
+            description="Requester applications will appear here once you request access from a metadata asset."
+            action={
+              <Button asChild>
+                <Link to="/metadata/tbl-customers">
+                  Request access from a metadata asset
+                </Link>
+              </Button>
+            }
+          />
+        </div>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {applications.map((app) => (
@@ -296,64 +287,42 @@ function AccessReviewRequestCard({
   app: AccessApplicationContract;
   canReview: boolean;
 }) {
-  const fetcher = useFetcher<ReviewActionData>();
-  const busy = fetcher.state !== "idle";
-  const result = fetcher.data;
-  const approvedRequestId =
-    result?.ok && result.status === "approved"
-      ? (result.requestId ?? app.id)
-      : null;
+  const navigation = useNavigation();
+  const busy = navigation.state !== "idle";
 
   return (
-    <Card data-testid="access-review-card" data-status={app.status}>
-      <CardHeader className="space-y-2">
-        <CardTitle className="text-base">{app.assetName}</CardTitle>
-        <CardDescription>
+    <Panel data-testid="access-review-card" data-status={app.status}>
+      <div className="mb-3 space-y-2">
+        <h2 className="text-type-16 font-semibold text-foreground">
+          {app.assetName}
+        </h2>
+        <p className="text-type-14 text-muted-foreground">
           {app.requesterId} · {app.purpose} · {app.role}
-        </CardDescription>
+        </p>
         <AccessRequestLifecycleStepper status={app.status} />
-      </CardHeader>
-      <CardContent className="space-y-3">
+      </div>
+      <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{app.status}</Badge>
         </div>
 
-        {result ? (
-          <div className="space-y-1">
-            <StatusMessage ok={result.ok} text={result.text} />
-            {approvedRequestId ? (
-              <p className="text-sm">
-                <Link
-                  to={myApisHighlightHref(approvedRequestId)}
-                  className="text-primary hover:underline"
-                >
-                  View in My APIs (requester view) →
-                </Link>
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-
         {canReview ? (
           <div className="flex flex-wrap items-center gap-3">
-            <fetcher.Form method="post" className="inline">
+            <Form method="post" className="inline">
               <input type="hidden" name="requestId" value={app.id} />
               <input type="hidden" name="decision" value="approved" />
               <Button type="submit" size="sm" disabled={busy}>
                 Approve
               </Button>
-            </fetcher.Form>
-            <fetcher.Form method="post" className="inline">
+            </Form>
+            <Form method="post" className="inline">
               <input type="hidden" name="requestId" value={app.id} />
               <input type="hidden" name="decision" value="denied" />
               <Button type="submit" size="sm" variant="outline" disabled={busy}>
                 Reject
               </Button>
-            </fetcher.Form>
-            <fetcher.Form
-              method="post"
-              className="flex flex-wrap items-center gap-2"
-            >
+            </Form>
+            <Form method="post" className="flex flex-wrap items-center gap-2">
               <input type="hidden" name="requestId" value={app.id} />
               <input type="hidden" name="decision" value="edited" />
               <Select
@@ -384,11 +353,11 @@ function AccessReviewRequestCard({
               >
                 Edit
               </Button>
-            </fetcher.Form>
+            </Form>
           </div>
         ) : null}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 
@@ -400,12 +369,16 @@ export function AccessRequestReviewPanel({
 }: {
   pending: AccessApplicationContract[];
   sessionRole: GovernanceSessionRole;
-  actionMessage?: { ok: boolean; text: string };
+  actionMessage?: ReviewActionData;
   loading?: boolean;
 }) {
   const canReview = sessionRole === "owner" || sessionRole === "admin";
   const navigation = useNavigation();
   const busy = loading || navigation.state !== "idle";
+  const approvedRequestId =
+    actionMessage?.ok && actionMessage.status === "approved"
+      ? actionMessage.requestId
+      : null;
 
   return (
     <div className="space-y-6" data-surface="product">
@@ -422,14 +395,28 @@ export function AccessRequestReviewPanel({
         <SessionRoleSwitcher sessionRole={sessionRole} />
       </div>
 
-      {actionMessage ? <StatusMessage {...actionMessage} /> : null}
+      {actionMessage ? (
+        <div className="space-y-1">
+          <StatusMessage {...actionMessage} />
+          {approvedRequestId ? (
+            <p className="text-sm">
+              <Link
+                to={myApisHighlightHref(approvedRequestId)}
+                className={PRODUCT_TABLE_LINK_CLASS}
+              >
+                View in My APIs (requester view) →
+              </Link>
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       {!canReview ? (
         <p className="text-sm text-muted-foreground" role="status">
           Switch to owner or admin to review.{" "}
           <Link
             to="/my-apis?sessionRole=requester"
-            className="text-primary hover:underline"
+            className={PRODUCT_TABLE_LINK_CLASS}
           >
             My APIs
           </Link>
@@ -439,15 +426,12 @@ export function AccessRequestReviewPanel({
       {busy ? (
         <ApplicationCardSkeletonGrid rows={1} />
       ) : pending.length === 0 ? (
-        <Card>
-          <CardContent
-            className="space-y-2 py-10 text-center text-sm text-muted-foreground"
-            data-testid="access-review-empty-state"
-          >
-            <p className="font-medium text-foreground">No pending approvals</p>
-            <p>New requests that require human review will show up here.</p>
-          </CardContent>
-        </Card>
+        <div data-testid="access-review-empty-state">
+          <EmptyState
+            title="No pending approvals"
+            description="New requests that require human review will show up here."
+          />
+        </div>
       ) : (
         <ul className="space-y-4">
           {pending.map((app) => (

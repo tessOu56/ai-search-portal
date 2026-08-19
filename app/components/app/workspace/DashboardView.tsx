@@ -4,6 +4,7 @@ import { Button } from "~/components/ui/Button";
 import { useI18n } from "~/shared/i18n/context";
 
 import { WorkspaceFooter } from "./WorkspaceFooter";
+import { useWorkspaceSession } from "./WorkspaceSession";
 
 const QUERIES = [
   {
@@ -32,6 +33,7 @@ const QUERIES = [
  */
 export function DashboardView() {
   const { t } = useI18n();
+  const { rememberCurrentIfOverview } = useWorkspaceSession();
 
   return (
     <div className="flex flex-1 flex-col">
@@ -70,7 +72,10 @@ export function DashboardView() {
               </p>
               <div className="flex flex-wrap gap-space-8">
                 <Button asChild size="sm">
-                  <Link to={`/?q=${encodeURIComponent(question)}`}>
+                  <Link
+                    to={`/?q=${encodeURIComponent(question)}`}
+                    onClick={rememberCurrentIfOverview}
+                  >
                     {t("overview.ask")}
                   </Link>
                 </Button>

@@ -31,38 +31,17 @@ describe("api.items route — contract enforcement", () => {
     expect(Array.isArray(body.data)).toBe(true);
   });
 
-  it("POST /api/items rejects invalid payload", async () => {
-    const response = await createItemAction({
+  it("POST /api/items is not allowed for visitors", () => {
+    const response = createItemAction({
       request: new Request(ITEMS_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: "missing name" }),
+        body: JSON.stringify({ name: "Blocked" }),
       }),
       params: {},
       context: {},
     });
-    expect(response.status).toBe(400);
-  });
-
-  it("POST /api/items creates item with contract-shaped response", async () => {
-    const response = await createItemAction({
-      request: new Request(ITEMS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: " Route test item ",
-          description: "via loader action",
-        }),
-      }),
-      params: {},
-      context: {},
-    });
-    expect(response.status).toBe(201);
-    const body = (await response.json()) as {
-      data: { id: string; name: string };
-    };
-    expect(body.data.name).toBe("Route test item");
-    expect(body.data.id).toBeTruthy();
+    expect(response.status).toBe(405);
   });
 });
 
@@ -78,16 +57,16 @@ describe("api.items.$itemId route — contract enforcement", () => {
     expect(response.status).toBe(404);
   });
 
-  it("PATCH rejects empty update body", async () => {
-    const response = await itemByIdAction({
+  it("PATCH is not allowed for visitors", () => {
+    const response = itemByIdAction({
       request: new Request(`${ITEMS_URL}/1`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ name: "Nope" }),
       }),
       params: { itemId: "1" },
       context: {},
     });
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(405);
   });
 });

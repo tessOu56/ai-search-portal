@@ -8,6 +8,8 @@
   "home.nav.ask": "Ask",
   "home.nav.overview": "Overview",
   "home.nav.switcher": "Workspace view",
+  "nav.back": "Back",
+  "nav.directory": "Directory",
   "home.badge.trusted": "Trusted answers",
   "home.badge.lui": "LUI guide",
   "home.badge.tech": "Remix + Vite",

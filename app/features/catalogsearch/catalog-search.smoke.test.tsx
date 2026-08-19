@@ -45,5 +45,6 @@ describe("catalog-search shell", () => {
       screen.getByRole("textbox", { name: /catalog search query/i })
     ).toBeTruthy();
     expect(screen.getByText(/dictionary\/search/i)).toBeTruthy();
+    expect(screen.queryByText(/\?material=/)).toBeNull();
   });
 });

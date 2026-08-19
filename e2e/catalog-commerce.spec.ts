@@ -35,7 +35,7 @@ test.describe("catalog commerce facets", () => {
     await expect(page.getByTestId("catalog-knowledge-section")).toBeVisible({
       timeout: 30_000,
     });
-    await expect(page.getByText(/auctionEligible/)).toBeVisible();
+    await expect(page.getByText(/row\(s\) · auctionEligible/)).toBeVisible();
   });
 
   test("invalid productType is stripped with facetWarning", async ({
@@ -44,12 +44,11 @@ test.describe("catalog commerce facets", () => {
     await page.goto(`/catalog-search?productType=not-a-type&${PACK}`, {
       waitUntil: WAIT_DOM,
     });
-    await expect(page.getByRole("status")).toContainText(
-      /Unknown productType/i,
-      {
-        timeout: 30_000,
-      }
-    );
+    await expect(
+      page.getByRole("status").filter({ hasText: /Unknown productType/i })
+    ).toBeVisible({
+      timeout: 30_000,
+    });
     // Loader clears activeProductType; UI must not treat the invalid value as active.
     await expect(page.getByText("productType=not-a-type")).toHaveCount(0);
   });

@@ -9,11 +9,10 @@ import {
   DashboardView,
   WorkspaceChatView,
   WorkspaceFooter,
-  WorkspaceTopbar,
 } from "~/components/app/workspace";
 import { Button } from "~/components/ui/Button";
+import { ASK_HOME_RESET_EVENT } from "~/lib/workspace-mode";
 import { getLocale, getTranslations } from "~/shared/i18n";
-import { useI18n } from "~/shared/i18n/context";
 import { t } from "~/shared/i18n/server";
 import {
   buildJsonLdWebPage,
@@ -79,7 +78,6 @@ function Atmosphere() {
 }
 
 export default function Index() {
-  const { t: translate } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
   const viewParam = searchParams.get("view");
   const view =
@@ -120,11 +118,16 @@ export default function Index() {
     }
   }, [searchParams, setSearchParams]);
 
+  useEffect(() => {
+    const onReset = () => onNewConversation();
+    window.addEventListener(ASK_HOME_RESET_EVENT, onReset);
+    return () => window.removeEventListener(ASK_HOME_RESET_EVENT, onReset);
+  }, [onNewConversation]);
+
   if (view === "dashboard") {
     return (
-      <div className="relative flex min-h-dvh flex-col">
+      <div className="relative flex min-h-0 flex-1 flex-col">
         <Atmosphere />
-        <WorkspaceTopbar />
         <DashboardView />
       </div>
     );
@@ -134,7 +137,6 @@ export default function Index() {
     return (
       <div className="relative">
         <Atmosphere />
-        <WorkspaceTopbar />
         <HomeLanding onAsk={onAsk} />
         <HomeIntro />
         <WorkspaceFooter />
@@ -144,26 +146,14 @@ export default function Index() {
 
   return (
     <div
-      className="relative flex min-h-dvh flex-col"
+      className="relative flex min-h-0 flex-1 flex-col"
       data-testid="conversation-shell"
     >
       <Atmosphere />
-      <WorkspaceTopbar
-        onBrandClick={onNewConversation}
-        trailing={
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onNewConversation}
-          >
-            {translate("chat.new")}
-          </Button>
-        }
-      />
       <WorkspaceChatView
         pendingQuery={pendingQuery}
         onPendingQueryConsumed={() => setPendingQuery(null)}
+        onNewConversation={onNewConversation}
       />
     </div>
   );

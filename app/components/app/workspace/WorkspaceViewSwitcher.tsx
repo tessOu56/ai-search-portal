@@ -1,77 +1,48 @@
-import { Link, useSearchParams } from "@remix-run/react";
+import { Link } from "@remix-run/react";
+import { Compass, Sparkles } from "lucide-react";
 
-import { Button } from "~/components/ui/Button";
-import { Tabs, TabsList } from "~/components/ui/Tabs";
+import { SegmentedNav, SegmentedNavItem } from "~/components/ui/SegmentedNav";
+import { ASK_HOME } from "~/lib/workspace-mode";
 import { useI18n } from "~/shared/i18n/context";
 import { cn } from "~/shared/utils/cn";
 
-type WorkspaceView = "chat" | "dashboard";
+import { useWorkspaceSession } from "./WorkspaceSession";
 
 type WorkspaceViewSwitcherProps = {
   className?: string;
 };
 
-const VIEW_PARAM = "view";
-
 export function WorkspaceViewSwitcher({
   className,
 }: WorkspaceViewSwitcherProps) {
   const { t } = useI18n();
-  const [searchParams] = useSearchParams();
-  const raw = searchParams.get(VIEW_PARAM);
-  const current: WorkspaceView =
-    raw === "dashboard" || raw === "saas" ? "dashboard" : "chat";
-
-  const makeHref = (view: WorkspaceView) => {
-    const next = new URLSearchParams(searchParams);
-    next.delete("q");
-    if (view === "chat") {
-      next.delete(VIEW_PARAM);
-    } else {
-      next.set(VIEW_PARAM, view);
-    }
-    const query = next.toString();
-    return query ? `/?${query}` : "/";
-  };
+  const { mode, overviewReturnHref, rememberCurrentIfOverview } =
+    useWorkspaceSession();
 
   return (
-    <Tabs className="space-y-0">
-      <TabsList className={className} aria-label={t("home.nav.switcher")}>
-        <ViewChip
-          to={makeHref("chat")}
-          isActive={current === "chat"}
-          label={t("home.nav.ask")}
-        />
-        <ViewChip
-          to={makeHref("dashboard")}
-          isActive={current === "dashboard"}
-          label={t("home.nav.overview")}
-        />
-      </TabsList>
-    </Tabs>
-  );
-}
-
-type ViewChipProps = {
-  to: string;
-  isActive: boolean;
-  label: string;
-};
-
-function ViewChip({ to, isActive, label }: ViewChipProps) {
-  return (
-    <Button
-      asChild
-      size="sm"
-      variant={isActive ? "default" : "ghost"}
-      className={cn(
-        "rounded-full px-4",
-        !isActive && "bg-transparent text-muted-foreground hover:bg-background"
-      )}
-      role="tab"
-      aria-selected={isActive}
+    <SegmentedNav
+      density="icon"
+      aria-label={t("home.nav.switcher")}
+      className={cn(className)}
     >
-      <Link to={to}>{label}</Link>
-    </Button>
+      <SegmentedNavItem
+        asChild
+        current={mode === "ask"}
+        aria-label={t("home.nav.ask")}
+      >
+        <Link to={ASK_HOME} onClick={rememberCurrentIfOverview}>
+          <Sparkles className="size-4" aria-hidden />
+        </Link>
+      </SegmentedNavItem>
+      <SegmentedNavItem
+        asChild
+        current={mode === "overview"}
+        aria-label={t("home.nav.overview")}
+      >
+        <Link to={overviewReturnHref}>
+          <Compass className="size-4" aria-hidden />
+        </Link>
+      </SegmentedNavItem>
+    </SegmentedNav>
   );
 }

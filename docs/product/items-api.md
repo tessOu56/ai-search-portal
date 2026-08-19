@@ -8,8 +8,8 @@
 
 ## 用途
 
-- 示範 Remix Resource Route 的 GET/POST/PUT/PATCH/DELETE。
-- 提供與後端無關的**最小可測 API**，供整合測試或前端串接練習。
+- 示範 Remix Resource Route 的 GET 列表／詳情。
+- 訪客平台不開放建立／更新／刪除；寫入回 405。
 - 非領域核心；領域模型以 [domain-food-recipe](domain-food-recipe.md) 為準。
 
 ---
@@ -31,13 +31,13 @@
 
 ## 端點行為
 
-| 方法        | 路徑               | 說明                                                                                           |
-| ----------- | ------------------ | ---------------------------------------------------------------------------------------------- |
-| GET         | /api/items         | 回傳 `{ data: MockItem[] }`                                                                    |
-| POST        | /api/items         | Body: `{ name: string, description?: string }`；回傳 201 `{ data: MockItem }`；name 必填、非空 |
-| GET         | /api/items/:itemId | 回傳 `{ data: MockItem }`；無則 404                                                            |
-| PUT / PATCH | /api/items/:itemId | Body: `{ name?: string, description?: string }`；至少一欄；回傳 `{ data: MockItem }`；無則 404 |
-| DELETE      | /api/items/:itemId | 回傳 `{ data: MockItem }`（已刪除的那筆）；無則 404                                            |
+| 方法        | 路徑               | 說明                                |
+| ----------- | ------------------ | ----------------------------------- |
+| GET         | /api/items         | 回傳 `{ data: MockItem[] }`         |
+| POST        | /api/items         | **405**（訪客不可寫）               |
+| GET         | /api/items/:itemId | 回傳 `{ data: MockItem }`；無則 404 |
+| PUT / PATCH | /api/items/:itemId | **405**                             |
+| DELETE      | /api/items/:itemId | **405**                             |
 
 - 錯誤：400（缺參/格式）、404（Item not found）、405（Method not allowed），body 為 `{ error: string }`。
 
@@ -45,16 +45,15 @@
 
 ## 對應頁面（v1）
 
-- `/items`：列表頁
-- `/items/new`：新增頁
-- `/items/:itemId`：單筆詳情與編輯頁
+- `/items`：唯讀列表
+- `/items/:itemId`：唯讀詳情（無表單）
 
-頁面 route：`app/routes/items.tsx`、`app/routes/items._index.tsx`、`app/routes/items.new.tsx`、`app/routes/items.$itemId.tsx`
+頁面 route：`app/routes/items.tsx`、`app/routes/items._index.tsx`、`app/routes/items.$itemId.tsx`。`/items/new` 已刪，須 404。
 
 ---
 
 ## 檔案對應
 
-- 路由：`app/routes/api.items.ts`（list, create）、`app/routes/api.items.$itemId.ts`（get, update, delete）
-- 頁面：`app/routes/items.tsx`、`app/routes/items._index.tsx`、`app/routes/items.new.tsx`、`app/routes/items.$itemId.tsx`
+- 路由：`app/routes/api.items.ts`（list GET）、`app/routes/api.items.$itemId.ts`（get GET；寫入 405）
+- 頁面：`app/routes/items.tsx`、`app/routes/items._index.tsx`、`app/routes/items.$itemId.tsx`
 - 服務：`app/services/mock-items.server.ts`（listMockItems, getMockItem, createMockItem, updateMockItem, deleteMockItem）

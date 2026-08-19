@@ -69,6 +69,15 @@ function notify(): void {
 export function recordVital(vital: StoredVital): void {
   if (!isBrowser()) return;
   ensureHydrated();
+  const previous = memoryStore.get(vital.name);
+  if (
+    previous &&
+    previous.value === vital.value &&
+    previous.rating === vital.rating &&
+    previous.route === vital.route
+  ) {
+    return;
+  }
   memoryStore.set(vital.name, vital);
   persist();
   notify();

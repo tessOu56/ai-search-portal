@@ -30,7 +30,7 @@ UI tokens come from [explore-design-sdk](https://github.com/tessOu56/explore-des
 3. Review (demo role, **not** real auth): `/access-requests/review?sessionRole=owner`
 4. Track: `/my-apis?sessionRole=requester`
 
-Also: `/` (golden chat with offline fixture), `/catalog-search/dictionary` (virtualized list), `/site-map` (human IA map).
+Also: `/` (golden chat with offline fixture), `/catalog-search/dictionary` (virtualized list).
 
 ## Stack
 

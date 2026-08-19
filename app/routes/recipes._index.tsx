@@ -4,8 +4,10 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { DataTable } from "~/components/ui/DataTable";
 import { EmptyState } from "~/components/ui/EmptyState";
+import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
 import { getAllRecipes } from "~/features/recipe/recipe.server";
+import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { ensureSeeded } from "~/services/seed.server";
 
 export async function loader(_args: LoaderFunctionArgs) {
@@ -24,40 +26,42 @@ export default function RecipesIndexPage() {
       {recipes.length === 0 ? (
         <EmptyState title="尚無 Recipe" />
       ) : (
-        <DataTable
-          columns={[
-            {
-              key: "title",
-              header: "Title",
-              accessor: (row) => (
-                <Link
-                  to={`/recipes/${row.id}`}
-                  className="font-medium text-primary hover:underline"
-                >
-                  {row.title}
-                </Link>
-              ),
-            },
-            {
-              key: "description",
-              header: "Description",
-              accessor: (row) => (
-                <span className="text-muted-foreground">
-                  {row.description ?? "（無描述）"}
-                </span>
-              ),
-            },
-            {
-              key: "dish",
-              header: "Dish",
-              accessor: (row) => (
-                <span className="text-muted-foreground">{row.dishName}</span>
-              ),
-            },
-          ]}
-          rows={recipes}
-          getRowKey={(row) => row.id}
-        />
+        <Panel className="overflow-x-auto">
+          <DataTable
+            columns={[
+              {
+                key: "title",
+                header: "Title",
+                accessor: (row) => (
+                  <Link
+                    to={`/recipes/${row.id}`}
+                    className={PRODUCT_TABLE_LINK_CLASS}
+                  >
+                    {row.title}
+                  </Link>
+                ),
+              },
+              {
+                key: "description",
+                header: "Description",
+                accessor: (row) => (
+                  <span className="text-muted-foreground">
+                    {row.description ?? "（無描述）"}
+                  </span>
+                ),
+              },
+              {
+                key: "dish",
+                header: "Dish",
+                accessor: (row) => (
+                  <span className="text-muted-foreground">{row.dishName}</span>
+                ),
+              },
+            ]}
+            rows={recipes}
+            getRowKey={(row) => row.id}
+          />
+        </Panel>
       )}
     </Stack>
   );

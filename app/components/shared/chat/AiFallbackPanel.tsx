@@ -5,13 +5,7 @@ import {
 import { Link } from "@remix-run/react";
 
 import { Button } from "~/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/Card";
+import { Panel } from "~/components/ui/Panel";
 import { useI18n } from "~/shared/i18n/context";
 import {
   buildCatalogSearchUrl,
@@ -66,12 +60,14 @@ export function AiFallbackPanel({
   };
 
   return (
-    <Card data-testid="ai-fallback-panel">
-      <CardHeader>
-        <CardTitle className="text-base">{t("chat.fallback.title")}</CardTitle>
-        <CardDescription>{t("chat.fallback.description")}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-wrap items-center gap-2">
+    <Panel data-testid="ai-fallback-panel">
+      <h2 className="text-type-16 font-semibold text-foreground">
+        {t("chat.fallback.title")}
+      </h2>
+      <p className="mt-1 text-type-14 text-muted-foreground">
+        {t("chat.fallback.description")}
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <Button asChild size="sm">
           <Link
             to={buildCatalogSearchUrl({ q: trimmed, ...fallbackIntent })}
@@ -138,7 +134,7 @@ export function AiFallbackPanel({
             </Link>
           </Button>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }

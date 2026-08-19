@@ -1,13 +1,7 @@
 import type { ReactNode } from "react";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/Card";
 import { EmptyState } from "~/components/ui/EmptyState";
+import { Panel } from "~/components/ui/Panel";
 import { Skeleton } from "~/components/ui/Skeleton";
 
 export type ProductResultsShellProps = {
@@ -38,19 +32,17 @@ export function ProductResultsShell({
   skeletonRows = 3,
 }: ProductResultsShellProps) {
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div className="space-y-1">
-            <CardTitle className="text-base">{title}</CardTitle>
-            {description ? (
-              <CardDescription>{description}</CardDescription>
-            ) : null}
-          </div>
-          {headerExtra}
+    <Panel>
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
+        <div className="space-y-1">
+          <h2 className="text-type-16 font-medium text-foreground">{title}</h2>
+          {description ? (
+            <p className="text-type-14 text-muted-foreground">{description}</p>
+          ) : null}
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        {headerExtra}
+      </div>
+      <div className="space-y-4">
         {isLoading ? (
           <div role="status" aria-label={loadingLabel} className="space-y-2">
             {Array.from({ length: skeletonRows }, (_, index) => (
@@ -63,8 +55,8 @@ export function ProductResultsShell({
           children
         )}
         {pagination}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 

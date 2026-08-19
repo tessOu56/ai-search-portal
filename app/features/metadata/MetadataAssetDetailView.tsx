@@ -7,14 +7,9 @@ import { GenUiRenderer } from "~/components/shared/genui";
 import { AccessRequestLifecycleStepper } from "~/components/shared/governance";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/Card";
+import { Panel } from "~/components/ui/Panel";
 import { Select } from "~/components/ui/Select";
+import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import type {
   AccessApplicationContract,
   GenUiDocumentContract,
@@ -101,7 +96,7 @@ function ApprovedTrackingLink({ requestId }: { requestId: string }) {
     <p className="text-sm">
       <Link
         to={myApisHighlightHref(requestId)}
-        className="text-primary hover:underline"
+        className={PRODUCT_TABLE_LINK_CLASS}
       >
         View in My APIs (requester view) →
       </Link>
@@ -129,14 +124,14 @@ function SubmitResultBanner({
         <p className="text-sm">
           <Link
             to="/my-apis?sessionRole=requester"
-            className="text-primary hover:underline"
+            className={PRODUCT_TABLE_LINK_CLASS}
           >
             Track in My APIs
           </Link>
           {" · "}
           <Link
             to="/access-requests/review?sessionRole=owner"
-            className="text-primary hover:underline"
+            className={PRODUCT_TABLE_LINK_CLASS}
           >
             Owner review queue
           </Link>
@@ -168,15 +163,17 @@ function AccessContextForm({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Access context</CardTitle>
-        <CardDescription>
+    <Panel>
+      <div className="mb-3 space-y-1">
+        <h2 className="text-type-16 font-semibold text-foreground">
+          Access context
+        </h2>
+        <p className="text-type-14 text-muted-foreground">
           Purpose and role drive the policy decision below — changing them
           updates this page&apos;s URL so the exact scenario stays shareable.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+        </p>
+      </div>
+      <div>
         <form
           ref={formRef}
           method="get"
@@ -225,8 +222,8 @@ function AccessContextForm({
             </Button>
           </noscript>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 
@@ -250,14 +247,16 @@ function AccessRequestPanel({
   const busy = fetcher.state !== "idle";
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Request access</CardTitle>
-        <CardDescription>
+    <Panel>
+      <div className="mb-3 space-y-1">
+        <h2 className="text-type-16 font-semibold text-foreground">
+          Request access
+        </h2>
+        <p className="text-type-14 text-muted-foreground">
           Role: {role} · Purpose: {purpose}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </p>
+      </div>
+      <div className="space-y-4">
         <SubmitResultBanner result={effectiveResult} />
 
         {!showConfirm ? (
@@ -309,8 +308,8 @@ function AccessRequestPanel({
             </fetcher.Form>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 
@@ -344,15 +343,17 @@ function AiAccessRequestPanel({
   const canRequest = policyDecision.allow || policyDecision.need_approval;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">AI-assisted access request</CardTitle>
-        <CardDescription>
+    <Panel>
+      <div className="mb-3 space-y-1">
+        <h2 className="text-type-16 font-semibold text-foreground">
+          AI-assisted access request
+        </h2>
+        <p className="text-type-14 text-muted-foreground">
           Validated by Zod before render. Human confirmation is required before
           submit.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </p>
+      </div>
+      <div className="space-y-4">
         <SubmitResultBanner result={effectiveResult} />
 
         <div className="rounded-lg border border-border p-4">
@@ -455,21 +456,23 @@ function AiAccessRequestPanel({
             </fetcher.Form>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 
 function DataContractCard({ asset }: { asset: MetadataAssetDetailContract }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Data contract</CardTitle>
-        <CardDescription>
+    <Panel>
+      <div className="mb-3 space-y-1">
+        <h2 className="text-type-16 font-semibold text-foreground">
+          Data contract
+        </h2>
+        <p className="text-type-14 text-muted-foreground">
           Owner, classification, PII fields, and terms of use
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3 text-sm">
+        </p>
+      </div>
+      <div className="space-y-3 text-sm">
         <p>
           <span className="text-muted-foreground">Owner:</span>{" "}
           {asset.owner ? (
@@ -525,8 +528,8 @@ function DataContractCard({ asset }: { asset: MetadataAssetDetailContract }) {
         ) : (
           <p className="text-muted-foreground">No terms attached.</p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 
@@ -536,14 +539,16 @@ function AccessPolicyCard({
   policyDecision: PolicyDecisionContract;
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Access policy</CardTitle>
-        <CardDescription>
+    <Panel>
+      <div className="mb-3 space-y-1">
+        <h2 className="text-type-16 font-semibold text-foreground">
+          Access policy
+        </h2>
+        <p className="text-type-14 text-muted-foreground">
           Policy-driven evaluation (OPA Rego / in-process fallback)
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4 text-sm">
+        </p>
+      </div>
+      <div className="space-y-4 text-sm">
         <p>{humanPolicySummary(policyDecision)}</p>
         {policyDecision.require_audit ? (
           <p className="text-muted-foreground">
@@ -591,8 +596,8 @@ function AccessPolicyCard({
             </ul>
           </div>
         </details>
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 
@@ -604,10 +609,7 @@ function AssetLineageLists({ asset }: { asset: MetadataAssetDetailContract }) {
         <ul className="space-y-1 text-muted-foreground">
           {asset.upstreamIds.map((id) => (
             <li key={id}>
-              <Link
-                to={`/metadata/${id}`}
-                className="text-primary hover:underline"
-              >
+              <Link to={`/metadata/${id}`} className={PRODUCT_TABLE_LINK_CLASS}>
                 {id}
               </Link>
             </li>
@@ -620,10 +622,7 @@ function AssetLineageLists({ asset }: { asset: MetadataAssetDetailContract }) {
         <ul className="space-y-1 text-muted-foreground">
           {asset.downstreamIds.map((id) => (
             <li key={id}>
-              <Link
-                to={`/metadata/${id}`}
-                className="text-primary hover:underline"
-              >
+              <Link to={`/metadata/${id}`} className={PRODUCT_TABLE_LINK_CLASS}>
                 {id}
               </Link>
             </li>
@@ -641,24 +640,26 @@ function ExistingApplicationCard({
   application: AccessApplicationContract;
 }) {
   return (
-    <Card data-testid="existing-application-card">
-      <CardHeader className="space-y-2">
-        <CardTitle className="text-base">Your application</CardTitle>
-        <CardDescription>
+    <Panel data-testid="existing-application-card">
+      <div className="mb-3 space-y-2">
+        <h2 className="text-type-16 font-semibold text-foreground">
+          Your application
+        </h2>
+        <p className="text-type-14 text-muted-foreground">
           {application.purpose} · {application.role} · submitted{" "}
           {new Date(application.createdAt).toLocaleDateString()}
-        </CardDescription>
+        </p>
         <AccessRequestLifecycleStepper status={application.status} />
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div>
         <Link
           to={myApisHighlightHref(application.id)}
-          className="text-sm text-primary hover:underline"
+          className={`text-sm ${PRODUCT_TABLE_LINK_CLASS}`}
         >
           View in My APIs →
         </Link>
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 

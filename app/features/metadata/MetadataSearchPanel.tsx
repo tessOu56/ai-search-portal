@@ -6,18 +6,14 @@ import { ProductPageHeader } from "~/components/shared/product/ProductPageShell"
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/Card";
 import { DataTable } from "~/components/ui/DataTable";
 import { Input } from "~/components/ui/Input";
+import { Panel } from "~/components/ui/Panel";
 import { Select } from "~/components/ui/Select";
 import { Stack } from "~/components/ui/Stack";
 import { StatusChip } from "~/components/ui/StatusChip";
+import { Toolbar } from "~/components/ui/Toolbar";
+import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { API_CONTEXT_PACK_SELECT } from "~/shared/api/paths";
 import type {
   ContextPackManifestContract,
@@ -200,136 +196,109 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         </p>
       ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Context pack</CardTitle>
-          <CardDescription>
-            Switch between enterprise MAU and vertical supply-chain fixtures.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form
-            method="post"
-            action={API_CONTEXT_PACK_SELECT}
-            className="flex flex-col gap-3 sm:flex-row sm:items-end"
-          >
-            <input type="hidden" name="redirectTo" value={redirectTo} />
-            <label className="flex flex-1 flex-col gap-1 text-sm">
-              <span className="font-medium text-foreground">Active pack</span>
-              <Select
-                name="packId"
-                defaultValue={model.activePackId}
-                className="w-full"
-                aria-label="Context pack"
-                options={model.packs.map((pack) => ({
-                  value: pack.id,
-                  label: pack.name,
-                }))}
-              />
-            </label>
-            <Button type="submit">{t("catalog.search.applyPack")}</Button>
-          </Form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Search</CardTitle>
-          <CardDescription>
-            Filter by name, FQN, tags, or description.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form method="get" className="flex flex-col gap-3 sm:flex-row">
-            <input type="hidden" name="pack" value={model.activePackId} />
-            {model.intent ? (
-              <input type="hidden" name="intent" value={model.intent} />
-            ) : null}
-            {model.activeType ? (
-              <input type="hidden" name="type" value={model.activeType} />
-            ) : null}
-            {model.activeMaterial ? (
-              <input
-                type="hidden"
-                name="material"
-                value={model.activeMaterial}
-              />
-            ) : null}
-            {model.activeStandard ? (
-              <input
-                type="hidden"
-                name="standard"
-                value={model.activeStandard}
-              />
-            ) : null}
-            {model.activeProductType ? (
-              <input
-                type="hidden"
-                name="productType"
-                value={model.activeProductType}
-              />
-            ) : null}
-            {model.activeAuctionEligible ? (
-              <input type="hidden" name="auctionEligible" value="true" />
-            ) : null}
-            <Input
-              name="q"
-              defaultValue={model.query}
-              placeholder="Search metadata… or 925 / 18K"
-              aria-label="Metadata search query"
-              className="flex-1"
+      <Panel>
+        <h2 className="mb-3 text-type-16 font-medium text-foreground">
+          Context pack
+        </h2>
+        <Form
+          method="post"
+          action={API_CONTEXT_PACK_SELECT}
+          className="flex flex-col gap-3 sm:flex-row sm:items-end"
+        >
+          <input type="hidden" name="redirectTo" value={redirectTo} />
+          <label className="flex flex-1 flex-col gap-1 text-sm">
+            <span className="font-medium text-foreground">Active pack</span>
+            <Select
+              name="packId"
+              defaultValue={model.activePackId}
+              className="w-full"
+              aria-label="Context pack"
+              options={model.packs.map((pack) => ({
+                value: pack.id,
+                label: pack.name,
+              }))}
             />
-            <Button type="submit">{t("catalog.search.submit")}</Button>
-          </form>
-        </CardContent>
-      </Card>
+          </label>
+          <Button type="submit">{t("catalog.search.applyPack")}</Button>
+        </Form>
+      </Panel>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Type</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-1">
-          <FacetChip
-            to={buildMetadataSearchUrl({
-              q: model.query,
-              pack: model.activePackId,
-              intent: model.intent,
-              material: model.activeMaterial,
-              standard: model.activeStandard,
-            })}
-            active={!model.activeType}
-          >
-            All
-          </FacetChip>
-          {TYPE_OPTIONS.map((opt) => (
+      <Toolbar>
+        <form method="get" className="flex w-full flex-col gap-3 sm:flex-row">
+          <input type="hidden" name="pack" value={model.activePackId} />
+          {model.intent ? (
+            <input type="hidden" name="intent" value={model.intent} />
+          ) : null}
+          {model.activeType ? (
+            <input type="hidden" name="type" value={model.activeType} />
+          ) : null}
+          {model.activeMaterial ? (
+            <input type="hidden" name="material" value={model.activeMaterial} />
+          ) : null}
+          {model.activeStandard ? (
+            <input type="hidden" name="standard" value={model.activeStandard} />
+          ) : null}
+          {model.activeProductType ? (
+            <input
+              type="hidden"
+              name="productType"
+              value={model.activeProductType}
+            />
+          ) : null}
+          {model.activeAuctionEligible ? (
+            <input type="hidden" name="auctionEligible" value="true" />
+          ) : null}
+          <Input
+            name="q"
+            defaultValue={model.query}
+            placeholder="Search metadata… or 925 / 18K"
+            aria-label="Metadata search query"
+            className="flex-1"
+          />
+          <Button type="submit">{t("catalog.search.submit")}</Button>
+        </form>
+      </Toolbar>
+
+      <Panel>
+        <h2 className="mb-3 text-type-16 font-medium text-foreground">
+          Filters
+        </h2>
+        <div className="mb-4 space-y-1">
+          <span className="text-xs font-medium text-muted-foreground">
+            Type
+          </span>
+          <div className="flex flex-wrap gap-1">
             <FacetChip
-              key={opt}
               to={buildMetadataSearchUrl({
                 q: model.query,
-                type: opt,
                 pack: model.activePackId,
                 intent: model.intent,
                 material: model.activeMaterial,
                 standard: model.activeStandard,
               })}
-              active={model.activeType === opt}
+              active={!model.activeType}
             >
-              {opt}
+              All
             </FacetChip>
-          ))}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Industry facets</CardTitle>
-          <CardDescription>
-            Hallmark / material filters bridge to catalog knowledge (
-            <code className="text-xs">?material=</code> /{" "}
-            <code className="text-xs">?standard=</code>).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-4">
+            {TYPE_OPTIONS.map((opt) => (
+              <FacetChip
+                key={opt}
+                to={buildMetadataSearchUrl({
+                  q: model.query,
+                  type: opt,
+                  pack: model.activePackId,
+                  intent: model.intent,
+                  material: model.activeMaterial,
+                  standard: model.activeStandard,
+                })}
+                active={model.activeType === opt}
+              >
+                {opt}
+              </FacetChip>
+            ))}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-4">
           <div className="space-y-1">
             <span className="text-xs font-medium text-muted-foreground">
               Material
@@ -413,18 +382,18 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               Open matching knowledge in catalog →
             </Link>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
       {knowledgeHits.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Knowledge bridge</CardTitle>
-            <CardDescription>
-              Industry-matched glossary / ops from the active pack.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
+        <Panel>
+          <h2 className="mb-1 text-type-16 font-medium text-foreground">
+            Knowledge bridge
+          </h2>
+          <p className="mb-3 text-type-14 text-muted-foreground">
+            Industry-matched glossary from the active pack.
+          </p>
+          <div className="space-y-2">
             {knowledgeHits.map((hit) => (
               <Link
                 key={hit.id}
@@ -462,8 +431,8 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                 </Badge>
               </Link>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </Panel>
       ) : null}
 
       <ProductResultsShell
@@ -512,7 +481,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               accessor: (row) => (
                 <Link
                   to={`/metadata/${row.id}?pack=${encodeURIComponent(model.activePackId)}`}
-                  className="font-medium text-primary hover:underline"
+                  className={PRODUCT_TABLE_LINK_CLASS}
                 >
                   {row.name}
                 </Link>

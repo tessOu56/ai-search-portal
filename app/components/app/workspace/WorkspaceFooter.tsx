@@ -48,11 +48,6 @@ export function WorkspaceFooter({ agentMode }: WorkspaceFooterProps) {
             {t("footer.vitals")}
           </Link>
         </p>
-        <p>
-          <Link to="/site-map" className="text-primary hover:underline">
-            {t("footer.sitemap")}
-          </Link>
-        </p>
         {modeLabel ? <p title={t("chat.badge.sse")}>{modeLabel}</p> : null}
         <p title={t("footer.synthetic.hint")}>{t("footer.synthetic")}</p>
         <p title={t("footer.demo_roles.hint")}>{t("footer.demo_roles")}</p>
