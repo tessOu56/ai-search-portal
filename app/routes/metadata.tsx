@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "@remix-run/react";
 
 import { ProductPageShell } from "~/components/shared/product/ProductPageShell";
+import { OVERVIEW_HOME } from "~/lib/workspace-mode";
 
 export default function MetadataLayout() {
   const { pathname } = useLocation();
@@ -9,7 +10,7 @@ export default function MetadataLayout() {
   return (
     <ProductPageShell
       crumbs={[
-        { to: "/", label: "AI Search Portal" },
+        { to: OVERVIEW_HOME, label: "AI Search Portal" },
         ...(onDetail ? [{ to: "/metadata", label: "Metadata catalog" }] : []),
       ]}
       current={onDetail ? "Asset" : "Metadata catalog"}

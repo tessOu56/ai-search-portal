@@ -3,6 +3,7 @@ import { forwardRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { DashboardView } from "./DashboardView";
+import { WorkspaceSessionProvider } from "./WorkspaceSession";
 
 vi.mock("@remix-run/react", () => ({
   Link: ({
@@ -21,6 +22,8 @@ vi.mock("@remix-run/react", () => ({
     ({ children }, ref) => <form ref={ref}>{children}</form>
   ),
   useRouteLoaderData: () => ({ locale: "en", version: "0.0.0" }),
+  useLocation: () => ({ pathname: "/", search: "?view=dashboard" }),
+  useSearchParams: () => [new URLSearchParams("view=dashboard"), vi.fn()],
 }));
 
 vi.mock("~/shared/i18n/context", () => ({
@@ -74,7 +77,11 @@ vi.mock("~/shared/i18n/context", () => ({
 
 describe("DashboardView", () => {
   it("presents business queries instead of empty metrics", () => {
-    render(<DashboardView />);
+    render(
+      <WorkspaceSessionProvider>
+        <DashboardView />
+      </WorkspaceSessionProvider>
+    );
     expect(
       screen.getByRole("heading", { name: "What you can look up" })
     ).toBeInTheDocument();

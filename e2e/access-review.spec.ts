@@ -41,7 +41,9 @@ test.describe("access review center (T-068)", () => {
     await expect(page.getByText(PENDING).first()).toBeVisible();
 
     await page.getByRole("button", { name: "Approve" }).first().click();
-    await expect(page.getByRole("status")).toContainText("approved");
+    await expect(
+      page.getByRole("status").filter({ hasText: "approved" })
+    ).toBeVisible();
 
     const audit = await page.request.get(AUDIT_API);
     expect(audit.ok()).toBeTruthy();
@@ -68,7 +70,9 @@ test.describe("access review center (T-068)", () => {
     });
 
     await page.getByRole("button", { name: "Reject" }).first().click();
-    await expect(page.getByRole("status")).toContainText("denied");
+    await expect(
+      page.getByRole("status").filter({ hasText: "denied" })
+    ).toBeVisible();
 
     const audit = await page.request.get(AUDIT_API);
     const body = (await audit.json()) as {
@@ -91,11 +95,15 @@ test.describe("access review center (T-068)", () => {
     });
 
     const card = page.locator("li").filter({ hasText: PENDING }).first();
-    await card.getByLabel("Edit purpose").selectOption("operations");
-    await card.getByLabel("Edit role").selectOption("engineer");
-    await card.getByRole("button", { name: "Edit" }).click();
+    await card.getByRole("button", { name: "Edit purpose" }).click();
+    await card.getByRole("option", { name: "operations" }).click();
+    await card.getByRole("button", { name: "Edit role" }).click();
+    await card.getByRole("option", { name: "engineer" }).click();
+    await card.getByRole("button", { name: "Edit", exact: true }).click();
 
-    await expect(page.getByRole("status")).toContainText("edited");
+    await expect(
+      page.getByRole("status").filter({ hasText: "edited" })
+    ).toBeVisible();
     await expect(page.getByText("operations · engineer").first()).toBeVisible();
     await expect(page.getByText(PENDING).first()).toBeVisible();
 

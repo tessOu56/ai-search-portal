@@ -6,6 +6,7 @@ import { EmptyState } from "~/components/ui/EmptyState";
 import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
 import { StatusChip } from "~/components/ui/StatusChip";
+import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { getLocale, getTranslations } from "~/shared/i18n";
 import { useI18n } from "~/shared/i18n/context";
 import { t } from "~/shared/i18n/server";
@@ -91,7 +92,7 @@ export default function ReleaseNotesIndex() {
                   <div className="mb-3 flex flex-wrap items-center gap-3">
                     <Link
                       to={`/release-notes/${note.version}`}
-                      className="text-xl font-semibold text-primary hover:underline"
+                      className={`text-xl font-semibold ${PRODUCT_TABLE_LINK_CLASS}`}
                     >
                       v{note.version}
                     </Link>
@@ -108,7 +109,7 @@ export default function ReleaseNotesIndex() {
                   <p className="text-muted-foreground">{note.summary}</p>
                   <Link
                     to={`/release-notes/${note.version}`}
-                    className="mt-3 inline-block text-sm text-primary hover:underline"
+                    className={`mt-3 inline-block text-sm ${PRODUCT_TABLE_LINK_CLASS}`}
                   >
                     {t("release-notes.summary")} →
                   </Link>

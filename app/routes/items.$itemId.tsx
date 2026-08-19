@@ -1,19 +1,11 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { Link, useLoaderData } from "@remix-run/react";
 
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { Button } from "~/components/ui/Button";
-import { FormField } from "~/components/ui/FormField";
-import { Input } from "~/components/ui/Input";
 import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
-import { Textarea } from "~/components/ui/Textarea";
-import {
-  deleteMockItem,
-  getMockItem,
-  updateMockItem,
-} from "~/services/mock-items.server";
+import { getMockItem } from "~/services/mock-items.server";
 
 export function loader({ params }: LoaderFunctionArgs) {
   const itemId = params.itemId;
@@ -23,29 +15,6 @@ export function loader({ params }: LoaderFunctionArgs) {
   return { item };
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
-  const itemId = params.itemId;
-  if (!itemId) throw new Response("Missing itemId", { status: 400 });
-
-  const form = await request.formData();
-  const intent = String(form.get("intent") ?? "update");
-
-  if (intent === "delete") {
-    deleteMockItem(itemId);
-    return redirect("/items");
-  }
-
-  const name = String(form.get("name") ?? "").trim();
-  const descriptionRaw = String(form.get("description") ?? "").trim();
-  if (!name) return new Response("Name is required", { status: 400 });
-
-  updateMockItem(itemId, {
-    name,
-    description: descriptionRaw.length > 0 ? descriptionRaw : null,
-  });
-  return redirect(`/items/${itemId}`);
-}
-
 export default function ItemDetailPage() {
   const { item } = useLoaderData<typeof loader>();
 
@@ -53,31 +22,25 @@ export default function ItemDetailPage() {
     <Stack gap="lg">
       <ProductPageHeader title={`Item #${item.id}`} />
       <Panel>
-        <Form method="post" className="space-y-4">
-          <FormField label="名稱" required id="name">
-            <Input id="name" name="name" defaultValue={item.name} required />
-          </FormField>
-          <FormField label="描述" id="description">
-            <Textarea
-              id="description"
-              name="description"
-              defaultValue={item.description ?? ""}
-            />
-          </FormField>
-          <div className="flex gap-3">
-            <Button type="submit">儲存</Button>
-            <Button asChild variant="outline">
-              <Link to="/items">返回列表</Link>
-            </Button>
+        <Stack gap="md">
+          <div>
+            <p className="text-type-12 font-medium text-muted-foreground">
+              名稱
+            </p>
+            <p className="text-type-16 text-foreground">{item.name}</p>
           </div>
-        </Form>
-
-        <Form method="post" className="mt-4">
-          <input type="hidden" name="intent" value="delete" />
-          <Button type="submit" variant="outline">
-            刪除 Item
+          <div>
+            <p className="text-type-12 font-medium text-muted-foreground">
+              描述
+            </p>
+            <p className="text-type-16 text-muted-foreground">
+              {item.description ?? "（無描述）"}
+            </p>
+          </div>
+          <Button asChild variant="outline">
+            <Link to="/items">返回列表</Link>
           </Button>
-        </Form>
+        </Stack>
       </Panel>
     </Stack>
   );

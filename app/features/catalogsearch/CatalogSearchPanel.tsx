@@ -9,17 +9,13 @@ import { ProductPageHeader } from "~/components/shared/product/ProductPageShell"
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/Card";
 import { DataTable } from "~/components/ui/DataTable";
 import { Input } from "~/components/ui/Input";
+import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
 import { StatusChip } from "~/components/ui/StatusChip";
+import { Toolbar } from "~/components/ui/Toolbar";
+import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { useI18n } from "~/shared/i18n/context";
 import { buildMetadataSearchUrl } from "~/shared/navigation";
 
@@ -104,18 +100,9 @@ function CatalogFacetFilters({
   standardLabels: Map<string, string>;
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Filters</CardTitle>
-        <CardDescription>
-          Type + industry / commerce facets via URL (
-          <code className="text-xs">?material=</code> /{" "}
-          <code className="text-xs">?standard=</code> /{" "}
-          <code className="text-xs">?productType=</code> /{" "}
-          <code className="text-xs">?auctionEligible=</code>).
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-wrap gap-4">
+    <Panel>
+      <h2 className="mb-3 text-type-16 font-medium text-foreground">Filters</h2>
+      <div className="flex flex-wrap gap-4">
         <div className="space-y-1">
           <span className="text-xs font-medium text-muted-foreground">
             Type
@@ -280,8 +267,8 @@ function CatalogFacetFilters({
             </div>
           </fieldset>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 
@@ -294,21 +281,15 @@ function CatalogKnowledgeHits({
 }) {
   if ((model.sourceCounts?.knowledge ?? 0) === 0) return null;
   return (
-    <Card data-testid="catalog-knowledge-section">
-      <CardHeader>
-        <CardTitle className="text-base">Domain knowledge</CardTitle>
-        <CardDescription>
-          Facet-filtered glossary / narrative / ops
-          {model.activeStandard ? ` · standard=${model.activeStandard}` : ""}
-          {model.activeMaterial ? ` · material=${model.activeMaterial}` : ""}
-          {model.activeProductType
-            ? ` · productType=${model.activeProductType}`
-            : ""}
-          {model.activeAuctionEligible ? " · auctionEligible" : ""}. Metadata
-          assets below are not filtered by hallmark.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <Panel data-testid="catalog-knowledge-section">
+      <h2 className="mb-1 text-type-16 font-medium text-foreground">
+        Domain knowledge
+      </h2>
+      <p className="mb-3 text-type-14 text-muted-foreground">
+        Glossary and domain notes matching the active filters. Asset rows below
+        are not filtered by hallmark.
+      </p>
+      <div className="space-y-2">
         {model.results
           .filter((row) => row.source === "knowledge")
           .map((row) => (
@@ -358,8 +339,8 @@ function CatalogKnowledgeHits({
               </Badge>
             </div>
           ))}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }
 
@@ -412,46 +393,40 @@ function CatalogPagination({
 function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
   const { t } = useI18n();
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Search</CardTitle>
-        <CardDescription>GET form — filters preserved in URL.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form method="get" className="flex flex-col gap-3 sm:flex-row">
-          {model.intent ? (
-            <input type="hidden" name="intent" value={model.intent} />
-          ) : null}
-          {model.activeType ? (
-            <input type="hidden" name="type" value={model.activeType} />
-          ) : null}
-          {model.activeMaterial ? (
-            <input type="hidden" name="material" value={model.activeMaterial} />
-          ) : null}
-          {model.activeStandard ? (
-            <input type="hidden" name="standard" value={model.activeStandard} />
-          ) : null}
-          {model.activeProductType ? (
-            <input
-              type="hidden"
-              name="productType"
-              value={model.activeProductType}
-            />
-          ) : null}
-          {model.activeAuctionEligible ? (
-            <input type="hidden" name="auctionEligible" value="true" />
-          ) : null}
-          <Input
-            name="q"
-            defaultValue={model.query}
-            placeholder="Filter APIs, tables, 925, 鍛造…"
-            aria-label="Catalog search query"
-            className="flex-1"
+    <Toolbar>
+      <form method="get" className="flex w-full flex-col gap-3 sm:flex-row">
+        {model.intent ? (
+          <input type="hidden" name="intent" value={model.intent} />
+        ) : null}
+        {model.activeType ? (
+          <input type="hidden" name="type" value={model.activeType} />
+        ) : null}
+        {model.activeMaterial ? (
+          <input type="hidden" name="material" value={model.activeMaterial} />
+        ) : null}
+        {model.activeStandard ? (
+          <input type="hidden" name="standard" value={model.activeStandard} />
+        ) : null}
+        {model.activeProductType ? (
+          <input
+            type="hidden"
+            name="productType"
+            value={model.activeProductType}
           />
-          <Button type="submit">{t("catalog.search.submit")}</Button>
-        </form>
-      </CardContent>
-    </Card>
+        ) : null}
+        {model.activeAuctionEligible ? (
+          <input type="hidden" name="auctionEligible" value="true" />
+        ) : null}
+        <Input
+          name="q"
+          defaultValue={model.query}
+          placeholder="Filter APIs, tables, 925, 鍛造…"
+          aria-label="Catalog search query"
+          className="flex-1"
+        />
+        <Button type="submit">{t("catalog.search.submit")}</Button>
+      </form>
+    </Toolbar>
   );
 }
 
@@ -584,7 +559,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
                   {row.detailHref ? (
                     <Link
                       to={row.detailHref}
-                      className="font-medium text-primary hover:underline"
+                      className={PRODUCT_TABLE_LINK_CLASS}
                     >
                       {row.name}
                     </Link>

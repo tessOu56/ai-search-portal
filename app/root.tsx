@@ -17,6 +17,7 @@ import {
 import { useEffect } from "react";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
+import { AppChrome } from "~/components/app/workspace";
 import { NavProgress } from "~/components/shared/chrome/NavProgress";
 import { StarCursor } from "~/components/shared/chrome/StarCursor";
 import { startWebVitalsReporting } from "~/lib/analytics/web-vitals-reporter";
@@ -124,9 +125,14 @@ export default function App() {
   }
   return (
     <I18nProvider locale={data.locale} translations={data.translations}>
-      <main id="main-content">
-        <Outlet />
-      </main>
+      <AppChrome>
+        <main
+          id="main-content"
+          className="flex min-h-0 min-w-0 flex-1 flex-col"
+        >
+          <Outlet />
+        </main>
+      </AppChrome>
     </I18nProvider>
   );
 }

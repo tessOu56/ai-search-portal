@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "@remix-run/react";
 
 import { ProductPageShell } from "~/components/shared/product/ProductPageShell";
+import { OVERVIEW_HOME } from "~/lib/workspace-mode";
 import { useI18n } from "~/shared/i18n/context";
 
 export default function ReleaseNotesLayout() {
@@ -12,7 +13,7 @@ export default function ReleaseNotesLayout() {
   return (
     <ProductPageShell
       crumbs={[
-        { to: "/", label: t("app.title") },
+        { to: OVERVIEW_HOME, label: t("app.title") },
         ...(onVersion
           ? [{ to: "/release-notes", label: t("release-notes.page.title") }]
           : []),

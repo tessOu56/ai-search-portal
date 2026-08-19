@@ -17,8 +17,10 @@ import {
 import { ClientOnly } from "remix-utils/client-only";
 
 import { Button } from "~/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { Panel } from "~/components/ui/Panel";
 import { Skeleton } from "~/components/ui/Skeleton";
+import { Stack } from "~/components/ui/Stack";
+import { Toolbar } from "~/components/ui/Toolbar";
 
 import {
   catalogDistribution,
@@ -119,31 +121,31 @@ export function InsightsPanel() {
     chartType === "line" ? "每月搜尋次數趨勢" : "Catalog 項目類型分布";
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2">
-        {chartOptions.map((option) => (
-          <Button
-            key={option.type}
-            size="sm"
-            variant={chartType === option.type ? "default" : "outline"}
-            onClick={() => setChartType(option.type)}
-          >
-            {option.label}
-          </Button>
-        ))}
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>{heading}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ClientOnly
-            fallback={<Skeleton className="h-[320px] w-full rounded-lg" />}
-          >
-            {() => <InsightChart type={chartType} data={data} />}
-          </ClientOnly>
-        </CardContent>
-      </Card>
-    </div>
+    <Stack gap="lg">
+      <Toolbar>
+        <div className="flex flex-wrap items-center gap-2">
+          {chartOptions.map((option) => (
+            <Button
+              key={option.type}
+              size="sm"
+              variant={chartType === option.type ? "default" : "outline"}
+              onClick={() => setChartType(option.type)}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+      </Toolbar>
+      <Panel>
+        <h2 className="mb-3 text-type-16 font-semibold text-foreground">
+          {heading}
+        </h2>
+        <ClientOnly
+          fallback={<Skeleton className="h-[320px] w-full rounded-lg" />}
+        >
+          {() => <InsightChart type={chartType} data={data} />}
+        </ClientOnly>
+      </Panel>
+    </Stack>
   );
 }

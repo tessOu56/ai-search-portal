@@ -2,6 +2,7 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
+import { Button } from "~/components/ui/Button";
 import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
 import { StatusChip } from "~/components/ui/StatusChip";
@@ -48,9 +49,9 @@ export default function RecipeDetailPage() {
         </div>
       </Panel>
 
-      <Link to="/recipes" className="text-primary hover:underline">
-        返回 Recipe 列表
-      </Link>
+      <Button asChild variant="outline">
+        <Link to="/recipes">返回 Recipe 列表</Link>
+      </Button>
     </Stack>
   );
 }

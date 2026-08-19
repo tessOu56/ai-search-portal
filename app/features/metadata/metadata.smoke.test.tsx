@@ -66,6 +66,7 @@ describe("metadata catalog", () => {
       screen.getByRole("heading", { name: /metadata catalog/i })
     ).toBeTruthy();
     expect(screen.getByText(/customer_profile/i)).toBeTruthy();
+    expect(screen.queryByText(/\?material=/)).toBeNull();
   });
 
   it("GenUiRenderer renders lineage graph node", () => {

@@ -8,6 +8,8 @@
   "home.nav.ask": "提問",
   "home.nav.overview": "總覽",
   "home.nav.switcher": "工作區檢視",
+  "nav.back": "返回",
+  "nav.directory": "目錄",
   "home.badge.trusted": "可信解答",
   "home.badge.lui": "LUI 引導",
   "home.badge.tech": "Remix + Vite",

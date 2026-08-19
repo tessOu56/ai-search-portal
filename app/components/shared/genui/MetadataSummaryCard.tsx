@@ -1,5 +1,5 @@
 import { Badge } from "~/components/ui/Badge";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { Panel } from "~/components/ui/Panel";
 
 export type MetadataSummaryCardProps = {
   name: string;
@@ -17,11 +17,9 @@ export function MetadataSummaryCard({
   tags,
 }: MetadataSummaryCardProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{name}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2 text-sm text-muted-foreground">
+    <Panel>
+      <h2 className="text-type-16 font-semibold text-foreground">{name}</h2>
+      <div className="mt-3 space-y-2 text-sm text-muted-foreground">
         <p>
           <span className="font-medium text-foreground">FQN:</span> {fqn}
         </p>
@@ -39,7 +37,7 @@ export function MetadataSummaryCard({
             </Badge>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }

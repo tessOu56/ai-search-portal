@@ -1,6 +1,6 @@
 import type { WebVitalName } from "@ai-search-portal/contracts";
 import type { MetaFunction } from "@remix-run/node";
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
 import {
   ProductPageHeader,
@@ -14,7 +14,6 @@ import {
   clearVitals,
   getVitals,
   type StoredVital,
-  subscribeVitals,
 } from "~/lib/analytics/vitals-store";
 import { useI18n } from "~/shared/i18n/context";
 
@@ -29,26 +28,22 @@ export const meta: MetaFunction = () => [
 
 const METRIC_META: Record<
   WebVitalName,
-  { label: string; unit: string; blurb: string; thresholds: string }
+  { label: string; unit: string; blurb: string }
 > = {
   LCP: {
     label: "Largest Contentful Paint",
     unit: "ms",
     blurb: "Time until the largest visible element finishes rendering.",
-    thresholds: "good ≤ 2500ms · needs improvement ≤ 4000ms · poor > 4000ms",
   },
   INP: {
     label: "Interaction to Next Paint",
     unit: "ms",
-    blurb:
-      "Responsiveness of the page to user interactions across its lifetime.",
-    thresholds: "good ≤ 200ms · needs improvement ≤ 500ms · poor > 500ms",
+    blurb: "Responsiveness of the page to user interactions.",
   },
   CLS: {
     label: "Cumulative Layout Shift",
     unit: "",
     blurb: "Unexpected layout movement during the page's lifetime.",
-    thresholds: "good ≤ 0.1 · needs improvement ≤ 0.25 · poor > 0.25",
   },
 };
 
@@ -67,13 +62,14 @@ function formatValue(vital: StoredVital): string {
   return `${Math.round(vital.value)}${meta.unit}`;
 }
 
-function useVitals(): StoredVital[] {
-  return useSyncExternalStore(subscribeVitals, getVitals, () => []);
-}
-
 export default function VitalsRoute() {
   const { t } = useI18n();
-  const vitals = useVitals();
+  const [vitals, setVitals] = useState<StoredVital[]>([]);
+
+  useEffect(() => {
+    setVitals(getVitals());
+  }, []);
+
   const byName = new Map(vitals.map((v) => [v.name, v]));
   const metricNames = Object.keys(METRIC_META) as WebVitalName[];
 
@@ -81,7 +77,7 @@ export default function VitalsRoute() {
     <ProductPageShell current="Web Vitals">
       <ProductPageHeader
         title="Web Vitals"
-        description="Browser-session metrics only (LCP / INP / CLS). Navigate the app, then return here. Values stay in this tab’s session storage."
+        description="Snapshot of LCP / INP / CLS from this tab. Navigate the app, then refresh."
       />
 
       <Grid columns={3} gap="md">
@@ -101,28 +97,27 @@ export default function VitalsRoute() {
                 </span>
               }
               value={vital ? formatValue(vital) : "—"}
-              description={`${meta.label}. ${meta.blurb} ${meta.thresholds}${
-                vital
-                  ? ` · route ${vital.route} · ${new Date(vital.at).toLocaleTimeString()}`
-                  : " · Interact with the app to populate this metric."
-              }`}
+              description={meta.blurb}
             />
           );
         })}
       </Grid>
 
       <div className="flex items-center gap-3">
+        <Button type="button" size="sm" onClick={() => setVitals(getVitals())}>
+          Refresh
+        </Button>
         <Button
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => clearVitals()}
+          onClick={() => {
+            clearVitals();
+            setVitals([]);
+          }}
         >
           {t("vitals.clear")}
         </Button>
-        <p className="text-type-14 text-muted-foreground">
-          Metrics persist for this browser tab only.
-        </p>
       </div>
     </ProductPageShell>
   );

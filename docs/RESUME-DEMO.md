@@ -29,7 +29,7 @@ Optional: `?aiFill=1` for Zod-validated AI form fill + HITL; `?aiFill=invalid` s
 2. Confirm HITL apply → pending.
 3. Owner review → approve → My APIs granted.
 
-Also: `/` golden chat (offline fixture by default), `/catalog-search/dictionary` (virtualized list), `/site-map`.
+Also: `/` golden chat (offline fixture by default), `/catalog-search/dictionary` (virtualized list).
 
 ## Checklist
 
