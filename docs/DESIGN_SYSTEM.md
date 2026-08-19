@@ -43,7 +43,6 @@
 - `Card` + `CardHeader` + `CardContent`
 - `Badge`
 - `Alert`
-- `ScrollArea`
 - `Container`
 
 ## Component Layers

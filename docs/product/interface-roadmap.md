@@ -1,7 +1,8 @@
 # 介面端產品 Roadmap × Sitemap × UI Flow
 
-> 建立日：2026-07-08（v2）· 定位：介面端規劃 SSOT（不取代 [PROJECT-PLAN.md](../PROJECT-PLAN.md) Phase 出口條件與 [EXECUTION-PLAN-2026H2.md](../EXECUTION-PLAN-2026H2.md) M1–M6）
-> 上游原則：[ai-experience-plan.md](./ai-experience-plan.md) dual-path（每條 AI 流程都有手動路徑）
+> **As-is sitemap（歷史規劃稿）。** 階段／票／「哪些畫面算 LIVE」的 SSOT 在 private **platform-command**：`planning/projects/surface-completeness.md`。本檔不要再當階段出口條件；dual-path 原則仍見 [ai-experience-plan.md](./ai-experience-plan.md)。
+>
+> 建立日：2026-07-08（v2）· 上游原則：dual-path（每條 AI 流程都有手動路徑）
 > v2 決策：① Chat 為預設首頁與主流程；Dashboard 為 **AI 儀錶板搜尋總覽（輔助路徑）**，經首頁入口／頂部導覽／快捷卡片／`?view=dashboard` 進入 ② 以**開放平台（API / SDK / Sandbox）**取代原 Phase 4 的外部參考頁面規劃 ③ 業務體系完全自足，不引用任何外部產品術語
 
 ---

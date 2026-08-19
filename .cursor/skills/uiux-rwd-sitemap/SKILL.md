@@ -44,6 +44,13 @@ Test or reason about **375 / 768 / 1280**:
 2. Brand readable; sections match product sitemap docs (Plinth `docs/product/sitemap.md`; Portal interface-roadmap primary journeys).
 3. Entry from footer (and optionally header). Keep `/sitemap.xml` as machine SEO only — do not replace it with the HTML page.
 4. Mark demo/mock journeys clearly on Portal.
+5. **Portal human inventory SSOT:** `app/lib/ux-sitemap.ts`. `/site-map` must render only that list. Adding a human-facing route (including nested `/items/:id`, `/metadata/:id`, …) requires a new inventory row; missing rows are a regression. Do not list `/api/*` or `sitemap.xml`.
+
+### Product vs marketing chrome
+
+- `/` stays marketing (BrandMark, atmosphere).
+- Deep pages use `ProductPageShell` + SDK DataTable / EmptyState / Skeleton / Panel. Do not copy BrandMark heroes onto tool pages.
+- Public UI must not show ticket numbers or “W3 shell” badges.
 
 ### Visual taste (short)
 

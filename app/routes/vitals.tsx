@@ -2,16 +2,14 @@ import type { WebVitalName } from "@ai-search-portal/contracts";
 import type { MetaFunction } from "@remix-run/node";
 import { useSyncExternalStore } from "react";
 
-import { Badge } from "~/components/ui/Badge";
-import { Button } from "~/components/ui/Button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/Card";
-import { Container } from "~/components/ui/Container";
+  ProductPageHeader,
+  ProductPageShell,
+} from "~/components/shared/product/ProductPageShell";
+import { Button } from "~/components/ui/Button";
+import { Grid } from "~/components/ui/Grid";
+import { Metric } from "~/components/ui/Metric";
+import { StatusChip } from "~/components/ui/StatusChip";
 import {
   clearVitals,
   getVitals,
@@ -54,14 +52,14 @@ const METRIC_META: Record<
   },
 };
 
-const RATING_VARIANT: Record<
-  StoredVital["rating"],
-  "default" | "secondary" | "outline"
-> = {
-  good: "default",
-  "needs-improvement": "secondary",
-  poor: "outline",
-};
+function ratingStatus(
+  rating: StoredVital["rating"] | undefined
+): "success" | "warning" | "danger" | "neutral" {
+  if (rating === "good") return "success";
+  if (rating === "needs-improvement") return "warning";
+  if (rating === "poor") return "danger";
+  return "neutral";
+}
 
 function formatValue(vital: StoredVital): string {
   const meta = METRIC_META[vital.name];
@@ -80,76 +78,40 @@ export default function VitalsRoute() {
   const metricNames = Object.keys(METRIC_META) as WebVitalName[];
 
   return (
-    <Container className="py-10">
-      <div className="mb-6 flex flex-col gap-2">
-        <h1 className="text-2xl font-bold">Web Vitals</h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Browser-session metrics only (LCP / INP / CLS). Public DTO — no
-          internal collector, DSN, or probe endpoints are exposed on this page.
-          See <code>web-vitals-reporter.ts</code>. No backend analytics
-          required.
-        </p>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Live LCP / INP / CLS reported by this browser tab, mirrored into an
-          in-memory + <code>sessionStorage</code> store fed by{" "}
-          <code>web-vitals-reporter.ts</code>. No backend or analytics endpoint
-          required — this works fully offline (T-2026-115).
-        </p>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Baseline load-time measurements (long tasks, heap) for the catalog
-          dictionary are captured separately at{" "}
-          <code>docs/perf/catalog-dictionary-measured.json</code>. See{" "}
-          <code>docs/perf/vitals-panel.md</code> for how to see aggregate P75 in
-          PostHog.
-        </p>
-      </div>
+    <ProductPageShell current="Web Vitals">
+      <ProductPageHeader
+        title="Web Vitals"
+        description="Browser-session metrics only (LCP / INP / CLS). Navigate the app, then return here. Values stay in this tab’s session storage."
+      />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <Grid columns={3} gap="md">
         {metricNames.map((name) => {
           const vital = byName.get(name);
           // eslint-disable-next-line security/detect-object-injection -- name is typed WebVitalName
           const meta = METRIC_META[name];
           return (
-            <Card key={name}>
-              <CardHeader>
-                <div className="flex items-center justify-between gap-2">
-                  <CardTitle>{name}</CardTitle>
-                  {vital ? (
-                    <Badge variant={RATING_VARIANT[vital.rating]}>
-                      {vital.rating}
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline">waiting…</Badge>
-                  )}
-                </div>
-                <CardDescription>{meta.label}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-2">
-                <div className="text-3xl font-semibold tabular-nums">
-                  {vital ? formatValue(vital) : "—"}
-                </div>
-                <p className="text-xs text-muted-foreground">{meta.blurb}</p>
-                <p className="text-xs text-muted-foreground">
-                  {meta.thresholds}
-                </p>
-                {vital ? (
-                  <p className="text-xs text-muted-foreground">
-                    route <code>{vital.route}</code> · captured{" "}
-                    {new Date(vital.at).toLocaleTimeString()}
-                  </p>
-                ) : (
-                  <p className="text-xs text-muted-foreground">
-                    Navigate the app (and for INP, interact with it) to populate
-                    this metric, then revisit this page.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+            <Metric
+              key={name}
+              label={
+                <span className="flex items-center justify-between gap-2">
+                  <span>{name}</span>
+                  <StatusChip status={ratingStatus(vital?.rating)}>
+                    {vital ? vital.rating : "waiting"}
+                  </StatusChip>
+                </span>
+              }
+              value={vital ? formatValue(vital) : "—"}
+              description={`${meta.label}. ${meta.blurb} ${meta.thresholds}${
+                vital
+                  ? ` · route ${vital.route} · ${new Date(vital.at).toLocaleTimeString()}`
+                  : " · Interact with the app to populate this metric."
+              }`}
+            />
           );
         })}
-      </div>
+      </Grid>
 
-      <div className="mt-6 flex items-center gap-3">
+      <div className="flex items-center gap-3">
         <Button
           type="button"
           variant="outline"
@@ -158,11 +120,10 @@ export default function VitalsRoute() {
         >
           {t("vitals.clear")}
         </Button>
-        <p className="text-xs text-muted-foreground">
-          Metrics persist for this browser tab only (<code>sessionStorage</code>
-          ); closing the tab clears them.
+        <p className="text-type-14 text-muted-foreground">
+          Metrics persist for this browser tab only.
         </p>
       </div>
-    </Container>
+    </ProductPageShell>
   );
 }

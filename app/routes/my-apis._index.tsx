@@ -11,6 +11,7 @@ import {
   useNavigation,
 } from "@remix-run/react";
 
+import { ProductPageShell } from "~/components/shared/product/ProductPageShell";
 import { MyApisPanel } from "~/features/accessrequests";
 import {
   expireStaleAccessApplications,
@@ -79,7 +80,7 @@ export default function MyApisRoute() {
   const navigation = useNavigation();
   const loading = navigation.state !== "idle";
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <ProductPageShell current="My APIs">
       <MyApisPanel
         applications={applications}
         sessionRole={sessionRole}
@@ -87,14 +88,14 @@ export default function MyApisRoute() {
         actionMessage={actionMessage}
         highlightId={highlightId}
       />
-    </main>
+    </ProductPageShell>
   );
 }
 
 /** Route-level error state (four-state completeness — mirrors catalog-search / metadata). */
 export function ErrorBoundary() {
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <ProductPageShell current="My APIs">
       <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
         <h1 className="text-lg font-semibold text-destructive">
           My APIs hit an error
@@ -110,6 +111,6 @@ export function ErrorBoundary() {
           Reset and retry
         </Link>
       </div>
-    </main>
+    </ProductPageShell>
   );
 }

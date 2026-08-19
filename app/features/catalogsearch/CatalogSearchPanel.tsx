@@ -5,6 +5,7 @@ import {
 import { Link, useNavigation } from "@remix-run/react";
 import type { ReactNode } from "react";
 
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
@@ -15,7 +16,10 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
+import { DataTable } from "~/components/ui/DataTable";
 import { Input } from "~/components/ui/Input";
+import { Stack } from "~/components/ui/Stack";
+import { StatusChip } from "~/components/ui/StatusChip";
 import { useI18n } from "~/shared/i18n/context";
 import { buildMetadataSearchUrl } from "~/shared/navigation";
 
@@ -509,46 +513,39 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
     INDUSTRY_STANDARD_REGISTRY.map((e) => [e.code, e.labelZhTw])
   );
 
+  const assetRows = model.results.filter((row) => row.source !== "knowledge");
+
   return (
-    <div className="space-y-8">
-      <header className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className="rounded-full text-xs">
-            W3 shell
-          </Badge>
-          <Badge variant="secondary" className="rounded-full text-xs">
-            {model.phase}
-          </Badge>
-          {model.intent === "ai-fallback" ? (
-            <Badge
-              variant="outline"
-              className="rounded-full border-amber-300/60 bg-amber-50/60 text-xs text-amber-900"
+    <Stack gap="xl">
+      <ProductPageHeader
+        title="Catalog search"
+        extra={
+          model.intent === "ai-fallback" ? (
+            <StatusChip status="warning">AI fallback</StatusChip>
+          ) : null
+        }
+        description={
+          <>
+            {model.phase === "hybrid"
+              ? "Filter APIs and tables, then open an asset to request access. Domain knowledge appears first; assets are not filtered by hallmark."
+              : "Search and filter catalog rows, then open an asset to request access."}{" "}
+            <Link
+              to="/catalog-search/dictionary"
+              className="text-primary hover:underline"
             >
-              AI fallback
-            </Badge>
-          ) : null}
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight">Catalog search</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          {model.phase === "hybrid"
-            ? "Domain knowledge (facet-filtered) and metadata assets appear first; assets are not filtered by hallmark."
-            : "Mock-first catalog UI (fixtures + GAP). Type filter and pagination work on placeholder data."}{" "}
-          <Link
-            to="/catalog-search/dictionary"
-            className="text-primary hover:underline"
-          >
-            10k dictionary (virtualized) →
-          </Link>
+              Browse the full dictionary →
+            </Link>
+          </>
+        }
+      />
+      {model.facetWarning ? (
+        <p
+          role="status"
+          className="rounded-md border border-amber-300/60 bg-amber-50/80 px-3 py-2 text-sm text-amber-950"
+        >
+          {model.facetWarning}
         </p>
-        {model.facetWarning ? (
-          <p
-            role="status"
-            className="rounded-md border border-amber-300/60 bg-amber-50/80 px-3 py-2 text-sm text-amber-950"
-          >
-            {model.facetWarning}
-          </p>
-        ) : null}
-      </header>
+      ) : null}
 
       <CatalogSearchForm model={model} />
 
@@ -571,96 +568,98 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
             : buildResultsDescription(model)
         }
         isLoading={isLoading}
-        isEmpty={
-          model.results.filter((row) => row.source !== "knowledge").length === 0
-        }
-        skeletonGridClass="grid-cols-[1fr_2fr_auto_auto]"
+        isEmpty={assetRows.length === 0}
         skeletonRows={3}
         emptyMessage="No asset or catalog rows match your query."
         emptyAction={<CatalogEmptyAction model={model} />}
         pagination={<CatalogPagination pagination={pagination} base={base} />}
       >
-        <div className="overflow-x-auto">
-          <div className="grid min-w-[40rem] grid-cols-[1fr_2fr_auto_auto] bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">
-            <span>Name</span>
-            <span>Description</span>
-            <span className="text-right">Source</span>
-            <span className="text-right">Type</span>
-          </div>
-          <div className="min-w-[40rem] divide-y divide-border text-sm">
-            {model.results
-              .filter((row) => row.source !== "knowledge")
-              .map((row) => (
-                <div
-                  key={`${row.source}-${row.id}`}
-                  className="grid grid-cols-[1fr_2fr_auto_auto] items-start gap-2 px-4 py-3"
-                >
-                  <div className="space-y-1">
-                    {row.detailHref ? (
-                      <Link
-                        to={row.detailHref}
-                        className="font-medium text-primary hover:underline"
-                      >
-                        {row.name}
-                      </Link>
-                    ) : (
-                      <span className="font-medium text-foreground">
-                        {row.name}
-                      </span>
-                    )}
-                    {row.facets &&
-                    (row.facets.standards.length > 0 ||
-                      row.facets.materials.length > 0) ? (
-                      <div className="flex flex-wrap gap-1">
-                        {row.facets.standards.map((code) => (
-                          <Link
-                            key={code}
-                            to={buildCatalogSearchUrl({
-                              ...base,
-                              standard: code,
-                              page: 1,
-                            })}
-                            className="inline-flex rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
-                          >
-                            {code}
-                          </Link>
-                        ))}
-                        {row.facets.materials.slice(0, 2).map((m) => (
-                          <Link
-                            key={m}
-                            to={buildCatalogSearchUrl({
-                              ...base,
-                              material: m,
-                              page: 1,
-                            })}
-                            className="border-border/60 inline-flex rounded border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
-                          >
-                            {m.replace(/_/g, " ")}
-                          </Link>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                  <span className="line-clamp-2 text-muted-foreground">
-                    {row.description}
-                  </span>
-                  <Badge
-                    variant="outline"
-                    className="justify-self-end rounded-full text-xs capitalize"
-                  >
-                    {row.source}
-                  </Badge>
-                  <Badge
-                    variant="secondary"
-                    className="justify-self-end rounded-full text-xs"
-                  >
-                    {row.itemType}
-                  </Badge>
+        <DataTable
+          columns={[
+            {
+              key: "name",
+              header: "Name",
+              accessor: (row) => (
+                <div className="space-y-1">
+                  {row.detailHref ? (
+                    <Link
+                      to={row.detailHref}
+                      className="font-medium text-primary hover:underline"
+                    >
+                      {row.name}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-foreground">
+                      {row.name}
+                    </span>
+                  )}
+                  {row.facets &&
+                  (row.facets.standards.length > 0 ||
+                    row.facets.materials.length > 0) ? (
+                    <div className="flex flex-wrap gap-1">
+                      {row.facets.standards.map((code) => (
+                        <Link
+                          key={code}
+                          to={buildCatalogSearchUrl({
+                            ...base,
+                            standard: code,
+                            page: 1,
+                          })}
+                          className="inline-flex rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                        >
+                          {code}
+                        </Link>
+                      ))}
+                      {row.facets.materials.slice(0, 2).map((material) => (
+                        <Link
+                          key={material}
+                          to={buildCatalogSearchUrl({
+                            ...base,
+                            material,
+                            page: 1,
+                          })}
+                          className="border-border/60 inline-flex rounded border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                        >
+                          {material.replace(/_/g, " ")}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-              ))}
-          </div>
-        </div>
+              ),
+            },
+            {
+              key: "description",
+              header: "Description",
+              accessor: (row) => (
+                <span className="line-clamp-2 text-muted-foreground">
+                  {row.description}
+                </span>
+              ),
+            },
+            {
+              key: "source",
+              header: "Source",
+              align: "right",
+              accessor: (row) => (
+                <StatusChip status="neutral" className="capitalize">
+                  {row.source}
+                </StatusChip>
+              ),
+            },
+            {
+              key: "type",
+              header: "Type",
+              align: "right",
+              accessor: (row) => (
+                <StatusChip status="info">{row.itemType}</StatusChip>
+              ),
+            },
+          ]}
+          rows={assetRows}
+          getRowKey={(row) => `${row.source}-${row.id}`}
+        />
       </ProductResultsShell>
-    </div>
+    </Stack>
   );
 }

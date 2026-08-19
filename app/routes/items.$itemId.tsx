@@ -2,9 +2,12 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { Button } from "~/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { FormField } from "~/components/ui/FormField";
 import { Input } from "~/components/ui/Input";
+import { Panel } from "~/components/ui/Panel";
+import { Stack } from "~/components/ui/Stack";
 import { Textarea } from "~/components/ui/Textarea";
 import {
   deleteMockItem,
@@ -47,28 +50,20 @@ export default function ItemDetailPage() {
   const { item } = useLoaderData<typeof loader>();
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Item #{item.id}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Stack gap="lg">
+      <ProductPageHeader title={`Item #${item.id}`} />
+      <Panel>
         <Form method="post" className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              名稱
-            </label>
+          <FormField label="名稱" required id="name">
             <Input id="name" name="name" defaultValue={item.name} required />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="description" className="text-sm font-medium">
-              描述
-            </label>
+          </FormField>
+          <FormField label="描述" id="description">
             <Textarea
               id="description"
               name="description"
               defaultValue={item.description ?? ""}
             />
-          </div>
+          </FormField>
           <div className="flex gap-3">
             <Button type="submit">儲存</Button>
             <Button asChild variant="outline">
@@ -83,7 +78,7 @@ export default function ItemDetailPage() {
             刪除 Item
           </Button>
         </Form>
-      </CardContent>
-    </Card>
+      </Panel>
+    </Stack>
   );
 }

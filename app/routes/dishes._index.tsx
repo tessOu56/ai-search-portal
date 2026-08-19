@@ -1,7 +1,10 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
+import { DataTable } from "~/components/ui/DataTable";
+import { EmptyState } from "~/components/ui/EmptyState";
+import { Stack } from "~/components/ui/Stack";
 import { getAllDishes } from "~/features/dish/dish.server";
 import { ensureSeeded } from "~/services/seed.server";
 
@@ -13,27 +16,49 @@ export async function loader(_args: LoaderFunctionArgs) {
 export default function DishesIndexPage() {
   const { dishes } = useLoaderData<typeof loader>();
   return (
-    <section className="space-y-6">
-      <h1 className="text-3xl font-bold">Dish 列表</h1>
-      <div className="grid gap-4">
-        {dishes.map((dish) => (
-          <Card key={dish.id}>
-            <CardHeader>
-              <CardTitle>{dish.name}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <p>{dish.description ?? "（無描述）"}</p>
-              <p>Region: {dish.region}</p>
-              <Link
-                to={`/dishes/${dish.id}`}
-                className="text-primary hover:underline"
-              >
-                查看詳情
-              </Link>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </section>
+    <Stack gap="lg">
+      <ProductPageHeader
+        title="Dishes"
+        description="Seeded lab records — open a row for recipes and vendors."
+      />
+      {dishes.length === 0 ? (
+        <EmptyState title="尚無 Dish" />
+      ) : (
+        <DataTable
+          columns={[
+            {
+              key: "name",
+              header: "Name",
+              accessor: (row) => (
+                <Link
+                  to={`/dishes/${row.id}`}
+                  className="font-medium text-primary hover:underline"
+                >
+                  {row.name}
+                </Link>
+              ),
+            },
+            {
+              key: "description",
+              header: "Description",
+              accessor: (row) => (
+                <span className="text-muted-foreground">
+                  {row.description ?? "（無描述）"}
+                </span>
+              ),
+            },
+            {
+              key: "region",
+              header: "Region",
+              accessor: (row) => (
+                <span className="text-muted-foreground">{row.region}</span>
+              ),
+            },
+          ]}
+          rows={dishes}
+          getRowKey={(row) => row.id}
+        />
+      )}
+    </Stack>
   );
 }

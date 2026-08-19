@@ -7,6 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
+import { EmptyState } from "~/components/ui/EmptyState";
+import { Skeleton } from "~/components/ui/Skeleton";
 
 export type ProductResultsShellProps = {
   title: string;
@@ -19,8 +21,6 @@ export type ProductResultsShellProps = {
   headerExtra?: ReactNode;
   children: ReactNode;
   pagination?: ReactNode;
-  /** Grid column classes for skeleton rows (e.g. `grid-cols-[1fr_2fr_auto]`). */
-  skeletonGridClass?: string;
   skeletonRows?: number;
 };
 
@@ -35,8 +35,7 @@ export function ProductResultsShell({
   headerExtra,
   children,
   pagination,
-  skeletonGridClass = "grid-cols-[1fr_2fr_auto]",
-  skeletonRows = 2,
+  skeletonRows = 3,
 }: ProductResultsShellProps) {
   return (
     <Card>
@@ -52,33 +51,17 @@ export function ProductResultsShell({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="overflow-hidden rounded-lg border border-border">
-          {isLoading ? (
-            <div
-              aria-label={loadingLabel}
-              role="status"
-              className="divide-y divide-border"
-            >
-              {Array.from({ length: skeletonRows }, (_, index) => (
-                <div
-                  key={index}
-                  className={`grid animate-pulse ${skeletonGridClass} items-center gap-2 px-4 py-3`}
-                >
-                  <span className="h-4 rounded bg-muted" />
-                  <span className="h-4 rounded bg-muted" />
-                  <span className="h-6 w-16 justify-self-end rounded-full bg-muted" />
-                </div>
-              ))}
-            </div>
-          ) : isEmpty ? (
-            <ProductResultsEmpty message={emptyMessage} />
-          ) : (
-            children
-          )}
-        </div>
-        {!isLoading && isEmpty && emptyAction ? (
-          <div className="flex justify-center">{emptyAction}</div>
-        ) : null}
+        {isLoading ? (
+          <div role="status" aria-label={loadingLabel} className="space-y-2">
+            {Array.from({ length: skeletonRows }, (_, index) => (
+              <Skeleton key={index} className="h-12 w-full" />
+            ))}
+          </div>
+        ) : isEmpty ? (
+          <EmptyState title={emptyMessage} action={emptyAction} />
+        ) : (
+          children
+        )}
         {pagination}
       </CardContent>
     </Card>
@@ -90,5 +73,5 @@ export type ProductResultsEmptyProps = {
 };
 
 export function ProductResultsEmpty({ message }: ProductResultsEmptyProps) {
-  return <p className="px-4 py-6 text-muted-foreground">{message}</p>;
+  return <EmptyState title={message} />;
 }

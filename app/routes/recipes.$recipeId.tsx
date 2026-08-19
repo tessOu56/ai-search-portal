@@ -1,8 +1,10 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
-import { Badge } from "~/components/ui/Badge";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
+import { Panel } from "~/components/ui/Panel";
+import { Stack } from "~/components/ui/Stack";
+import { StatusChip } from "~/components/ui/StatusChip";
 import { getRecipe } from "~/features/recipe/recipe.server";
 import { ensureSeeded } from "~/services/seed.server";
 
@@ -18,43 +20,37 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function RecipeDetailPage() {
   const { recipe } = useLoaderData<typeof loader>();
   return (
-    <section className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">{recipe.title}</h1>
-        <p className="mt-2 text-muted-foreground">
-          {recipe.description ?? "（無描述）"}
-        </p>
-      </div>
+    <Stack gap="lg">
+      <ProductPageHeader
+        title={recipe.title}
+        description={recipe.description ?? "（無描述）"}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>步驟</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
+      <Panel>
+        <h2 className="mb-3 text-type-16 font-semibold">步驟</h2>
+        <ol className="space-y-2 text-sm">
           {recipe.instructions.map((step) => (
-            <p key={step.stepNumber}>
+            <li key={step.stepNumber}>
               {step.stepNumber}. {step.instruction}
-            </p>
+            </li>
           ))}
-        </CardContent>
-      </Card>
+        </ol>
+      </Panel>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>功效</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
+      <Panel>
+        <h2 className="mb-3 text-type-16 font-semibold">功效</h2>
+        <div className="flex flex-wrap gap-2">
           {recipe.properties.map((prop) => (
-            <Badge key={prop} variant="secondary">
+            <StatusChip key={prop} status="info">
               {prop}
-            </Badge>
+            </StatusChip>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
       <Link to="/recipes" className="text-primary hover:underline">
         返回 Recipe 列表
       </Link>
-    </section>
+    </Stack>
   );
 }

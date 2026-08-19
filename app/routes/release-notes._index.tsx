@@ -1,6 +1,11 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData, useRouteLoaderData } from "@remix-run/react";
 
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
+import { EmptyState } from "~/components/ui/EmptyState";
+import { Panel } from "~/components/ui/Panel";
+import { Stack } from "~/components/ui/Stack";
+import { StatusChip } from "~/components/ui/StatusChip";
 import { getLocale, getTranslations } from "~/shared/i18n";
 import { useI18n } from "~/shared/i18n/context";
 import { t } from "~/shared/i18n/server";
@@ -66,62 +71,53 @@ export default function ReleaseNotesIndex() {
   const { notes } = data;
 
   return (
-    <>
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold text-foreground">
-          {t("release-notes.page.title")}
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          {t("release-notes.page.description")}
-        </p>
-      </header>
+    <Stack gap="lg">
+      <ProductPageHeader
+        title={t("release-notes.page.title")}
+        description={t("release-notes.page.description")}
+      />
 
       <section aria-labelledby="release-notes-list-heading">
         <h2 id="release-notes-list-heading" className="sr-only">
           {t("release-notes.list.title")}
         </h2>
-        <ul className="space-y-6">
-          {notes.map((note) => (
-            <li key={note.version}>
-              <article
-                id={`v${note.version}`}
-                className="rounded-lg border border-border bg-card p-6 shadow-sm"
-              >
-                <div className="mb-3 flex flex-wrap items-center gap-3">
+        {notes.length === 0 ? (
+          <EmptyState title={t("release-notes.notFound")} />
+        ) : (
+          <ul className="space-y-4">
+            {notes.map((note) => (
+              <li key={note.version}>
+                <Panel id={`v${note.version}`}>
+                  <div className="mb-3 flex flex-wrap items-center gap-3">
+                    <Link
+                      to={`/release-notes/${note.version}`}
+                      className="text-xl font-semibold text-primary hover:underline"
+                    >
+                      v{note.version}
+                    </Link>
+                    {note.version === currentVersion ? (
+                      <StatusChip status="info">Current</StatusChip>
+                    ) : null}
+                    <time
+                      dateTime={note.date}
+                      className="text-sm text-muted-foreground"
+                    >
+                      {note.date}
+                    </time>
+                  </div>
+                  <p className="text-muted-foreground">{note.summary}</p>
                   <Link
                     to={`/release-notes/${note.version}`}
-                    className="text-xl font-semibold text-primary hover:underline"
+                    className="mt-3 inline-block text-sm text-primary hover:underline"
                   >
-                    v{note.version}
+                    {t("release-notes.summary")} →
                   </Link>
-                  {note.version === currentVersion && (
-                    <span className="bg-primary/10 rounded px-2 py-0.5 text-sm text-primary">
-                      Current
-                    </span>
-                  )}
-                  <time
-                    dateTime={note.date}
-                    className="text-sm text-muted-foreground"
-                  >
-                    {note.date}
-                  </time>
-                </div>
-                <p className="text-muted-foreground">{note.summary}</p>
-                <Link
-                  to={`/release-notes/${note.version}`}
-                  className="mt-3 inline-block text-sm text-primary hover:underline"
-                >
-                  {t("release-notes.summary")} →
-                </Link>
-              </article>
-            </li>
-          ))}
-        </ul>
+                </Panel>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
-
-      {notes.length === 0 && (
-        <p className="text-muted-foreground">{t("release-notes.notFound")}</p>
-      )}
-    </>
+    </Stack>
   );
 }

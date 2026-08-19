@@ -10,7 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
+import { Panel } from "~/components/ui/Panel";
 import { Select } from "~/components/ui/Select";
+import { Skeleton } from "~/components/ui/Skeleton";
 import type {
   AccessApplicationContract,
   AccessRequestLifecycleStatus,
@@ -62,20 +64,16 @@ export function SessionRoleSwitcher({
   );
 }
 
-/** Card skeleton — mirrors ProductResultsShell's animate-pulse convention. */
 function ApplicationCardSkeleton() {
   return (
-    <div
-      className="animate-pulse space-y-3 rounded-2xl border border-border bg-card p-6"
-      aria-hidden="true"
-    >
-      <div className="h-4 w-2/3 rounded bg-muted" />
-      <div className="h-3 w-1/2 rounded bg-muted" />
+    <Panel className="space-y-3" aria-hidden="true">
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="h-3 w-1/2" />
       <div className="flex gap-2">
-        <div className="h-6 w-20 rounded-full bg-muted" />
-        <div className="h-6 w-24 rounded-full bg-muted" />
+        <Skeleton className="h-6 w-20 rounded-full" />
+        <Skeleton className="h-6 w-24 rounded-full" />
       </div>
-    </div>
+    </Panel>
   );
 }
 

@@ -59,7 +59,7 @@
 - **Items tool**：另開 `pnpm run dev:api`（port 3001），設定 `AGENT_EXECUTE_TOOLS=1` 或 `ITEMS_API_URL=http://127.0.0.1:3001/api/v1/items`；chat 串流會執行 `items.lookup`。
 - **Offline eval**：`pnpm run test:labs`、`pnpm run eval:offline` → `reports/eval-YYYY-MM-DD.json`（見 `labs/eval-runner/`）。
 - **Langfuse（可選）**：`pnpm run observability:up` → 在 UI 建立 project keys → `.env.local` 設 `LANGFUSE_*` → `pnpm run observability:smoke` 或一般 chat。見 `labs/observability/README.md`。
-- **Catalog search（W3 殼）**：`/catalog-search` — placeholder panel；SaaS view 側欄有連結。
+- **Catalog search**：`/catalog-search` — product shell + SDK DataTable. Human UX map: `/site-map`.
 - 架構決策見 [ai-product](../architecture/ai-product/README.md)。
 
 ## 相關文件

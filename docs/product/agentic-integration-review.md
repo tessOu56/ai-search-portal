@@ -1,6 +1,6 @@
 # Agentic 整合檢閱與路線圖 — Agent-Executable Portal
 
-> 建立日：2026-07-09 · 對齊：[ai-experience-plan.md](ai-experience-plan.md)（dual-path SSOT）、[interface-roadmap.md](interface-roadmap.md)（R1–R4）、[../PROJECT-PLAN.md](../PROJECT-PLAN.md)（Phase 0–5）
+> 建立日：2026-07-09 · 對齊：[ai-experience-plan.md](ai-experience-plan.md)（dual-path）、[interface-roadmap.md](interface-roadmap.md)（歷史 sitemap）。階段 SSOT 不在本公開 repo。
 > 依據：Gartner 2026-07 預測——至 2030 年約 2,340 億美元（約 20%）企業 SaaS 支出暴露於 agentic arbitrage；產品價值從「畫面功能」移向「能否被 Agent 安全、可控、可稽核地呼叫」。
 
 ## 0. 結論先講

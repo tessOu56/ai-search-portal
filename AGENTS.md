@@ -13,7 +13,7 @@
 
 ## End-to-End Workflow
 
-0. **Context**：公開敘述見 [docs/PUBLIC-NARRATIVE.md](docs/PUBLIC-NARRATIVE.md)。**Tickets are not tracked in this repo** — use [docs/PROJECT-PLAN.md](docs/PROJECT-PLAN.md) phase checklists and code-review IDs.
+0. **Context**：公開敘述見 [docs/PUBLIC-NARRATIVE.md](docs/PUBLIC-NARRATIVE.md)。**Tickets and phase SSOT are not in this repo** — use [docs/RESUME-DEMO.md](docs/RESUME-DEMO.md) for the live journey, [docs/PROJECT-PLAN.md](docs/PROJECT-PLAN.md) for how-to only, and code-review IDs in-repo.
 1. **Setup**：`pnpm install` → `pnpm run dev`（建議 `corepack enable` 對齊 `packageManager`）
 2. **Code**：修改 app/features、app/components、app/services、app/shared 等
 3. **Before PR / push（硬性）**：`pnpm run pr-gate`（= build + test + lint:ci）。沙箱無法跑 pnpm 時，改碼後必須在本機跑 pr-gate，全綠才可 push；不得用 `--no-verify` 略過 hook。
@@ -51,7 +51,7 @@
 ## Agent 協作（skills / hooks / commands）
 
 - **Playbook**：[docs/agent-collaboration.md](docs/agent-collaboration.md) — session 進入順序、儀式指令、prompt 範本
-- **階段 SSOT**：[docs/PROJECT-PLAN.md](docs/PROJECT-PLAN.md) — Phase 0–5 出口條件（無日曆）
+- **How-to**：[docs/PROJECT-PLAN.md](docs/PROJECT-PLAN.md) — setup／pr-gate／demo links（not a roadmap）
 - **Skills**：`.cursor/skills/portal-phase-work`、`portal-contract-change`、`portal-lab-boundary`
 - **Hooks**：`.cursor/hooks.json`（session 指向 PROJECT-PLAN；git 守門）
 - **公開規範**：[SECURITY.md](SECURITY.md)、[docs/PUBLIC-NARRATIVE.md](docs/PUBLIC-NARRATIVE.md)

@@ -3,7 +3,7 @@ $raw = [Console]::In.ReadToEnd()
 # stdin consumed for hook contract; context is static pointers
 $ctx = @'
 ai-search-portal session context:
-- Phase / exit criteria: docs/PROJECT-PLAN.md
+- Demo / how-to: docs/RESUME-DEMO.md · docs/PROJECT-PLAN.md
 - Agent playbook (skills, hooks, commands): docs/agent-collaboration.md
 - Inbox tickets: docs/platform-inbox/CURRENT.md
 - Skills: portal-phase-work | portal-contract-change | portal-lab-boundary

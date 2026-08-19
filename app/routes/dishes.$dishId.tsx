@@ -1,8 +1,11 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
-import { Badge } from "~/components/ui/Badge";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
+import { EmptyState } from "~/components/ui/EmptyState";
+import { Panel } from "~/components/ui/Panel";
+import { Stack } from "~/components/ui/Stack";
+import { StatusChip } from "~/components/ui/StatusChip";
 import { getDish } from "~/features/dish/dish.server";
 import { getRecipesByDishId } from "~/features/recipe/recipe.server";
 import { getVendorsByDishId } from "~/features/vendor/vendor.server";
@@ -24,63 +27,59 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function DishDetailPage() {
   const { dish, recipes, vendors } = useLoaderData<typeof loader>();
   return (
-    <section className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">{dish.name}</h1>
-        <p className="mt-2 text-muted-foreground">
-          {dish.description ?? "（無描述）"}
-        </p>
-      </div>
+    <Stack gap="lg">
+      <ProductPageHeader
+        title={dish.name}
+        description={dish.description ?? "（無描述）"}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>功效</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
+      <Panel>
+        <h2 className="mb-3 text-type-16 font-semibold">功效</h2>
+        <div className="flex flex-wrap gap-2">
           {dish.properties.map((prop) => (
-            <Badge key={prop} variant="secondary">
+            <StatusChip key={prop} status="info">
               {prop}
-            </Badge>
+            </StatusChip>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>相關食譜</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          {recipes.map((recipe) => (
-            <p key={recipe.id}>
-              <Link
-                to={`/recipes/${recipe.id}`}
-                className="text-primary hover:underline"
-              >
-                {recipe.title}
-              </Link>
-            </p>
-          ))}
-          {recipes.length === 0 && (
-            <p className="text-muted-foreground">尚無食譜</p>
-          )}
-        </CardContent>
-      </Card>
+      <Panel>
+        <h2 className="mb-3 text-type-16 font-semibold">相關食譜</h2>
+        {recipes.length === 0 ? (
+          <EmptyState title="尚無食譜" />
+        ) : (
+          <ul className="space-y-2 text-sm">
+            {recipes.map((recipe) => (
+              <li key={recipe.id}>
+                <Link
+                  to={`/recipes/${recipe.id}`}
+                  className="text-primary hover:underline"
+                >
+                  {recipe.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>購買通路</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
-          {vendors.map((vendor) => (
-            <p key={vendor.id}>{vendor.name}</p>
-          ))}
-          {vendors.length === 0 && <p>尚無通路資料</p>}
-        </CardContent>
-      </Card>
+      <Panel>
+        <h2 className="mb-3 text-type-16 font-semibold">購買通路</h2>
+        {vendors.length === 0 ? (
+          <EmptyState title="尚無通路資料" />
+        ) : (
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            {vendors.map((vendor) => (
+              <li key={vendor.id}>{vendor.name}</li>
+            ))}
+          </ul>
+        )}
+      </Panel>
 
       <Link to="/dishes" className="text-primary hover:underline">
         返回 Dish 列表
       </Link>
-    </section>
+    </Stack>
   );
 }

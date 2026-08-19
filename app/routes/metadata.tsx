@@ -1,25 +1,20 @@
-import { Link, Outlet } from "@remix-run/react";
+import { Outlet, useLocation } from "@remix-run/react";
 
-import { Container } from "~/components/ui/Container";
+import { ProductPageShell } from "~/components/shared/product/ProductPageShell";
 
 export default function MetadataLayout() {
+  const { pathname } = useLocation();
+  const onDetail = /^\/metadata\/[^/]+$/.test(pathname);
+
   return (
-    <div className="min-h-screen bg-background">
-      <Container className="py-10">
-        <nav
-          className="mb-6 text-sm text-muted-foreground"
-          aria-label="Breadcrumb"
-        >
-          <Link to="/" className="hover:text-foreground hover:underline">
-            AI Search Portal
-          </Link>
-          <span className="mx-2" aria-hidden>
-            /
-          </span>
-          <span className="text-foreground">Metadata catalog</span>
-        </nav>
-        <Outlet />
-      </Container>
-    </div>
+    <ProductPageShell
+      crumbs={[
+        { to: "/", label: "AI Search Portal" },
+        ...(onDetail ? [{ to: "/metadata", label: "Metadata catalog" }] : []),
+      ]}
+      current={onDetail ? "Asset" : "Metadata catalog"}
+    >
+      <Outlet />
+    </ProductPageShell>
   );
 }

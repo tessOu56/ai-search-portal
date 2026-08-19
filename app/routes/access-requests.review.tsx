@@ -11,6 +11,7 @@ import {
   useNavigation,
 } from "@remix-run/react";
 
+import { ProductPageShell } from "~/components/shared/product/ProductPageShell";
 import { AccessRequestReviewPanel } from "~/features/accessrequests";
 import {
   editAccessApplication,
@@ -144,21 +145,21 @@ export default function AccessRequestsReviewRoute() {
   const actionMessage = useActionData<typeof action>();
   const navigation = useNavigation();
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <ProductPageShell current="Access review">
       <AccessRequestReviewPanel
         pending={pending}
         sessionRole={sessionRole}
         actionMessage={actionMessage}
         loading={navigation.state !== "idle"}
       />
-    </main>
+    </ProductPageShell>
   );
 }
 
 /** Route-level error state (four-state completeness — mirrors catalog-search / metadata). */
 export function ErrorBoundary() {
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <ProductPageShell current="Access review">
       <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
         <h1 className="text-lg font-semibold text-destructive">
           Access review hit an error
@@ -174,6 +175,6 @@ export function ErrorBoundary() {
           Reset and retry
         </Link>
       </div>
-    </main>
+    </ProductPageShell>
   );
 }

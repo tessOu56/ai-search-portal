@@ -43,5 +43,4 @@ description: >-
 
 ## References
 
-- [docs/PROJECT-PLAN.md](../../docs/PROJECT-PLAN.md) — 平行軌 Lab
 - [labs/README.md](../../labs/README.md)

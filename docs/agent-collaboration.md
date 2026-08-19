@@ -1,8 +1,9 @@
 # Agent 協作 — ai-search-portal
 
-> 產品階段：[PROJECT-PLAN.md](./PROJECT-PLAN.md)  
+> 產品 how-to：[PROJECT-PLAN.md](./PROJECT-PLAN.md)（not phase SSOT）  
 > 能力邊界：[AGENT_CAPABILITIES.md](../AGENT_CAPABILITIES.md)  
 > 公開敘述：[PUBLIC-NARRATIVE.md](./PUBLIC-NARRATIVE.md)  
+> Live journey：[RESUME-DEMO.md](./RESUME-DEMO.md)  
 > Optional private orchestration playbook may exist outside this public repo — do not hard-require it.
 
 ---
@@ -10,7 +11,7 @@
 ## 1. 進入順序（每次 session）
 
 1. [AGENTS.md](../AGENTS.md)
-2. [PROJECT-PLAN.md](./PROJECT-PLAN.md) — **確認當前 Phase 與出口條件**
+2. [RESUME-DEMO.md](./RESUME-DEMO.md) — 保護 Journey C；[PROJECT-PLAN.md](./PROJECT-PLAN.md) 只當 how-to
 3. [platform-inbox/CURRENT.md](./platform-inbox/CURRENT.md) — P0／P1 ticket（**local-only / gitignored**；若無則跳過）
 4. 任務相關：`specs/`、`docs/architecture/ai-product/`
 5. 載入 skill（見 §2）— 僅在任務匹配時
@@ -19,11 +20,11 @@
 
 ## 2. Skills（`.cursor/skills/`）
 
-| Skill                      | 觸發情境                                         | 作用                                        |
-| -------------------------- | ------------------------------------------------ | ------------------------------------------- |
-| **portal-phase-work**      | 「做到 Phase N」「階段收尾」「能不能進下一階段」 | 對照 PROJECT-PLAN 出口條件列 checklist      |
-| **portal-contract-change** | 改 API、SSE、chat、MSW、OpenAPI                  | 契約先於實作：specs → shared-contracts → UI |
-| **portal-lab-boundary**    | 新功能在 labs、WebGPU、本機 LLM、promote         | 禁止破壞 v1 契約；promote 條件              |
+| Skill                      | 觸發情境                                         | 作用                                                  |
+| -------------------------- | ------------------------------------------------ | ----------------------------------------------------- |
+| **portal-phase-work**      | 「做到 Phase N」「階段收尾」「能不能進下一階段」 | 本 repo 不持有階段 SSOT；保護 LIVE 旅程、不擴未列功能 |
+| **portal-contract-change** | 改 API、SSE、chat、MSW、OpenAPI                  | 契約先於實作：specs → shared-contracts → UI           |
+| **portal-lab-boundary**    | 新功能在 labs、WebGPU、本機 LLM、promote         | 禁止破壞 v1 契約；promote 條件                        |
 
 **使用方式**：對話中 `@portal-phase-work` 或明確說「依 portal-phase-work skill」。
 
@@ -31,10 +32,10 @@
 
 ## 3. Hooks（`.cursor/hooks.json`）
 
-| 事件                   | 腳本                                      | 行為                                         |
-| ---------------------- | ----------------------------------------- | -------------------------------------------- |
-| `sessionStart`         | `.cursor/hooks/session-context.ps1`       | 注入當前 repo、PROJECT-PLAN 連結、Phase 焦點 |
-| `beforeShellExecution` | `.cursor/hooks/guard-destructive-git.ps1` | 阻擋 `git push --force`、`git reset --hard`  |
+| 事件                   | 腳本                                      | 行為                                        |
+| ---------------------- | ----------------------------------------- | ------------------------------------------- |
+| `sessionStart`         | `.cursor/hooks/session-context.ps1`       | 注入當前 repo、RESUME-DEMO／how-to 連結     |
+| `beforeShellExecution` | `.cursor/hooks/guard-destructive-git.ps1` | 阻擋 `git push --force`、`git reset --hard` |
 
 驗證：新開 agent chat，確認 context 提及 `docs/PROJECT-PLAN.md`；嘗試 `git reset --hard` 應被擋（測試後勿真的執行破壞指令）。
 
@@ -61,7 +62,7 @@
 **Phase 0 收尾**
 
 ```text
-依 docs/PROJECT-PLAN.md Phase 0。完成 T-2026-001 檢查清單（公開 live URL 寫進 README／deploy notes），跑 pr-gate，不新增範圍。
+Protect Journey C in docs/RESUME-DEMO.md. Confirm live URL in README. Run pr-gate. Do not add unlisted screens.
 ```
 
 **Phase 2 Langfuse 閉環**

@@ -1,7 +1,10 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
+import { DataTable } from "~/components/ui/DataTable";
+import { EmptyState } from "~/components/ui/EmptyState";
+import { Stack } from "~/components/ui/Stack";
 import { getAllRecipes } from "~/features/recipe/recipe.server";
 import { ensureSeeded } from "~/services/seed.server";
 
@@ -13,27 +16,49 @@ export async function loader(_args: LoaderFunctionArgs) {
 export default function RecipesIndexPage() {
   const { recipes } = useLoaderData<typeof loader>();
   return (
-    <section className="space-y-6">
-      <h1 className="text-3xl font-bold">Recipe 列表</h1>
-      <div className="grid gap-4">
-        {recipes.map((recipe) => (
-          <Card key={recipe.id}>
-            <CardHeader>
-              <CardTitle>{recipe.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <p>{recipe.description ?? "（無描述）"}</p>
-              <p>Dish: {recipe.dishName}</p>
-              <Link
-                to={`/recipes/${recipe.id}`}
-                className="text-primary hover:underline"
-              >
-                查看詳情
-              </Link>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </section>
+    <Stack gap="lg">
+      <ProductPageHeader
+        title="Recipes"
+        description="Seeded lab records — open a row for steps and properties."
+      />
+      {recipes.length === 0 ? (
+        <EmptyState title="尚無 Recipe" />
+      ) : (
+        <DataTable
+          columns={[
+            {
+              key: "title",
+              header: "Title",
+              accessor: (row) => (
+                <Link
+                  to={`/recipes/${row.id}`}
+                  className="font-medium text-primary hover:underline"
+                >
+                  {row.title}
+                </Link>
+              ),
+            },
+            {
+              key: "description",
+              header: "Description",
+              accessor: (row) => (
+                <span className="text-muted-foreground">
+                  {row.description ?? "（無描述）"}
+                </span>
+              ),
+            },
+            {
+              key: "dish",
+              header: "Dish",
+              accessor: (row) => (
+                <span className="text-muted-foreground">{row.dishName}</span>
+              ),
+            },
+          ]}
+          rows={recipes}
+          getRowKey={(row) => row.id}
+        />
+      )}
+    </Stack>
   );
 }

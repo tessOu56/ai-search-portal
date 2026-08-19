@@ -1,6 +1,10 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
+import { EmptyState } from "~/components/ui/EmptyState";
+import { Panel } from "~/components/ui/Panel";
+import { Stack } from "~/components/ui/Stack";
 import { getLocale, getTranslations } from "~/shared/i18n";
 import { useI18n } from "~/shared/i18n/context";
 import { t } from "~/shared/i18n/server";
@@ -84,70 +88,68 @@ export default function ReleaseNoteVersion() {
 
   if (!note) {
     return (
-      <>
-        <p className="text-muted-foreground">{t("release-notes.notFound")}</p>
-        <Link
-          to="/release-notes"
-          className="mt-4 inline-block text-primary hover:underline"
-        >
+      <Stack gap="md">
+        <EmptyState title={t("release-notes.notFound")} />
+        <Link to="/release-notes" className="text-primary hover:underline">
           {t("release-notes.back")}
         </Link>
-      </>
+      </Stack>
     );
   }
 
   return (
-    <article className="rounded-lg border border-border bg-card p-6 shadow-sm">
-      <header className="mb-6">
-        <Link
-          to="/release-notes"
-          className="text-sm text-muted-foreground hover:text-foreground hover:underline"
-        >
-          ← {t("release-notes.back")}
-        </Link>
-        <h1 className="mt-3 text-2xl font-bold text-foreground">
-          v{note.version}
-        </h1>
-        <time
-          dateTime={note.date}
-          className="block text-sm text-muted-foreground"
-        >
-          {t("release-notes.date")}: {note.date}
-        </time>
-      </header>
+    <Panel>
+      <article>
+        <header className="mb-6">
+          <Link
+            to="/release-notes"
+            className="text-sm text-muted-foreground hover:text-foreground hover:underline"
+          >
+            ← {t("release-notes.back")}
+          </Link>
+          <ProductPageHeader
+            title={`v${note.version}`}
+            description={
+              <time dateTime={note.date}>
+                {t("release-notes.date")}: {note.date}
+              </time>
+            }
+          />
+        </header>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">
-          {t("release-notes.summary")}
-        </h2>
-        <p className="text-muted-foreground">{note.summary}</p>
-      </section>
-
-      {note.highlights.length > 0 && (
-        <section className="mt-6 space-y-2">
+        <section className="space-y-4">
           <h2 className="text-lg font-semibold text-foreground">
-            {t("release-notes.highlights")}
+            {t("release-notes.summary")}
           </h2>
-          <ul className="list-inside list-disc space-y-1 text-muted-foreground">
-            {note.highlights.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          <p className="text-muted-foreground">{note.summary}</p>
         </section>
-      )}
 
-      {note.commits.length > 0 && (
-        <section className="mt-6 space-y-2">
-          <h2 className="text-lg font-semibold text-foreground">
-            {t("release-notes.commits")}
-          </h2>
-          <ul className="space-y-1 font-mono text-sm text-muted-foreground">
-            {note.commits.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-    </article>
+        {note.highlights.length > 0 && (
+          <section className="mt-6 space-y-2">
+            <h2 className="text-lg font-semibold text-foreground">
+              {t("release-notes.highlights")}
+            </h2>
+            <ul className="list-inside list-disc space-y-1 text-muted-foreground">
+              {note.highlights.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {note.commits.length > 0 && (
+          <section className="mt-6 space-y-2">
+            <h2 className="text-lg font-semibold text-foreground">
+              {t("release-notes.commits")}
+            </h2>
+            <ul className="space-y-1 font-mono text-sm text-muted-foreground">
+              {note.commits.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </article>
+    </Panel>
   );
 }

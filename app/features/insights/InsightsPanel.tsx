@@ -18,6 +18,7 @@ import { ClientOnly } from "remix-utils/client-only";
 
 import { Button } from "~/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { Skeleton } from "~/components/ui/Skeleton";
 
 import {
   catalogDistribution,
@@ -137,9 +138,7 @@ export function InsightsPanel() {
         </CardHeader>
         <CardContent>
           <ClientOnly
-            fallback={
-              <div className="h-[320px] animate-pulse rounded-lg bg-muted" />
-            }
+            fallback={<Skeleton className="h-[320px] w-full rounded-lg" />}
           >
             {() => <InsightChart type={chartType} data={data} />}
           </ClientOnly>

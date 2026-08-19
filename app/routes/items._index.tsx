@@ -1,7 +1,11 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
+import { Button } from "~/components/ui/Button";
+import { DataTable } from "~/components/ui/DataTable";
+import { EmptyState } from "~/components/ui/EmptyState";
+import { Stack } from "~/components/ui/Stack";
 import { listMockItems } from "~/services/mock-items.server";
 import { ensureSeeded } from "~/services/seed.server";
 
@@ -14,36 +18,62 @@ export default function ItemsIndexPage() {
   const { items } = useLoaderData<typeof loader>();
 
   return (
-    <section className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Items</h1>
-        <Link
-          to="/items/new"
-          className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
-        >
-          新增 Item
-        </Link>
-      </div>
+    <Stack gap="lg">
+      <ProductPageHeader
+        title="Items"
+        description="Lab CRUD list for catalog-shaped records."
+        actions={
+          <Button asChild>
+            <Link to="/items/new">新增 Item</Link>
+          </Button>
+        }
+      />
 
-      <div className="grid gap-4">
-        {items.map((item) => (
-          <Card key={item.id}>
-            <CardHeader>
-              <CardTitle>{item.name}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <p>{item.description ?? "（無描述）"}</p>
-              <p>Updated: {item.updatedAt}</p>
-              <Link
-                to={`/items/${item.id}`}
-                className="text-primary hover:underline"
-              >
-                查看 / 編輯
-              </Link>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </section>
+      {items.length === 0 ? (
+        <EmptyState
+          title="No items yet"
+          action={
+            <Button asChild>
+              <Link to="/items/new">新增 Item</Link>
+            </Button>
+          }
+        />
+      ) : (
+        <DataTable
+          columns={[
+            {
+              key: "name",
+              header: "Name",
+              accessor: (row) => (
+                <Link
+                  to={`/items/${row.id}`}
+                  className="font-medium text-primary hover:underline"
+                >
+                  {row.name}
+                </Link>
+              ),
+            },
+            {
+              key: "description",
+              header: "Description",
+              accessor: (row) => (
+                <span className="text-muted-foreground">
+                  {row.description ?? "（無描述）"}
+                </span>
+              ),
+            },
+            {
+              key: "updated",
+              header: "Updated",
+              accessor: (row) => (
+                <span className="text-muted-foreground">{row.updatedAt}</span>
+              ),
+            },
+          ]}
+          rows={items}
+          getRowKey={(row) => row.id}
+        />
+      )}
+    </Stack>
   );
 }

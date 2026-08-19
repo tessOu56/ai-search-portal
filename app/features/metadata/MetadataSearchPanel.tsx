@@ -2,6 +2,7 @@ import { listIndustryStandards } from "@ai-search-portal/contracts";
 import { Form, Link, useNavigation } from "@remix-run/react";
 import type { ReactNode } from "react";
 
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
@@ -12,8 +13,11 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/Card";
+import { DataTable } from "~/components/ui/DataTable";
 import { Input } from "~/components/ui/Input";
 import { Select } from "~/components/ui/Select";
+import { Stack } from "~/components/ui/Stack";
+import { StatusChip } from "~/components/ui/StatusChip";
 import { API_CONTEXT_PACK_SELECT } from "~/shared/api/paths";
 import type {
   ContextPackManifestContract,
@@ -177,39 +181,24 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
   const knowledgeHits = model.knowledgeHits ?? [];
 
   return (
-    <div className="space-y-8">
-      <header className="space-y-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className="rounded-full text-xs">
-            Context catalog
-          </Badge>
-          <Badge variant="secondary" className="rounded-full text-xs">
-            Context pack
-          </Badge>
-          {model.intent === "ai-fallback" ? (
-            <Badge
-              variant="outline"
-              className="rounded-full border-amber-300/60 bg-amber-50/60 text-xs text-amber-900"
-            >
-              AI fallback
-            </Badge>
-          ) : null}
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight">Metadata catalog</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Domain-neutral context infrastructure with swappable packs,
-          policy-driven access, GenUI lineage, and industry hallmark bridges.
-          Asset rows are not filtered by hallmark — knowledge bridge is.
+    <Stack gap="xl">
+      <ProductPageHeader
+        title="Metadata catalog"
+        extra={
+          model.intent === "ai-fallback" ? (
+            <StatusChip status="warning">AI fallback</StatusChip>
+          ) : null
+        }
+        description="Find tables and APIs in the active context pack, then open a row to request access. Asset rows are not filtered by hallmark — the knowledge bridge is."
+      />
+      {model.facetWarning ? (
+        <p
+          role="status"
+          className="rounded-md border border-amber-300/60 bg-amber-50/80 px-3 py-2 text-sm text-amber-950"
+        >
+          {model.facetWarning}
         </p>
-        {model.facetWarning ? (
-          <p
-            role="status"
-            className="rounded-md border border-amber-300/60 bg-amber-50/80 px-3 py-2 text-sm text-amber-950"
-          >
-            {model.facetWarning}
-          </p>
-        ) : null}
-      </header>
+      ) : null}
 
       <Card>
         <CardHeader>
@@ -482,7 +471,6 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         description={buildResultsDescription(model)}
         isLoading={isLoading}
         isEmpty={model.results.length === 0}
-        skeletonGridClass="grid-cols-[1fr_1fr_2fr_auto]"
         skeletonRows={3}
         emptyMessage="No assets match your filters."
         emptyAction={
@@ -516,36 +504,49 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         }
         pagination={<MetadataPagination pagination={pagination} base={base} />}
       >
-        <div className="overflow-x-auto">
-          <div className="grid min-w-[40rem] grid-cols-[1fr_1fr_2fr_auto] bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">
-            <span>Name</span>
-            <span>Owner</span>
-            <span>Description</span>
-            <span className="text-right">Type</span>
-          </div>
-          <div className="min-w-[40rem] divide-y divide-border text-sm">
-            {model.results.map((row) => (
-              <Link
-                key={row.id}
-                to={`/metadata/${row.id}?pack=${encodeURIComponent(model.activePackId)}`}
-                className="hover:bg-muted/50 grid grid-cols-[1fr_1fr_2fr_auto] items-center gap-2 px-4 py-3"
-              >
-                <span className="font-medium text-primary">{row.name}</span>
+        <DataTable
+          columns={[
+            {
+              key: "name",
+              header: "Name",
+              accessor: (row) => (
+                <Link
+                  to={`/metadata/${row.id}?pack=${encodeURIComponent(model.activePackId)}`}
+                  className="font-medium text-primary hover:underline"
+                >
+                  {row.name}
+                </Link>
+              ),
+            },
+            {
+              key: "owner",
+              header: "Owner",
+              accessor: (row) => (
                 <span className="text-muted-foreground">
                   {row.owner || "Unassigned"}
                 </span>
+              ),
+            },
+            {
+              key: "description",
+              header: "Description",
+              accessor: (row) => (
                 <span className="text-muted-foreground">{row.description}</span>
-                <Badge
-                  variant="secondary"
-                  className="justify-self-end rounded-full text-xs"
-                >
-                  {row.assetType}
-                </Badge>
-              </Link>
-            ))}
-          </div>
-        </div>
+              ),
+            },
+            {
+              key: "type",
+              header: "Type",
+              align: "right",
+              accessor: (row) => (
+                <StatusChip status="info">{row.assetType}</StatusChip>
+              ),
+            },
+          ]}
+          rows={model.results}
+          getRowKey={(row) => row.id}
+        />
       </ProductResultsShell>
-    </div>
+    </Stack>
   );
 }

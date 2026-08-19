@@ -1,6 +1,9 @@
 import type { MetaFunction } from "@remix-run/node";
 
-import { Container } from "~/components/ui/Container";
+import {
+  ProductPageHeader,
+  ProductPageShell,
+} from "~/components/shared/product/ProductPageShell";
 import { InsightsPanel } from "~/features/insights";
 
 export const meta: MetaFunction = () => [
@@ -13,14 +16,12 @@ export const meta: MetaFunction = () => [
 
 export default function InsightsIndexRoute() {
   return (
-    <Container className="py-10">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Insights</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          資料視覺化 POC — 可切換圖表類型檢視 catalog 分布與搜尋趨勢。
-        </p>
-      </div>
+    <ProductPageShell current="Insights">
+      <ProductPageHeader
+        title="Insights"
+        description="資料視覺化 POC — 可切換圖表類型檢視 catalog 分布與搜尋趨勢。"
+      />
       <InsightsPanel />
-    </Container>
+    </ProductPageShell>
   );
 }

@@ -2,9 +2,12 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 
+import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { Button } from "~/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { FormField } from "~/components/ui/FormField";
 import { Input } from "~/components/ui/Input";
+import { Panel } from "~/components/ui/Panel";
+import { Stack } from "~/components/ui/Stack";
 import { Textarea } from "~/components/ui/Textarea";
 import { createMockItem } from "~/services/mock-items.server";
 
@@ -24,24 +27,16 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function ItemCreatePage() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>新增 Item</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Stack gap="lg">
+      <ProductPageHeader title="新增 Item" />
+      <Panel>
         <Form method="post" className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              名稱
-            </label>
+          <FormField label="名稱" required id="name">
             <Input id="name" name="name" required />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="description" className="text-sm font-medium">
-              描述
-            </label>
+          </FormField>
+          <FormField label="描述" id="description">
             <Textarea id="description" name="description" />
-          </div>
+          </FormField>
           <div className="flex gap-3">
             <Button type="submit">建立</Button>
             <Button asChild variant="outline">
@@ -49,7 +44,7 @@ export default function ItemCreatePage() {
             </Button>
           </div>
         </Form>
-      </CardContent>
-    </Card>
+      </Panel>
+    </Stack>
   );
 }

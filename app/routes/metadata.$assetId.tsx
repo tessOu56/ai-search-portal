@@ -17,6 +17,7 @@ import { z } from "zod";
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { buildDetailGenUiDocument } from "~/components/shared/genui";
 import { Button } from "~/components/ui/Button";
+import { Skeleton } from "~/components/ui/Skeleton";
 import { MetadataAssetDetailView } from "~/features/metadata";
 import {
   evaluateMetadataAccess,
@@ -240,16 +241,12 @@ export async function action({
 
 function MetadataAssetDetailSkeleton() {
   return (
-    <div
-      className="animate-pulse space-y-6"
-      role="status"
-      aria-label="Loading asset"
-    >
-      <div className="h-4 w-48 rounded bg-muted" />
-      <div className="h-40 rounded-2xl bg-muted" />
-      <div className="h-56 rounded-2xl bg-muted" />
-      <div className="h-24 rounded-2xl bg-muted" />
-      <div className="h-32 rounded-2xl bg-muted" />
+    <div className="space-y-6" role="status" aria-label="Loading asset">
+      <Skeleton className="h-4 w-48" />
+      <Skeleton className="h-40 w-full rounded-2xl" />
+      <Skeleton className="h-56 w-full rounded-2xl" />
+      <Skeleton className="h-24 w-full rounded-2xl" />
+      <Skeleton className="h-32 w-full rounded-2xl" />
     </div>
   );
 }
