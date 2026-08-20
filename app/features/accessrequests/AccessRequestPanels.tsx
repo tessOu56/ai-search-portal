@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/Button";
 import { Callout } from "~/components/ui/Callout";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { Panel } from "~/components/ui/Panel";
+import { SegmentedNav, SegmentedNavItem } from "~/components/ui/SegmentedNav";
 import { Select } from "~/components/ui/Select";
 import { Skeleton } from "~/components/ui/Skeleton";
 import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
@@ -39,24 +40,26 @@ export function SessionRoleSwitcher({
 }) {
   const roles: GovernanceSessionRole[] = ["requester", "owner", "admin"];
   return (
-    <div className="grid gap-2" role="group" aria-label="Demo session role">
+    <div className="grid gap-3" role="group" aria-label="Demo session role">
       <Callout tone="info">
         Demo persona via{" "}
         <code className="rounded bg-muted px-1">?sessionRole=</code>— not a
         login. This is a showcase, not production RBAC.
       </Callout>
-      <div className="flex flex-wrap items-center gap-2 text-sm">
-        <span className="text-muted-foreground">Demo session:</span>
-        {roles.map((role) => (
-          <Button
-            key={role}
-            asChild
-            size="sm"
-            variant={sessionRole === role ? "default" : "outline"}
-          >
-            <Link to={`?sessionRole=${role}`}>{role}</Link>
-          </Button>
-        ))}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-sm text-muted-foreground">Demo session:</span>
+        <SegmentedNav aria-label="Demo session role">
+          {roles.map((role) => (
+            <SegmentedNavItem
+              key={role}
+              asChild
+              current={sessionRole === role}
+              className="min-w-0 px-3 capitalize sm:min-w-28"
+            >
+              <Link to={`?sessionRole=${role}`}>{role}</Link>
+            </SegmentedNavItem>
+          ))}
+        </SegmentedNav>
       </div>
     </div>
   );

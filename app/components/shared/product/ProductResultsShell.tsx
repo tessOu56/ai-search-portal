@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 
 import { EmptyState } from "~/components/ui/EmptyState";
-import { Panel } from "~/components/ui/Panel";
 import { Skeleton } from "~/components/ui/Skeleton";
 
 export type ProductResultsShellProps = {
@@ -18,6 +17,10 @@ export type ProductResultsShellProps = {
   skeletonRows?: number;
 };
 
+/**
+ * Results block without an outer card — DataTable / list owns its own surface.
+ * Loading and empty still use SDK Skeleton / EmptyState.
+ */
 export function ProductResultsShell({
   title,
   description,
@@ -32,10 +35,15 @@ export function ProductResultsShell({
   skeletonRows = 3,
 }: ProductResultsShellProps) {
   return (
-    <Panel>
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
+    <section className="space-y-4" aria-labelledby="product-results-title">
+      <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="space-y-1">
-          <h2 className="text-type-16 font-medium text-foreground">{title}</h2>
+          <h2
+            id="product-results-title"
+            className="text-type-16 font-medium text-foreground"
+          >
+            {title}
+          </h2>
           {description ? (
             <p className="text-type-14 text-muted-foreground">{description}</p>
           ) : null}
@@ -56,7 +64,7 @@ export function ProductResultsShell({
         )}
         {pagination}
       </div>
-    </Panel>
+    </section>
   );
 }
 

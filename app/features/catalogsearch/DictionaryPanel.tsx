@@ -4,7 +4,6 @@ import { ProductPageHeader } from "~/components/shared/product/ProductPageShell"
 import { Button } from "~/components/ui/Button";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { Input } from "~/components/ui/Input";
-import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
 import { StatusChip } from "~/components/ui/StatusChip";
 import { Toolbar } from "~/components/ui/Toolbar";
@@ -83,11 +82,8 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
         }
       />
 
-      <Panel>
-        <Toolbar>
-          <h2 className="text-type-16 font-semibold text-foreground">Search</h2>
-        </Toolbar>
-        <form method="get" className="mt-3 flex flex-col gap-3 sm:flex-row">
+      <Toolbar className="flex-col items-stretch gap-3 sm:items-stretch">
+        <form method="get" className="flex w-full flex-col gap-3 sm:flex-row">
           {model.activeType ? (
             <input type="hidden" name="type" value={model.activeType} />
           ) : null}
@@ -103,7 +99,7 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
           />
           <Button type="submit">{t("catalog.search.submit")}</Button>
         </form>
-        <div className="mt-3 flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1">
           <Button
             asChild
             size="sm"
@@ -128,11 +124,11 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
             </Button>
           ))}
         </div>
-      </Panel>
+      </Toolbar>
 
-      <Panel>
+      <section className="space-y-3" aria-label="Dictionary results">
         <p
-          className="mb-3 text-type-14 text-muted-foreground"
+          className="text-type-14 text-muted-foreground"
           data-testid="dictionary-count"
         >
           {model.total.toLocaleString()} row(s)
@@ -173,7 +169,7 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
             )}
           </div>
         )}
-      </Panel>
+      </section>
     </Stack>
   );
 }

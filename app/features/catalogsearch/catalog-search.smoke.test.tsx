@@ -21,6 +21,20 @@ vi.mock("@remix-run/react", () => ({
   useNavigation: () => ({ state: "idle", location: undefined }),
 }));
 
+vi.mock("~/shared/i18n/context", () => ({
+  useI18n: () => ({
+    t: (key: string) => {
+      const labels = new Map([
+        ["catalog-search.page.title", "Catalog search"],
+        ["catalog.search.submit", "Search"],
+        ["nav.metadata", "Data assets"],
+        ["nav.catalog-dictionary", "Dictionary"],
+      ]);
+      return labels.get(key) ?? key;
+    },
+  }),
+}));
+
 describe("catalog-search shell", () => {
   it("getCatalogSearchPlaceholder returns filters and mock rows", () => {
     const model = getCatalogSearchPlaceholder("");
@@ -42,7 +56,7 @@ describe("catalog-search shell", () => {
       screen.getByRole("heading", { name: /catalog search/i })
     ).toBeTruthy();
     expect(
-      screen.getByRole("textbox", { name: /catalog search query/i })
+      screen.getByRole("textbox", { name: /catalog search/i })
     ).toBeTruthy();
     expect(screen.getByText(/dictionary\/search/i)).toBeTruthy();
     expect(screen.queryByText(/\?material=/)).toBeNull();

@@ -9,9 +9,9 @@ import { ProductPageHeader } from "~/components/shared/product/ProductPageShell"
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
+import { Callout } from "~/components/ui/Callout";
 import { DataTable } from "~/components/ui/DataTable";
 import { Input } from "~/components/ui/Input";
-import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
 import { StatusChip } from "~/components/ui/StatusChip";
 import { Toolbar } from "~/components/ui/Toolbar";
@@ -100,8 +100,8 @@ function CatalogFacetFilters({
   standardLabels: Map<string, string>;
 }) {
   return (
-    <Panel>
-      <h2 className="mb-3 text-type-16 font-medium text-foreground">Filters</h2>
+    <div className="space-y-3" aria-label="Filters">
+      <h2 className="text-type-16 font-medium text-foreground">Filters</h2>
       <div className="flex flex-wrap gap-4">
         <div className="space-y-1">
           <span className="text-xs font-medium text-muted-foreground">
@@ -268,7 +268,7 @@ function CatalogFacetFilters({
           </fieldset>
         ))}
       </div>
-    </Panel>
+    </div>
   );
 }
 
@@ -281,7 +281,7 @@ function CatalogKnowledgeHits({
 }) {
   if ((model.sourceCounts?.knowledge ?? 0) === 0) return null;
   return (
-    <Panel data-testid="catalog-knowledge-section">
+    <section className="space-y-3" data-testid="catalog-knowledge-section">
       <h2 className="mb-1 text-type-16 font-medium text-foreground">
         Domain knowledge
       </h2>
@@ -340,7 +340,7 @@ function CatalogKnowledgeHits({
             </div>
           ))}
       </div>
-    </Panel>
+    </section>
   );
 }
 
@@ -516,12 +516,9 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         }
       />
       {model.facetWarning ? (
-        <p
-          role="status"
-          className="rounded-md border border-amber-300/60 bg-amber-50/80 px-3 py-2 text-sm text-amber-950"
-        >
+        <Callout tone="warning" role="status">
           {model.facetWarning}
-        </p>
+        </Callout>
       ) : null}
 
       <CatalogSearchForm model={model} />

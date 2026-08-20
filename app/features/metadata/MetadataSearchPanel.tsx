@@ -6,9 +6,9 @@ import { ProductPageHeader } from "~/components/shared/product/ProductPageShell"
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
+import { Callout } from "~/components/ui/Callout";
 import { DataTable } from "~/components/ui/DataTable";
 import { Input } from "~/components/ui/Input";
-import { Panel } from "~/components/ui/Panel";
 import { Select } from "~/components/ui/Select";
 import { Stack } from "~/components/ui/Stack";
 import { StatusChip } from "~/components/ui/StatusChip";
@@ -188,22 +188,19 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         description="Find tables and APIs in the active context pack, then open a row to request access. Asset rows are not filtered by hallmark — the knowledge bridge is."
       />
       {model.facetWarning ? (
-        <p
-          role="status"
-          className="rounded-md border border-amber-300/60 bg-amber-50/80 px-3 py-2 text-sm text-amber-950"
-        >
+        <Callout tone="warning" role="status">
           {model.facetWarning}
-        </p>
+        </Callout>
       ) : null}
 
-      <Panel>
-        <h2 className="mb-3 text-type-16 font-medium text-foreground">
+      <Toolbar className="flex-col items-stretch gap-3">
+        <h2 className="text-type-16 font-medium text-foreground">
           Context pack
         </h2>
         <Form
           method="post"
           action={API_CONTEXT_PACK_SELECT}
-          className="flex flex-col gap-3 sm:flex-row sm:items-end"
+          className="flex w-full flex-col gap-3 sm:flex-row sm:items-end"
         >
           <input type="hidden" name="redirectTo" value={redirectTo} />
           <label className="flex flex-1 flex-col gap-1 text-sm">
@@ -221,7 +218,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
           </label>
           <Button type="submit">{t("catalog.search.applyPack")}</Button>
         </Form>
-      </Panel>
+      </Toolbar>
 
       <Toolbar>
         <form method="get" className="flex w-full flex-col gap-3 sm:flex-row">
@@ -259,10 +256,8 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         </form>
       </Toolbar>
 
-      <Panel>
-        <h2 className="mb-3 text-type-16 font-medium text-foreground">
-          Filters
-        </h2>
+      <div className="space-y-3" aria-label="Filters">
+        <h2 className="text-type-16 font-medium text-foreground">Filters</h2>
         <div className="mb-4 space-y-1">
           <span className="text-xs font-medium text-muted-foreground">
             Type
@@ -383,10 +378,10 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
             </Link>
           </div>
         </div>
-      </Panel>
+      </div>
 
       {knowledgeHits.length > 0 ? (
-        <Panel>
+        <section className="space-y-3">
           <h2 className="mb-1 text-type-16 font-medium text-foreground">
             Knowledge bridge
           </h2>
@@ -432,7 +427,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               </Link>
             ))}
           </div>
-        </Panel>
+        </section>
       ) : null}
 
       <ProductResultsShell

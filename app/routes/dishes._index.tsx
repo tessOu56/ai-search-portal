@@ -4,7 +4,6 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { DataTable } from "~/components/ui/DataTable";
 import { EmptyState } from "~/components/ui/EmptyState";
-import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
 import { getAllDishes } from "~/features/dish/dish.server";
 import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
@@ -28,7 +27,7 @@ export default function DishesIndexPage() {
       {dishes.length === 0 ? (
         <EmptyState title="尚無 Dish" />
       ) : (
-        <Panel className="overflow-x-auto">
+        <div className="overflow-x-auto">
           <DataTable
             columns={[
               {
@@ -63,7 +62,7 @@ export default function DishesIndexPage() {
             rows={dishes}
             getRowKey={(row) => row.id}
           />
-        </Panel>
+        </div>
       )}
     </Stack>
   );

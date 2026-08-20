@@ -4,7 +4,6 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { DataTable } from "~/components/ui/DataTable";
 import { EmptyState } from "~/components/ui/EmptyState";
-import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
 import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { listMockItems } from "~/services/mock-items.server";
@@ -28,7 +27,7 @@ export default function ItemsIndexPage() {
       {items.length === 0 ? (
         <EmptyState title="No items yet" />
       ) : (
-        <Panel className="overflow-x-auto">
+        <div className="overflow-x-auto">
           <DataTable
             columns={[
               {
@@ -63,7 +62,7 @@ export default function ItemsIndexPage() {
             rows={items}
             getRowKey={(row) => row.id}
           />
-        </Panel>
+        </div>
       )}
     </Stack>
   );
