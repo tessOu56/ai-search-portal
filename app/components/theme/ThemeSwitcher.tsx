@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { Button } from "~/components/ui/Button";
 import { Select } from "~/components/ui/Select";
+import { Switch } from "~/components/ui/Switch";
 
 /**
  * 主題切換器 — 語意 token 由 explore-design-sdk 供應（app/styles/tokens.portal.css）。
@@ -72,15 +72,11 @@ export function ThemeSwitcher({
         }}
         aria-label={themeLabel}
       />
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => applyMode(!dark)}
+      <Switch
+        checked={dark}
+        onCheckedChange={applyMode}
         aria-label={dark ? toLightLabel : toDarkLabel}
-      >
-        {dark ? "☀" : "☾"}
-      </Button>
+      />
     </div>
   );
 }

@@ -12,6 +12,10 @@ type WorkspaceViewSwitcherProps = {
   className?: string;
 };
 
+/**
+ * Ask ↔ Overview destinations. Label density (not icon-only, not Switch).
+ * On narrow viewports items shrink so the h-12 topbar does not overflow.
+ */
 export function WorkspaceViewSwitcher({
   className,
 }: WorkspaceViewSwitcherProps) {
@@ -19,28 +23,27 @@ export function WorkspaceViewSwitcher({
   const { mode, overviewReturnHref, rememberCurrentIfOverview } =
     useWorkspaceSession();
 
+  const itemClass = "min-w-0 gap-1 px-2.5 sm:min-w-28 sm:gap-1.5 sm:px-3";
+
   return (
     <SegmentedNav
-      density="icon"
       aria-label={t("home.nav.switcher")}
-      className={cn(className)}
+      className={cn("max-w-full shrink", className)}
     >
-      <SegmentedNavItem
-        asChild
-        current={mode === "ask"}
-        aria-label={t("home.nav.ask")}
-      >
+      <SegmentedNavItem asChild current={mode === "ask"} className={itemClass}>
         <Link to={ASK_HOME} onClick={rememberCurrentIfOverview}>
-          <Sparkles className="size-4" aria-hidden />
+          <Sparkles className="size-4 shrink-0" aria-hidden />
+          <span className="truncate">{t("home.nav.ask")}</span>
         </Link>
       </SegmentedNavItem>
       <SegmentedNavItem
         asChild
         current={mode === "overview"}
-        aria-label={t("home.nav.overview")}
+        className={itemClass}
       >
         <Link to={overviewReturnHref}>
-          <Compass className="size-4" aria-hidden />
+          <Compass className="size-4 shrink-0" aria-hidden />
+          <span className="truncate">{t("home.nav.overview")}</span>
         </Link>
       </SegmentedNavItem>
     </SegmentedNav>

@@ -40,7 +40,7 @@ export function WorkspaceTopbar({
         className
       )}
     >
-      <div className="flex h-12 w-full flex-nowrap items-center justify-between gap-space-8 px-space-16 md:px-space-32">
+      <div className="flex min-h-12 w-full flex-wrap items-center justify-between gap-x-space-8 gap-y-2 px-space-16 py-2 md:flex-nowrap md:px-space-32 md:py-0">
         <Link
           to={to}
           onClick={() => {
@@ -62,7 +62,7 @@ export function WorkspaceTopbar({
             className="hidden text-foreground md:inline-flex"
           />
         </Link>
-        <div className="flex shrink-0 flex-nowrap items-center justify-end gap-1">
+        <div className="flex min-w-0 max-w-full shrink-0 flex-wrap items-center justify-end gap-1 sm:flex-nowrap">
           {trailingStart}
           {trailing}
           <WorkspaceViewSwitcher />
