@@ -1,12 +1,10 @@
 /**
- * Mock / fixture LUI 回應 — 當有 local RAG hits 時，sources／答案引用領域知識 chunk，
- * 並附帶 catalog／metadata 分面 continue CTA。無命中時改走 query-aware golden fixture
- * （合成資料，非真實 PII），並強制 deep link 到 catalog／metadata。
+ * Mock / fixture LUI 回應 — 當有 local RAG hits 時，sources／答案引用領域知識 chunk。
+ * 導覽 CTA（Continue in catalog / Browse metadata）由 UI ContinueFacets 專責，
+ * 不塞進 sources。無命中時走 query-aware golden fixture（合成資料，非真實 PII）。
  */
 
 import {
-  buildCatalogFacetUrl,
-  buildKnowledgeContinueSources,
   buildKnowledgeSourceUrl,
   buildMetadataFacetUrl,
 } from "./knowledge-links.js";
@@ -42,45 +40,28 @@ function detectTopic(query: string): FixtureTopic {
   return "generic";
 }
 
-function syntheticBadgeSources(query: string, packId: string): LuiSource[] {
-  return [
-    {
-      title: "Synthetic fixture — not real PII",
-      url: buildMetadataFacetUrl({ q: query, pack: packId, intent: "manual" }),
-    },
-    {
-      title: "Continue in catalog",
-      url: buildCatalogFacetUrl({ q: query, intent: "manual" }),
-    },
-    {
-      title: "Browse metadata catalog",
-      url: buildMetadataFacetUrl({ q: query, pack: packId, intent: "manual" }),
-    },
-  ];
+function uniqueByUrl(sources: LuiSource[]): LuiSource[] {
+  return sources.filter(
+    (s, i, arr) => arr.findIndex((x) => x.url === s.url) === i
+  );
 }
 
 function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
   const topic = detectTopic(query);
-  const continueSources = buildKnowledgeContinueSources(
-    query,
-    undefined,
-    packId
-  );
-  const synth = syntheticBadgeSources(query, packId);
 
   if (topic === "pii") {
     return {
-      summary: "Synthetic fixture：PII／權限題。展示資料為假資料，非真實個資。",
+      summary: "示範 · 含 PII 標籤的資產需 owner 核准後才能分析。",
       answer: [
         "依合成目錄，含 PII 標籤的示範資產包括 customer_profile（tbl-customers）",
         "與相關 marketing 用途資料表。分析師角色通常需要 owner 核准；這不是真實授權",
-        "——請用 Access request 流程（Demo role switcher）體驗 HITL，再從 References",
+        "——請用 Access request 流程（Demo role switcher）體驗 HITL，再從下方按鈕",
         "進入 metadata 詳情。",
       ].join(""),
       confidence: 0.86,
-      sources: [
+      sources: uniqueByUrl([
         {
-          title: "customer_profile (synthetic)",
+          title: "customer_profile（示範資產）",
           url: [
             "/metadata/",
             encodeURIComponent("tbl-customers"),
@@ -88,9 +69,7 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
             encodeURIComponent(packId),
           ].join(""),
         },
-        ...continueSources,
-        ...synth,
-      ].filter((s, i, arr) => arr.findIndex((x) => x.url === s.url) === i),
+      ]),
       nextSteps: [
         "在 metadata 開啟 tbl-customers 查看 classification／terms",
         "以 requester 送出 access request（合成流程）",
@@ -101,32 +80,23 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
 
   if (topic === "lineage") {
     return {
-      summary:
-        "Synthetic fixture：customer_profile 上游血緣示範（非生產譜系）。",
+      summary: "示範 · customer_profile 的上游血緣可在 metadata 詳情檢視。",
       answer: [
         "依合成 metadata pack，customer_profile（tbl-customers）的上游通常來自",
-        " analytics 與相關同意／訂單表。請從 References 進入 metadata 詳情看 Lineage DAG；",
+        " analytics 與相關同意／訂單表。請從下方來源進入 metadata 詳情看 Lineage DAG；",
         "若出現環則會顯示警告。此為 showcase 合成資料。",
       ].join(""),
       confidence: 0.84,
-      sources: [
+      sources: uniqueByUrl([
         {
-          title: "customer_profile lineage (synthetic)",
+          title: "customer_profile lineage（示範）",
           url: buildMetadataFacetUrl({
             q: "customer_profile",
             pack: packId,
             intent: "manual",
           }),
         },
-        {
-          title: "Continue in catalog",
-          url: buildCatalogFacetUrl({
-            q: "customer_profile",
-            intent: "manual",
-          }),
-        },
-        ...continueSources,
-      ].filter((s, i, arr) => arr.findIndex((x) => x.url === s.url) === i),
+      ]),
       nextSteps: [
         "開啟 metadata 詳情檢視 lineage",
         "用 catalog 搜尋同名維度／API",
@@ -137,28 +107,22 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
 
   if (topic === "orders") {
     return {
-      summary: "Synthetic fixture：orders 相關 API／資料集示範。",
+      summary: "示範 · orders 相關 API 與資料集可對照 catalog 與 metadata。",
       answer: [
         "依合成目錄，orders 相關資產涵蓋訂單 API、事實表與金流狀態欄位。",
         "建議先用 catalog 篩選 API／Dictionary，再從 metadata 對照契約欄位。",
-        "References 已帶入 deep link。",
       ].join(""),
       confidence: 0.82,
-      sources: [
+      sources: uniqueByUrl([
         {
-          title: "Orders in catalog",
-          url: buildCatalogFacetUrl({ q: "orders", intent: "manual" }),
-        },
-        {
-          title: "Orders in metadata",
+          title: "Orders metadata（示範）",
           url: buildMetadataFacetUrl({
             q: "orders",
             pack: packId,
             intent: "manual",
           }),
         },
-        ...continueSources,
-      ].filter((s, i, arr) => arr.findIndex((x) => x.url === s.url) === i),
+      ]),
       nextSteps: [
         "在 catalog 以 orders 篩選 API",
         "在 metadata 對照表／欄位",
@@ -168,19 +132,17 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
   }
 
   return {
-    summary: `已理解你的問題：「${query}」（Offline fixture／合成資料）。`,
+    summary: `示範 · 尚無直接命中，建議從目錄與 metadata 交叉驗證「${query}」。`,
     answer: [
       "目前知識庫沒有直接命中。建議先釐清範圍，再從 catalog 與 metadata 交叉驗證；",
-      "下方 References 已帶入搜尋 deep link。此為 public showcase——回覆為合成 fixture，",
+      "下方按鈕可帶你進入搜尋。此為 public showcase——回覆為合成 fixture，",
       "不是企業級授權答案。",
     ].join(""),
     confidence: 0.72,
-    sources: [...continueSources, ...synth].filter(
-      (s, i, arr) => arr.findIndex((x) => x.url === s.url) === i
-    ),
+    sources: [],
     nextSteps: [
       "補充你目前的情境限制或目標",
-      "從 References 開啟 catalog／metadata",
+      "用下方按鈕開啟 catalog／metadata",
       "把答案轉成可執行任務清單",
     ],
   };
@@ -204,14 +166,12 @@ function buildGroundedLuiResponse(
     .filter(Boolean)
     .join(" ");
 
-  const hitSources: LuiSource[] = hits.map((hit) => ({
-    title: hit.title ?? hit.id,
-    url: buildKnowledgeSourceUrl(hit, packId),
-    source: hit.source,
-  }));
-  const continueSources = buildKnowledgeContinueSources(query, top, packId);
-  const sources = [...hitSources, ...continueSources].filter(
-    (s, i, arr) => arr.findIndex((x) => x.url === s.url) === i
+  const sources = uniqueByUrl(
+    hits.map((hit) => ({
+      title: hit.title ?? hit.id,
+      url: buildKnowledgeSourceUrl(hit, packId),
+      source: hit.source,
+    }))
   );
 
   const standard = top.facets?.standards?.[0];
@@ -230,13 +190,13 @@ function buildGroundedLuiResponse(
   }
 
   return {
-    summary: `已依 ${packId} 知識庫檢索「${query}」，找到 ${hits.length} 筆相關依據。`,
+    summary: `已依知識庫找到 ${hits.length} 筆與「${query}」相關的依據。`,
     answer: groundedAnswer,
     confidence: Math.min(0.92, 0.7 + hits.length * 0.05),
     sources,
     nextSteps: [
       nextStep,
-      "需要實體商品／工作室時，從來源 refs 進入 metadata 或 Plinth Discover",
+      "需要實體商品／工作室時，從來源進入 metadata 或 Plinth Discover",
       "若涉及權限或拍賣狀態，對照 ops 狀態機 stub",
     ],
   };

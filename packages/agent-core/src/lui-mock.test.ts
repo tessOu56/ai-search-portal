@@ -47,21 +47,26 @@ describe("buildLuiResponse source citation (T-2026-071)", () => {
     expect(cited?.source).toBeUndefined();
   });
 
-  it("uses query-aware PII fixture with catalog/metadata deep links when RAG misses", () => {
+  it("uses query-aware PII fixture with metadata evidence links when RAG misses", () => {
     const response = buildLuiResponse(
       "Which datasets contain PII and what access do I need?",
       { packId: PACK_ID }
     );
-    expect(response.summary.toLowerCase()).toMatch(/synthetic|pii/);
+    expect(response.summary).toMatch(/示範|PII|pii/i);
     expect(response.sources.some((s) => s.url.includes("/metadata"))).toBe(
       true
     );
-    expect(
-      response.sources.some((s) => s.url.includes("/catalog-search"))
-    ).toBe(true);
     expect(response.sources.some((s) => s.url.includes("tbl-customers"))).toBe(
       true
     );
+    // Continue CTAs live in UI buttons — not duplicated in sources
+    expect(
+      response.sources.every(
+        (s) =>
+          !/continue in catalog|browse metadata/i.test(s.title) &&
+          !s.url.includes("/catalog-search")
+      )
+    ).toBe(true);
     expect(response.sources.every((s) => !s.url.includes("/dishes"))).toBe(
       true
     );

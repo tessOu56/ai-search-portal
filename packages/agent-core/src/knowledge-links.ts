@@ -128,7 +128,9 @@ export function buildKnowledgeSourceUrl(
 }
 
 /**
- * Extra "continue" links for LUI success path (facet-aware handoff).
+ * Extra "continue" links for facet-aware handoff outside LUI sources.
+ * Chat UI ContinueFacets owns the primary catalog/metadata CTAs; do not
+ * merge these into LuiResponse.sources (avoids duplicate "Continue in catalog").
  */
 export function buildKnowledgeContinueSources(
   query: string,

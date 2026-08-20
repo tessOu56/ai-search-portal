@@ -173,10 +173,11 @@
   }
 }
 
-/* Portal home: glow spans hero + upper half of second screen, then fades */
+/* Portal home: glow covers the relative content box only (no fixed 160svh —
+ * absolute height was extending scrollable overflow past the footer). */
 .eds-atmosphere--home-span {
-  height: 160svh;
-  max-height: 160svh;
+  top: 0;
+  bottom: 0;
   mask-image: linear-gradient(
     to bottom,
     #000 0%,

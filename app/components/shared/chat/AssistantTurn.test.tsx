@@ -108,6 +108,22 @@ describe("AssistantTurn (LUI conversation)", () => {
     expect(screen.getByTestId("chat-continue-metadata")).toBeInTheDocument();
   });
 
+  it("complete with empty sources: hides References, keeps continue buttons", () => {
+    render(
+      <AssistantTurn
+        content="No direct hit."
+        summary="示範 · 尚無直接命中。"
+        sources={[]}
+        nextSteps={["Clarify scope"]}
+        query="obscure topic"
+        showContinue
+      />
+    );
+    expect(screen.queryByText("References")).not.toBeInTheDocument();
+    expect(screen.getByTestId(CONTINUE)).toBeInTheDocument();
+    expect(screen.getByText("Clarify scope")).toBeInTheDocument();
+  });
+
   it("error: shows alert and dual-path fallback, not continue chips", () => {
     render(
       <AssistantTurn

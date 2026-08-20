@@ -75,6 +75,8 @@ export function ChatInterface({
   const logEndRef = useRef<HTMLDivElement>(null);
   const onAgentModeChangeRef = useRef(onAgentModeChange);
   onAgentModeChangeRef.current = onAgentModeChange;
+  /** Same-instance Strict Mode effect re-run; remount gets a fresh ref. */
+  const consumedPendingQueryRef = useRef<string | null>(null);
 
   const patchAssistant = (id: string, patch: Partial<Message>) => {
     setMessages((prev) =>
@@ -85,18 +87,15 @@ export function ChatInterface({
   };
 
   useEffect(() => {
-    return () => {
-      streamRef.current?.close();
-    };
-  }, []);
-
-  useEffect(() => {
     logEndRef.current?.scrollIntoView({ block: "end" });
   }, [messages, isStreaming]);
 
   const submitQuery = (raw: string) => {
     const query = raw.trim();
     if (!query || isStreaming) return;
+
+    streamRef.current?.close();
+    streamRef.current = null;
 
     const userMessage: Message = {
       id: crypto.randomUUID(),
@@ -195,8 +194,14 @@ export function ChatInterface({
   submitQueryRef.current = submitQuery;
 
   useEffect(() => {
-    if (!pendingQuery?.trim()) return;
-    submitQueryRef.current(pendingQuery);
+    const trimmed = pendingQuery?.trim();
+    if (!trimmed) return;
+    if (consumedPendingQueryRef.current === trimmed) {
+      onPendingQueryConsumed?.();
+      return;
+    }
+    consumedPendingQueryRef.current = trimmed;
+    submitQueryRef.current(trimmed);
     onPendingQueryConsumed?.();
   }, [pendingQuery, onPendingQueryConsumed]);
 
