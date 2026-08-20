@@ -16,6 +16,7 @@ import type {
   MetadataAssetDetailContract,
   PolicyDecisionContract,
 } from "~/shared/contracts";
+import { useI18n } from "~/shared/i18n/context";
 import { myApisHighlightHref } from "~/shared/navigation";
 import { cn } from "~/shared/utils/cn";
 
@@ -92,13 +93,14 @@ function humanPolicySummary(decision: PolicyDecisionContract): string {
 
 /** Approve-outcome deep link into My APIs (requester view) — T-186 #5. */
 function ApprovedTrackingLink({ requestId }: { requestId: string }) {
+  const { t } = useI18n();
   return (
     <p className="text-sm">
       <Link
         to={myApisHighlightHref(requestId)}
         className={PRODUCT_TABLE_LINK_CLASS}
       >
-        View in My APIs (requester view) →
+        {t("nav.my-requests.view")}
       </Link>
     </p>
   );
@@ -109,6 +111,7 @@ function SubmitResultBanner({
 }: {
   result?: MetadataAssetSubmitResult;
 }) {
+  const { t } = useI18n();
   if (!result) return null;
   return (
     <div className="space-y-2">
@@ -126,7 +129,7 @@ function SubmitResultBanner({
             to="/my-apis?sessionRole=requester"
             className={PRODUCT_TABLE_LINK_CLASS}
           >
-            Track in My APIs
+            {t("nav.my-requests.track")}
           </Link>
           {" · "}
           <Link
@@ -639,6 +642,7 @@ function ExistingApplicationCard({
 }: {
   application: AccessApplicationContract;
 }) {
+  const { t } = useI18n();
   return (
     <Panel data-testid="existing-application-card">
       <div className="mb-3 space-y-2">
@@ -656,7 +660,7 @@ function ExistingApplicationCard({
           to={myApisHighlightHref(application.id)}
           className={`text-sm ${PRODUCT_TABLE_LINK_CLASS}`}
         >
-          View in My APIs →
+          {t("nav.my-requests.view")}
         </Link>
       </div>
     </Panel>
@@ -673,11 +677,12 @@ export function MetadataAssetDetailView({
   existingApplication,
   submitResult,
 }: MetadataAssetDetailProps) {
+  const { t } = useI18n();
   return (
     <div className="space-y-6">
       <nav className="text-sm text-muted-foreground">
         <Link to="/metadata" className="hover:text-foreground hover:underline">
-          Metadata catalog
+          {t("nav.metadata")}
         </Link>
         <span className="mx-2">/</span>
         <span className="text-foreground">{asset.name}</span>

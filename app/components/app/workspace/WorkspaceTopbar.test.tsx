@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { WorkspaceSessionProvider } from "./WorkspaceSession";
 import { WorkspaceTopbar } from "./WorkspaceTopbar";
 
-const APP_TITLE = "AI Search Portal";
+const APP_TITLE = "Portal";
 const nav = vi.hoisted(() => ({ pathname: "/", search: "" }));
 
 vi.mock("@remix-run/react", () => ({

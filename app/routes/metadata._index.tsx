@@ -126,7 +126,7 @@ export function ErrorBoundary() {
   return (
     <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
       <h1 className="text-lg font-semibold text-destructive">
-        Metadata catalog hit an error
+        Data assets hit an error
       </h1>
       <p className="text-sm text-muted-foreground">
         Something went wrong while loading assets. Filters live in the URL —

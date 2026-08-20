@@ -6,7 +6,7 @@ import { OVERVIEW_HOME } from "~/lib/workspace-mode";
 
 import { ProductPageShell } from "./ProductPageShell";
 
-const APP_TITLE = "AI Search Portal";
+const APP_TITLE = "Portal";
 
 const navigate = vi.hoisted(() => vi.fn());
 

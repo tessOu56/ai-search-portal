@@ -25,9 +25,10 @@ import {
   governanceSessionRoleSchema,
   reviewAccessRequestSchema,
 } from "~/shared/contracts";
+import { useI18n } from "~/shared/i18n/context";
 
 export const meta: MetaFunction = () => [
-  { title: "Access review · AI Search Portal" },
+  { title: "Access review · Portal" },
   {
     name: "description",
     content: "Owner and admin pending access request queue.",
@@ -141,11 +142,12 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function AccessRequestsReviewRoute() {
+  const { t } = useI18n();
   const { sessionRole, pending } = useLoaderData<typeof loader>();
   const actionMessage = useActionData<typeof action>();
   const navigation = useNavigation();
   return (
-    <ProductPageShell current="Access review">
+    <ProductPageShell current={t("nav.access-review")}>
       <AccessRequestReviewPanel
         pending={pending}
         sessionRole={sessionRole}
@@ -158,11 +160,12 @@ export default function AccessRequestsReviewRoute() {
 
 /** Route-level error state (four-state completeness — mirrors catalog-search / metadata). */
 export function ErrorBoundary() {
+  const { t } = useI18n();
   return (
-    <ProductPageShell current="Access review">
+    <ProductPageShell current={t("nav.access-review")}>
       <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
         <h1 className="text-lg font-semibold text-destructive">
-          Access review hit an error
+          {t("access-review.error.title")}
         </h1>
         <p className="text-sm text-muted-foreground">
           Something went wrong while loading the pending queue. Reloading

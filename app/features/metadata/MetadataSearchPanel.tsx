@@ -179,7 +179,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
   return (
     <Stack gap="xl">
       <ProductPageHeader
-        title="Metadata catalog"
+        title={t("metadata.page.title")}
         extra={
           model.intent === "ai-fallback" ? (
             <StatusChip status="warning">AI fallback</StatusChip>

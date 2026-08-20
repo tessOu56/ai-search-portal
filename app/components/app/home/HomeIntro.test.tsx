@@ -35,7 +35,8 @@ vi.mock("~/shared/i18n/context", () => ({
         ["home.section.browse.title", "Browse without asking"],
         ["home.section.browse.desc", "Open the catalog."],
         ["home.section.browse.catalog", "Catalog search"],
-        ["home.section.browse.dishes", "Sample dishes"],
+        ["home.section.browse.assets", "Data assets"],
+        ["home.section.browse.dishes", "Demo catalog: dishes"],
         ["home.cta.dashboard", "Open overview"],
         ["footer.synthetic.hint", "Synthetic catalog."],
       ]);
@@ -59,10 +60,13 @@ describe("HomeIntro", () => {
     expect(
       screen.getByRole("link", { name: "Catalog search" })
     ).toHaveAttribute("href", "/catalog-search");
-    expect(screen.getByRole("link", { name: "Sample dishes" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Data assets" })).toHaveAttribute(
       "href",
-      "/dishes"
+      "/metadata"
     );
+    expect(
+      screen.getByRole("link", { name: "Demo catalog: dishes" })
+    ).toHaveAttribute("href", "/dishes");
     expect(screen.getByRole("link", { name: "Open overview" })).toHaveAttribute(
       "href",
       "/?view=dashboard"

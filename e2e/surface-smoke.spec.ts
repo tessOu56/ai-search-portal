@@ -57,7 +57,7 @@ test.describe("surface smoke", () => {
       topbar.getByRole("link", { name: /Overview|總覽/ })
     ).toHaveAttribute("aria-current", "page");
     await expect(
-      page.getByRole("link", { name: "Catalog search" })
+      page.getByRole("link", { name: /Catalog search|目錄搜尋/ })
     ).toBeVisible();
     await expect(page.getByRole("link", { name: "New item" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Item detail" })).toHaveCount(

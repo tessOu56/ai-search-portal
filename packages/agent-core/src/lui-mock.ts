@@ -161,7 +161,7 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
       nextSteps: [
         "在 catalog 以 orders 篩選 API",
         "在 metadata 對照表／欄位",
-        "需要授權時走 My APIs／access request（demo）",
+        "需要授權時走我的申請／access request（demo）",
       ],
     };
   }

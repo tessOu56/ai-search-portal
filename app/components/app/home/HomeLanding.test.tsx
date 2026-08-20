@@ -40,7 +40,7 @@ vi.mock("~/shared/i18n/context", () => ({
     locale: "en",
     t: (key: string) => {
       const labels = new Map<string, string>([
-        ["app.title", "AI Search Portal"],
+        ["app.title", "Portal"],
         ["home.title", "Find data you can trust"],
         ["home.tagline", "Ask, then act with sources."],
         ["home.composer.label", "Ask a question"],

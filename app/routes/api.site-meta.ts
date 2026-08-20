@@ -14,11 +14,11 @@ export function loader({ request }: LoaderFunctionArgs) {
   const notes = getReleaseNotes();
 
   const site = {
-    name: "AI Search Portal",
-    nameZh: "AI 搜尋入口",
+    name: "Portal",
+    nameZh: "Portal",
     description:
-      "Smart AI search platform. LUI-guided answers with sources and next steps.",
-    descriptionZh: "智能 AI 搜尋平台，LUI 引導可信解答與下一步。",
+      "Ask a data catalog about access, APIs, and sources. LUI-guided answers with next steps.",
+    descriptionZh: "用一句話問資料目錄、權限與 API。LUI 引導可信解答與下一步。",
     url: origin,
     sitemap: `${origin}/sitemap.xml`,
     robots: `${origin}/robots.txt`,

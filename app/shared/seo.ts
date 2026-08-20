@@ -18,8 +18,8 @@ export type SeoLoaderData = {
 };
 
 const DEFAULT_SEO: SeoLoaderData = {
-  title: "AI 搜尋入口",
-  description: "智能 AI 搜尋平台",
+  title: "Portal",
+  description: "用一句話問資料目錄、權限與 API",
   canonical: "",
   locale: "zh_TW",
   structuredData: [],

@@ -9,6 +9,7 @@ import { useI18n } from "~/shared/i18n/context";
 import { cn } from "~/shared/utils/cn";
 
 function DirectoryLinks({ onNavigate }: { onNavigate?: () => void }) {
+  const { t } = useI18n();
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -22,7 +23,7 @@ function DirectoryLinks({ onNavigate }: { onNavigate?: () => void }) {
         return (
           <div key={section.id}>
             <p className="mb-2 text-type-12 font-medium text-muted-foreground">
-              {section.title}
+              {t(section.titleKey)}
             </p>
             <ul className="space-y-1">
               {entries.map((entry) => {
@@ -44,7 +45,7 @@ function DirectoryLinks({ onNavigate }: { onNavigate?: () => void }) {
                           : "text-muted-foreground hover:text-foreground"
                       )}
                     >
-                      {entry.label}
+                      {t(entry.labelKey)}
                     </Link>
                   </li>
                 );

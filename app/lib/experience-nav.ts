@@ -1,6 +1,7 @@
 /**
  * Visitor experience destinations for Overview chrome.
  * Product planning ledger lives in platform-command (planning/projects/).
+ * Labels are i18n keys — do not hardcode visitor copy here.
  * Do not list /new, :id placeholders, or /site-map.
  */
 
@@ -9,45 +10,49 @@ export type ExperienceNavSectionId =
 
 export type ExperienceNavEntry = {
   href: string;
-  label: string;
+  labelKey: string;
   section: ExperienceNavSectionId;
 };
 
 export const EXPERIENCE_NAV_SECTIONS: Array<{
   id: ExperienceNavSectionId;
-  title: string;
+  titleKey: string;
 }> = [
-  { id: "primary", title: "Primary journeys" },
-  { id: "governance", title: "Governance demo" },
-  { id: "catalogs", title: "Seeded catalogs" },
-  { id: "support", title: "Support" },
+  { id: "primary", titleKey: "nav.section.primary" },
+  { id: "governance", titleKey: "nav.section.governance" },
+  { id: "catalogs", titleKey: "nav.section.catalogs" },
+  { id: "support", titleKey: "nav.section.support" },
 ];
 
 export const EXPERIENCE_NAV: ExperienceNavEntry[] = [
-  { href: "/?view=dashboard", label: "Overview", section: "primary" },
-  { href: "/catalog-search", label: "Catalog search", section: "primary" },
+  { href: "/?view=dashboard", labelKey: "nav.overview", section: "primary" },
   {
-    href: "/catalog-search/dictionary",
-    label: "Catalog dictionary",
+    href: "/catalog-search",
+    labelKey: "nav.catalog-search",
     section: "primary",
   },
-  { href: "/metadata", label: "Metadata catalog", section: "primary" },
+  {
+    href: "/catalog-search/dictionary",
+    labelKey: "nav.catalog-dictionary",
+    section: "primary",
+  },
+  { href: "/metadata", labelKey: "nav.metadata", section: "primary" },
   {
     href: "/access-requests/review?sessionRole=owner",
-    label: "Access review",
+    labelKey: "nav.access-review",
     section: "governance",
   },
   {
     href: "/my-apis?sessionRole=requester",
-    label: "My APIs",
+    labelKey: "nav.my-requests",
     section: "governance",
   },
-  { href: "/insights", label: "Insights", section: "catalogs" },
-  { href: "/items", label: "Items", section: "catalogs" },
-  { href: "/dishes", label: "Dishes", section: "catalogs" },
-  { href: "/recipes", label: "Recipes", section: "catalogs" },
-  { href: "/vitals", label: "Web Vitals", section: "support" },
-  { href: "/release-notes", label: "Release notes", section: "support" },
+  { href: "/items", labelKey: "nav.items", section: "catalogs" },
+  { href: "/dishes", labelKey: "nav.dishes", section: "catalogs" },
+  { href: "/recipes", labelKey: "nav.recipes", section: "catalogs" },
+  { href: "/insights", labelKey: "nav.insights", section: "support" },
+  { href: "/vitals", labelKey: "nav.vitals", section: "support" },
+  { href: "/release-notes", labelKey: "nav.release-notes", section: "support" },
 ];
 
 export const PRODUCT_TABLE_LINK_CLASS =

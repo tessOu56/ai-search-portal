@@ -87,6 +87,9 @@ export function HomeIntro() {
             <Link to="/catalog-search">{t("home.section.browse.catalog")}</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
+            <Link to="/metadata">{t("home.section.browse.assets")}</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
             <Link to="/dishes">{t("home.section.browse.dishes")}</Link>
           </Button>
           <Button asChild variant="outline" size="sm">

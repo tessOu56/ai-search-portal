@@ -59,7 +59,7 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
   return (
     <Stack gap="lg">
       <ProductPageHeader
-        title="Catalog dictionary"
+        title={t("nav.catalog-dictionary")}
         extra={
           <StatusChip status={model.virtual ? "info" : "neutral"}>
             {model.virtual ? "Fast list" : "Full list"}

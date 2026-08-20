@@ -14,6 +14,7 @@ import type {
   AccessRequestLifecycleStatus,
   GovernanceSessionRole,
 } from "~/shared/contracts";
+import { useI18n } from "~/shared/i18n/context";
 import { myApisHighlightHref } from "~/shared/navigation";
 import { cn } from "~/shared/utils/cn";
 
@@ -203,12 +204,13 @@ export function MyApisPanel({
   actionMessage?: { ok: boolean; text: string };
   highlightId?: string;
 }) {
+  const { t } = useI18n();
   return (
     <div className="space-y-6" data-surface="product">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">
-            My APIs
+            {t("nav.my-requests")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Requester applications and permission status (G1 showcase —
@@ -372,6 +374,7 @@ export function AccessRequestReviewPanel({
   actionMessage?: ReviewActionData;
   loading?: boolean;
 }) {
+  const { t } = useI18n();
   const canReview = sessionRole === "owner" || sessionRole === "admin";
   const navigation = useNavigation();
   const busy = loading || navigation.state !== "idle";
@@ -385,7 +388,7 @@ export function AccessRequestReviewPanel({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">
-            Access review
+            {t("nav.access-review")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Owner/admin pending queue — approve or deny (showcase demo; not
@@ -404,7 +407,7 @@ export function AccessRequestReviewPanel({
                 to={myApisHighlightHref(approvedRequestId)}
                 className={PRODUCT_TABLE_LINK_CLASS}
               >
-                View in My APIs (requester view) →
+                {t("nav.my-requests.view")}
               </Link>
             </p>
           ) : null}
@@ -418,7 +421,7 @@ export function AccessRequestReviewPanel({
             to="/my-apis?sessionRole=requester"
             className={PRODUCT_TABLE_LINK_CLASS}
           >
-            My APIs
+            {t("nav.my-requests")}
           </Link>
         </p>
       ) : null}

@@ -22,9 +22,10 @@ import {
   type GovernanceSessionRole,
   governanceSessionRoleSchema,
 } from "~/shared/contracts";
+import { useI18n } from "~/shared/i18n/context";
 
 export const meta: MetaFunction = () => [
-  { title: "My APIs · AI Search Portal" },
+  { title: "My requests · Portal" },
   {
     name: "description",
     content: "Track metadata access applications and permission status.",
@@ -74,13 +75,14 @@ export function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function MyApisRoute() {
+  const { t } = useI18n();
   const { sessionRole, applications, highlightId } =
     useLoaderData<typeof loader>();
   const actionMessage = useActionData<typeof action>();
   const navigation = useNavigation();
   const loading = navigation.state !== "idle";
   return (
-    <ProductPageShell current="My APIs">
+    <ProductPageShell current={t("nav.my-requests")}>
       <MyApisPanel
         applications={applications}
         sessionRole={sessionRole}
@@ -94,11 +96,12 @@ export default function MyApisRoute() {
 
 /** Route-level error state (four-state completeness — mirrors catalog-search / metadata). */
 export function ErrorBoundary() {
+  const { t } = useI18n();
   return (
-    <ProductPageShell current="My APIs">
+    <ProductPageShell current={t("nav.my-requests")}>
       <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
         <h1 className="text-lg font-semibold text-destructive">
-          My APIs hit an error
+          {t("my-apis.error.title")}
         </h1>
         <p className="text-sm text-muted-foreground">
           Something went wrong while loading your applications. Reloading

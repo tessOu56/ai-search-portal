@@ -421,7 +421,7 @@ function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
           name="q"
           defaultValue={model.query}
           placeholder="Filter APIs, tables, 925, 鍛造…"
-          aria-label="Catalog search query"
+          aria-label={t("catalog-search.page.title")}
           className="flex-1"
         />
         <Button type="submit">{t("catalog.search.submit")}</Button>
@@ -431,6 +431,7 @@ function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
 }
 
 function CatalogEmptyAction({ model }: { model: CatalogSearchViewModel }) {
+  const { t } = useI18n();
   const hasFacets =
     Boolean(model.activeMaterial) ||
     Boolean(model.activeStandard) ||
@@ -462,13 +463,14 @@ function CatalogEmptyAction({ model }: { model: CatalogSearchViewModel }) {
         })}
         className="text-sm font-medium text-primary hover:underline"
       >
-        Try metadata catalog →
+        {t("nav.metadata")} →
       </Link>
     </div>
   );
 }
 
 export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
+  const { t } = useI18n();
   const { pagination } = model;
   const base = {
     q: model.query,
@@ -493,7 +495,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
   return (
     <Stack gap="xl">
       <ProductPageHeader
-        title="Catalog search"
+        title={t("catalog-search.page.title")}
         extra={
           model.intent === "ai-fallback" ? (
             <StatusChip status="warning">AI fallback</StatusChip>

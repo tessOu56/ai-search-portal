@@ -18,7 +18,7 @@ import {
 import { useI18n } from "~/shared/i18n/context";
 
 export const meta: MetaFunction = () => [
-  { title: "Web Vitals | AI Search Portal" },
+  { title: "Web Vitals | Portal" },
   {
     name: "description",
     content:
@@ -74,9 +74,9 @@ export default function VitalsRoute() {
   const metricNames = Object.keys(METRIC_META) as WebVitalName[];
 
   return (
-    <ProductPageShell current="Web Vitals">
+    <ProductPageShell current={t("nav.vitals")}>
       <ProductPageHeader
-        title="Web Vitals"
+        title={t("nav.vitals")}
         description="Snapshot of LCP / INP / CLS from this tab. Navigate the app, then refresh."
       />
 
