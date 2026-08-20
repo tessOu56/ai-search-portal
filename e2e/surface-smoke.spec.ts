@@ -48,6 +48,15 @@ test.describe("surface smoke", () => {
     }
   });
 
+  test("insights chart mounts without error shell", async ({ page }) => {
+    await page.goto("/insights", { waitUntil: WAIT });
+    await assertHealthy(page);
+    await expect(page.getByTestId("insights-chart")).toBeVisible();
+    await expect(page.locator(".recharts-responsive-container")).toBeVisible({
+      timeout: 15_000,
+    });
+  });
+
   test("deep routes mark Overview current and omit create/detail nav rows", async ({
     page,
   }) => {

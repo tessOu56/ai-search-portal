@@ -120,7 +120,7 @@ function MetadataPagination({
   if (pagination.totalPages <= 1) return null;
   return (
     <nav
-      className="flex items-center justify-between gap-2"
+      className="flex items-center justify-between gap-space-8"
       aria-label="Results pagination"
     >
       {pagination.page > 1 ? (
@@ -193,17 +193,17 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         </Callout>
       ) : null}
 
-      <Toolbar className="flex-col items-stretch gap-3">
+      <Toolbar className="flex-col items-stretch gap-stack-dense">
         <h2 className="text-type-16 font-medium text-foreground">
           Context pack
         </h2>
         <Form
           method="post"
           action={API_CONTEXT_PACK_SELECT}
-          className="flex w-full flex-col gap-3 sm:flex-row sm:items-end"
+          className="flex w-full flex-col gap-stack-dense sm:flex-row sm:items-end"
         >
           <input type="hidden" name="redirectTo" value={redirectTo} />
-          <label className="flex flex-1 flex-col gap-1 text-sm">
+          <label className="flex flex-1 flex-col gap-space-4 text-sm">
             <span className="font-medium text-foreground">Active pack</span>
             <Select
               name="packId"
@@ -220,8 +220,11 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         </Form>
       </Toolbar>
 
-      <Toolbar>
-        <form method="get" className="flex w-full flex-col gap-3 sm:flex-row">
+      <Toolbar appearance="plain">
+        <form
+          method="get"
+          className="flex w-full flex-col gap-stack-dense sm:flex-row"
+        >
           <input type="hidden" name="pack" value={model.activePackId} />
           {model.intent ? (
             <input type="hidden" name="intent" value={model.intent} />
@@ -256,13 +259,13 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         </form>
       </Toolbar>
 
-      <div className="space-y-3" aria-label="Filters">
+      <div className="space-y-stack-dense" aria-label="Filters">
         <h2 className="text-type-16 font-medium text-foreground">Filters</h2>
-        <div className="mb-4 space-y-1">
+        <div className="mb-space-16 space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
             Type
           </span>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildMetadataSearchUrl({
                 q: model.query,
@@ -293,12 +296,12 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
             ))}
           </div>
         </div>
-        <div className="flex flex-wrap gap-4">
-          <div className="space-y-1">
+        <div className="flex flex-wrap gap-stack">
+          <div className="space-y-space-4">
             <span className="text-xs font-medium text-muted-foreground">
               Material
             </span>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-space-4">
               <FacetChip
                 to={buildMetadataSearchUrl({
                   q: model.query,
@@ -329,11 +332,11 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               ))}
             </div>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-space-4">
             <span className="text-xs font-medium text-muted-foreground">
               Industry code
             </span>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-space-4">
               <FacetChip
                 to={buildMetadataSearchUrl({
                   q: model.query,
@@ -381,14 +384,14 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
       </div>
 
       {knowledgeHits.length > 0 ? (
-        <section className="space-y-3">
-          <h2 className="mb-1 text-type-16 font-medium text-foreground">
+        <section className="space-y-stack-dense">
+          <h2 className="mb-space-4 text-type-16 font-medium text-foreground">
             Knowledge bridge
           </h2>
-          <p className="mb-3 text-type-14 text-muted-foreground">
+          <p className="mb-space-8 text-type-14 text-muted-foreground">
             Industry-matched glossary from the active pack.
           </p>
-          <div className="space-y-2">
+          <div className="space-y-space-8">
             {knowledgeHits.map((hit) => (
               <Link
                 key={hit.id}
@@ -403,9 +406,9 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                   model.activePackId,
                   model.intent
                 )}
-                className="hover:bg-muted/40 flex flex-wrap items-start justify-between gap-2 rounded-md border border-border px-3 py-2"
+                className="hover:bg-muted/40 flex flex-wrap items-start justify-between gap-space-8 rounded-md border border-border px-stack-dense py-space-8"
               >
-                <div className="min-w-0 space-y-1">
+                <div className="min-w-0 space-y-space-4">
                   <p className="text-sm font-medium text-primary hover:underline">
                     {hit.title}
                   </p>
@@ -438,7 +441,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         skeletonRows={3}
         emptyMessage="No assets match your filters."
         emptyAction={
-          <div className="flex flex-col items-center gap-2 sm:flex-row">
+          <div className="flex flex-col items-center gap-space-8 sm:flex-row">
             {Boolean(model.activeMaterial) || Boolean(model.activeStandard) ? (
               <Link
                 to={buildMetadataSearchUrl({

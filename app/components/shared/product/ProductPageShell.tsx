@@ -46,14 +46,14 @@ export function ProductPageShell({
       <Container className="px-space-16 py-space-32 md:px-space-32">
         <Stack gap="lg">
           <nav
-            className="flex flex-wrap items-center gap-2 text-type-14 text-muted-foreground"
+            className="flex flex-wrap items-center gap-space-8 text-type-14 text-muted-foreground"
             aria-label="Breadcrumb"
           >
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="gap-1.5 px-2"
+              className="gap-inline px-space-8"
               onClick={() => {
                 if (canGoBackFromHistory()) {
                   navigate(-1);
@@ -67,7 +67,7 @@ export function ProductPageShell({
             </Button>
             {trail.map((crumb) => (
               <span key={`${crumb.to}:${crumb.label}`}>
-                <span className="mx-2" aria-hidden>
+                <span className="mx-space-8" aria-hidden>
                   /
                 </span>
                 <Link
@@ -104,7 +104,7 @@ export function ProductPageHeader({
   return (
     <header className="space-y-space-8">
       {extra}
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-stack-dense">
         <h1 className="font-display text-type-32 font-medium tracking-tight text-foreground">
           {title}
         </h1>

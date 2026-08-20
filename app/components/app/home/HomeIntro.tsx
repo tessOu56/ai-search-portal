@@ -83,7 +83,7 @@ export function HomeIntro() {
           {t("home.section.browse.desc")}
         </p>
         <div className="flex flex-wrap gap-space-8">
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="default" size="md">
             <Link to="/catalog-search">{t("home.section.browse.catalog")}</Link>
           </Button>
           <Button asChild variant="outline" size="sm">

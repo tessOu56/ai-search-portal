@@ -40,13 +40,17 @@ export function SessionRoleSwitcher({
 }) {
   const roles: GovernanceSessionRole[] = ["requester", "owner", "admin"];
   return (
-    <div className="grid gap-3" role="group" aria-label="Demo session role">
+    <div
+      className="grid gap-stack-dense"
+      role="group"
+      aria-label="Demo session role"
+    >
       <Callout tone="info">
         Demo persona via{" "}
-        <code className="rounded bg-muted px-1">?sessionRole=</code>— not a
-        login. This is a showcase, not production RBAC.
+        <code className="rounded bg-muted px-space-4">?sessionRole=</code>— not
+        a login. This is a showcase, not production RBAC.
       </Callout>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-space-8">
         <span className="text-sm text-muted-foreground">Demo session:</span>
         <SegmentedNav aria-label="Demo session role">
           {roles.map((role) => (
@@ -54,7 +58,7 @@ export function SessionRoleSwitcher({
               key={role}
               asChild
               current={sessionRole === role}
-              className="min-w-0 px-3 capitalize sm:min-w-28"
+              className="min-w-0 px-stack-dense capitalize sm:min-w-28"
             >
               <Link to={`?sessionRole=${role}`}>{role}</Link>
             </SegmentedNavItem>
@@ -67,10 +71,10 @@ export function SessionRoleSwitcher({
 
 function ApplicationCardSkeleton() {
   return (
-    <Panel className="space-y-3" aria-hidden="true">
+    <Panel className="space-y-stack-dense" aria-hidden="true">
       <Skeleton className="h-4 w-2/3" />
       <Skeleton className="h-3 w-1/2" />
-      <div className="flex gap-2">
+      <div className="flex gap-space-8">
         <Skeleton className="h-6 w-20 rounded-full" />
         <Skeleton className="h-6 w-24 rounded-full" />
       </div>
@@ -81,7 +85,7 @@ function ApplicationCardSkeleton() {
 function ApplicationCardSkeletonGrid({ rows = 2 }: { rows?: number }) {
   return (
     <div
-      className="grid gap-4 sm:grid-cols-2"
+      className="grid gap-stack sm:grid-cols-2"
       role="status"
       aria-label="Loading applications"
     >
@@ -132,7 +136,7 @@ function MyApisApplicationCard({
       data-testid="my-apis-application-card"
       data-status={app.status}
     >
-      <div className="mb-3 space-y-2">
+      <div className="mb-space-8 space-y-space-8">
         {highlighted ? (
           <Badge variant="default" className="w-fit">
             Just updated
@@ -148,8 +152,8 @@ function MyApisApplicationCard({
         </p>
         <AccessRequestLifecycleStepper status={app.status} />
       </div>
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="space-y-stack-dense">
+        <div className="flex flex-wrap items-center gap-space-8">
           <Badge variant="outline">status: {app.status}</Badge>
           <Badge
             variant={
@@ -167,7 +171,7 @@ function MyApisApplicationCard({
           />
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-space-8">
           {canSubmitDraft ? (
             <draftFetcher.Form method="post">
               <input type="hidden" name="intent" value="submit-draft" />
@@ -210,13 +214,13 @@ export function MyApisPanel({
 }) {
   const { t } = useI18n();
   return (
-    <div className="space-y-6" data-surface="product">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="space-y-section-dense" data-surface="product">
+      <div className="flex flex-wrap items-end justify-between gap-stack">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">
             {t("nav.my-requests")}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-space-4 text-sm text-muted-foreground">
             Requester applications and permission status (G1 showcase —
             in-memory store; not production auth).
           </p>
@@ -264,7 +268,7 @@ export function MyApisPanel({
           />
         </div>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <ul className="grid gap-stack sm:grid-cols-2">
           {applications.map((app) => (
             <li key={app.id}>
               <MyApisApplicationCard
@@ -298,7 +302,7 @@ function AccessReviewRequestCard({
 
   return (
     <Panel data-testid="access-review-card" data-status={app.status}>
-      <div className="mb-3 space-y-2">
+      <div className="mb-space-8 space-y-space-8">
         <h2 className="text-type-16 font-semibold text-foreground">
           {app.assetName}
         </h2>
@@ -307,13 +311,13 @@ function AccessReviewRequestCard({
         </p>
         <AccessRequestLifecycleStepper status={app.status} />
       </div>
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="space-y-stack-dense">
+        <div className="flex flex-wrap items-center gap-space-8">
           <Badge variant="secondary">{app.status}</Badge>
         </div>
 
         {canReview ? (
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-stack-dense">
             <Form method="post" className="inline">
               <input type="hidden" name="requestId" value={app.id} />
               <input type="hidden" name="decision" value="approved" />
@@ -328,7 +332,10 @@ function AccessReviewRequestCard({
                 Reject
               </Button>
             </Form>
-            <Form method="post" className="flex flex-wrap items-center gap-2">
+            <Form
+              method="post"
+              className="flex flex-wrap items-center gap-space-8"
+            >
               <input type="hidden" name="requestId" value={app.id} />
               <input type="hidden" name="decision" value="edited" />
               <Select
@@ -388,13 +395,13 @@ export function AccessRequestReviewPanel({
       : null;
 
   return (
-    <div className="space-y-6" data-surface="product">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="space-y-section-dense" data-surface="product">
+      <div className="flex flex-wrap items-end justify-between gap-stack">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">
             {t("nav.access-review")}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-space-4 text-sm text-muted-foreground">
             Owner/admin pending queue — approve or deny (showcase demo; not
             production RBAC).
           </p>
@@ -403,7 +410,7 @@ export function AccessRequestReviewPanel({
       </div>
 
       {actionMessage ? (
-        <div className="space-y-1">
+        <div className="space-y-space-4">
           <StatusMessage {...actionMessage} />
           {approvedRequestId ? (
             <p className="text-sm">
@@ -440,7 +447,7 @@ export function AccessRequestReviewPanel({
           />
         </div>
       ) : (
-        <ul className="space-y-4">
+        <ul className="space-y-stack">
           {pending.map((app) => (
             <li key={app.id}>
               <AccessReviewRequestCard app={app} canReview={canReview} />

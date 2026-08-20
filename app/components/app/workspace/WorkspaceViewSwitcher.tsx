@@ -23,7 +23,8 @@ export function WorkspaceViewSwitcher({
   const { mode, overviewReturnHref, rememberCurrentIfOverview } =
     useWorkspaceSession();
 
-  const itemClass = "min-w-0 gap-1 px-2.5 sm:min-w-28 sm:gap-1.5 sm:px-3";
+  const itemClass =
+    "min-w-0 gap-space-4 px-space-8 sm:min-w-28 sm:gap-inline sm:px-stack-dense";
 
   return (
     <SegmentedNav

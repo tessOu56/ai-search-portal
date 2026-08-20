@@ -37,7 +37,7 @@ function Row({ row }: { row: CatalogApiRow }) {
   return (
     <div
       data-row
-      className="grid h-full grid-cols-[1fr_2fr_auto] items-center gap-2 border-b border-border bg-card px-4 text-sm"
+      className="grid h-full grid-cols-[1fr_2fr_auto] items-center gap-space-8 border-b border-border bg-card px-space-16 text-sm"
     >
       <span className="truncate font-medium text-foreground">{row.name}</span>
       <span className="truncate text-muted-foreground">{row.description}</span>
@@ -82,8 +82,14 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
         }
       />
 
-      <Toolbar className="flex-col items-stretch gap-3 sm:items-stretch">
-        <form method="get" className="flex w-full flex-col gap-3 sm:flex-row">
+      <Toolbar
+        appearance="plain"
+        className="flex-col items-stretch gap-stack-dense sm:items-stretch"
+      >
+        <form
+          method="get"
+          className="flex w-full flex-col gap-stack-dense sm:flex-row"
+        >
           {model.activeType ? (
             <input type="hidden" name="type" value={model.activeType} />
           ) : null}
@@ -99,7 +105,7 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
           />
           <Button type="submit">{t("catalog.search.submit")}</Button>
         </form>
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-space-4">
           <Button
             asChild
             size="sm"
@@ -126,7 +132,7 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
         </div>
       </Toolbar>
 
-      <section className="space-y-3" aria-label="Dictionary results">
+      <section className="space-y-stack-dense" aria-label="Dictionary results">
         <p
           className="text-type-14 text-muted-foreground"
           data-testid="dictionary-count"
@@ -139,7 +145,7 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
           <EmptyState title="No rows match your query." />
         ) : (
           <div className="overflow-hidden rounded-2xl border border-border">
-            <div className="grid grid-cols-[1fr_2fr_auto] border-b border-border bg-card px-4 py-3 text-xs font-medium tracking-wide text-muted-foreground">
+            <div className="grid grid-cols-[1fr_2fr_auto] border-b border-border bg-card px-space-16 py-stack-dense text-xs font-medium tracking-wide text-muted-foreground">
               <span>Name</span>
               <span>Description</span>
               <span className="text-right">Type</span>

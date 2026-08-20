@@ -100,14 +100,14 @@ function CatalogFacetFilters({
   standardLabels: Map<string, string>;
 }) {
   return (
-    <div className="space-y-3" aria-label="Filters">
+    <div className="space-y-stack-dense" aria-label="Filters">
       <h2 className="text-type-16 font-medium text-foreground">Filters</h2>
-      <div className="flex flex-wrap gap-4">
-        <div className="space-y-1">
+      <div className="flex flex-wrap gap-stack">
+        <div className="space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
             Type
           </span>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
@@ -132,11 +132,11 @@ function CatalogFacetFilters({
           </div>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
             Material
           </span>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
@@ -161,11 +161,11 @@ function CatalogFacetFilters({
           </div>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
             Industry code
           </span>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
@@ -191,11 +191,11 @@ function CatalogFacetFilters({
           </div>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
             Product type
           </span>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
@@ -220,11 +220,11 @@ function CatalogFacetFilters({
           </div>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
             Auction
           </span>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildCatalogSearchUrl({
                 ...base,
@@ -247,11 +247,11 @@ function CatalogFacetFilters({
         </div>
 
         {model.filters.slice(1).map((filter) => (
-          <fieldset key={filter.id} className="space-y-1">
+          <fieldset key={filter.id} className="space-y-space-4">
             <legend className="text-xs font-medium text-muted-foreground">
               {filter.label}
             </legend>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-space-4">
               {filter.options.map((opt) => (
                 <Button
                   key={`${filter.id}-${opt.value}`}
@@ -281,23 +281,26 @@ function CatalogKnowledgeHits({
 }) {
   if ((model.sourceCounts?.knowledge ?? 0) === 0) return null;
   return (
-    <section className="space-y-3" data-testid="catalog-knowledge-section">
-      <h2 className="mb-1 text-type-16 font-medium text-foreground">
+    <section
+      className="space-y-stack-dense"
+      data-testid="catalog-knowledge-section"
+    >
+      <h2 className="mb-space-4 text-type-16 font-medium text-foreground">
         Domain knowledge
       </h2>
-      <p className="mb-3 text-type-14 text-muted-foreground">
+      <p className="mb-space-8 text-type-14 text-muted-foreground">
         Glossary and domain notes matching the active filters. Asset rows below
         are not filtered by hallmark.
       </p>
-      <div className="space-y-2">
+      <div className="space-y-space-8">
         {model.results
           .filter((row) => row.source === "knowledge")
           .map((row) => (
             <div
               key={`knowledge-${row.id}`}
-              className="flex flex-wrap items-start justify-between gap-2 rounded-md border border-border px-3 py-2"
+              className="flex flex-wrap items-start justify-between gap-space-8 rounded-md border border-border px-stack-dense py-space-8"
             >
-              <div className="min-w-0 space-y-1">
+              <div className="min-w-0 space-y-space-4">
                 {row.detailHref ? (
                   <Link
                     to={row.detailHref}
@@ -314,7 +317,7 @@ function CatalogKnowledgeHits({
                 {row.facets &&
                 (row.facets.standards.length > 0 ||
                   row.facets.materials.length > 0) ? (
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-space-4">
                     {row.facets.standards.map((code) => (
                       <Link
                         key={code}
@@ -323,7 +326,7 @@ function CatalogKnowledgeHits({
                           standard: code,
                           page: 1,
                         })}
-                        className="inline-flex rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                        className="inline-flex rounded border border-border px-space-4 py-space-2 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
                       >
                         {code}
                       </Link>
@@ -354,7 +357,7 @@ function CatalogPagination({
   if (pagination.totalPages <= 1) return null;
   return (
     <nav
-      className="flex items-center justify-between gap-2"
+      className="flex items-center justify-between gap-space-8"
       aria-label="Results pagination"
     >
       {pagination.page > 1 ? (
@@ -393,8 +396,11 @@ function CatalogPagination({
 function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
   const { t } = useI18n();
   return (
-    <Toolbar>
-      <form method="get" className="flex w-full flex-col gap-3 sm:flex-row">
+    <Toolbar appearance="plain">
+      <form
+        method="get"
+        className="flex w-full flex-col gap-stack-dense sm:flex-row"
+      >
         {model.intent ? (
           <input type="hidden" name="intent" value={model.intent} />
         ) : null}
@@ -438,7 +444,7 @@ function CatalogEmptyAction({ model }: { model: CatalogSearchViewModel }) {
     Boolean(model.activeProductType) ||
     Boolean(model.activeAuctionEligible);
   return (
-    <div className="flex flex-col items-center gap-2 sm:flex-row">
+    <div className="flex flex-col items-center gap-space-8 sm:flex-row">
       {hasFacets ? (
         <Link
           to={buildCatalogSearchUrl({
@@ -554,7 +560,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
               key: "name",
               header: "Name",
               accessor: (row) => (
-                <div className="space-y-1">
+                <div className="space-y-space-4">
                   {row.detailHref ? (
                     <Link
                       to={row.detailHref}
@@ -570,7 +576,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
                   {row.facets &&
                   (row.facets.standards.length > 0 ||
                     row.facets.materials.length > 0) ? (
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-space-4">
                       {row.facets.standards.map((code) => (
                         <Link
                           key={code}
@@ -579,7 +585,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
                             standard: code,
                             page: 1,
                           })}
-                          className="inline-flex rounded border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                          className="inline-flex rounded border border-border px-space-4 py-space-2 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
                         >
                           {code}
                         </Link>
@@ -592,7 +598,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
                             material,
                             page: 1,
                           })}
-                          className="border-border/60 inline-flex rounded border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                          className="border-border/60 inline-flex rounded border px-space-4 py-space-2 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
                         >
                           {material.replace(/_/g, " ")}
                         </Link>

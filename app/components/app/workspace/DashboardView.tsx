@@ -71,7 +71,7 @@ export function DashboardView() {
                 {t(item.desc)}
               </p>
               <div className="flex flex-wrap gap-space-8">
-                <Button asChild size="sm">
+                <Button asChild size="md" variant="default">
                   <Link
                     to={`/?q=${encodeURIComponent(question)}`}
                     onClick={rememberCurrentIfOverview}

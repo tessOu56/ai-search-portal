@@ -26,6 +26,9 @@ import { I18nProvider } from "~/shared/i18n/context";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
 
 export const links: LinksFunction = () => [
+  { rel: "icon", href: "/favicon.ico", sizes: "any" },
+  { rel: "icon", href: "/favicon-32.png", type: "image/png", sizes: "32x32" },
+  { rel: "icon", href: "/favicon-16.png", type: "image/png", sizes: "16x16" },
   { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
   { rel: "apple-touch-icon", href: "/apple-touch-icon.svg" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

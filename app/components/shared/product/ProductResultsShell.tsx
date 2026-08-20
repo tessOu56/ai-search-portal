@@ -35,9 +35,9 @@ export function ProductResultsShell({
   skeletonRows = 3,
 }: ProductResultsShellProps) {
   return (
-    <section className="space-y-4" aria-labelledby="product-results-title">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="space-y-1">
+    <section className="space-y-stack" aria-labelledby="product-results-title">
+      <div className="flex flex-wrap items-start justify-between gap-space-8">
+        <div className="space-y-space-4">
           <h2
             id="product-results-title"
             className="text-type-16 font-medium text-foreground"
@@ -50,9 +50,13 @@ export function ProductResultsShell({
         </div>
         {headerExtra}
       </div>
-      <div className="space-y-4">
+      <div className="space-y-stack">
         {isLoading ? (
-          <div role="status" aria-label={loadingLabel} className="space-y-2">
+          <div
+            role="status"
+            aria-label={loadingLabel}
+            className="space-y-space-8"
+          >
             {Array.from({ length: skeletonRows }, (_, index) => (
               <Skeleton key={index} className="h-12 w-full" />
             ))}
