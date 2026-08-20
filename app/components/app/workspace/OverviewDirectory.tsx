@@ -48,7 +48,10 @@ type OverviewDirectoryProps = {
   onNavigate?: () => void;
 };
 
-/** Overview directory. Mobile overlay from topbar icon; md+ sticky sidebar. */
+/**
+ * Overview directory. Mobile overlay from topbar; md+ sticky SideNav rail.
+ * Surface: product — Quiet directory, not a second marketing column.
+ */
 export function OverviewDirectory({
   mobileOpen = false,
   onNavigate,
@@ -73,7 +76,7 @@ export function OverviewDirectory({
         variant="rail"
         aria-label={directoryLabel}
         id="overview-directory-desktop"
-        className="hidden md:block"
+        className="hidden md:flex"
       >
         <DirectorySections />
       </SideNav>

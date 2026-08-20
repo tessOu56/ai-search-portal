@@ -29,7 +29,11 @@ const typeScale: Record<string, [string, { lineHeight: string }]> = {
 
 export default {
   darkMode: ["class"],
-  content: ["./app/**/*.{js,jsx,ts,tsx}"],
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}",
+    // SDK ships class strings in dist — without this, SideNav/SegmentedNav chrome is purged.
+    "./node_modules/@is_tess/components/dist/**/*.{js,mjs}",
+  ],
   theme: {
     extend: {
       borderRadius: {

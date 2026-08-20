@@ -37,12 +37,12 @@ function AppChromeFrame({ children }: { children: ReactNode }) {
         }
       />
       {mode === "overview" ? (
-        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row md:items-stretch">
           <OverviewDirectory
             mobileOpen={directoryOpen}
             onNavigate={() => setDirectoryOpen(false)}
           />
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto bg-background">
             {children}
           </div>
         </div>
