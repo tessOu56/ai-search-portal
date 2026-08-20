@@ -100,7 +100,7 @@ export function getCanonicalUrl(
 ): string {
   const url = new URL(request.url);
   const path = pathOverride ?? url.pathname;
-  return `${url.origin}${path}`.replace(/\/+/g, "/");
+  return new URL(path, `${url.origin}/`).toString();
 }
 
 /**
