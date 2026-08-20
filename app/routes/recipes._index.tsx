@@ -9,6 +9,7 @@ import { Stack } from "~/components/ui/Stack";
 import { getAllRecipes } from "~/features/recipe/recipe.server";
 import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { ensureSeeded } from "~/services/seed.server";
+import { useI18n } from "~/shared/i18n/context";
 
 export async function loader(_args: LoaderFunctionArgs) {
   await ensureSeeded();
@@ -17,10 +18,11 @@ export async function loader(_args: LoaderFunctionArgs) {
 
 export default function RecipesIndexPage() {
   const { recipes } = useLoaderData<typeof loader>();
+  const { t } = useI18n();
   return (
     <Stack gap="lg">
       <ProductPageHeader
-        title="Recipes"
+        title={t("nav.recipes")}
         description="Seeded lab records — open a row for steps and properties."
       />
       {recipes.length === 0 ? (

@@ -63,7 +63,9 @@ describe("metadata catalog", () => {
       />
     );
     expect(
-      screen.getByRole("heading", { name: /metadata catalog/i })
+      screen.getByRole("heading", {
+        name: /metadata\.page\.title|data assets/i,
+      })
     ).toBeTruthy();
     expect(screen.getByText(/customer_profile/i)).toBeTruthy();
     expect(screen.queryByText(/\?material=/)).toBeNull();

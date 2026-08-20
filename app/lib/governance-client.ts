@@ -1,5 +1,14 @@
+import {
+  API_METADATA_ACCESS_EVALUATE,
+  API_METADATA_ACCESS_REQUESTS,
+  apiMetadataAccessRequestCancel,
+  apiMetadataAccessRequestReview,
+  apiMetadataAccessRequestSubmit,
+} from "~/shared/api/paths";
+
 /**
- * Client fetch helpers for governance mutations — AbortSignal + X-Request-Id (T-186).
+ * Client fetch helpers for governance JSON mutations — AbortSignal + X-Request-Id (T-186).
+ * Journey C UI stays on Remix Form/action; these helpers are the programmatic BFF client.
  */
 
 export type GovernanceFetchInit = {
@@ -43,7 +52,7 @@ export function evaluateAccess(
   body: { assetId: string; purpose: string; role?: string },
   init?: Omit<GovernanceFetchInit, "body" | "method">
 ) {
-  return governanceFetch("/api/metadata/access-requests/evaluate", {
+  return governanceFetch(API_METADATA_ACCESS_EVALUATE, {
     ...init,
     method: "POST",
     body,
@@ -54,7 +63,7 @@ export function submitAccess(
   body: Record<string, unknown>,
   init?: Omit<GovernanceFetchInit, "body" | "method">
 ) {
-  return governanceFetch("/api/metadata/access-requests", {
+  return governanceFetch(API_METADATA_ACCESS_REQUESTS, {
     ...init,
     method: "POST",
     body,
@@ -70,10 +79,11 @@ export function reviewAccess(
   },
   init?: Omit<GovernanceFetchInit, "body" | "method">
 ) {
-  return governanceFetch(
-    `/api/metadata/access-requests/${encodeURIComponent(requestId)}/review`,
-    { ...init, method: "POST", body }
-  );
+  return governanceFetch(apiMetadataAccessRequestReview(requestId), {
+    ...init,
+    method: "POST",
+    body,
+  });
 }
 
 export function submitDraftAccess(
@@ -81,10 +91,11 @@ export function submitDraftAccess(
   body: { approved?: boolean } = {},
   init?: Omit<GovernanceFetchInit, "body" | "method">
 ) {
-  return governanceFetch(
-    `/api/metadata/access-requests/${encodeURIComponent(requestId)}/submit`,
-    { ...init, method: "POST", body }
-  );
+  return governanceFetch(apiMetadataAccessRequestSubmit(requestId), {
+    ...init,
+    method: "POST",
+    body,
+  });
 }
 
 export function cancelAccess(
@@ -92,8 +103,9 @@ export function cancelAccess(
   body: { reason?: string } = {},
   init?: Omit<GovernanceFetchInit, "body" | "method">
 ) {
-  return governanceFetch(
-    `/api/metadata/access-requests/${encodeURIComponent(requestId)}/cancel`,
-    { ...init, method: "POST", body }
-  );
+  return governanceFetch(apiMetadataAccessRequestCancel(requestId), {
+    ...init,
+    method: "POST",
+    body,
+  });
 }

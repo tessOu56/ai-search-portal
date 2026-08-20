@@ -108,6 +108,49 @@ export async function createRecipe(input: CreateRecipeInput): Promise<Recipe> {
   return recipe;
 }
 
+/** Seed use: upsert recipe with a stable id. */
+export async function putRecipe(
+  id: string,
+  input: CreateRecipeInput
+): Promise<Recipe> {
+  if (!input.dishId) {
+    throw validationError("dishId is required");
+  }
+  const dish = await getDishById(input.dishId);
+  if (!dish) {
+    throw notFound("Dish", input.dishId);
+  }
+
+  const now = new Date();
+  const existing = recipesMap.get(id);
+  const ingredients = input.ingredients ?? dish.ingredients;
+  let calculatedNutrition = dish.calculatedNutrition;
+  if (input.ingredients && input.ingredients.length > 0) {
+    calculatedNutrition = await calculateNutrition(ingredients);
+  }
+
+  const recipe: Recipe = {
+    id,
+    title: input.title,
+    description: input.description,
+    region: input.region,
+    dishId: input.dishId,
+    dishName: dish.name,
+    ingredients,
+    instructions: input.instructions,
+    calculatedNutrition,
+    properties: dish.properties,
+    cookingTime: input.cookingTime,
+    difficulty: input.difficulty,
+    servings: input.servings,
+    createdAt: existing?.createdAt ?? now,
+    updatedAt: now,
+  };
+
+  recipesMap.set(id, recipe);
+  return recipe;
+}
+
 /**
  * 更新 Recipe
  */

@@ -72,17 +72,18 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
     return {
       summary: "Synthetic fixture：PII／權限題。展示資料為假資料，非真實個資。",
       answer: [
-        "依合成目錄，含 PII 標籤的示範資產包括 dim_customer_profile 與相關 marketing 用途資料表。",
-        "分析師角色通常需要 owner 核准；這不是真實授權——請用 Access request 流程",
-        "（Demo role switcher）體驗 HITL，再從 References 進入 metadata 詳情。",
+        "依合成目錄，含 PII 標籤的示範資產包括 customer_profile（tbl-customers）",
+        "與相關 marketing 用途資料表。分析師角色通常需要 owner 核准；這不是真實授權",
+        "——請用 Access request 流程（Demo role switcher）體驗 HITL，再從 References",
+        "進入 metadata 詳情。",
       ].join(""),
       confidence: 0.86,
       sources: [
         {
-          title: "dim_customer_profile (synthetic)",
+          title: "customer_profile (synthetic)",
           url: [
             "/metadata/",
-            encodeURIComponent("dim_customer_profile"),
+            encodeURIComponent("tbl-customers"),
             "?pack=",
             encodeURIComponent(packId),
           ].join(""),
@@ -91,7 +92,7 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
         ...synth,
       ].filter((s, i, arr) => arr.findIndex((x) => x.url === s.url) === i),
       nextSteps: [
-        "在 metadata 開啟 dim_customer_profile 查看 classification／terms",
+        "在 metadata 開啟 tbl-customers 查看 classification／terms",
         "以 requester 送出 access request（合成流程）",
         "用 ?sessionRole=owner 體驗審核（Demo only — not authentication）",
       ],
@@ -103,8 +104,8 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
       summary:
         "Synthetic fixture：customer_profile 上游血緣示範（非生產譜系）。",
       answer: [
-        "依合成 metadata pack，customer_profile／dim_customer_profile 的上游通常來自",
-        " staging 訂單與身分維度表。請從 References 進入 metadata 詳情看 Lineage DAG；",
+        "依合成 metadata pack，customer_profile（tbl-customers）的上游通常來自",
+        " analytics 與相關同意／訂單表。請從 References 進入 metadata 詳情看 Lineage DAG；",
         "若出現環則會顯示警告。此為 showcase 合成資料。",
       ].join(""),
       confidence: 0.84,

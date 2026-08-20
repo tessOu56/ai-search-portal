@@ -53,13 +53,15 @@ function nextMockRequestId(): string {
  * applications in access-request-store.server.ts (MSW-only fixture; the real
  * audit-log.server.ts intentionally starts empty, see spec review §3).
  */
+const ASSET_CUSTOMERS = "tbl-customers";
+
 const MOCK_AUDIT_EVENTS = [
   {
     id: "aud-mock-1",
     at: "2026-07-09T00:00:00.000Z",
     action: AUDIT_ACTION_SUBMIT,
     actor: { role: "analyst" as const },
-    resource: { type: "metadata_asset", id: "tbl-customers" },
+    resource: { type: "metadata_asset", id: ASSET_CUSTOMERS },
     decisionId: "dec-mock-1",
     requestId: "mock-req-seed",
     outcome: "pending_approval" as const,
@@ -71,7 +73,7 @@ const MOCK_AUDIT_EVENTS = [
     at: "2026-08-09T02:00:00.000Z",
     action: AUDIT_ACTION_SUBMIT,
     actor: { role: "analyst" as const },
-    resource: { type: "metadata_asset", id: "tbl-customer-profile" },
+    resource: { type: "metadata_asset", id: ASSET_CUSTOMERS },
     decisionId: "dec-seed-pending-1",
     requestId: "seed-req-pending-1",
     outcome: "pending_approval" as const,
@@ -83,7 +85,7 @@ const MOCK_AUDIT_EVENTS = [
     at: "2026-08-06T09:30:00.000Z",
     action: "access_request.deny",
     actor: { role: "analyst" as const },
-    resource: { type: "metadata_asset", id: "dash-studio-margin" },
+    resource: { type: "metadata_asset", id: "dash-orders" },
     decisionId: "dec-seed-denied-1",
     requestId: "seed-req-denied-1",
     outcome: "denied" as const,
@@ -98,7 +100,7 @@ const MOCK_AUDIT_EVENTS = [
     at: "2026-07-28T01:00:00.000Z",
     action: "access_request.expire",
     actor: { role: "analyst" as const },
-    resource: { type: "metadata_asset", id: "tbl-customer-profile" },
+    resource: { type: "metadata_asset", id: ASSET_CUSTOMERS },
     decisionId: "dec-seed-expired-1",
     requestId: "seed-req-expired-1",
     outcome: "expired" as const,
@@ -110,7 +112,7 @@ const MOCK_AUDIT_EVENTS = [
     at: "2026-08-07T03:15:00.000Z",
     action: AUDIT_ACTION_SUBMIT,
     actor: { role: "analyst" as const },
-    resource: { type: "metadata_asset", id: "tbl-rental-slot" },
+    resource: { type: "metadata_asset", id: "tbl-etl-orders" },
     decisionId: "dec-seed-permission-denied-1",
     requestId: "seed-req-permission-denied-1",
     outcome: "denied" as const,
@@ -122,7 +124,7 @@ const MOCK_AUDIT_EVENTS = [
     at: "2026-08-02T05:05:00.000Z",
     action: AUDIT_ACTION_SUBMIT,
     actor: { role: "engineer" as const },
-    resource: { type: "metadata_asset", id: "api-legacy-quote" },
+    resource: { type: "metadata_asset", id: "api-legacy-orders" },
     decisionId: "dec-seed-deprecated-1",
     requestId: "seed-req-deprecated-api-1",
     outcome: "denied" as const,

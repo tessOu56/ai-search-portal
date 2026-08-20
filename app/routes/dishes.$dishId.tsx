@@ -47,6 +47,22 @@ export default function DishDetailPage() {
       </Panel>
 
       <Panel>
+        <h2 className="mb-3 text-type-16 font-semibold">原料</h2>
+        {dish.ingredients.length === 0 ? (
+          <EmptyState density="inline" title="尚無原料" />
+        ) : (
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            {dish.ingredients.map((usage) => (
+              <li key={usage.ingredientId}>
+                {usage.ingredientName} · {usage.amount}
+                {usage.unit}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+
+      <Panel>
         <h2 className="mb-3 text-type-16 font-semibold">相關食譜</h2>
         {recipes.length === 0 ? (
           <EmptyState density="inline" title="尚無食譜" />

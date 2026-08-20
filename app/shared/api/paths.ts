@@ -15,6 +15,12 @@ export const API_METADATA_ACCESS_EVALUATE =
 export function apiMetadataAccessRequestReview(requestId: string) {
   return `${API_METADATA_ACCESS_REQUESTS}/${encodeURIComponent(requestId)}/review`;
 }
+export function apiMetadataAccessRequestSubmit(requestId: string) {
+  return `${API_METADATA_ACCESS_REQUESTS}/${encodeURIComponent(requestId)}/submit`;
+}
+export function apiMetadataAccessRequestCancel(requestId: string) {
+  return `${API_METADATA_ACCESS_REQUESTS}/${encodeURIComponent(requestId)}/cancel`;
+}
 export const API_AUDIT = "/api/audit";
 export const API_MCP_GATEWAY = "/api/mcp/gateway";
 export const API_CHAT = "/api/chat";
@@ -23,6 +29,11 @@ export const API_LOCALE = "/api/locale";
 export const API_RELEASE_NOTES = "/api/release-notes";
 export const API_SITE_META = "/api/site-meta";
 
+/**
+ * Food-domain path constants are reserved for unused client hooks.
+ * LIVE has no REST for these; pages use Remix loaders.
+ * See specs/api/live-surface.yaml (T-2026-247).
+ */
 export const API_DISHES = "/api/dishes";
 export const API_INGREDIENTS = "/api/ingredients";
 export const API_RECIPES = "/api/recipes";

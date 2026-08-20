@@ -11,7 +11,12 @@
     "fqn": "analytics",
     "columns": [],
     "upstreamIds": [],
-    "downstreamIds": ["tbl-customers", "tbl-orders"],
+    "downstreamIds": [
+      "tbl-customers",
+      "tbl-orders",
+      "tbl-consent",
+      "tbl-payments"
+    ],
     "datasetId": "analytics",
     "packId": "enterprise-mau"
   },
@@ -69,7 +74,12 @@
       }
     ],
     "upstreamIds": ["db-analytics"],
-    "downstreamIds": ["api-orders", "dash-orders"],
+    "downstreamIds": [
+      "api-orders",
+      "dash-orders",
+      "tbl-consent",
+      "api-customer-export"
+    ],
     "datasetId": "customer-profile",
     "packId": "enterprise-mau",
     "metricIds": ["metric-monthly-active-users"],
@@ -102,7 +112,7 @@
       }
     ],
     "upstreamIds": ["db-analytics"],
-    "downstreamIds": ["tbl-etl-orders", "api-orders"],
+    "downstreamIds": ["tbl-etl-orders", "api-orders", "tbl-payments"],
     "datasetId": "orders",
     "packId": "enterprise-mau"
   },
@@ -174,9 +184,162 @@
     "updatedAt": "2026-06-15T14:00:00.000Z",
     "fqn": "bi.dashboards.orders",
     "columns": [],
-    "upstreamIds": ["tbl-etl-orders", "tbl-customers"],
+    "upstreamIds": ["tbl-etl-orders", "tbl-customers", "tbl-payments"],
     "downstreamIds": [],
     "datasetId": "orders-dashboard",
+    "packId": "enterprise-mau"
+  },
+  {
+    "id": "tbl-consent",
+    "name": "consent_log",
+    "description": "Marketing consent events with synthetic PII subject identifiers",
+    "assetType": "Table",
+    "owner": "privacy-office@example.com",
+    "department": "Privacy",
+    "tags": ["PII", "privacy"],
+    "classification": "PII",
+    "updatedAt": "2026-06-16T09:00:00.000Z",
+    "fqn": "analytics.public.consent_log",
+    "columns": [
+      {
+        "name": "subject_id",
+        "dataType": "bigint",
+        "tags": ["key"]
+      },
+      {
+        "name": "email",
+        "dataType": "varchar",
+        "description": "Synthetic subject email",
+        "tags": ["PII"],
+        "sensitive": true
+      },
+      {
+        "name": "channel",
+        "dataType": "varchar"
+      },
+      {
+        "name": "granted_at",
+        "dataType": "timestamp"
+      }
+    ],
+    "upstreamIds": ["tbl-customers"],
+    "downstreamIds": ["api-customer-export", "dash-access-review"],
+    "datasetId": "consent-log",
+    "packId": "enterprise-mau",
+    "termsOfUse": ["analytics", "marketing_requires_approval"]
+  },
+  {
+    "id": "tbl-payments",
+    "name": "payment_events",
+    "description": "Order payment events; card last4 is masked at source",
+    "assetType": "Table",
+    "owner": "payments-owner@example.com",
+    "department": "Payments",
+    "tags": ["fact", "payments"],
+    "classification": "confidential",
+    "updatedAt": "2026-06-16T10:00:00.000Z",
+    "fqn": "analytics.public.payment_events",
+    "columns": [
+      {
+        "name": "payment_id",
+        "dataType": "bigint",
+        "tags": ["key"]
+      },
+      {
+        "name": "order_id",
+        "dataType": "bigint"
+      },
+      {
+        "name": "amount",
+        "dataType": "decimal"
+      },
+      {
+        "name": "card_last4",
+        "dataType": "char",
+        "tags": ["PII"],
+        "sensitive": true
+      }
+    ],
+    "upstreamIds": ["tbl-orders"],
+    "downstreamIds": ["dash-orders"],
+    "datasetId": "payment-events",
+    "packId": "enterprise-mau"
+  },
+  {
+    "id": "api-customer-export",
+    "name": "POST /api/customers/export",
+    "description": "Bulk customer export; HITL required for analyst marketing use",
+    "assetType": "API",
+    "owner": "crm-owner@example.com",
+    "department": "CRM",
+    "tags": ["rest", "PII"],
+    "classification": "PII",
+    "updatedAt": "2026-06-17T11:00:00.000Z",
+    "fqn": "api.customers.export",
+    "columns": [],
+    "upstreamIds": ["tbl-customers", "tbl-consent"],
+    "downstreamIds": [],
+    "datasetId": "customer-export-api",
+    "packId": "enterprise-mau",
+    "termsOfUse": ["operations", "marketing_requires_approval"]
+  },
+  {
+    "id": "api-legacy-orders",
+    "name": "GET /api/orders/v1",
+    "description": "Deprecated orders list; use GET /api/orders",
+    "assetType": "API",
+    "owner": "api-team@example.com",
+    "tags": ["rest", "deprecated"],
+    "classification": "internal",
+    "updatedAt": "2026-05-01T08:00:00.000Z",
+    "fqn": "api.orders.list.v1",
+    "columns": [],
+    "upstreamIds": ["tbl-orders"],
+    "downstreamIds": [],
+    "datasetId": "orders-api-legacy",
+    "packId": "enterprise-mau"
+  },
+  {
+    "id": "dash-access-review",
+    "name": "access_review_queue",
+    "description": "Owner queue for pending access requests on PII assets",
+    "assetType": "Dashboard",
+    "owner": "data-platform@example.com",
+    "department": "Data platform",
+    "tags": ["bi", "governance"],
+    "classification": "confidential",
+    "updatedAt": "2026-06-18T12:00:00.000Z",
+    "fqn": "bi.dashboards.access_review",
+    "columns": [],
+    "upstreamIds": ["tbl-customers", "tbl-consent"],
+    "downstreamIds": [],
+    "datasetId": "access-review-dashboard",
+    "packId": "enterprise-mau"
+  },
+  {
+    "id": "dim-vendor-directory",
+    "name": "dim_vendor_directory",
+    "description": "Vendor directory with no owner on record (escalation demo)",
+    "assetType": "Table",
+    "owner": "",
+    "tags": ["dimension"],
+    "classification": "internal",
+    "updatedAt": "2026-06-19T08:00:00.000Z",
+    "fqn": "analytics.public.dim_vendor_directory",
+    "columns": [
+      {
+        "name": "vendor_id",
+        "dataType": "bigint",
+        "tags": ["key"]
+      },
+      {
+        "name": "vendor_name",
+        "dataType": "varchar"
+      }
+    ],
+    "upstreamIds": ["db-analytics"],
+    "downstreamIds": [],
+    "datasetId": "vendor-directory",
     "packId": "enterprise-mau"
   }
 ]

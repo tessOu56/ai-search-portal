@@ -9,6 +9,7 @@ import { Panel } from "~/components/ui/Panel";
 import { Select } from "~/components/ui/Select";
 import { Skeleton } from "~/components/ui/Skeleton";
 import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
+import { apiMetadataAccessRequestCancel } from "~/shared/api/paths";
 import type {
   AccessApplicationContract,
   AccessRequestLifecycleStatus,
@@ -178,7 +179,7 @@ function MyApisApplicationCard({
           {canCancel ? (
             <cancelFetcher.Form
               method="post"
-              action={`/api/metadata/access-requests/${encodeURIComponent(app.id)}/cancel`}
+              action={apiMetadataAccessRequestCancel(app.id)}
             >
               <Button type="submit" size="sm" variant="outline" disabled={busy}>
                 {cancelFetcher.state !== "idle" ? "Cancelling…" : "Cancel"}

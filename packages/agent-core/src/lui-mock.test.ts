@@ -59,5 +59,11 @@ describe("buildLuiResponse source citation (T-2026-071)", () => {
     expect(
       response.sources.some((s) => s.url.includes("/catalog-search"))
     ).toBe(true);
+    expect(response.sources.some((s) => s.url.includes("tbl-customers"))).toBe(
+      true
+    );
+    expect(response.sources.every((s) => !s.url.includes("/dishes"))).toBe(
+      true
+    );
   });
 });

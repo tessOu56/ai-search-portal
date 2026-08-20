@@ -1,0 +1,100 @@
+# LIVE surface SSOT (T-2026-247)
+#
+# Production path = Remix BFF on Vercel. OpenAPI leans Hono. Food pages are
+# loader-only — do not add /api/dishes REST unless this file and mapping change.
+# CI: app/test/live-surface-drift.test.ts
+
+live: remix-bff
+
+loaderOnlyPages:
+  - page: /dishes
+    data: app/features/dish/dish.server.ts
+    rest: none
+  - page: /recipes
+    data: app/features/recipe/recipe.server.ts
+    rest: none
+  - note: ingredients and vendors have no list page; they hang off dish loaders
+
+reservedRestNotLive:
+  - /api/dishes
+  - /api/recipes
+  - /api/ingredients
+  - /api/vendors
+  - /api/dish-vendors
+
+# Path sets (no methods). Update this file when adding a route, then CI passes.
+
+remixBffPaths:
+  - /api/audit
+  - /api/chat
+  - /api/context/bindings
+  - /api/context/metrics/{metricId}
+  - /api/context/pack-select
+  - /api/context/packs
+  - /api/items
+  - /api/items/{itemId}
+  - /api/knowledge/search
+  - /api/locale
+  - /api/mcp/gateway
+  - /api/mcp/tasks/{taskId}
+  - /api/metadata
+  - /api/metadata/access-requests
+  - /api/metadata/access-requests/evaluate
+  - /api/metadata/access-requests/{requestId}/cancel
+  - /api/metadata/access-requests/{requestId}/review
+  - /api/metadata/access-requests/{requestId}/submit
+  - /api/metadata/{assetId}
+  - /api/metadata/{assetId}/lineage
+  - /api/release-notes
+  - /api/site-meta
+
+openapiPaths:
+  - /api/audit
+  - /api/context/bindings
+  - /api/context/metrics/{metricId}
+  - /api/context/packs
+  - /api/items
+  - /api/items/{itemId}
+  - /api/metadata
+  - /api/metadata/access-requests
+  - /api/metadata/access-requests/evaluate
+  - /api/metadata/access-requests/{requestId}/cancel
+  - /api/metadata/access-requests/{requestId}/review
+  - /api/metadata/access-requests/{requestId}/submit
+  - /api/metadata/{assetId}
+  - /api/metadata/{assetId}/lineage
+
+honoPaths:
+  - /api/context/bindings
+  - /api/context/metrics/{metricId}
+  - /api/context/packs
+  - /api/items
+  - /api/items/{itemId}
+  - /api/metadata
+  - /api/metadata/access-requests
+  - /api/metadata/access-requests/evaluate
+  - /api/metadata/access-requests/{requestId}/cancel
+  - /api/metadata/access-requests/{requestId}/review
+  - /api/metadata/access-requests/{requestId}/submit
+  - /api/metadata/{assetId}
+  - /api/metadata/{assetId}/lineage
+  - /health
+
+drift:
+  bffNotInOpenApi:
+    - /api/chat
+    - /api/context/pack-select
+    - /api/knowledge/search
+    - /api/locale
+    - /api/mcp/gateway
+    - /api/mcp/tasks/{taskId}
+    - /api/release-notes
+    - /api/site-meta
+  openApiNotInBff: []
+  openApiNotInHono:
+    - /api/audit
+  honoNotInOpenApi:
+    - /health
+  notes: |
+    knowledge search stays Zod-only. Hono is the contract reference, not LIVE.
+    Journey C UI uses Remix Form/action; JSON helpers live in governance-client.ts.

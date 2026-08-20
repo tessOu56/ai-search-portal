@@ -7,7 +7,8 @@ import { submitFormPayload } from "~/shared/api/submitPayload";
 import type { CreateDishInput, Dish, UpdateDishInput } from "./dish.types";
 
 /**
- * 使用 Dish 資料的 Hook
+ * 這些 hooks 打的是 reserved REST 路徑，LIVE 沒有對應 route。
+ * 畫面 `/dishes` 走 Remix loader。見 specs/api/live-surface.yaml。
  */
 export function useDish(id: string | null) {
   const fetcher = useFetcher<{ dish: Dish | null }>();

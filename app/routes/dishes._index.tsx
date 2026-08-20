@@ -9,6 +9,7 @@ import { Stack } from "~/components/ui/Stack";
 import { getAllDishes } from "~/features/dish/dish.server";
 import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { ensureSeeded } from "~/services/seed.server";
+import { useI18n } from "~/shared/i18n/context";
 
 export async function loader(_args: LoaderFunctionArgs) {
   await ensureSeeded();
@@ -17,11 +18,12 @@ export async function loader(_args: LoaderFunctionArgs) {
 
 export default function DishesIndexPage() {
   const { dishes } = useLoaderData<typeof loader>();
+  const { t } = useI18n();
   return (
     <Stack gap="lg">
       <ProductPageHeader
-        title="Dishes"
-        description="Seeded lab records — open a row for recipes and vendors."
+        title={t("nav.dishes")}
+        description="Seeded lab records — open a row for ingredients, recipes, and vendors."
       />
       {dishes.length === 0 ? (
         <EmptyState title="尚無 Dish" />

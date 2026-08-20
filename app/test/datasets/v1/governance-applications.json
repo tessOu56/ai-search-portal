@@ -1,0 +1,202 @@
+[
+  {
+    "id": "seed-req-pending-1",
+    "assetId": "tbl-customers",
+    "assetName": "customer_profile",
+    "purpose": "marketing",
+    "role": "analyst",
+    "requesterId": "requester:analyst",
+    "status": "pending_approval",
+    "permissionStatus": "pending",
+    "owner": "crm-owner@example.com",
+    "createdAt": "2026-08-09T02:00:00.000Z",
+    "updatedAt": "2026-08-09T02:00:00.000Z",
+    "decision": {
+      "allow": false,
+      "need_approval": true,
+      "mask_fields": ["email", "phone"],
+      "require_audit": false,
+      "decision_id": "dec-seed-pending-1",
+      "reasons": [
+        "policy: analyst requires approval for PII datasets",
+        "policy: marketing purpose on PII requires approval"
+      ]
+    }
+  },
+  {
+    "id": "seed-req-denied-1",
+    "assetId": "dash-orders",
+    "assetName": "orders_dashboard",
+    "purpose": "analytics",
+    "role": "analyst",
+    "requesterId": "requester:analyst",
+    "status": "denied",
+    "permissionStatus": "revoked",
+    "owner": "bi-team@example.com",
+    "createdAt": "2026-08-04T06:00:00.000Z",
+    "updatedAt": "2026-08-06T09:30:00.000Z",
+    "decision": {
+      "allow": false,
+      "need_approval": true,
+      "mask_fields": [],
+      "require_audit": true,
+      "decision_id": "dec-seed-denied-1",
+      "reasons": ["policy: confidential classification requires audit log"]
+    }
+  },
+  {
+    "id": "seed-req-expired-1",
+    "assetId": "tbl-customers",
+    "assetName": "customer_profile",
+    "purpose": "operations",
+    "role": "analyst",
+    "requesterId": "requester:analyst",
+    "status": "expired",
+    "permissionStatus": "revoked",
+    "owner": "crm-owner@example.com",
+    "createdAt": "2026-07-20T01:00:00.000Z",
+    "updatedAt": "2026-07-28T01:00:00.000Z",
+    "decision": {
+      "allow": false,
+      "need_approval": true,
+      "mask_fields": ["email", "phone"],
+      "require_audit": false,
+      "decision_id": "dec-seed-expired-1",
+      "reasons": ["policy: analyst requires approval for PII datasets"]
+    }
+  },
+  {
+    "id": "seed-req-permission-denied-1",
+    "assetId": "tbl-etl-orders",
+    "assetName": "etl_orders",
+    "purpose": "analytics",
+    "role": "analyst",
+    "requesterId": "requester:analyst",
+    "status": "denied",
+    "permissionStatus": "revoked",
+    "owner": "data-platform@example.com",
+    "createdAt": "2026-08-07T03:15:00.000Z",
+    "updatedAt": "2026-08-07T03:15:00.000Z",
+    "decision": {
+      "allow": false,
+      "need_approval": false,
+      "mask_fields": [],
+      "require_audit": false,
+      "decision_id": "dec-seed-permission-denied-1",
+      "reasons": ["policy: default deny"]
+    }
+  },
+  {
+    "id": "seed-req-deprecated-api-1",
+    "assetId": "api-legacy-orders",
+    "assetName": "GET /api/orders/v1",
+    "purpose": "operations",
+    "role": "engineer",
+    "requesterId": "requester:engineer",
+    "status": "denied",
+    "permissionStatus": "revoked",
+    "owner": "api-team@example.com",
+    "createdAt": "2026-08-02T05:00:00.000Z",
+    "updatedAt": "2026-08-02T05:05:00.000Z",
+    "decision": {
+      "allow": false,
+      "need_approval": false,
+      "mask_fields": [],
+      "require_audit": false,
+      "decision_id": "dec-seed-deprecated-1",
+      "reasons": [
+        "policy: asset deprecated — access blocked pending sunset",
+        "see api-orders for the supported replacement"
+      ]
+    }
+  },
+  {
+    "id": "seed-req-missing-owner-1",
+    "assetId": "dim-vendor-directory",
+    "assetName": "dim_vendor_directory",
+    "purpose": "operations",
+    "role": "analyst",
+    "requesterId": "requester:analyst",
+    "status": "pending_approval",
+    "permissionStatus": "pending",
+    "owner": "",
+    "createdAt": "2026-08-10T08:00:00.000Z",
+    "updatedAt": "2026-08-10T08:00:00.000Z",
+    "decision": {
+      "allow": false,
+      "need_approval": true,
+      "mask_fields": [],
+      "require_audit": false,
+      "decision_id": "dec-seed-missing-owner-1",
+      "reasons": [
+        "policy: no owner on record — routed to admin escalation queue"
+      ]
+    }
+  },
+  {
+    "id": "seed-req-draft-1",
+    "assetId": "tbl-orders",
+    "assetName": "orders",
+    "purpose": "analytics",
+    "role": "analyst",
+    "requesterId": "requester:analyst",
+    "status": "draft",
+    "permissionStatus": "none",
+    "owner": "commerce-owner@example.com",
+    "createdAt": "2026-08-11T04:00:00.000Z",
+    "updatedAt": "2026-08-11T04:00:00.000Z",
+    "decision": {
+      "allow": false,
+      "need_approval": false,
+      "mask_fields": [],
+      "require_audit": false,
+      "decision_id": "dec-seed-draft-1",
+      "reasons": ["policy: default deny"]
+    }
+  },
+  {
+    "id": "seed-req-approved-1",
+    "assetId": "tbl-orders",
+    "assetName": "orders",
+    "purpose": "operations",
+    "role": "engineer",
+    "requesterId": "requester:engineer",
+    "status": "approved",
+    "permissionStatus": "granted",
+    "owner": "commerce-owner@example.com",
+    "createdAt": "2026-08-03T09:00:00.000Z",
+    "updatedAt": "2026-08-05T11:00:00.000Z",
+    "decision": {
+      "allow": true,
+      "need_approval": false,
+      "mask_fields": [],
+      "require_audit": false,
+      "decision_id": "dec-seed-approved-1",
+      "reasons": ["policy: engineer_internal allow"]
+    }
+  },
+  {
+    "id": "seed-req-consent-pending-1",
+    "assetId": "tbl-consent",
+    "assetName": "consent_log",
+    "purpose": "marketing",
+    "role": "analyst",
+    "requesterId": "requester:analyst",
+    "status": "pending_approval",
+    "permissionStatus": "pending",
+    "owner": "privacy-office@example.com",
+    "createdAt": "2026-08-12T07:00:00.000Z",
+    "updatedAt": "2026-08-12T07:00:00.000Z",
+    "decision": {
+      "allow": false,
+      "need_approval": true,
+      "mask_fields": ["email"],
+      "require_audit": false,
+      "decision_id": "dec-seed-consent-pending-1",
+      "reasons": [
+        "policy: analyst requires approval for PII datasets",
+        "policy: marketing purpose on PII requires approval"
+      ]
+    }
+  }
+]
