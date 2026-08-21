@@ -1,5 +1,5 @@
 import { PanelLeft } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { Button } from "~/components/ui/Button";
 import { useI18n } from "~/shared/i18n/context";
@@ -16,6 +16,15 @@ function AppChromeFrame({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const [directoryOpen, setDirectoryOpen] = useState(false);
 
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 768px)");
+    const closeOnDesktop = () => {
+      if (media.matches) setDirectoryOpen(false);
+    };
+    media.addEventListener("change", closeOnDesktop);
+    return () => media.removeEventListener("change", closeOnDesktop);
+  }, []);
+
   return (
     <div className="flex min-h-dvh flex-col">
       <WorkspaceTopbar
@@ -23,15 +32,15 @@ function AppChromeFrame({ children }: { children: ReactNode }) {
           mode === "overview" ? (
             <Button
               type="button"
-              size="icon"
-              variant="ghost"
-              className="md:hidden"
+              size="sm"
+              variant="outline"
+              className="gap-space-8 md:hidden"
               aria-expanded={directoryOpen}
               aria-controls="overview-directory"
-              aria-label={t("nav.directory")}
               onClick={() => setDirectoryOpen((open) => !open)}
             >
               <PanelLeft className="size-4" aria-hidden />
+              {t("nav.directory")}
             </Button>
           ) : null
         }

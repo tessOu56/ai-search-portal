@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Select } from "~/components/ui/Select";
 import { Switch } from "~/components/ui/Switch";
+import { useI18n } from "~/shared/i18n/context";
 
 /**
  * 主題切換器 — 語意 token 由 explore-design-sdk 供應（app/styles/tokens.portal.css）。
@@ -31,6 +32,7 @@ export function ThemeSwitcher({
   toLightLabel,
   toDarkLabel,
 }: ThemeSwitcherProps) {
+  const { t } = useI18n();
   const [theme, setTheme] = useState<ThemeId>(DEFAULT_THEME);
   const [dark, setDark] = useState(false);
 
@@ -72,6 +74,9 @@ export function ThemeSwitcher({
         }}
         aria-label={themeLabel}
       />
+      <span className="text-type-12 text-muted-foreground">
+        {dark ? t("theme.mode.dark") : t("theme.mode.light")}
+      </span>
       <Switch
         checked={dark}
         onCheckedChange={applyMode}

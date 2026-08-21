@@ -22,11 +22,11 @@ importers:
         specifier: workspace:*
         version: link:packages/governance-domain
       '@is_tess/components':
-        specifier: ^0.1.10
-        version: 0.1.10(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.1.13
+        version: 0.1.13(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@is_tess/tokens':
-        specifier: ^0.1.2
-        version: 0.1.2
+        specifier: ^0.1.3
+        version: 0.1.3
       '@radix-ui/react-scroll-area':
         specifier: ^1.2.10
         version: 1.2.14(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1372,14 +1372,14 @@ packages:
       '@types/node':
         optional: true
 
-  '@is_tess/components@0.1.10':
-    resolution: {integrity: sha512-YMgDwQ3SY9RELn2auFzeD5kmUvo3hmXNTtb832E2PQI8b7QyDX0QLH3a6HX1IJcaWvhz9izdqIQH61qkZ56h+A==}
+  '@is_tess/components@0.1.13':
+    resolution: {integrity: sha512-1aWTpUa0tc5wQw9A1BIYrEcFGx1rU/L+BJf5g07z2VZzLfJJqB1Kv3JcQQ1FuNOIBL4PLe83FrAd5TRcn+h/QA==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
-  '@is_tess/tokens@0.1.2':
-    resolution: {integrity: sha512-Cjtr4a3GteUjKSB8n/2U0brp4tjtvgsHnPsoRt4BcWoPAppICGpG7WCdq5T56SXxnZd32DPg50zPQRkv54Z0Zw==}
+  '@is_tess/tokens@0.1.3':
+    resolution: {integrity: sha512-eThqUm8onGNOfp3LnBzyp8pnZQI6vQ3ym7EUM6SLNOcylOn6U6wtmoWeaZlSYXiscB4piusuGx3t0apXWn8MWw==}
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -6661,9 +6661,6 @@ packages:
     peerDependencies:
       tailwindcss: ^3.3.0 || ^4.0.0 || ^4.0.0-beta
 
-  tailwind-merge@2.6.1:
-    resolution: {integrity: sha512-Oo6tHdpZsGpkKG88HJ8RR1rg/RdnEkQEfMoEk2x1XRI3F1AxeU+ijRXpiVUF4UbLfcxxRGw6TbUINKYdWVsQTQ==}
-
   tailwind-merge@3.6.0:
     resolution: {integrity: sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w==}
 
@@ -8373,7 +8370,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 26.1.1
 
-  '@is_tess/components@0.1.10(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@is_tess/components@0.1.13(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@radix-ui/react-scroll-area': 1.2.14(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot': 1.3.3(@types/react@18.3.31)(react@18.3.1)
@@ -8382,12 +8379,12 @@ snapshots:
       clsx: 2.1.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      tailwind-merge: 2.6.1
+      tailwind-merge: 3.6.0
     transitivePeerDependencies:
       - '@types/react'
       - '@types/react-dom'
 
-  '@is_tess/tokens@0.1.2': {}
+  '@is_tess/tokens@0.1.3': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -9916,14 +9913,14 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@20.19.39)(lightningcss@1.32.0))':
+  '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))':
     dependencies:
       '@vitest/spy': 2.1.9
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
       msw: 2.15.0(@types/node@20.19.39)(typescript@5.9.3)
-      vite: 5.4.21(@types/node@20.19.39)(lightningcss@1.32.0)
+      vite: 5.4.21(@types/node@26.1.1)(lightningcss@1.32.0)
 
   '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@26.1.1)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))':
     dependencies:
@@ -14415,8 +14412,6 @@ snapshots:
       local-pkg: 1.2.1
       tailwindcss: 3.4.17
 
-  tailwind-merge@2.6.1: {}
-
   tailwind-merge@3.6.0: {}
 
   tailwindcss-animate@1.0.7(tailwindcss@3.4.17):
@@ -15044,7 +15039,7 @@ snapshots:
   vitest@2.1.9(@types/node@20.19.39)(jsdom@29.1.1)(lightningcss@1.32.0)(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3)):
     dependencies:
       '@vitest/expect': 2.1.9
-      '@vitest/mocker': 2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@20.19.39)(lightningcss@1.32.0))
+      '@vitest/mocker': 2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))
       '@vitest/pretty-format': 2.1.9
       '@vitest/runner': 2.1.9
       '@vitest/snapshot': 2.1.9

@@ -78,7 +78,7 @@ export function ProductPageShell({
                 </Link>
               </span>
             ))}
-            <span className="mx-2" aria-hidden>
+            <span className="mx-space-8" aria-hidden>
               /
             </span>
             <span className="text-foreground">{current}</span>

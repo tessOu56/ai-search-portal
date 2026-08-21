@@ -96,6 +96,8 @@
   "theme.switch": "主題",
   "theme.toLight": "切換為亮色",
   "theme.toDark": "切換為暗色",
+  "theme.mode.light": "淺",
+  "theme.mode.dark": "深",
   "chat.badge.live": "即時 LUI 回覆",
   "chat.badge.sse": "SSE Streaming",
   "chat.title": "輸入你的問題，我會給出可信的行動答案",

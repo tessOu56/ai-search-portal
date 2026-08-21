@@ -103,7 +103,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body className="bg-background font-sans antialiased">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         >
           {data?.translations?.["a11y.skipToContent"] ??
             (locale === "en" ? "Skip to main content" : "跳至主內容")}

@@ -37,13 +37,14 @@ function VoiceButton({
     <Button
       type="button"
       variant="ghost"
+      size="icon"
       data-testid="composer-voice"
       disabled={disabled}
       aria-pressed={listening}
       aria-label={
         listening ? t("composer.voice.stop") : t("composer.voice.start")
       }
-      className="size-11 shrink-0 px-0"
+      className="shrink-0"
       onClick={onToggle}
     >
       <Mic className="size-5" aria-hidden />
@@ -223,18 +224,19 @@ export function Composer({
         ) : null}
         <Button
           type="submit"
+          size="icon"
           data-star-hot
           disabled={disabled}
           aria-busy={disabled}
           aria-label={t("chat.submit")}
-          className="size-11 shrink-0 px-0"
+          className="shrink-0"
         >
           <ArrowRight className="size-5" aria-hidden />
         </Button>
       </form>
       {voiceSupported ? <VoiceStatus status={voiceStatus} t={t} /> : null}
       {suggestions.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-space-8">
           {suggestions.map((question) => (
             <Button
               key={question}

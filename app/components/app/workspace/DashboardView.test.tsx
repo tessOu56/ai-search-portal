@@ -70,6 +70,8 @@ vi.mock("~/shared/i18n/context", () => ({
         ["theme.switch", "Theme"],
         ["theme.toLight", "Switch to light"],
         ["theme.toDark", "Switch to dark"],
+        ["theme.mode.light", "Light"],
+        ["theme.mode.dark", "Dark"],
       ]);
       return labels.get(key) ?? key;
     },
