@@ -1,4 +1,5 @@
 import { Form, Link, useFetcher, useNavigation } from "@remix-run/react";
+import { useState } from "react";
 
 import { AccessRequestLifecycleStepper } from "~/components/shared/governance";
 import { Badge } from "~/components/ui/Badge";
@@ -106,6 +107,94 @@ function isCancelSuccess(
   return !!data && "data" in data;
 }
 
+function ApprovedUsePanel({
+  purpose,
+  role,
+}: {
+  purpose: string;
+  role: string;
+}) {
+  const { t } = useI18n();
+  const [copied, setCopied] = useState(false);
+  const filter = `purpose=${purpose}&role=${role}`;
+
+  return (
+    <div
+      className="bg-muted/40 space-y-space-8 rounded-lg border border-border p-space-16"
+      data-testid="approved-use-preview"
+    >
+      <p className="text-type-12 font-medium text-foreground">
+        {t("my-apis.use.title")}
+      </p>
+      <p className="text-type-12 text-muted-foreground">
+        {t("my-apis.use.label")}
+      </p>
+      <pre className="overflow-x-auto font-mono text-type-12 text-foreground">
+        {`email: a***@example.com\nphone: ***-***-1234`}
+      </pre>
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        onClick={() => {
+          void navigator.clipboard.writeText(filter).then(
+            () => setCopied(true),
+            () => setCopied(false)
+          );
+        }}
+      >
+        {copied ? t("my-apis.use.copied") : t("my-apis.use.copy-filter")}
+      </Button>
+    </div>
+  );
+}
+
+function canShowApprovedUse(app: AccessApplicationContract): boolean {
+  return app.status === "approved" || app.permissionStatus === "granted";
+}
+
+function ApplicationCardMutations({
+  appId,
+  canSubmitDraft,
+  canCancel,
+  busy,
+  draftFetcher,
+  cancelFetcher,
+}: {
+  appId: string;
+  canSubmitDraft: boolean;
+  canCancel: boolean;
+  busy: boolean;
+  draftFetcher: ReturnType<typeof useFetcher<SubmitDraftFetcherData>>;
+  cancelFetcher: ReturnType<typeof useFetcher<CancelFetcherData>>;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-space-8">
+      {canSubmitDraft ? (
+        <draftFetcher.Form method="post">
+          <input type="hidden" name="intent" value="submit-draft" />
+          <input type="hidden" name="requestId" value={appId} />
+          <Button type="submit" size="sm" disabled={busy}>
+            {draftFetcher.state !== "idle"
+              ? "Submitting…"
+              : "Submit for approval"}
+          </Button>
+        </draftFetcher.Form>
+      ) : null}
+      {canCancel ? (
+        <cancelFetcher.Form
+          method="post"
+          action={apiMetadataAccessRequestCancel(appId)}
+        >
+          <Button type="submit" size="sm" variant="outline" disabled={busy}>
+            {cancelFetcher.state !== "idle" ? "Cancelling…" : "Cancel"}
+          </Button>
+        </cancelFetcher.Form>
+      ) : null}
+    </div>
+  );
+}
+
 function MyApisApplicationCard({
   app,
   highlighted,
@@ -171,29 +260,18 @@ function MyApisApplicationCard({
           />
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-space-8">
-          {canSubmitDraft ? (
-            <draftFetcher.Form method="post">
-              <input type="hidden" name="intent" value="submit-draft" />
-              <input type="hidden" name="requestId" value={app.id} />
-              <Button type="submit" size="sm" disabled={busy}>
-                {draftFetcher.state !== "idle"
-                  ? "Submitting…"
-                  : "Submit for approval"}
-              </Button>
-            </draftFetcher.Form>
-          ) : null}
-          {canCancel ? (
-            <cancelFetcher.Form
-              method="post"
-              action={apiMetadataAccessRequestCancel(app.id)}
-            >
-              <Button type="submit" size="sm" variant="outline" disabled={busy}>
-                {cancelFetcher.state !== "idle" ? "Cancelling…" : "Cancel"}
-              </Button>
-            </cancelFetcher.Form>
-          ) : null}
-        </div>
+        {canShowApprovedUse(app) ? (
+          <ApprovedUsePanel purpose={app.purpose} role={app.role} />
+        ) : null}
+
+        <ApplicationCardMutations
+          appId={app.id}
+          canSubmitDraft={canSubmitDraft}
+          canCancel={canCancel}
+          busy={busy}
+          draftFetcher={draftFetcher}
+          cancelFetcher={cancelFetcher}
+        />
       </div>
     </Panel>
   );

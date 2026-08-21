@@ -29,6 +29,9 @@ export type CatalogApiRow = {
   detailHref?: string;
   /** Industry facets — mainly on knowledge rows. */
   facets?: CatalogRowFacets;
+  owner?: string;
+  classification?: string;
+  updatedAt?: string;
 };
 
 export type CatalogSearchIntent = "ai-fallback" | "manual";

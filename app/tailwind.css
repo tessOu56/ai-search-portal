@@ -1,5 +1,6 @@
 /* T-186: @is_tess/tokens via app/styles/tokens.portal.css (npm CSS imports) */
 @import "./styles/tokens.portal.css";
+@import "./styles/motion.portal.css";
 @import "./styles/scale.system.css";
 @import "./styles/brand-mark.css";
 @import "./styles/atmosphere.css";

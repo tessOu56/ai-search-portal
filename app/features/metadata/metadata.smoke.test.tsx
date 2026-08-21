@@ -68,6 +68,7 @@ describe("metadata catalog", () => {
       })
     ).toBeTruthy();
     expect(screen.getByText(/customer_profile/i)).toBeTruthy();
+    expect(screen.getAllByText("PII").length).toBeGreaterThan(0);
     expect(screen.queryByText(/\?material=/)).toBeNull();
   });
 

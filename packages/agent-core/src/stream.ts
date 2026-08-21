@@ -177,6 +177,9 @@ export async function* streamChatInternalEvents(args: {
   const finalPayload = stableChatFinalSchema.parse({
     sources: response.sources,
     nextSteps: response.nextSteps,
+    ...(response.nextActions?.length
+      ? { nextActions: response.nextActions }
+      : {}),
   });
   yield { event: "internal.final", data: JSON.stringify(finalPayload) };
   traceSession?.complete({

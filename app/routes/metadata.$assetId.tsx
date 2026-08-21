@@ -1,6 +1,7 @@
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
+  MetaFunction,
   TypedResponse,
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -34,6 +35,14 @@ import {
   genUiDocumentSchema,
   metadataAccessRequestSchema,
 } from "~/shared/contracts";
+import {
+  buildJsonLdDataset,
+  buildJsonLdFaqPage,
+  buildSeoMeta,
+  getCanonicalUrl,
+  getOrigin,
+  getSeoFromLoader,
+} from "~/shared/seo";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
 
 const aiAccessRequestPayloadSchema = z.object({
@@ -160,6 +169,43 @@ export function loader({ params, request }: LoaderFunctionArgs) {
     requesterId: `requester:${role}`,
   });
 
+  const origin = getOrigin(request);
+  const canonical = getCanonicalUrl(request);
+  const title = `${asset.name} · Portal`;
+  const description = asset.description;
+  const faqItems = [
+    {
+      question: `Who owns ${asset.name}?`,
+      answer: asset.owner
+        ? `${asset.owner} owns this asset.`
+        : "This asset has no assigned owner yet.",
+    },
+    {
+      question: "Can I query it now?",
+      answer:
+        asset.classification === "public"
+          ? "Public classification — still request access in this showcase."
+          : `${asset.classification} data needs an access request before use.`,
+    },
+    {
+      question: "How do I request access?",
+      answer:
+        "Choose purpose and role on this page, submit, then track the request in My requests.",
+    },
+  ];
+  const structuredData = [
+    buildJsonLdDataset({
+      url: canonical,
+      name: asset.name,
+      description: asset.description,
+      identifier: asset.id,
+      dateModified: asset.updatedAt,
+      creator: asset.owner || undefined,
+      isAccessibleForFree: asset.classification === "public",
+    }),
+    buildJsonLdFaqPage(canonical, faqItems),
+  ];
+
   return json({
     asset,
     genUiDocument,
@@ -169,8 +215,29 @@ export function loader({ params, request }: LoaderFunctionArgs) {
     packId,
     aiAccessRequest,
     existingApplication,
+    title,
+    description,
+    canonical,
+    image: `${origin}/og-image.png`,
+    locale: "zh_TW",
+    structuredData,
   });
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  const seo = getSeoFromLoader(data);
+  return [
+    ...buildSeoMeta({
+      title: seo.title,
+      description: seo.description,
+      canonical: seo.canonical,
+      image: seo.image,
+      locale: seo.locale,
+      type: "article",
+    }),
+    ...seo.structuredData.map((obj) => ({ "script:ld+json": obj })),
+  ];
+};
 
 type MetadataAccessActionData = {
   ok: boolean;

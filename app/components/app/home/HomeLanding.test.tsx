@@ -4,6 +4,22 @@ import { describe, expect, it, vi } from "vitest";
 
 import { HomeLanding } from "./HomeLanding";
 
+vi.mock("@remix-run/react", () => ({
+  Link: ({
+    to,
+    children,
+    ...props
+  }: {
+    to: string;
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
 vi.mock("~/components/ui/BrandMark", () => ({
   BrandMark: () => <div>Brand</div>,
 }));
@@ -38,7 +54,7 @@ vi.mock("motion/react", () => ({
 vi.mock("~/shared/i18n/context", () => ({
   useI18n: () => ({
     locale: "en",
-    t: (key: string) => {
+    t: (key: string, vars?: Record<string, string>) => {
       const labels = new Map<string, string>([
         ["app.title", "Portal"],
         ["home.title", "Find data you can trust"],
@@ -52,6 +68,10 @@ vi.mock("~/shared/i18n/context", () => ({
         ["home.composer.suggest.1", "Which datasets contain PII?"],
         ["home.composer.suggest.2", "What is the upstream lineage?"],
         ["home.composer.suggest.3", "Find APIs related to orders"],
+        ["home.workbench.title", "Workbench"],
+        ["home.workbench.pending", "Pending requests: {count}"],
+        ["home.workbench.suggested", "Suggested assets"],
+        ["nav.my-requests", "My requests"],
         ["composer.voice.start", "Voice input"],
         ["composer.voice.stop", "Stop voice input"],
         ["composer.voice.listening", "Listening"],
@@ -59,7 +79,13 @@ vi.mock("~/shared/i18n/context", () => ({
         ["composer.voice.error", "Voice recognition failed"],
         ["composer.voice.privacy", "Speech may be sent to the browser vendor"],
       ]);
-      return labels.get(key) ?? key;
+      let value = labels.get(key) ?? key;
+      if (vars) {
+        for (const [k, v] of Object.entries(vars)) {
+          value = value.replaceAll(`{${k}}`, v);
+        }
+      }
+      return value;
     },
   }),
 }));
@@ -69,6 +95,8 @@ describe("HomeLanding", () => {
     render(<HomeLanding onAsk={vi.fn()} />);
     expect(screen.getByLabelText("Ask a question")).toBeInTheDocument();
     expect(screen.getAllByTestId("golden-question")).toHaveLength(3);
+    expect(screen.getByTestId("home-workbench")).toBeInTheDocument();
+    expect(screen.getByText("Pending requests: 0")).toBeInTheDocument();
     expect(screen.queryByTestId("assistant-turn")).not.toBeInTheDocument();
     expect(
       screen.queryByTestId("chat-continue-catalog")

@@ -232,6 +232,9 @@ export function getCatalogSearchViewModel(
     itemType: asset.assetType,
     source: "metadata",
     detailHref: `/metadata/${asset.id}?pack=${encodeURIComponent(packId)}`,
+    owner: asset.owner,
+    classification: asset.classification,
+    updatedAt: asset.updatedAt,
   }));
 
   // When industry/commerce facets are active, prefer knowledge + matching metadata only.

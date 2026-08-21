@@ -12,6 +12,7 @@ export function loader({ request }: LoaderFunctionArgs) {
 Allow: /
 
 # JSON index for crawlers / AI: GET ${origin}/api/site-meta
+# Path list: ${origin}/llms.txt
 Sitemap: ${sitemapUrl}
 `;
 

@@ -667,6 +667,37 @@ function ExistingApplicationCard({
   );
 }
 
+function AssetFaqCard({ asset }: { asset: MetadataAssetDetailContract }) {
+  return (
+    <Panel data-testid="asset-faq">
+      <h2 className="mb-space-16 text-type-16 font-semibold text-foreground">
+        About this asset
+      </h2>
+      <dl className="space-y-space-16 text-type-14">
+        <div>
+          <dt className="text-muted-foreground">Who owns it?</dt>
+          <dd className="text-foreground">{asset.owner || "Unassigned"}</dd>
+        </div>
+        <div>
+          <dt className="text-muted-foreground">Can I query it now?</dt>
+          <dd className="text-foreground">
+            {asset.classification === "public"
+              ? "Public classification — still request access in this showcase."
+              : `${asset.classification} data needs an access request before use.`}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-muted-foreground">How do I request access?</dt>
+          <dd className="text-foreground">
+            Choose purpose and role on this page, submit, then track the request
+            in My requests.
+          </dd>
+        </div>
+      </dl>
+    </Panel>
+  );
+}
+
 export function MetadataAssetDetailView({
   asset,
   genUiDocument,
@@ -716,6 +747,7 @@ export function MetadataAssetDetailView({
       )}
 
       <AssetLineageLists asset={asset} />
+      <AssetFaqCard asset={asset} />
     </div>
   );
 }

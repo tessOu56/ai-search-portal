@@ -15,30 +15,32 @@ function DirectorySections({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      {EXPERIENCE_NAV_SECTIONS.map((section) => {
-        const entries = EXPERIENCE_NAV.filter(
-          (entry) => entry.section === section.id
-        );
-        if (entries.length === 0) return null;
-        return (
-          <SideNavSection key={section.id} title={t(section.titleKey)}>
-            {entries.map((entry) => {
-              const active = experienceNavIsActive(
-                entry,
-                pathname,
-                searchParams
-              );
-              return (
-                <SideNavItem key={entry.href} asChild current={active}>
-                  <Link to={entry.href} onClick={onNavigate}>
-                    {t(entry.labelKey)}
-                  </Link>
-                </SideNavItem>
-              );
-            })}
-          </SideNavSection>
-        );
-      })}
+      <div className="eds-surface-enter">
+        {EXPERIENCE_NAV_SECTIONS.map((section) => {
+          const entries = EXPERIENCE_NAV.filter(
+            (entry) => entry.section === section.id
+          );
+          if (entries.length === 0) return null;
+          return (
+            <SideNavSection key={section.id} title={t(section.titleKey)}>
+              {entries.map((entry) => {
+                const active = experienceNavIsActive(
+                  entry,
+                  pathname,
+                  searchParams
+                );
+                return (
+                  <SideNavItem key={entry.href} asChild current={active}>
+                    <Link to={entry.href} onClick={onNavigate}>
+                      {t(entry.labelKey)}
+                    </Link>
+                  </SideNavItem>
+                );
+              })}
+            </SideNavSection>
+          );
+        })}
+      </div>
     </>
   );
 }

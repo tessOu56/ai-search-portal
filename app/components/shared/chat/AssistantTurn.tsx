@@ -1,4 +1,3 @@
-import { inferIndustryFacetsFromText } from "@ai-search-portal/contracts";
 import { Link } from "@remix-run/react";
 
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
@@ -16,6 +15,11 @@ export type AssistantSource = {
   source?: string;
 };
 
+export type AssistantNextAction = {
+  label: string;
+  href: string;
+};
+
 export type AssistantTurnProps = {
   content: string;
   isStreaming?: boolean;
@@ -23,6 +27,7 @@ export type AssistantTurnProps = {
   confidence?: number;
   sources?: AssistantSource[];
   nextSteps?: string[];
+  nextActions?: AssistantNextAction[];
   query?: string;
   showContinue?: boolean;
   error?: string | null;
@@ -33,6 +38,8 @@ const CHIP_CLASS =
 
 const SOURCE_LINK_CLASS = "text-primary hover:underline";
 const KEY_SOURCES_TITLE = "chat.sources.title";
+const DEFAULT_REQUEST_HREF =
+  "/metadata/tbl-customers?purpose=marketing&role=analyst";
 
 function EvidenceHeader({
   summary,
@@ -95,22 +102,45 @@ function TurnError({ query, error }: { query: string; error: string }) {
   );
 }
 
-function NextSteps({ steps }: { steps: string[] }) {
+function NextSteps({
+  steps,
+  actions,
+}: {
+  steps: string[];
+  actions: AssistantNextAction[];
+}) {
   const { t } = useI18n();
-  if (steps.length === 0) return null;
+  if (actions.length === 0 && steps.length === 0) return null;
   return (
     <div>
       <h3 className="mb-space-8 text-type-14 font-medium text-foreground">
         {t("chat.next.title")}
       </h3>
-      <ul className="space-y-space-8 text-type-14 text-muted-foreground">
-        {steps.map((step) => (
-          <li key={step} className="flex items-start gap-2">
-            <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-            <span>{step}</span>
-          </li>
-        ))}
-      </ul>
+      {actions.length > 0 ? (
+        <ul className="space-y-space-8 text-type-14">
+          {actions.map((action) => (
+            <li key={action.href} className="flex items-start gap-2">
+              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+              <Link
+                to={action.href}
+                className={SOURCE_LINK_CLASS}
+                data-testid="chat-next-action"
+              >
+                {action.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <ul className="space-y-space-8 text-type-14 text-muted-foreground">
+          {steps.map((step) => (
+            <li key={step} className="flex items-start gap-2">
+              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+              <span>{step}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -163,20 +193,8 @@ function Sources({ sources }: { sources: AssistantSource[] }) {
 
 function ContinueFacets({ query }: { query: string }) {
   const { t } = useI18n();
-  const inferred = inferIndustryFacetsFromText(query);
-  const facetLabel = [
-    inferred.standard,
-    inferred.productType,
-    inferred.auctionEligible ? "auction" : undefined,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-  const facetQuery = {
+  const keywordQuery = {
     q: query,
-    material: inferred.material,
-    standard: inferred.standard,
-    productType: inferred.productType,
-    auctionEligible: inferred.auctionEligible,
     intent: "manual" as const,
   };
 
@@ -187,19 +205,23 @@ function ContinueFacets({ query }: { query: string }) {
     >
       <Button asChild variant="outline" size="sm" className={CHIP_CLASS}>
         <Link
-          to={buildCatalogSearchUrl(facetQuery)}
+          to={buildCatalogSearchUrl(keywordQuery)}
           data-testid="chat-continue-catalog"
         >
           {t("chat.continue.catalog")}
-          {facetLabel ? ` · ${facetLabel}` : ""}
         </Link>
       </Button>
       <Button asChild variant="outline" size="sm" className={CHIP_CLASS}>
         <Link
-          to={buildMetadataSearchUrl(facetQuery)}
+          to={buildMetadataSearchUrl(keywordQuery)}
           data-testid="chat-continue-metadata"
         >
           {t("chat.continue.metadata")}
+        </Link>
+      </Button>
+      <Button asChild size="sm" className={CHIP_CLASS}>
+        <Link to={DEFAULT_REQUEST_HREF} data-testid="chat-continue-request">
+          {t("chat.continue.request")}
         </Link>
       </Button>
     </div>
@@ -218,6 +240,7 @@ export function AssistantTurn({
   confidence,
   sources = [],
   nextSteps = [],
+  nextActions = [],
   query = "",
   showContinue = false,
   error = null,
@@ -233,7 +256,9 @@ export function AssistantTurn({
       <EvidenceHeader summary={summary} confidence={confidence} />
       <StreamBody content={content} isStreaming={isStreaming} />
       {error ? <TurnError query={query} error={error} /> : null}
-      {!isStreaming ? <NextSteps steps={nextSteps} /> : null}
+      {!isStreaming ? (
+        <NextSteps steps={nextSteps} actions={nextActions} />
+      ) : null}
       {!isStreaming ? <Sources sources={sources} /> : null}
       {showContinueRow ? <ContinueFacets query={query} /> : null}
     </article>

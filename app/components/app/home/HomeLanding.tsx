@@ -1,6 +1,10 @@
 import { motion, useReducedMotion } from "motion/react";
 
 import { HomeAskPanel } from "~/components/app/home/HomeAskPanel";
+import {
+  HomeWorkbench,
+  type HomeWorkbenchAsset,
+} from "~/components/app/home/HomeWorkbench";
 import { BrandMark } from "~/components/ui/BrandMark";
 import { useI18n } from "~/shared/i18n/context";
 import { cn } from "~/shared/utils/cn";
@@ -8,6 +12,8 @@ import { cn } from "~/shared/utils/cn";
 type HomeLandingProps = {
   className?: string;
   onAsk: (query: string) => void;
+  pendingCount?: number;
+  suggestedAssets?: HomeWorkbenchAsset[];
 };
 
 /**
@@ -15,7 +21,12 @@ type HomeLandingProps = {
  * Atmosphere glow is lifted to the page wrapper (spans into second screen).
  * Surface: marketing.
  */
-export function HomeLanding({ className, onAsk }: HomeLandingProps) {
+export function HomeLanding({
+  className,
+  onAsk,
+  pendingCount = 0,
+  suggestedAssets = [],
+}: HomeLandingProps) {
   const { t } = useI18n();
   const reduceMotion = useReducedMotion();
 
@@ -67,6 +78,10 @@ export function HomeLanding({ className, onAsk }: HomeLandingProps) {
           transition={{ duration: 0.55, delay: 0.3 }}
         >
           <HomeAskPanel onSubmit={onAsk} />
+          <HomeWorkbench
+            pendingCount={pendingCount}
+            suggestedAssets={suggestedAssets}
+          />
         </motion.div>
       </div>
     </section>

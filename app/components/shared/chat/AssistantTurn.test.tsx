@@ -26,6 +26,7 @@ vi.mock("~/shared/i18n/context", () => {
     ["chat.sources.title", "References"],
     ["chat.continue.catalog", "Continue in catalog"],
     ["chat.continue.metadata", "Browse metadata"],
+    ["chat.continue.request", "Request this asset"],
     ["chat.error.title", "Error"],
     ["chat.summary.waiting", "Waiting for reply..."],
     ["chat.fallback.title", "AI is unavailable — continue manually"],
@@ -51,6 +52,7 @@ vi.mock("~/shared/i18n/context", () => {
 describe("AssistantTurn (LUI conversation)", () => {
   const CONTINUE = "chat-continue-facets";
   const WAITING = "Waiting for reply...";
+  const REQUEST_HREF = "/metadata/tbl-customers?purpose=marketing&role=analyst";
   it("empty: omits waiting copy, sources, next steps, and continue chips", () => {
     render(<AssistantTurn content="" />);
     expect(screen.queryByText(WAITING)).not.toBeInTheDocument();
@@ -91,6 +93,12 @@ describe("AssistantTurn (LUI conversation)", () => {
           },
         ]}
         nextSteps={["Request access with masking"]}
+        nextActions={[
+          {
+            label: "Open tbl-customers and request",
+            href: REQUEST_HREF,
+          },
+        ]}
         query="Which datasets contain PII?"
         showContinue
       />
@@ -102,10 +110,25 @@ describe("AssistantTurn (LUI conversation)", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("customer_profile")).toBeInTheDocument();
     expect(screen.getByText("glossary#pii")).toBeInTheDocument();
-    expect(screen.getByText("Request access with masking")).toBeInTheDocument();
+    expect(
+      screen.getByText("Open tbl-customers and request")
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("chat-next-action")).toHaveAttribute(
+      "href",
+      REQUEST_HREF
+    );
+    expect(
+      screen.queryByText("Request access with masking")
+    ).not.toBeInTheDocument();
     expect(screen.getByTestId(CONTINUE)).toBeInTheDocument();
-    expect(screen.getByTestId("chat-continue-catalog")).toBeInTheDocument();
-    expect(screen.getByTestId("chat-continue-metadata")).toBeInTheDocument();
+    const catalogHref =
+      screen.getByTestId("chat-continue-catalog").getAttribute("href") ?? "";
+    expect(catalogHref.startsWith("/catalog-search?")).toBe(true);
+    expect(catalogHref).not.toMatch(/material=|auctionEligible=/);
+    expect(screen.getByTestId("chat-continue-request")).toHaveAttribute(
+      "href",
+      REQUEST_HREF
+    );
   });
 
   it("complete with empty sources: hides References, keeps continue buttons", () => {

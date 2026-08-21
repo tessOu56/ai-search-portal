@@ -3,6 +3,9 @@
   "app.description": "Ask a data catalog about access, APIs, and sources",
   "home.title": "Ask about data in one sentence",
   "home.tagline": "Ask in everyday language. Get an answer, the sources behind it, and what to do next.",
+  "home.workbench.title": "Workbench",
+  "home.workbench.pending": "Pending requests: {count}",
+  "home.workbench.suggested": "Suggested assets",
   "home.cta.ask": "Ask",
   "home.cta.dashboard": "Open overview",
   "home.nav.ask": "Ask",
@@ -131,6 +134,7 @@
   "chat.sources.title": "References",
   "chat.continue.catalog": "Continue in catalog",
   "chat.continue.metadata": "Browse metadata",
+  "chat.continue.request": "Request this asset",
   "release-notes.page.title": "Release notes",
   "release-notes.page.description": "Version summaries and commits for users and AI context.",
   "release-notes.list.title": "Versions",
@@ -148,6 +152,10 @@
   "metadata.page.title": "Data assets",
   "metadata.page.description": "Policy-driven asset detail and lineage.",
   "my-apis.error.title": "My requests hit an error",
+  "my-apis.use.title": "Use after approval (demo)",
+  "my-apis.use.label": "Labelled mock masked preview — not live data.",
+  "my-apis.use.copy-filter": "Copy filter",
+  "my-apis.use.copied": "Copied",
   "access-review.error.title": "Access review hit an error",
   "vitals.clear": "Clear session metrics"
 }

@@ -37,9 +37,18 @@ export const luiSourceSchema = z.object({
   source: z.string().optional(),
 });
 
+export const luiNextActionSchema = z.object({
+  label: z.string().min(1),
+  href: z.string().min(1),
+});
+
+export type LuiNextAction = z.infer<typeof luiNextActionSchema>;
+
 export const stableChatFinalSchema = z.object({
   sources: z.array(luiSourceSchema),
   nextSteps: z.array(z.string()),
+  /** Clickable know→act links. Optional so older fixtures still parse. */
+  nextActions: z.array(luiNextActionSchema).optional(),
 });
 
 /** 穩定層：error 事件 */

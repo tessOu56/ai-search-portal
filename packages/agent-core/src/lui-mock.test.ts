@@ -70,5 +70,13 @@ describe("buildLuiResponse source citation (T-2026-071)", () => {
     expect(response.sources.every((s) => !s.url.includes("/dishes"))).toBe(
       true
     );
+    expect(
+      response.nextActions?.some((a) => a.href.includes("tbl-customers"))
+    ).toBe(true);
+    expect(
+      response.nextActions?.some((a) =>
+        a.href.includes("purpose=marketing&role=analyst")
+      )
+    ).toBe(true);
   });
 });

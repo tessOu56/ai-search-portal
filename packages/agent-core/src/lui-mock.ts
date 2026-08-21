@@ -17,13 +17,71 @@ export type LuiSource = {
   source?: string;
 };
 
+export type LuiNextAction = {
+  label: string;
+  href: string;
+};
+
 export type LuiResponse = {
   summary: string;
   answer: string;
   confidence: number;
   sources: LuiSource[];
   nextSteps: string[];
+  nextActions?: LuiNextAction[];
 };
+
+const DEFAULT_ASSET_ID = "tbl-customers";
+const MY_REQUESTS_HREF = "/my-apis?sessionRole=requester";
+const OWNER_REVIEW_HREF = "/access-requests/review?sessionRole=owner";
+
+function assetRequestHref(
+  assetId: string,
+  packId: string,
+  purpose = "marketing",
+  role = "analyst"
+): string {
+  const sp = new URLSearchParams({
+    pack: packId,
+    purpose,
+    role,
+  });
+  return `/metadata/${encodeURIComponent(assetId)}?${sp.toString()}`;
+}
+
+function governanceNextActions(
+  packId: string,
+  assetId = DEFAULT_ASSET_ID
+): LuiNextAction[] {
+  return [
+    {
+      label: "打開這筆資產並帶入申請條件",
+      href: assetRequestHref(assetId, packId),
+    },
+    {
+      label: "送出或追蹤申請",
+      href: MY_REQUESTS_HREF,
+    },
+    {
+      label: "以 owner 審核（示範）",
+      href: OWNER_REVIEW_HREF,
+    },
+  ];
+}
+
+function catalogKeywordHref(query: string): string {
+  const sp = new URLSearchParams({ q: query, intent: "manual" });
+  return `/catalog-search?${sp.toString()}`;
+}
+
+function metadataKeywordHref(query: string, packId: string): string {
+  const sp = new URLSearchParams({
+    q: query,
+    pack: packId,
+    intent: "manual",
+  });
+  return `/metadata?${sp.toString()}`;
+}
 
 export type BuildLuiOptions = {
   ragHits?: LocalDoc[];
@@ -64,7 +122,7 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
           title: "customer_profile（示範資產）",
           url: [
             "/metadata/",
-            encodeURIComponent("tbl-customers"),
+            encodeURIComponent(DEFAULT_ASSET_ID),
             "?pack=",
             encodeURIComponent(packId),
           ].join(""),
@@ -75,6 +133,7 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
         "以 requester 送出 access request（合成流程）",
         "用 ?sessionRole=owner 體驗審核（Demo only — not authentication）",
       ],
+      nextActions: governanceNextActions(packId),
     };
   }
 
@@ -102,6 +161,7 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
         "用 catalog 搜尋同名維度／API",
         "需要權限時走 access-request 示範路徑",
       ],
+      nextActions: governanceNextActions(packId),
     };
   }
 
@@ -128,6 +188,20 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
         "在 metadata 對照表／欄位",
         "需要授權時走我的申請／access request（demo）",
       ],
+      nextActions: [
+        {
+          label: "在目錄搜尋 orders",
+          href: catalogKeywordHref("orders"),
+        },
+        {
+          label: "打開顧客表並申請",
+          href: assetRequestHref(DEFAULT_ASSET_ID, packId, "analytics"),
+        },
+        {
+          label: "追蹤我的申請",
+          href: MY_REQUESTS_HREF,
+        },
+      ],
     };
   }
 
@@ -144,6 +218,16 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
       "補充你目前的情境限制或目標",
       "用下方按鈕開啟 catalog／metadata",
       "把答案轉成可執行任務清單",
+    ],
+    nextActions: [
+      {
+        label: "在目錄搜尋這句話",
+        href: catalogKeywordHref(query),
+      },
+      {
+        label: "在資料資產搜尋",
+        href: metadataKeywordHref(query, packId),
+      },
     ],
   };
 }
@@ -174,20 +258,7 @@ function buildGroundedLuiResponse(
     }))
   );
 
-  const standard = top.facets?.standards?.[0];
-  const material = top.facets?.materials?.[0];
-  const productType = top.facets?.productTypes?.[0];
-  const auctionEligible = top.facets?.auctionEligible === true;
-  let nextStep = "開啟來源連結核對 glossary／敘事細節";
-  if (productType) {
-    nextStep = `在 catalog 以產品類型 ${productType} 繼續篩選`;
-  } else if (auctionEligible) {
-    nextStep = "在 catalog 篩選可拍賣／孤品知識與作品";
-  } else if (standard) {
-    nextStep = `在 catalog 以印記 ${standard} 繼續篩選相關知識與資產`;
-  } else if (material) {
-    nextStep = `在 catalog 以材質 ${material} 繼續篩選`;
-  }
+  const firstHref = sources[0]?.url ?? catalogKeywordHref(query);
 
   return {
     summary: `已依知識庫找到 ${hits.length} 筆與「${query}」相關的依據。`,
@@ -195,9 +266,17 @@ function buildGroundedLuiResponse(
     confidence: Math.min(0.92, 0.7 + hits.length * 0.05),
     sources,
     nextSteps: [
-      nextStep,
-      "需要實體商品／工作室時，從來源進入 metadata 或 Plinth Discover",
-      "若涉及權限或拍賣狀態，對照 ops 狀態機 stub",
+      "開啟來源連結核對 glossary／敘事細節",
+      "用關鍵字在目錄與資料資產交叉驗證",
+      "需要權限時走 access-request 示範路徑",
+    ],
+    nextActions: [
+      { label: "開啟這筆來源", href: firstHref },
+      { label: "在目錄繼續（僅關鍵字）", href: catalogKeywordHref(query) },
+      {
+        label: "追蹤我的申請",
+        href: MY_REQUESTS_HREF,
+      },
     ],
   };
 }

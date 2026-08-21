@@ -3,6 +3,9 @@
   "app.description": "用一句話問資料目錄、權限與 API",
   "home.title": "用一句話問資料",
   "home.tagline": "用日常語言提問，得到答案、依據，以及下一步。",
+  "home.workbench.title": "工作台",
+  "home.workbench.pending": "進行中申請：{count}",
+  "home.workbench.suggested": "建議先看的資產",
   "home.cta.ask": "開始提問",
   "home.cta.dashboard": "開啟總覽",
   "home.nav.ask": "提問",
@@ -131,6 +134,7 @@
   "chat.sources.title": "參考來源",
   "chat.continue.catalog": "在目錄繼續篩選",
   "chat.continue.metadata": "瀏覽 metadata",
+  "chat.continue.request": "申請這筆資產",
   "release-notes.page.title": "版本說明",
   "release-notes.page.description": "各版本更新摘要與 commits，供使用者與 AI 參考。",
   "release-notes.list.title": "版本列表",
@@ -148,6 +152,10 @@
   "metadata.page.title": "資料資產",
   "metadata.page.description": "政策驅動的資產詳情與血緣。",
   "my-apis.error.title": "我的申請載入失敗",
+  "my-apis.use.title": "核准後可用（示範）",
+  "my-apis.use.label": "標示為 mock 的遮罩預覽，不是真實資料。",
+  "my-apis.use.copy-filter": "複製篩選條件",
+  "my-apis.use.copied": "已複製",
   "access-review.error.title": "申請審核載入失敗",
   "vitals.clear": "清除此次指標"
 }

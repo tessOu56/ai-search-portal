@@ -16,6 +16,7 @@ type AssistantEvidence = {
   confidence?: number;
   sources?: Array<{ title: string; url: string; source?: string }>;
   nextSteps?: string[];
+  nextActions?: Array<{ label: string; href: string }>;
   error?: string | null;
 };
 
@@ -44,6 +45,7 @@ function parseStableFinal(data: string) {
   return {
     sources: parsed.data.sources,
     nextSteps: parsed.data.nextSteps,
+    nextActions: parsed.data.nextActions,
   };
 }
 
@@ -159,6 +161,7 @@ export function ChatInterface({
         patchAssistant(assistantId, {
           sources: data.sources,
           nextSteps: data.nextSteps,
+          nextActions: data.nextActions,
         });
       } catch {
         patchAssistant(assistantId, { error: t(KEY_CHAT_ERROR_PARSE) });
@@ -245,6 +248,7 @@ export function ChatInterface({
                 confidence={message.confidence}
                 sources={message.sources}
                 nextSteps={message.nextSteps}
+                nextActions={message.nextActions}
                 query={message.query}
                 showContinue={
                   !isStreaming && message.id === lastAssistantIdValue

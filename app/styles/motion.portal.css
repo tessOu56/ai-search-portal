@@ -1,0 +1,20 @@
+/* Wave G — Portal consumes shared EDS motion utilities (durations already on data-app). */
+[data-app="portal"] a,
+[data-app="portal"] button {
+  transition-duration: var(--motion-duration-fast, 150ms);
+  transition-timing-function: var(
+    --motion-easing-enter,
+    cubic-bezier(0, 0, 0.2, 1)
+  );
+}
+
+[data-app="portal"] .eds-surface-enter {
+  animation: eds-enter-kf var(--motion-duration-normal, 300ms)
+    var(--motion-easing-enter, cubic-bezier(0, 0, 0.2, 1)) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-app="portal"] .eds-surface-enter {
+    animation: none;
+  }
+}

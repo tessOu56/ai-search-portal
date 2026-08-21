@@ -116,6 +116,12 @@ export function listMetadataAssets(
   };
 }
 
+export function listAllMetadataSummaries(
+  packId = DEFAULT_CONTEXT_PACK_ID
+): MetadataAssetSummaryContract[] {
+  return loadAssetsForPack(packId).map(toSummary);
+}
+
 export function getMetadataAsset(
   assetId: string,
   packId = DEFAULT_CONTEXT_PACK_ID

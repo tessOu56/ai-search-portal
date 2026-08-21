@@ -69,6 +69,7 @@ export type {
   ChatAgentMode,
   ChatQueryParams,
   InternalRagStepPayload,
+  LuiNextAction,
 } from "./chat.contract.js";
 export {
   chatAgentModeSchema,
@@ -76,6 +77,7 @@ export {
   internalChunkPayloadSchema,
   internalRagStepPayloadSchema,
   internalToolStatusPayloadSchema,
+  luiNextActionSchema,
   luiSourceSchema,
   mapInternalSseToStable,
   stableChatErrorSchema,

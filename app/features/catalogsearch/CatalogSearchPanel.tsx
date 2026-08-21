@@ -618,6 +618,43 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
               ),
             },
             {
+              key: "owner",
+              header: "Owner",
+              accessor: (row) => (
+                <span className="text-muted-foreground">
+                  {row.owner ? row.owner : "—"}
+                </span>
+              ),
+            },
+            {
+              key: "classification",
+              header: "Class / PII",
+              accessor: (row) =>
+                row.classification ? (
+                  <StatusChip
+                    status={
+                      row.classification === "PII" ||
+                      row.classification === "confidential"
+                        ? "warning"
+                        : "neutral"
+                    }
+                  >
+                    {row.classification}
+                  </StatusChip>
+                ) : (
+                  <span className="text-muted-foreground">—</span>
+                ),
+            },
+            {
+              key: "updatedAt",
+              header: "Updated",
+              accessor: (row) => (
+                <span className="font-mono text-type-12 text-muted-foreground">
+                  {row.updatedAt ? row.updatedAt.slice(0, 10) : "—"}
+                </span>
+              ),
+            },
+            {
               key: "source",
               header: "Source",
               align: "right",

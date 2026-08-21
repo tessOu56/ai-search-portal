@@ -495,6 +495,31 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               ),
             },
             {
+              key: "classification",
+              header: "Class / PII",
+              accessor: (row) => (
+                <StatusChip
+                  status={
+                    row.classification === "PII" ||
+                    row.classification === "confidential"
+                      ? "warning"
+                      : "neutral"
+                  }
+                >
+                  {row.classification}
+                </StatusChip>
+              ),
+            },
+            {
+              key: "updatedAt",
+              header: "Updated",
+              accessor: (row) => (
+                <span className="font-mono text-type-12 text-muted-foreground">
+                  {row.updatedAt ? row.updatedAt.slice(0, 10) : "—"}
+                </span>
+              ),
+            },
+            {
               key: "description",
               header: "Description",
               accessor: (row) => (

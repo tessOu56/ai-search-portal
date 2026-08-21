@@ -1,5 +1,10 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Link, useRouteError, useSearchParams } from "@remix-run/react";
+import {
+  Link,
+  useLoaderData,
+  useRouteError,
+  useSearchParams,
+} from "@remix-run/react";
 import { useCallback, useEffect, useState } from "react";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
@@ -12,6 +17,8 @@ import {
 } from "~/components/app/workspace";
 import { Button } from "~/components/ui/Button";
 import { ASK_HOME_RESET_EVENT } from "~/lib/workspace-mode";
+import { listAccessApplications } from "~/services/access-request-store.server";
+import { listMetadataAssets } from "~/services/metadata.server";
 import { getLocale, getTranslations } from "~/shared/i18n";
 import { t } from "~/shared/i18n/server";
 import {
@@ -37,6 +44,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     buildJsonLdWebSite(origin, title, description),
     buildJsonLdWebPage(canonical, title, description, { inLanguage: locale }),
   ];
+  const pendingCount = listAccessApplications({ pendingOnly: true }).length;
+  const suggestedAssets = listMetadataAssets({})
+    .data.slice(0, 3)
+    .map((asset) => ({
+      id: asset.id,
+      name: asset.name,
+      href: `/metadata/${asset.id}?purpose=analytics&role=analyst`,
+      classification: asset.classification,
+    }));
   return {
     title,
     description,
@@ -44,6 +60,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     image,
     locale: ogLocale,
     structuredData,
+    pendingCount,
+    suggestedAssets,
   };
 };
 
@@ -78,6 +96,7 @@ function Atmosphere() {
 }
 
 export default function Index() {
+  const { pendingCount, suggestedAssets } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const viewParam = searchParams.get("view");
   const view =
@@ -137,7 +156,11 @@ export default function Index() {
     return (
       <div className="relative">
         <Atmosphere />
-        <HomeLanding onAsk={onAsk} />
+        <HomeLanding
+          onAsk={onAsk}
+          pendingCount={pendingCount}
+          suggestedAssets={suggestedAssets}
+        />
         <HomeIntro />
         <WorkspaceFooter />
       </div>

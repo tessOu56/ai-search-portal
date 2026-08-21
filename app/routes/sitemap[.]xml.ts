@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 
-import { getReleaseNotes } from "~/shared/release-notes.server";
+import { listPublicIndexPages } from "~/shared/public-index.server";
 import { getOrigin } from "~/shared/seo";
 
 const XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -24,14 +24,8 @@ function escapeXml(s: string): string {
 
 export function loader({ request }: LoaderFunctionArgs) {
   const base = getOrigin(request);
-  const notes = getReleaseNotes();
-
-  const urls: string[] = [
-    urlEntry(base, "/"),
-    urlEntry(base, "/release-notes"),
-    ...notes.map((n) => urlEntry(base, `/release-notes/${n.version}`, n.date)),
-  ];
-
+  const pages = listPublicIndexPages();
+  const urls = pages.map((page) => urlEntry(base, page.path, page.lastmod));
   const body = XML_HEADER + URLSET + urls.join("") + URLSET_END;
 
   return new Response(body, {

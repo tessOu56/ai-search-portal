@@ -1,4 +1,4 @@
-/* Token CSS SSOT: @is_tess/tokens (npm). Do not vendor duplicate values here. */
+/* Token CSS SSOT: @is_tess/tokens (npm / workspace file). Do not vendor duplicate values here. */
 @import "@is_tess/tokens/css/portal.css";
 @import "@is_tess/tokens/css/portal-dark.css";
 @import "@is_tess/tokens/css/portal-wakakusa.css";
@@ -8,3 +8,4 @@
 @import "@is_tess/tokens/css/portal-matcha-fuji.css";
 @import "@is_tess/tokens/css/portal-matcha-fuji-dark.css";
 @import "@is_tess/tokens/css/portal-untitled.css";
+@import "@is_tess/tokens/css/motion.css";

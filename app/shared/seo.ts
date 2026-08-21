@@ -229,3 +229,55 @@ export function buildJsonLdArticle(
   if (options?.inLanguage) article.inLanguage = options.inLanguage;
   return article;
 }
+
+/**
+ * Schema.org Dataset — public asset detail. Does not claim chat answers are indexed.
+ */
+export function buildJsonLdDataset(args: {
+  url: string;
+  name: string;
+  description: string;
+  identifier: string;
+  dateModified?: string;
+  creator?: string;
+  isAccessibleForFree?: boolean;
+}): Record<string, unknown> {
+  const dataset: Record<string, unknown> = {
+    "@context": SCHEMA_ORG_CONTEXT,
+    "@type": "Dataset",
+    url: args.url,
+    name: args.name,
+    description: args.description,
+    identifier: args.identifier,
+  };
+  if (args.dateModified) dataset.dateModified = args.dateModified;
+  if (args.creator) {
+    dataset.creator = { "@type": "Person", name: args.creator };
+  }
+  if (args.isAccessibleForFree !== undefined) {
+    dataset.isAccessibleForFree = args.isAccessibleForFree;
+  }
+  return dataset;
+}
+
+/**
+ * Schema.org FAQPage — short public questions on an asset page.
+ */
+export function buildJsonLdFaqPage(
+  url: string,
+  items: Array<{ question: string; answer: string }>
+): Record<string, unknown> {
+  return {
+    "@context": SCHEMA_ORG_CONTEXT,
+    "@type": "FAQPage",
+    url,
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+}

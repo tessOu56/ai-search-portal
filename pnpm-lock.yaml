@@ -25,8 +25,8 @@ importers:
         specifier: ^0.1.10
         version: 0.1.10(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@is_tess/tokens':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.1.2
+        version: 0.1.2
       '@radix-ui/react-scroll-area':
         specifier: ^1.2.10
         version: 1.2.14(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1378,8 +1378,8 @@ packages:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
-  '@is_tess/tokens@0.1.0':
-    resolution: {integrity: sha512-RwTR1UpDRrphxpvHpUxpBdAgYkHD1Vwo2HLscYusyvOvLu6hRYor7CUJj86PsUby+Gi2o/KhCpyq6U3zgPvN8A==}
+  '@is_tess/tokens@0.1.2':
+    resolution: {integrity: sha512-Cjtr4a3GteUjKSB8n/2U0brp4tjtvgsHnPsoRt4BcWoPAppICGpG7WCdq5T56SXxnZd32DPg50zPQRkv54Z0Zw==}
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -8387,7 +8387,7 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@is_tess/tokens@0.1.0': {}
+  '@is_tess/tokens@0.1.2': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -9916,14 +9916,14 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))':
+  '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@20.19.39)(lightningcss@1.32.0))':
     dependencies:
       '@vitest/spy': 2.1.9
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
       msw: 2.15.0(@types/node@20.19.39)(typescript@5.9.3)
-      vite: 5.4.21(@types/node@26.1.1)(lightningcss@1.32.0)
+      vite: 5.4.21(@types/node@20.19.39)(lightningcss@1.32.0)
 
   '@vitest/mocker@2.1.9(msw@2.15.0(@types/node@26.1.1)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))':
     dependencies:
@@ -15044,7 +15044,7 @@ snapshots:
   vitest@2.1.9(@types/node@20.19.39)(jsdom@29.1.1)(lightningcss@1.32.0)(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3)):
     dependencies:
       '@vitest/expect': 2.1.9
-      '@vitest/mocker': 2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@26.1.1)(lightningcss@1.32.0))
+      '@vitest/mocker': 2.1.9(msw@2.15.0(@types/node@20.19.39)(typescript@5.9.3))(vite@5.4.21(@types/node@20.19.39)(lightningcss@1.32.0))
       '@vitest/pretty-format': 2.1.9
       '@vitest/runner': 2.1.9
       '@vitest/snapshot': 2.1.9
