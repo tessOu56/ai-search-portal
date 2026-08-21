@@ -1,0 +1,4 @@
+{
+  "git": { "deploymentEnabled": false },
+  "ignoreCommand": "echo 'gh-pages is GitHub Pages only — skip Vercel'; exit 0"
+}
