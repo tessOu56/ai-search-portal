@@ -4,6 +4,13 @@ export {
   buildKnowledgeSourceUrl,
   buildMetadataFacetUrl,
 } from "./knowledge-links.js";
+export {
+  type AgentLlmMode,
+  agentModeLabel,
+  readAgentLlmMode,
+  shouldUseLiveLlm,
+} from "./llm/mode.js";
+export { hasOptionalLlmKey } from "./llm/optional-openai.js";
 export type { LuiResponse, LuiSource } from "./lui-mock.js";
 export { buildLuiResponse, splitToTokens } from "./lui-mock.js";
 export { beginChatTrace, isLangfuseEnabled } from "./observability/langfuse.js";

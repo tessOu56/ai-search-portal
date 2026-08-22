@@ -29,6 +29,14 @@ export function listPublicIndexPages(): PublicIndexPage[] {
         "用一句話問資料目錄、權限與 API。LUI 引導可信解答與下一步。",
     },
     {
+      path: "/developers",
+      title: "Developer Hub",
+      titleZh: "Developer Hub",
+      description:
+        "Read-only API explorer with sandbox try-it for the Portal demo.",
+      descriptionZh: "唯讀 API 探索與 sandbox try-it（示範用）。",
+    },
+    {
       path: "/catalog-search",
       title: "Catalog search",
       titleZh: "目錄搜尋",

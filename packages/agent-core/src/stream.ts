@@ -4,6 +4,11 @@ import {
   stableChatMetaSchema,
 } from "@ai-search-portal/contracts";
 
+import {
+  agentModeLabel,
+  readAgentLlmMode,
+  shouldUseLiveLlm,
+} from "./llm/mode.js";
 import { tryOptionalLlmCompose } from "./llm/optional-openai.js";
 import { buildLuiResponse, splitToTokens } from "./lui-mock.js";
 import { beginChatTrace } from "./observability/langfuse.js";
@@ -113,13 +118,16 @@ export async function* streamChatInternalEvents(args: {
     ragHits: rag.hits,
     packId: rag.packId ?? packId,
   });
-  const llm = await tryOptionalLlmCompose({
-    query,
-    hits: rag.hits,
-    fixture,
-  });
+  const llmMode = readAgentLlmMode();
+  const llm = shouldUseLiveLlm(llmMode)
+    ? await tryOptionalLlmCompose({
+        query,
+        hits: rag.hits,
+        fixture,
+      })
+    : null;
   const response = llm?.response ?? fixture;
-  const agentMode = llm?.mode ?? "offline_fixture";
+  const agentMode = llm ? agentModeLabel(llmMode) : "offline_fixture";
   const metaPayload = stableChatMetaSchema.parse({
     query,
     summary: response.summary,
