@@ -12,6 +12,7 @@ import {
 } from "@remix-run/react";
 
 import { ProductPageShell } from "~/components/shared/product/ProductPageShell";
+import { Button } from "~/components/ui/Button";
 import { AccessRequestReviewPanel } from "~/features/accessrequests";
 import {
   editAccessApplication,
@@ -171,12 +172,11 @@ export function ErrorBoundary() {
           Something went wrong while loading the pending queue. Reloading
           usually recovers.
         </p>
-        <Link
-          to="/access-requests/review?sessionRole=owner"
-          className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-        >
-          Reset and retry
-        </Link>
+        <Button asChild>
+          <Link to="/access-requests/review?sessionRole=owner">
+            Reset and retry
+          </Link>
+        </Button>
       </div>
     </ProductPageShell>
   );

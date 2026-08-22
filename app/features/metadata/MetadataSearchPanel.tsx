@@ -416,15 +416,12 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                     {hit.text}
                   </p>
                   {hit.facets.standards.length > 0 ? (
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="text-type-12 text-muted-foreground">
                       {hit.facets.standards.join(" · ")}
                     </p>
                   ) : null}
                 </div>
-                <Badge
-                  variant="outline"
-                  className="rounded-full text-xs capitalize"
-                >
+                <Badge variant="outline" className="text-type-12 capitalize">
                   {hit.kind}
                 </Badge>
               </Link>

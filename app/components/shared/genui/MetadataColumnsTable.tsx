@@ -23,7 +23,7 @@ export function MetadataColumnsTable({
           return (
             <div
               key={col.name}
-              className="grid grid-cols-[1fr_1fr_2fr_auto] gap-2 px-4 py-3"
+              className="grid grid-cols-[1fr_1fr_2fr_auto] gap-space-8 px-space-16 py-space-8"
             >
               <span className="font-medium">
                 {masked ? "••••••" : col.name}

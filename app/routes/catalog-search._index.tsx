@@ -1,6 +1,7 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
+import { Button } from "~/components/ui/Button";
 import { CatalogSearchPanel } from "~/features/catalogsearch";
 import { getCatalogSearchViewModel } from "~/features/catalogsearch/catalog-search.server";
 import type { CatalogSearchIntent } from "~/features/catalogsearch/catalog-search.types";
@@ -100,12 +101,9 @@ export function ErrorBoundary() {
         Something went wrong while loading results. Your filters live in the URL
         — resetting them usually recovers.
       </p>
-      <Link
-        to="/catalog-search"
-        className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-      >
-        Reset filters and retry
-      </Link>
+      <Button asChild>
+        <Link to="/catalog-search">Reset filters and retry</Link>
+      </Button>
     </div>
   );
 }

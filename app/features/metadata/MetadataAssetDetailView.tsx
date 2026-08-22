@@ -180,7 +180,7 @@ function AccessContextForm({
         <form
           ref={formRef}
           method="get"
-          className="flex flex-wrap items-end gap-4"
+          className="flex flex-wrap items-end gap-space-16"
           aria-label="Access context"
         >
           {packParam ? (
@@ -288,7 +288,7 @@ function AccessRequestPanel({
                 ))}
               </ul>
             ) : null}
-            <fetcher.Form method="post" className="flex flex-wrap gap-2">
+            <fetcher.Form method="post" className="flex flex-wrap gap-space-8">
               <input type="hidden" name="intent" value="access-request" />
               <input type="hidden" name="purpose" value={purpose} />
               <input type="hidden" name="role" value={role} />
@@ -366,7 +366,7 @@ function AiAccessRequestPanel({
           <GenUiRenderer document={aiAccessRequest.genUiDocument} />
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-space-8">
           <Badge variant="secondary">
             purpose: {aiAccessRequest.request.purpose}
           </Badge>
@@ -407,7 +407,7 @@ function AiAccessRequestPanel({
             <fetcher.Form method="post" className="space-y-3">
               <input type="hidden" name="intent" value="access-request" />
               <input type="hidden" name="approved" value="true" />
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-space-16">
                 <FormField
                   id="ai-request-purpose"
                   label="Purpose"
@@ -439,7 +439,7 @@ function AiAccessRequestPanel({
                   />
                 </FormField>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-space-8">
                 <Button type="submit" disabled={busy}>
                   {busy ? "Submitting…" : "Confirm AI request"}
                 </Button>
@@ -508,7 +508,7 @@ function DataContractCard({ asset }: { asset: MetadataAssetDetailContract }) {
             <p className="mb-1 font-medium">Fields</p>
             <ul className="space-y-1 text-muted-foreground">
               {asset.columns.map((col) => (
-                <li key={col.name} className="flex flex-wrap gap-2">
+                <li key={col.name} className="flex flex-wrap gap-space-8">
                   <span className="text-foreground">{col.name}</span>
                   <span>{col.dataType}</span>
                   {col.sensitive ? (
@@ -571,7 +571,7 @@ function AccessPolicyCard({
             Technical decision details
           </summary>
           <div className="mt-3 space-y-3">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-space-8">
               <Badge variant={policyDecision.allow ? "default" : "outline"}>
                 allow: {String(policyDecision.allow)}
               </Badge>
@@ -606,7 +606,7 @@ function AccessPolicyCard({
 
 function AssetLineageLists({ asset }: { asset: MetadataAssetDetailContract }) {
   return (
-    <div className="flex flex-wrap gap-4 text-sm">
+    <div className="flex flex-wrap gap-space-16 text-sm">
       <div>
         <h3 className="mb-2 font-medium">Upstream</h3>
         <ul className="space-y-1 text-muted-foreground">

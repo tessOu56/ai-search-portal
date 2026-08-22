@@ -12,6 +12,7 @@ import {
 } from "@remix-run/react";
 
 import { ProductPageShell } from "~/components/shared/product/ProductPageShell";
+import { Button } from "~/components/ui/Button";
 import { MyApisPanel } from "~/features/accessrequests";
 import {
   expireStaleAccessApplications,
@@ -107,12 +108,9 @@ export function ErrorBoundary() {
           Something went wrong while loading your applications. Reloading
           usually recovers.
         </p>
-        <Link
-          to="/my-apis?sessionRole=requester"
-          className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-        >
-          Reset and retry
-        </Link>
+        <Button asChild>
+          <Link to="/my-apis?sessionRole=requester">Reset and retry</Link>
+        </Button>
       </div>
     </ProductPageShell>
   );

@@ -40,7 +40,7 @@ export default function RecipeDetailPage() {
 
       <Panel>
         <h2 className="mb-3 text-type-16 font-semibold">功效</h2>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-space-8">
           {recipe.properties.map((prop) => (
             <StatusChip key={prop} status="info">
               {prop}

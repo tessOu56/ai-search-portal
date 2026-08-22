@@ -80,7 +80,7 @@
     "@ai-search-portal/agent-core": "workspace:*",
     "@ai-search-portal/contracts": "workspace:*",
     "@ai-search-portal/governance-domain": "workspace:*",
-    "@is_tess/components": "^0.1.13",
+    "@is_tess/components": "^0.1.14",
     "@is_tess/tokens": "^0.1.3",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-slot": "^1.2.4",

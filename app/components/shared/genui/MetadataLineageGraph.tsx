@@ -52,7 +52,7 @@ export function MetadataLineageGraph({
           </ol>
         </div>
       ) : null}
-      <ul className="space-y-2 text-sm">
+      <ul className="flex flex-col gap-space-8 text-sm">
         {edges.map((edge) => {
           const source = nodeMap.get(edge.source);
           const target = nodeMap.get(edge.target);
@@ -60,7 +60,7 @@ export function MetadataLineageGraph({
           return (
             <li
               key={`${edge.source}-${edge.target}`}
-              className="flex flex-wrap items-center gap-2"
+              className="flex flex-wrap items-center gap-space-8"
             >
               <Link
                 to={`/metadata/${edge.source}`}
@@ -77,7 +77,7 @@ export function MetadataLineageGraph({
               >
                 {target.label}
               </Link>
-              <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+              <span className="rounded-[var(--radius-sm)] bg-muted px-space-8 py-space-2 text-type-12 text-muted-foreground">
                 {source.type} → {target.type}
               </span>
             </li>

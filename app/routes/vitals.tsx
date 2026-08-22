@@ -89,7 +89,7 @@ export default function VitalsRoute() {
             <Metric
               key={name}
               label={
-                <span className="flex items-center justify-between gap-2">
+                <span className="flex items-center justify-between gap-space-8">
                   <span>{name}</span>
                   <StatusChip status={ratingStatus(vital?.rating)}>
                     {vital ? vital.rating : "waiting"}

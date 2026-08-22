@@ -67,7 +67,7 @@ export function AiFallbackPanel({
       <p className="mt-1 text-type-14 text-muted-foreground">
         {t("chat.fallback.description")}
       </p>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      <div className="mt-space-8 flex flex-wrap items-center gap-space-8">
         <Button asChild size="sm">
           <Link
             to={buildCatalogSearchUrl({ q: trimmed, ...fallbackIntent })}

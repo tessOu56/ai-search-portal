@@ -326,7 +326,7 @@ function CatalogKnowledgeHits({
                           standard: code,
                           page: 1,
                         })}
-                        className="inline-flex rounded border border-border px-space-4 py-space-2 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                        className="inline-flex rounded-[var(--radius-sm)] border border-border px-space-4 py-space-2 text-type-12 text-muted-foreground hover:border-primary hover:text-foreground"
                       >
                         {code}
                       </Link>
@@ -334,10 +334,7 @@ function CatalogKnowledgeHits({
                   </div>
                 ) : null}
               </div>
-              <Badge
-                variant="outline"
-                className="rounded-full text-xs capitalize"
-              >
+              <Badge variant="outline" className="text-type-12 capitalize">
                 {row.itemType}
               </Badge>
             </div>
@@ -585,7 +582,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
                             standard: code,
                             page: 1,
                           })}
-                          className="inline-flex rounded border border-border px-space-4 py-space-2 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                          className="inline-flex rounded-[var(--radius-sm)] border border-border px-space-4 py-space-2 text-type-12 text-muted-foreground hover:border-primary hover:text-foreground"
                         >
                           {code}
                         </Link>
@@ -598,7 +595,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
                             material,
                             page: 1,
                           })}
-                          className="border-border/60 inline-flex rounded border px-space-4 py-space-2 text-[10px] text-muted-foreground hover:border-primary hover:text-foreground"
+                          className="border-border/60 inline-flex rounded-[var(--radius-sm)] border px-space-4 py-space-2 text-type-12 text-muted-foreground hover:border-primary hover:text-foreground"
                         >
                           {material.replace(/_/g, " ")}
                         </Link>

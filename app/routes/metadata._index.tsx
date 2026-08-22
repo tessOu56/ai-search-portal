@@ -5,6 +5,7 @@ import type {
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
+import { Button } from "~/components/ui/Button";
 import { MetadataSearchPanel } from "~/features/metadata";
 import type { MetadataSearchIntent } from "~/features/metadata/MetadataSearchPanel";
 import {
@@ -132,12 +133,9 @@ export function ErrorBoundary() {
         Something went wrong while loading assets. Filters live in the URL —
         resetting them usually recovers.
       </p>
-      <Link
-        to="/metadata"
-        className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-      >
-        Reset filters and retry
-      </Link>
+      <Button asChild>
+        <Link to="/metadata">Reset filters and retry</Link>
+      </Button>
     </div>
   );
 }

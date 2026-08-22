@@ -119,7 +119,7 @@ function NextSteps({
       {actions.length > 0 ? (
         <ul className="space-y-space-8 text-type-14">
           {actions.map((action) => (
-            <li key={action.href} className="flex items-start gap-2">
+            <li key={action.href} className="flex items-start gap-space-8">
               <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
               <Link
                 to={action.href}
@@ -134,7 +134,7 @@ function NextSteps({
       ) : (
         <ul className="space-y-space-8 text-type-14 text-muted-foreground">
           {steps.map((step) => (
-            <li key={step} className="flex items-start gap-2">
+            <li key={step} className="flex items-start gap-space-8">
               <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
               <span>{step}</span>
             </li>
@@ -200,7 +200,7 @@ function ContinueFacets({ query }: { query: string }) {
 
   return (
     <div
-      className="flex flex-wrap gap-2 pt-space-8"
+      className="flex flex-wrap gap-space-8 pt-space-8"
       data-testid="chat-continue-facets"
     >
       <Button asChild variant="outline" size="sm" className={CHIP_CLASS}>

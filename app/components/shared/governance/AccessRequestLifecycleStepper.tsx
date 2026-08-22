@@ -115,7 +115,7 @@ export function AccessRequestLifecycleStepper({
           >
             <span
               className={cn(
-                "flex size-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
+                "flex size-5 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border text-type-10 font-semibold",
                 // eslint-disable-next-line security/detect-object-injection -- state is a typed StepVisualState
                 CIRCLE_CLASS[state]
               )}
