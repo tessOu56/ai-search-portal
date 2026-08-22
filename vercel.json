@@ -3,6 +3,19 @@
   "regions": ["hkg1"],
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm run build",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        { "key": "X-Frame-Options", "value": "DENY" }
+      ]
+    }
+  ],
   "git": {
     "deploymentEnabled": {
       "main": true,
