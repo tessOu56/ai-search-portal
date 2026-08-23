@@ -25,6 +25,7 @@ type Message = {
   role: "user" | "assistant";
   content: string;
   query?: string;
+  fallbackReason?: import("./AiFallbackPanel").AiFallbackReason;
 } & AssistantEvidence;
 
 type AgentMode = "live_llm" | "offline_fixture";
@@ -57,6 +58,8 @@ function parseStableFailure(data: string) {
 const KEY_SUMMARY_WAITING = "chat.summary.waiting";
 const KEY_CHAT_ERROR_PARSE = "chat.error.parse";
 
+const CHAT_STREAM_TIMEOUT_MS = 45_000;
+
 type ChatInterfaceProps = {
   pendingQuery?: string | null;
   onPendingQueryConsumed?: () => void;
@@ -73,6 +76,7 @@ export function ChatInterface({
   const [isStreaming, setIsStreaming] = useState(false);
   const lastAssistantId = useRef<string | null>(null);
   const streamRef = useRef<EventSource | null>(null);
+  const streamTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const submitQueryRef = useRef<(raw: string) => void>(() => undefined);
   const logEndRef = useRef<HTMLDivElement>(null);
   const onAgentModeChangeRef = useRef(onAgentModeChange);
@@ -98,6 +102,10 @@ export function ChatInterface({
 
     streamRef.current?.close();
     streamRef.current = null;
+    if (streamTimeoutRef.current) {
+      clearTimeout(streamTimeoutRef.current);
+      streamTimeoutRef.current = null;
+    }
 
     const userMessage: Message = {
       id: crypto.randomUUID(),
@@ -117,6 +125,26 @@ export function ChatInterface({
     const stream = new EventSource(apiChatQuery(query));
     streamRef.current = stream;
     const assistantId = assistantMessage.id;
+
+    const clearStreamTimeout = () => {
+      if (streamTimeoutRef.current) {
+        clearTimeout(streamTimeoutRef.current);
+        streamTimeoutRef.current = null;
+      }
+    };
+
+    streamTimeoutRef.current = setTimeout(() => {
+      if (streamRef.current) {
+        patchAssistant(assistantId, {
+          error: t("chat.error.timeout"),
+          fallbackReason: "timeout",
+        });
+        setIsStreaming(false);
+        streamRef.current.close();
+        streamRef.current = null;
+      }
+      clearStreamTimeout();
+    }, CHAT_STREAM_TIMEOUT_MS);
 
     stream.addEventListener("meta", (event) => {
       try {
@@ -180,17 +208,20 @@ export function ChatInterface({
       }
       setIsStreaming(false);
       stream.close();
+      clearStreamTimeout();
     });
 
     stream.addEventListener("done", () => {
       setIsStreaming(false);
       stream.close();
+      clearStreamTimeout();
     });
 
     stream.onerror = () => {
       setIsStreaming(false);
       patchAssistant(assistantId, { error: t("chat.error.connection") });
       stream.close();
+      clearStreamTimeout();
     };
   };
 
@@ -254,6 +285,7 @@ export function ChatInterface({
                   !isStreaming && message.id === lastAssistantIdValue
                 }
                 error={message.error}
+                fallbackReason={message.fallbackReason}
               />
             )
           )}

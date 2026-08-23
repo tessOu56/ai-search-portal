@@ -13,11 +13,30 @@ import {
   type CatalogSearchUrlParams,
 } from "~/shared/navigation";
 
+export type AiFallbackReason =
+  "error" | "timeout" | "guardrail" | "low-confidence";
+
 export type AiFallbackPanelProps = {
   /** The user's last query — preserved so the manual path can take over. */
   query: string;
   /** Quick type-filter shortcuts offered alongside the main takeover link. */
   types?: string[];
+  /** Why the manual path opened — adjusts copy only; URLs stay the same. */
+  reason?: AiFallbackReason;
+};
+
+const REASON_TITLE: Record<AiFallbackReason, string> = {
+  error: "chat.fallback.title",
+  timeout: "chat.fallback.reason.timeout",
+  guardrail: "chat.fallback.reason.guardrail",
+  "low-confidence": "chat.fallback.reason.lowConfidence",
+};
+
+const REASON_DESCRIPTION: Record<AiFallbackReason, string> = {
+  error: "chat.fallback.description",
+  timeout: "chat.fallback.reason.timeoutDescription",
+  guardrail: "chat.fallback.reason.guardrailDescription",
+  "low-confidence": "chat.fallback.reason.lowConfidenceDescription",
 };
 
 const INDUSTRY_SHORTCUTS = listIndustryStandards()
@@ -47,6 +66,7 @@ const AI_FALLBACK_INTENT = "ai-fallback";
 export function AiFallbackPanel({
   query,
   types = ["API", "Dataset"],
+  reason = "error",
 }: AiFallbackPanelProps) {
   const { t } = useI18n();
   const trimmed = query.trim();
@@ -60,12 +80,12 @@ export function AiFallbackPanel({
   };
 
   return (
-    <Panel data-testid="ai-fallback-panel">
+    <Panel data-testid="ai-fallback-panel" data-fallback-reason={reason}>
       <h2 className="text-type-16 font-semibold text-foreground">
-        {t("chat.fallback.title")}
+        {t(REASON_TITLE[reason])}
       </h2>
       <p className="mt-1 text-type-14 text-muted-foreground">
-        {t("chat.fallback.description")}
+        {t(REASON_DESCRIPTION[reason])}
       </p>
       <div className="mt-space-8 flex flex-wrap items-center gap-space-8">
         <Button asChild size="sm">

@@ -31,7 +31,36 @@ export type AssistantTurnProps = {
   query?: string;
   showContinue?: boolean;
   error?: string | null;
+  fallbackReason?: import("./AiFallbackPanel").AiFallbackReason;
 };
+
+const LOW_CONFIDENCE_THRESHOLD = 0.45;
+
+function inferFallbackReason(
+  error: string | null | undefined,
+  confidence: number | undefined,
+  explicit?: import("./AiFallbackPanel").AiFallbackReason
+): import("./AiFallbackPanel").AiFallbackReason | null {
+  if (explicit) return explicit;
+  if (error) {
+    const lower = error.toLowerCase();
+    if (lower.includes("guardrail") || lower.includes("policy")) {
+      return "guardrail";
+    }
+    if (lower.includes("timeout") || lower.includes("timed out")) {
+      return "timeout";
+    }
+    return "error";
+  }
+  if (
+    confidence !== undefined &&
+    confidence >= 0 &&
+    confidence < LOW_CONFIDENCE_THRESHOLD
+  ) {
+    return "low-confidence";
+  }
+  return null;
+}
 
 const CHIP_CLASS =
   "h-auto min-h-8 max-w-full whitespace-normal break-words py-1.5 text-left";
@@ -86,8 +115,20 @@ function StreamBody({
   );
 }
 
-function TurnError({ query, error }: { query: string; error: string }) {
+function TurnError({
+  query,
+  error,
+  reason = "error",
+}: {
+  query: string;
+  error: string;
+  reason?: import("./AiFallbackPanel").AiFallbackReason;
+}) {
   const { t } = useI18n();
+  const fallbackReason =
+    reason === "error"
+      ? (inferFallbackReason(error, undefined) ?? "error")
+      : reason;
   return (
     <>
       <Alert
@@ -97,7 +138,7 @@ function TurnError({ query, error }: { query: string; error: string }) {
         <AlertTitle>{t("chat.error.title")}</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-      <AiFallbackPanel query={query} />
+      <AiFallbackPanel query={query} reason={fallbackReason ?? "error"} />
     </>
   );
 }
@@ -244,9 +285,14 @@ export function AssistantTurn({
   query = "",
   showContinue = false,
   error = null,
+  fallbackReason,
 }: AssistantTurnProps) {
   const showContinueRow =
     showContinue && !isStreaming && !error && Boolean(query.trim());
+
+  const resolvedFallback = !isStreaming
+    ? inferFallbackReason(error, confidence, fallbackReason)
+    : null;
 
   return (
     <article
@@ -255,7 +301,18 @@ export function AssistantTurn({
     >
       <EvidenceHeader summary={summary} confidence={confidence} />
       <StreamBody content={content} isStreaming={isStreaming} />
-      {error ? <TurnError query={query} error={error} /> : null}
+      {error ? (
+        <TurnError
+          query={query}
+          error={error}
+          reason={
+            fallbackReason ?? inferFallbackReason(error, confidence) ?? "error"
+          }
+        />
+      ) : null}
+      {!error && resolvedFallback ? (
+        <AiFallbackPanel query={query} reason={resolvedFallback} />
+      ) : null}
       {!isStreaming ? (
         <NextSteps steps={nextSteps} actions={nextActions} />
       ) : null}
