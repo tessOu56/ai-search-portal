@@ -31,6 +31,9 @@ vi.mock("~/shared/i18n/context", () => ({
       const labels = new Map<string, string>([
         ["chat.fallback.title", "AI is unavailable — continue manually"],
         ["chat.fallback.description", "Your input is preserved."],
+        ["chat.fallback.eyebrow", "Manual path"],
+        ["chat.fallback.section.primary", "Continue with your query"],
+        ["chat.fallback.section.filters", "Filters"],
         ["chat.fallback.action", "Open catalog search"],
         ["chat.fallback.metadata", "Browse metadata catalog"],
       ]);

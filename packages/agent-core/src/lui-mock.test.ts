@@ -79,4 +79,45 @@ describe("buildLuiResponse source citation (T-2026-071)", () => {
       )
     ).toBe(true);
   });
+
+  it("maps talk/event queries to nx event-portal LIVE nextActions", () => {
+    const response = buildLuiResponse("哪裡可以報名講座活動？", {
+      packId: PACK_ID,
+    });
+    expect(
+      response.nextActions?.some((a) => a.href.includes("nx-event-portal"))
+    ).toBe(true);
+    expect(
+      response.nextActions?.every((a) => !a.href.includes("/api/dishes"))
+    ).toBe(true);
+  });
+
+  it("maps auction queries to Plinth LIVE nextActions", () => {
+    const response = buildLuiResponse("拍賣拍品在哪裡出價？", {
+      packId: PACK_ID,
+    });
+    expect(
+      response.nextActions?.some((a) =>
+        a.href.includes("metalcraft-storefront-eta.vercel.app")
+      )
+    ).toBe(true);
+  });
+
+  it("keeps food queries on loader dishes/recipes without fake REST", () => {
+    const response = buildLuiResponse("有沒有食譜 API？", { packId: PACK_ID });
+    expect(response.answer).toMatch(/loader|沒有 REST|honest|示範殼/i);
+    expect(response.nextActions?.some((a) => a.href === "/dishes")).toBe(true);
+    expect(response.nextActions?.some((a) => a.href === "/recipes")).toBe(true);
+    expect(
+      response.nextActions?.some((a) =>
+        a.href.includes("vue-motion-sandbox/recipes")
+      )
+    ).toBe(true);
+    expect(
+      response.nextActions?.every(
+        (a) =>
+          !a.href.includes("/api/dishes") && !a.href.includes("/api/recipes")
+      )
+    ).toBe(true);
+  });
 });

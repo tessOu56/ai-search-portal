@@ -5,6 +5,14 @@
  */
 
 import {
+  detectEcosystemTopic,
+  type EcosystemTopic,
+  NX_EVENT_PORTAL_LIVE,
+  PLINTH_AUCTIONS_LIVE,
+  PLINTH_LOT_LIVE,
+  VUE_MOTION_LAB_LIVE,
+} from "./ecosystem-live-links.js";
+import {
   buildKnowledgeSourceUrl,
   buildMetadataFacetUrl,
 } from "./knowledge-links.js";
@@ -20,6 +28,11 @@ export type LuiSource = {
 export type LuiNextAction = {
   label: string;
   href: string;
+};
+
+const NX_EVENTS_LIVE_ACTION: LuiNextAction = {
+  label: "開啟 nx 活動目錄（LIVE）",
+  href: NX_EVENT_PORTAL_LIVE,
 };
 
 export type LuiResponse = {
@@ -104,7 +117,93 @@ function uniqueByUrl(sources: LuiSource[]): LuiSource[] {
   );
 }
 
+function buildEcosystemLuiResponse(
+  query: string,
+  topic: Exclude<EcosystemTopic, null>
+): LuiResponse {
+  if (topic === "food") {
+    return {
+      summary: "示範領域 · 菜餚／食譜仍是 Portal loader 頁，沒有 REST。",
+      answer: [
+        `關於「${query}」：Portal 的 /dishes 與 /recipes 是 Remix loader seed（誠實示範殼），`,
+        "不是 Nest／公開 REST。Vue lab 另有 mock JSON gallery；此處不假裝已有食物 API。",
+      ].join(""),
+      confidence: 0.88,
+      sources: [],
+      nextSteps: [
+        "開啟 /dishes 看 loader 示範菜餚",
+        "開啟 /recipes 看 loader 示範食譜",
+        "或在 Vue lab 開啟食譜 gallery（GitHub Pages）",
+        "不要期待 /api/dishes 或 /api/recipes",
+      ],
+      nextActions: [
+        { label: "開啟菜餚示範頁（loader）", href: "/dishes" },
+        { label: "開啟食譜示範頁（loader）", href: "/recipes" },
+        { label: "在 Vue lab 開啟（LIVE）", href: VUE_MOTION_LAB_LIVE },
+      ],
+    };
+  }
+
+  if (topic === "auction") {
+    return {
+      summary: "生態轉址 · 拍賣 kind 到 Plinth LIVE（結算不在 Portal／nx）。",
+      answer: [
+        `關於「${query}」：活動類型 auction 的拍品與出價在 Plinth storefront；`,
+        "nx event-portal 只列 kind badge 與深鏈。Portal 是目錄＋RAG 轉址，不是拍賣後台。",
+      ].join(""),
+      confidence: 0.9,
+      sources: [],
+      nextSteps: [
+        "在 Plinth 開啟示範拍品（mock 出價）",
+        "需要活動目錄時再開 nx Events LIVE",
+      ],
+      nextActions: [
+        { label: "開啟 Plinth 示範拍品（LIVE）", href: PLINTH_LOT_LIVE },
+        { label: "開啟 Plinth 拍賣列表（LIVE）", href: PLINTH_AUCTIONS_LIVE },
+        NX_EVENTS_LIVE_ACTION,
+      ],
+    };
+  }
+
+  if (topic === "line_commerce") {
+    return {
+      summary: "生態轉址 · LINE 商務／報名示範走 nx event-portal LIVE。",
+      answer: [
+        `關於「${query}」：line_commerce kind 的參加者旅程在 nx event-portal（LIFF／labelled demo）；`,
+        "Portal 不合成第二個活動後台，也不假裝 LINE 真上架。",
+      ].join(""),
+      confidence: 0.88,
+      sources: [],
+      nextSteps: [
+        "開啟 nx Events LIVE 看活動列表",
+        "身份／金流仍標 demo，卡人工 STOP",
+      ],
+      nextActions: [NX_EVENTS_LIVE_ACTION],
+    };
+  }
+
+  return {
+    summary: "生態轉址 · 講座／報名 kind 到 nx event-portal LIVE。",
+    answer: [
+      `關於「${query}」：talk／工作坊報名與票券旅程在 nx event-portal；`,
+      "Portal 只做目錄＋RAG 轉址，不是 event-cms。",
+    ].join(""),
+    confidence: 0.9,
+    sources: [],
+    nextSteps: [
+      "開啟 nx Events LIVE 看列表→checkout 示範",
+      "主辦上架請走獨立 CMS（Kratos），不要在 Portal 找後台",
+    ],
+    nextActions: [NX_EVENTS_LIVE_ACTION],
+  };
+}
+
 function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
+  const ecosystem = detectEcosystemTopic(query);
+  if (ecosystem) {
+    return buildEcosystemLuiResponse(query, ecosystem);
+  }
+
   const topic = detectTopic(query);
 
   if (topic === "pii") {

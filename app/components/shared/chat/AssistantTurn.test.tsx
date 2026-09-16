@@ -131,6 +131,29 @@ describe("AssistantTurn (LUI conversation)", () => {
     );
   });
 
+  it("external LIVE nextActions open in a new tab", () => {
+    render(
+      <AssistantTurn
+        content="Auction journey is on Plinth."
+        summary="生態轉址 · 拍賣 kind 到 Plinth LIVE。"
+        nextActions={[
+          {
+            label: "開啟 Plinth 示範拍品（LIVE）",
+            href: "https://metalcraft-storefront-eta.vercel.app/en/lots/lot-1",
+          },
+        ]}
+        query="拍賣拍品在哪裡出價？"
+      />
+    );
+    const action = screen.getByTestId("chat-next-action");
+    expect(action).toHaveAttribute(
+      "href",
+      "https://metalcraft-storefront-eta.vercel.app/en/lots/lot-1"
+    );
+    expect(action).toHaveAttribute("target", "_blank");
+    expect(action).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
   it("complete with empty sources: hides References, keeps continue buttons", () => {
     render(
       <AssistantTurn

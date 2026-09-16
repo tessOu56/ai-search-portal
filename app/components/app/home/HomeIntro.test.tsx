@@ -37,6 +37,7 @@ vi.mock("~/shared/i18n/context", () => ({
         ["home.section.browse.catalog", "Catalog search"],
         ["home.section.browse.assets", "Data assets"],
         ["home.section.browse.dishes", "Demo catalog: dishes"],
+        ["home.section.browse.vueLab", "Vue recipe lab (LIVE)"],
         ["home.cta.dashboard", "Open overview"],
         ["footer.synthetic.hint", "Synthetic catalog."],
       ]);
@@ -67,6 +68,12 @@ describe("HomeIntro", () => {
     expect(
       screen.getByRole("link", { name: "Demo catalog: dishes" })
     ).toHaveAttribute("href", "/dishes");
+    expect(
+      screen.getByRole("link", { name: "Vue recipe lab (LIVE)" })
+    ).toHaveAttribute(
+      "href",
+      "https://tessou56.github.io/vue-motion-sandbox/recipes"
+    );
     expect(screen.getByRole("link", { name: "Open overview" })).toHaveAttribute(
       "href",
       "/?view=dashboard"

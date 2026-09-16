@@ -8,6 +8,13 @@ import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 
 import {
+  ProductPageHeader,
+  ProductPageShell,
+} from "~/components/shared/product/ProductPageShell";
+import { Button } from "~/components/ui/Button";
+import { Stack } from "~/components/ui/Stack";
+import { StatusChip } from "~/components/ui/StatusChip";
+import {
   getDeveloperApi,
   listDeveloperApis,
 } from "~/features/developers/developer-apis.server";
@@ -56,80 +63,88 @@ export default function DeveloperApiDetailRoute() {
   const { api, allApis } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [selectedOpId, setSelectedOpId] = useState(api.operations[0]?.id ?? "");
+  const selected = api.operations.find((op) => op.id === selectedOpId);
 
   return (
-    <div className="grid min-h-[70vh] grid-cols-1 gap-0 lg:grid-cols-[220px_1fr_320px]">
-      <aside className="border-b p-4 lg:border-b-0 lg:border-r">
-        <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">
-          APIs
-        </p>
-        <ul className="space-y-2 text-sm">
-          {allApis.map((item) => (
-            <li key={item.id}>
-              <Link
-                to={`/developers/apis/${item.id}`}
-                className={
-                  item.id === api.id
-                    ? "font-semibold text-primary"
-                    : "hover:underline"
-                }
-              >
-                {item.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </aside>
+    <ProductPageShell
+      crumbs={[{ to: "/developers", label: "APIs" }]}
+      current={api.name}
+    >
+      <ProductPageHeader
+        extra={<StatusChip status="warning">Sandbox only</StatusChip>}
+        title={api.name}
+        description={api.description}
+      />
+      <p className="text-type-12 text-muted-foreground">
+        Base {api.basePath} · mock try-it · no production writes
+      </p>
 
-      <section className="border-b p-4 lg:border-b-0 lg:border-r">
-        <h1 className="text-xl font-semibold">{api.name}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{api.description}</p>
-        <p className="mt-4 text-xs text-muted-foreground">
-          Base {api.basePath} · sandbox only
-        </p>
-        <ul className="mt-6 space-y-3">
-          {api.operations.map((op) => (
-            <li key={op.id}>
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(11rem,14rem)_minmax(0,1fr)_minmax(16rem,20rem)] lg:items-start">
+        <aside className="border-b border-border py-space-16 lg:border-b-0 lg:border-r lg:pr-space-16">
+          <p className="mb-space-8 text-type-12 font-medium uppercase tracking-wide text-muted-foreground">
+            Catalog
+          </p>
+          <Stack gap="sm">
+            {allApis.map((item) => (
+              <Button
+                key={item.id}
+                asChild
+                size="sm"
+                variant={item.id === api.id ? "secondary" : "ghost"}
+              >
+                <Link to={`/developers/apis/${item.id}`}>{item.name}</Link>
+              </Button>
+            ))}
+          </Stack>
+        </aside>
+
+        <section className="border-b border-border py-space-16 lg:border-b-0 lg:border-r lg:px-space-16">
+          <Stack gap="md">
+            {api.operations.map((op) => (
               <button
+                key={op.id}
                 type="button"
                 onClick={() => setSelectedOpId(op.id)}
-                className={`w-full rounded-md border p-3 text-left text-sm ${
-                  selectedOpId === op.id ? "bg-muted/40 border-primary" : ""
+                className={`p-space-12 w-full rounded-sm border text-left text-type-14 ${
+                  selectedOpId === op.id
+                    ? "bg-muted/40 border-primary"
+                    : "border-border"
                 }`}
               >
-                <span className="font-mono text-xs">{op.method}</span>{" "}
-                <span className="font-mono">{op.path}</span>
-                <p className="mt-1 text-muted-foreground">{op.summary}</p>
+                <span className="font-mono text-type-12 text-muted-foreground">
+                  {op.method}
+                </span>{" "}
+                <span className="font-mono text-foreground">{op.path}</span>
+                <p className="mt-space-8 text-muted-foreground">{op.summary}</p>
               </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+            ))}
+          </Stack>
+        </section>
 
-      <aside className="p-4">
-        <p className="text-xs font-medium uppercase text-muted-foreground">
-          Try it (mock)
-        </p>
-        {selectedOpId ? (
-          <Form method="post" className="mt-3 space-y-3">
-            <input type="hidden" name="operationId" value={selectedOpId} />
-            <button
-              type="submit"
-              className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground"
-            >
-              Send sandbox request
-            </button>
-          </Form>
-        ) : null}
-        {actionData && "body" in actionData ? (
-          <pre className="mt-4 max-h-80 overflow-auto rounded-md bg-muted p-3 text-xs">
-            {JSON.stringify(actionData, null, 2)}
-          </pre>
-        ) : null}
-        {actionData && "error" in actionData ? (
-          <p className="mt-4 text-sm text-destructive">{actionData.error}</p>
-        ) : null}
-      </aside>
-    </div>
+        <aside className="py-space-16 lg:pl-space-16">
+          <p className="text-type-12 font-medium uppercase tracking-wide text-muted-foreground">
+            Try it (mock)
+          </p>
+          {selected ? (
+            <Form method="post" className="mt-space-8">
+              <input type="hidden" name="operationId" value={selected.id} />
+              <Button type="submit" size="sm">
+                Send sandbox request
+              </Button>
+            </Form>
+          ) : null}
+          {actionData && "body" in actionData ? (
+            <pre className="p-space-12 mt-space-16 max-h-80 overflow-auto rounded-sm bg-muted text-type-12">
+              {JSON.stringify(actionData, null, 2)}
+            </pre>
+          ) : null}
+          {actionData && "error" in actionData ? (
+            <p className="mt-space-16 text-type-14 text-destructive">
+              {actionData.error}
+            </p>
+          ) : null}
+        </aside>
+      </div>
+    </ProductPageShell>
   );
 }

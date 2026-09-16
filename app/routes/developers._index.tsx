@@ -1,6 +1,14 @@
 import type { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
+import {
+  ProductPageHeader,
+  ProductPageShell,
+} from "~/components/shared/product/ProductPageShell";
+import { Button } from "~/components/ui/Button";
+import { Panel } from "~/components/ui/Panel";
+import { Stack } from "~/components/ui/Stack";
+import { StatusChip } from "~/components/ui/StatusChip";
 import { listDeveloperApis } from "~/features/developers/developer-apis.server";
 
 export const meta: MetaFunction = () => [
@@ -20,33 +28,38 @@ export default function DevelopersIndexRoute() {
   const { apis } = useLoaderData<typeof loader>();
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 p-6">
-      <header className="space-y-2">
-        <p className="text-sm text-muted-foreground">Developer Hub · sandbox</p>
-        <h1 className="text-2xl font-semibold">APIs</h1>
-        <p className="text-sm text-muted-foreground">
-          Read-only catalog. Try-it returns labelled mock responses — no
-          production writes or real keys.
-        </p>
-      </header>
-      <ul className="divide-y rounded-md border">
+    <ProductPageShell current="APIs">
+      <ProductPageHeader
+        extra={
+          <StatusChip status="neutral">Developer Hub · sandbox</StatusChip>
+        }
+        title="APIs"
+        description="Read-only catalog. Try-it returns labelled mock responses — no production writes, real keys, Neon, or dishes REST."
+      />
+      <Stack gap="md">
         {apis.map((api) => (
-          <li key={api.id} className="p-4">
-            <Link
-              to={`/developers/apis/${api.id}`}
-              className="font-medium text-primary hover:underline"
-            >
-              {api.name}
-            </Link>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {api.description}
-            </p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              {api.basePath} · v{api.version}
-            </p>
-          </li>
+          <Panel key={api.id}>
+            <Stack gap="sm">
+              <div className="flex flex-wrap items-start justify-between gap-stack-dense">
+                <h2 className="font-display text-type-20 font-medium tracking-tight text-foreground">
+                  {api.name}
+                </h2>
+                <p className="text-type-12 text-muted-foreground">
+                  {api.basePath} · v{api.version}
+                </p>
+              </div>
+              <p className="max-w-2xl text-type-14 text-muted-foreground">
+                {api.description}
+              </p>
+              <div>
+                <Button asChild size="sm" variant="outline">
+                  <Link to={`/developers/apis/${api.id}`}>Open explorer</Link>
+                </Button>
+              </div>
+            </Stack>
+          </Panel>
         ))}
-      </ul>
-    </div>
+      </Stack>
+    </ProductPageShell>
   );
 }

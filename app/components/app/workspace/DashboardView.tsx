@@ -1,6 +1,12 @@
 import { Link } from "@remix-run/react";
 
 import { Button } from "~/components/ui/Button";
+import {
+  NX_EVENT_PORTAL_LIVE,
+  PLINTH_AUCTIONS_LIVE,
+  PLINTH_LOT_LIVE,
+  VUE_MOTION_LAB_LIVE,
+} from "~/shared/ecosystem-live";
 import { useI18n } from "~/shared/i18n/context";
 
 import { WorkspaceFooter } from "./WorkspaceFooter";
@@ -29,7 +35,7 @@ const QUERIES = [
 
 /**
  * Overview — visitor map of business queries (auxiliary path, interface-roadmap).
- * Surface: product.
+ * Surface: product. LIVE deep links → nx / Plinth (T-2026-282).
  */
 export function DashboardView() {
   const { t } = useI18n();
@@ -86,6 +92,62 @@ export function DashboardView() {
             </section>
           );
         })}
+
+        <section
+          className="mx-auto w-full max-w-5xl px-space-16 pb-section md:px-space-32"
+          aria-labelledby="overview-live"
+        >
+          <h2
+            id="overview-live"
+            className="mb-space-8 font-display text-type-32 font-medium text-foreground"
+          >
+            {t("overview.live.title")}
+          </h2>
+          <p className="mb-space-16 max-w-xl text-type-16 leading-body text-muted-foreground">
+            {t("overview.live.desc")}
+          </p>
+          <div className="flex flex-wrap gap-space-8">
+            <Button asChild variant="outline" size="sm">
+              <a
+                href={NX_EVENT_PORTAL_LIVE}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("overview.live.events")}
+              </a>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <a
+                href={PLINTH_LOT_LIVE}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("overview.live.plinthLot")}
+              </a>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <a
+                href={PLINTH_AUCTIONS_LIVE}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("overview.live.plinthAuctions")}
+              </a>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <a
+                href={VUE_MOTION_LAB_LIVE}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("overview.live.vueLab")}
+              </a>
+            </Button>
+          </div>
+          <p className="mt-space-16 max-w-xl text-type-14 leading-body text-muted-foreground">
+            {t("overview.live.foodNote")}
+          </p>
+        </section>
 
         <section
           className="mx-auto w-full max-w-5xl px-space-16 pb-section md:px-space-32"

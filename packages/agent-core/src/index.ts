@@ -1,4 +1,13 @@
 export {
+  detectEcosystemTopic,
+  type EcosystemTopic,
+  NX_EVENT_PORTAL_LIVE,
+  PLINTH_AUCTIONS_LIVE,
+  PLINTH_LOT_LIVE,
+  PLINTH_STOREFRONT_LIVE,
+  VUE_MOTION_LAB_LIVE,
+} from "./ecosystem-live-links.js";
+export {
   buildCatalogFacetUrl,
   buildKnowledgeContinueSources,
   buildKnowledgeSourceUrl,

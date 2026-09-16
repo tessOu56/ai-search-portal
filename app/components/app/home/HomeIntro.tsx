@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
 
 import { Button } from "~/components/ui/Button";
+import { VUE_MOTION_LAB_LIVE } from "~/shared/ecosystem-live";
 import { useI18n } from "~/shared/i18n/context";
 
 const STEPS = [
@@ -91,6 +92,15 @@ export function HomeIntro() {
           </Button>
           <Button asChild variant="outline" size="sm">
             <Link to="/dishes">{t("home.section.browse.dishes")}</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <a
+              href={VUE_MOTION_LAB_LIVE}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("home.section.browse.vueLab")}
+            </a>
           </Button>
           <Button asChild variant="outline" size="sm">
             <Link to="/?view=dashboard">{t("home.cta.dashboard")}</Link>

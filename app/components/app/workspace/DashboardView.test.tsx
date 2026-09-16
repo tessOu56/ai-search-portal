@@ -42,6 +42,16 @@ vi.mock("~/shared/i18n/context", () => ({
         ["overview.orders.desc", "Find order datasets and APIs."],
         ["overview.browse.title", "Browse without asking"],
         ["overview.browse.desc", "Open the catalog or sample dishes."],
+        ["overview.live.title", "Open LIVE demos in this ecosystem"],
+        ["overview.live.desc", "Portal stays a directory plus RAG redirect."],
+        ["overview.live.events", "nx Events (LIVE)"],
+        ["overview.live.plinthLot", "Plinth sample lot (LIVE)"],
+        ["overview.live.plinthAuctions", "Plinth auctions (LIVE)"],
+        ["overview.live.vueLab", "Vue recipe lab (LIVE)"],
+        [
+          "overview.live.foodNote",
+          "Dishes and recipes stay loader demo pages on this Portal (no fake REST).",
+        ],
         [
           "home.composer.suggest.1",
           "Which datasets contain PII and what access do I need?",
@@ -54,6 +64,7 @@ vi.mock("~/shared/i18n/context", () => ({
         ["home.section.browse.catalog", "Catalog search"],
         ["home.section.browse.assets", "Data assets"],
         ["home.section.browse.dishes", "Demo catalog: dishes"],
+        ["home.section.browse.vueLab", "Vue recipe lab (LIVE)"],
         ["app.title", "Portal"],
         ["footer.copyright", `© ${vars?.year ?? "2026"} Portal`],
         ["footer.version", "v0.0.0"],
@@ -108,5 +119,31 @@ describe("DashboardView", () => {
     expect(
       screen.getByRole("link", { name: "Catalog search" })
     ).toHaveAttribute("href", "/catalog-search");
+    expect(
+      screen.getByRole("heading", { name: "Open LIVE demos in this ecosystem" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "nx Events (LIVE)" })
+    ).toHaveAttribute(
+      "href",
+      "https://nx-event-portal.vercel.app/zh-TW/events"
+    );
+    expect(
+      screen.getByRole("link", { name: "Plinth sample lot (LIVE)" })
+    ).toHaveAttribute(
+      "href",
+      "https://metalcraft-storefront-eta.vercel.app/en/lots/lot-1"
+    );
+    expect(
+      screen.getByRole("link", { name: /Vue recipe lab/ })
+    ).toHaveAttribute(
+      "href",
+      "https://tessou56.github.io/vue-motion-sandbox/recipes"
+    );
+    expect(
+      screen.getByText(
+        "Dishes and recipes stay loader demo pages on this Portal (no fake REST)."
+      )
+    ).toBeInTheDocument();
   });
 });

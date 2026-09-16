@@ -159,18 +159,33 @@ function NextSteps({
       </h3>
       {actions.length > 0 ? (
         <ul className="space-y-space-8 text-type-14">
-          {actions.map((action) => (
-            <li key={action.href} className="flex items-start gap-space-8">
-              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-              <Link
-                to={action.href}
-                className={SOURCE_LINK_CLASS}
-                data-testid="chat-next-action"
-              >
-                {action.label}
-              </Link>
-            </li>
-          ))}
+          {actions.map((action) => {
+            const internal = action.href.startsWith("/");
+            return (
+              <li key={action.href} className="flex items-start gap-space-8">
+                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                {internal ? (
+                  <Link
+                    to={action.href}
+                    className={SOURCE_LINK_CLASS}
+                    data-testid="chat-next-action"
+                  >
+                    {action.label}
+                  </Link>
+                ) : (
+                  <a
+                    href={action.href}
+                    className={SOURCE_LINK_CLASS}
+                    data-testid="chat-next-action"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    {action.label}
+                  </a>
+                )}
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <ul className="space-y-space-8 text-type-14 text-muted-foreground">
