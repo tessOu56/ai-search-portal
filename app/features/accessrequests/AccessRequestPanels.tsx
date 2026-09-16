@@ -39,21 +39,20 @@ export function SessionRoleSwitcher({
 }: {
   sessionRole: GovernanceSessionRole;
 }) {
+  const { t } = useI18n();
   const roles: GovernanceSessionRole[] = ["requester", "owner", "admin"];
   return (
     <div
       className="grid gap-stack-dense"
       role="group"
-      aria-label="Demo session role"
+      aria-label={t("session.roleAria")}
     >
-      <Callout tone="info">
-        Demo persona via{" "}
-        <code className="rounded bg-muted px-space-4">?sessionRole=</code>— not
-        a login. This is a showcase, not production RBAC.
-      </Callout>
+      <Callout tone="info">{t("session.demoCallout")}</Callout>
       <div className="flex flex-wrap items-center gap-space-8">
-        <span className="text-sm text-muted-foreground">Demo session:</span>
-        <SegmentedNav aria-label="Demo session role">
+        <span className="text-sm text-muted-foreground">
+          {t("session.demoLabel")}
+        </span>
+        <SegmentedNav aria-label={t("session.roleAria")}>
           {roles.map((role) => (
             <SegmentedNavItem
               key={role}
@@ -168,6 +167,7 @@ function ApplicationCardMutations({
   draftFetcher: ReturnType<typeof useFetcher<SubmitDraftFetcherData>>;
   cancelFetcher: ReturnType<typeof useFetcher<CancelFetcherData>>;
 }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-wrap items-center gap-space-8">
       {canSubmitDraft ? (
@@ -176,8 +176,8 @@ function ApplicationCardMutations({
           <input type="hidden" name="requestId" value={appId} />
           <Button type="submit" size="sm" disabled={busy}>
             {draftFetcher.state !== "idle"
-              ? "Submitting…"
-              : "Submit for approval"}
+              ? t("my-apis.submitting")
+              : t("my-apis.submit")}
           </Button>
         </draftFetcher.Form>
       ) : null}
@@ -187,7 +187,9 @@ function ApplicationCardMutations({
           action={apiMetadataAccessRequestCancel(appId)}
         >
           <Button type="submit" size="sm" variant="outline" disabled={busy}>
-            {cancelFetcher.state !== "idle" ? "Cancelling…" : "Cancel"}
+            {cancelFetcher.state !== "idle"
+              ? t("my-apis.cancelling")
+              : t("my-apis.cancel")}
           </Button>
         </cancelFetcher.Form>
       ) : null}
@@ -202,6 +204,7 @@ function MyApisApplicationCard({
   app: AccessApplicationContract;
   highlighted?: boolean;
 }) {
+  const { t } = useI18n();
   const draftFetcher = useFetcher<SubmitDraftFetcherData>();
   const cancelFetcher = useFetcher<CancelFetcherData>();
   const busy = draftFetcher.state !== "idle" || cancelFetcher.state !== "idle";
@@ -228,7 +231,7 @@ function MyApisApplicationCard({
       <div className="mb-space-8 space-y-space-8">
         {highlighted ? (
           <Badge variant="default" className="w-fit">
-            Just updated
+            {t("my-apis.justUpdated")}
           </Badge>
         ) : null}
         <h2 className="text-type-16 font-semibold text-foreground">
@@ -299,8 +302,7 @@ export function MyApisPanel({
             {t("nav.my-requests")}
           </h1>
           <p className="mt-space-4 text-sm text-muted-foreground">
-            Requester applications and permission status (G1 showcase —
-            in-memory store; not production auth).
+            {t("my-apis.lead")}
           </p>
         </div>
         <SessionRoleSwitcher sessionRole={sessionRole} />
@@ -310,12 +312,12 @@ export function MyApisPanel({
 
       {sessionRole !== "requester" ? (
         <p className="text-sm text-muted-foreground" role="status">
-          Switch to requester to track applications.{" "}
+          {t("my-apis.switch")}{" "}
           <Link
             to="/access-requests/review?sessionRole=owner"
             className={PRODUCT_TABLE_LINK_CLASS}
           >
-            Review queue
+            {t("my-apis.reviewQueue")}
           </Link>
         </p>
       ) : null}
@@ -324,7 +326,7 @@ export function MyApisPanel({
         <Form method="post">
           <input type="hidden" name="intent" value="expire-stale" />
           <Button type="submit" size="sm" variant="outline">
-            Expire stale (demo)
+            {t("my-apis.expire")}
           </Button>
         </Form>
       ) : null}
@@ -334,12 +336,12 @@ export function MyApisPanel({
       ) : applications.length === 0 ? (
         <div data-testid="my-apis-empty-state">
           <EmptyState
-            title="No applications yet"
-            description="Requester applications will appear here once you request access from a metadata asset."
+            title={t("my-apis.empty.title")}
+            description={t("my-apis.empty.desc")}
             action={
               <Button asChild>
                 <Link to="/metadata/tbl-customers">
-                  Request access from a metadata asset
+                  {t("my-apis.empty.action")}
                 </Link>
               </Button>
             }
@@ -375,6 +377,7 @@ function AccessReviewRequestCard({
   app: AccessApplicationContract;
   canReview: boolean;
 }) {
+  const { t } = useI18n();
   const navigation = useNavigation();
   const busy = navigation.state !== "idle";
 
@@ -400,14 +403,14 @@ function AccessReviewRequestCard({
               <input type="hidden" name="requestId" value={app.id} />
               <input type="hidden" name="decision" value="approved" />
               <Button type="submit" size="sm" disabled={busy}>
-                Approve
+                {t("access-review.approve")}
               </Button>
             </Form>
             <Form method="post" className="inline">
               <input type="hidden" name="requestId" value={app.id} />
               <input type="hidden" name="decision" value="denied" />
               <Button type="submit" size="sm" variant="outline" disabled={busy}>
-                Reject
+                {t("access-review.reject")}
               </Button>
             </Form>
             <Form
@@ -442,7 +445,7 @@ function AccessReviewRequestCard({
                 variant="secondary"
                 disabled={busy}
               >
-                Edit
+                {t("access-review.edit")}
               </Button>
             </Form>
           </div>
@@ -480,8 +483,7 @@ export function AccessRequestReviewPanel({
             {t("nav.access-review")}
           </h1>
           <p className="mt-space-4 text-sm text-muted-foreground">
-            Owner/admin pending queue — approve or deny (showcase demo; not
-            production RBAC).
+            {t("access-review.lead")}
           </p>
         </div>
         <SessionRoleSwitcher sessionRole={sessionRole} />
@@ -505,7 +507,7 @@ export function AccessRequestReviewPanel({
 
       {!canReview ? (
         <p className="text-sm text-muted-foreground" role="status">
-          Switch to owner or admin to review.{" "}
+          {t("access-review.switch")}{" "}
           <Link
             to="/my-apis?sessionRole=requester"
             className={PRODUCT_TABLE_LINK_CLASS}
@@ -520,8 +522,8 @@ export function AccessRequestReviewPanel({
       ) : pending.length === 0 ? (
         <div data-testid="access-review-empty-state">
           <EmptyState
-            title="No pending approvals"
-            description="New requests that require human review will show up here."
+            title={t("access-review.empty.title")}
+            description={t("access-review.empty.desc")}
           />
         </div>
       ) : (

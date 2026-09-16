@@ -69,10 +69,16 @@ const MATERIAL_OPTIONS = [
   { value: "bronze", label: "Bronze" },
 ] as const;
 
-function buildResultsDescription(model: MetadataSearchViewModel): string {
+function buildResultsDescription(
+  model: MetadataSearchViewModel,
+  t: (key: string, vars?: Record<string, string>) => string
+): string {
   const { pagination } = model;
-  const parts = [`${pagination.total} asset(s)`];
-  if (model.query) parts.push(`matching “${model.query}”`);
+  const parts = [
+    t("metadata.results.assets", { count: String(pagination.total) }),
+  ];
+  if (model.query)
+    parts.push(t("catalog.results.matching", { query: model.query }));
   if (model.activeType) parts.push(`type=${model.activeType}`);
   if (model.activeMaterial) parts.push(`material=${model.activeMaterial}`);
   if (model.activeStandard) parts.push(`standard=${model.activeStandard}`);
@@ -80,7 +86,12 @@ function buildResultsDescription(model: MetadataSearchViewModel): string {
     parts.push(`productType=${model.activeProductType}`);
   if (model.activeAuctionEligible) parts.push("auctionEligible");
   if (pagination.totalPages > 1) {
-    parts.push(`page ${pagination.page}/${pagination.totalPages}`);
+    parts.push(
+      t("catalog.results.pageOf", {
+        page: String(pagination.page),
+        total: String(pagination.totalPages),
+      })
+    );
   }
   return parts.join(" · ");
 }
@@ -117,11 +128,12 @@ function MetadataPagination({
     auctionEligible?: boolean;
   };
 }) {
+  const { t } = useI18n();
   if (pagination.totalPages <= 1) return null;
   return (
     <nav
       className="flex items-center justify-between gap-space-8"
-      aria-label="Results pagination"
+      aria-label={t("catalog.results.pagination")}
     >
       {pagination.page > 1 ? (
         <Link
@@ -131,13 +143,18 @@ function MetadataPagination({
           })}
           className="text-sm font-medium text-primary hover:underline"
         >
-          Previous
+          {t("catalog.results.prev")}
         </Link>
       ) : (
-        <span className="text-sm text-muted-foreground">Previous</span>
+        <span className="text-sm text-muted-foreground">
+          {t("catalog.results.prev")}
+        </span>
       )}
       <span className="text-xs text-muted-foreground">
-        Page {pagination.page} of {pagination.totalPages}
+        {t("catalog.results.pageOf", {
+          page: String(pagination.page),
+          total: String(pagination.totalPages),
+        })}
       </span>
       {pagination.page < pagination.totalPages ? (
         <Link
@@ -147,10 +164,12 @@ function MetadataPagination({
           })}
           className="text-sm font-medium text-primary hover:underline"
         >
-          Next
+          {t("catalog.results.next")}
         </Link>
       ) : (
-        <span className="text-sm text-muted-foreground">Next</span>
+        <span className="text-sm text-muted-foreground">
+          {t("catalog.results.next")}
+        </span>
       )}
     </nav>
   );
@@ -158,6 +177,7 @@ function MetadataPagination({
 
 export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
   const { t } = useI18n();
+  const allLabel = t("catalog.filters.all");
   const { pagination } = model;
   const base = {
     q: model.query,
@@ -182,10 +202,12 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         title={t("metadata.page.title")}
         extra={
           model.intent === "ai-fallback" ? (
-            <StatusChip status="warning">AI fallback</StatusChip>
+            <StatusChip status="warning">
+              {t("catalog.badge.fallback")}
+            </StatusChip>
           ) : null
         }
-        description="Find tables and APIs in the active context pack, then open a row to request access. Asset rows are not filtered by hallmark — the knowledge bridge is."
+        description={t("metadata.page.lead")}
       />
       {model.facetWarning ? (
         <Callout tone="warning" role="status">
@@ -195,7 +217,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
 
       <Toolbar className="flex-col items-stretch gap-stack-dense">
         <h2 className="text-type-16 font-medium text-foreground">
-          Context pack
+          {t("metadata.pack.title")}
         </h2>
         <Form
           method="post"
@@ -204,12 +226,14 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         >
           <input type="hidden" name="redirectTo" value={redirectTo} />
           <label className="flex flex-1 flex-col gap-space-4 text-sm">
-            <span className="font-medium text-foreground">Active pack</span>
+            <span className="font-medium text-foreground">
+              {t("metadata.pack.active")}
+            </span>
             <Select
               name="packId"
               defaultValue={model.activePackId}
               className="w-full"
-              aria-label="Context pack"
+              aria-label={t("metadata.pack.title")}
               options={model.packs.map((pack) => ({
                 value: pack.id,
                 label: pack.name,
@@ -251,19 +275,21 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
           <Input
             name="q"
             defaultValue={model.query}
-            placeholder="Search metadata… or 925 / 18K"
-            aria-label="Metadata search query"
+            placeholder={t("metadata.search.placeholder")}
+            aria-label={t("metadata.search.aria")}
             className="flex-1"
           />
           <Button type="submit">{t("catalog.search.submit")}</Button>
         </form>
       </Toolbar>
 
-      <div className="space-y-stack-dense" aria-label="Filters">
-        <h2 className="text-type-16 font-medium text-foreground">Filters</h2>
+      <div className="space-y-stack-dense" aria-label={t("catalog.filters")}>
+        <h2 className="text-type-16 font-medium text-foreground">
+          {t("catalog.filters")}
+        </h2>
         <div className="mb-space-16 space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
-            Type
+            {t("catalog.filters.type")}
           </span>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
@@ -276,7 +302,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               })}
               active={!model.activeType}
             >
-              All
+              {allLabel}
             </FacetChip>
             {TYPE_OPTIONS.map((opt) => (
               <FacetChip
@@ -299,7 +325,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         <div className="flex flex-wrap gap-stack">
           <div className="space-y-space-4">
             <span className="text-xs font-medium text-muted-foreground">
-              Material
+              {t("catalog.filters.material")}
             </span>
             <div className="flex flex-wrap gap-space-4">
               <FacetChip
@@ -312,7 +338,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                 })}
                 active={!model.activeMaterial}
               >
-                All
+                {allLabel}
               </FacetChip>
               {MATERIAL_OPTIONS.map((opt) => (
                 <FacetChip
@@ -334,7 +360,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
           </div>
           <div className="space-y-space-4">
             <span className="text-xs font-medium text-muted-foreground">
-              Industry code
+              {t("catalog.filters.standard")}
             </span>
             <div className="flex flex-wrap gap-space-4">
               <FacetChip
@@ -347,7 +373,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                 })}
                 active={!model.activeStandard}
               >
-                All
+                {allLabel}
               </FacetChip>
               {STANDARD_CHIP_CODES.map((code) => (
                 <FacetChip
@@ -377,7 +403,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               })}
               className="text-sm font-medium text-primary hover:underline"
             >
-              Open matching knowledge in catalog →
+              {t("metadata.openCatalog")}
             </Link>
           </div>
         </div>
@@ -386,10 +412,10 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
       {knowledgeHits.length > 0 ? (
         <section className="space-y-stack-dense">
           <h2 className="mb-space-4 text-type-16 font-medium text-foreground">
-            Knowledge bridge
+            {t("metadata.knowledge.title")}
           </h2>
           <p className="mb-space-8 text-type-14 text-muted-foreground">
-            Industry-matched glossary from the active pack.
+            {t("metadata.knowledge.desc")}
           </p>
           <div className="space-y-space-8">
             {knowledgeHits.map((hit) => (
@@ -431,12 +457,12 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
       ) : null}
 
       <ProductResultsShell
-        title="Results"
-        description={buildResultsDescription(model)}
+        title={t("catalog.results")}
+        description={buildResultsDescription(model, t)}
         isLoading={isLoading}
         isEmpty={model.results.length === 0}
         skeletonRows={3}
-        emptyMessage="No assets match your filters."
+        emptyMessage={t("metadata.empty")}
         emptyAction={
           <div className="flex flex-col items-center gap-space-8 sm:flex-row">
             {Boolean(model.activeMaterial) || Boolean(model.activeStandard) ? (
@@ -449,7 +475,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                 })}
                 className="text-sm font-medium text-primary hover:underline"
               >
-                Clear industry filters
+                {t("catalog.results.clearFacets")}
               </Link>
             ) : null}
             <Link
@@ -462,7 +488,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               })}
               className="text-sm font-medium text-primary hover:underline"
             >
-              Try catalog search →
+              {t("metadata.tryCatalog")}
             </Link>
           </div>
         }
@@ -472,7 +498,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
           columns={[
             {
               key: "name",
-              header: "Name",
+              header: t("catalog.col.name"),
               accessor: (row) => (
                 <Link
                   to={`/metadata/${row.id}?pack=${encodeURIComponent(model.activePackId)}`}
@@ -484,16 +510,16 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
             },
             {
               key: "owner",
-              header: "Owner",
+              header: t("catalog.col.owner"),
               accessor: (row) => (
                 <span className="text-muted-foreground">
-                  {row.owner || "Unassigned"}
+                  {row.owner || t("metadata.unassigned")}
                 </span>
               ),
             },
             {
               key: "classification",
-              header: "Class / PII",
+              header: t("catalog.col.class"),
               accessor: (row) => (
                 <StatusChip
                   status={
@@ -509,7 +535,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
             },
             {
               key: "updatedAt",
-              header: "Updated",
+              header: t("catalog.col.updated"),
               accessor: (row) => (
                 <span className="font-mono text-type-12 text-muted-foreground">
                   {row.updatedAt ? row.updatedAt.slice(0, 10) : "—"}
@@ -518,14 +544,14 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
             },
             {
               key: "description",
-              header: "Description",
+              header: t("catalog.col.description"),
               accessor: (row) => (
                 <span className="text-muted-foreground">{row.description}</span>
               ),
             },
             {
               key: "type",
-              header: "Type",
+              header: t("catalog.col.type"),
               align: "right",
               accessor: (row) => (
                 <StatusChip status="info">{row.assetType}</StatusChip>
