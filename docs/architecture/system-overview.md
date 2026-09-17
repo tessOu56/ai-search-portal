@@ -2,6 +2,8 @@
 
 **類型**：reference | **權重**：1
 
+> Ecosystem node: `ai-search-portal`（role: product）— 跨專案關係見 platform-command `dashboards/GRAPH.md`。文件慣例見 platform-command `docs/architecture-doc-convention.md`。
+
 這份文件聚焦於「大型協作」所需的結構與流程。
 
 專案朝向 **兩個方向** 對齊：
@@ -25,6 +27,31 @@
 | **components** | reusable UI（ui / shared / app 子層）           | `app/components/*`                          |
 | **services**   | API / domain access                             | `app/services/*`、`app/shared/*`            |
 | **infra**      | 技術基礎設施（可選）                            | `app/infra/*`（視需求擴充）                 |
+
+分層依賴方向（由外而內，features 不得相依 features、components 不得相依 features）：
+
+```mermaid
+flowchart TB
+  subgraph appShell [app shell]
+    Routes["app/routes, root.tsx, entry.*"]
+  end
+  subgraph features [features]
+    Feat["app/features/* (hooks / server / types)"]
+  end
+  subgraph components [components]
+    Comp["app/components/* (ui / shared / app)"]
+  end
+  subgraph services [services]
+    Svc["app/services/*, app/shared/* (contracts, api, services)"]
+  end
+  subgraph infra [infra optional]
+    Inf["app/infra/* (logger, analytics)"]
+  end
+  Routes --> Feat
+  Feat --> Comp
+  Feat --> Svc
+  Svc --> Inf
+```
 
 ## Tech Stack
 
@@ -56,6 +83,24 @@
 - server-side logic 位於 `app/features/*/*.server.ts`
 - 跨模組協作由 `app/shared/services` 串接
 - LUI 串流由 `app/routes/api.chat.ts` (SSE Resource Route) 提供
+
+核心系統流程：LUI 對話串流（in-process、mock-first、無外部依賴）：
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant R as api.chat.ts (SSE route)
+  participant G as chat-gateway.server
+  participant A as agent-core (in-process mock)
+  U->>R: GET /api/chat?q=...
+  R->>G: pipeLocalAgentCoreToStableSse
+  G->>A: run(query, packId)
+  A-->>G: meta / tool_status / token / final
+  G-->>R: stable SSE events
+  R-->>U: event stream (meta, token, final)
+```
+
+當設定 `AGENT_RUNTIME_URL` 時，改走 `pipeAgentHttpToStableSse`（分散式 agent-runtime）；預設為 in-process mock，無需 secrets。
 
 ## Quality Gates
 

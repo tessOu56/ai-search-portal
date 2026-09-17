@@ -8,28 +8,20 @@
 
 ## 資料流（請求方向）
 
+```mermaid
+flowchart TB
+  UI["UI (Component / Page)"]
+  Rule{"path 在契約 / 對照表內?"}
+  Contract["Contract: Zod schema (app/shared/contracts)"]
+  Test["Test 環境: MSW 攔截 fetch + schema.parse(body)"]
+  Prod["Production / Dev: Remix route handler + schema.parse(body)"]
+  UI -->|"useFetcher(path) 或 shared api client(path)"| Rule
+  Rule -->|yes| Contract
+  Contract --> Test
+  Contract --> Prod
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  UI（Component / Page）                                                  │
-│  僅允許：useFetcher( path ) 或 shared api client( path )                 │
-│  禁止：直接 fetch( 任意 URL )                                            │
-└────────────────────────────────┬────────────────────────────────────────┘
-                                 │ path 必須在契約／對照表內
-                                 ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│  Contract（app/shared/contracts/）                                       │
-│  Zod schema：request / response 定義；單一來源、可 runtime 驗證         │
-└────────────────────────────────┬────────────────────────────────────────┘
-                                 │
-         ┌───────────────────────┴───────────────────────┐
-         ▼                                                 ▼
-┌─────────────────────┐                         ┌─────────────────────────┐
-│  Test 環境          │                         │  Production / Dev       │
-│  MSW 攔截 fetch     │                         │  Remix route handler    │
-│  handler 回傳前     │                         │  回傳前（建議）         │
-│  schema.parse(body) │                         │  schema.parse(body)     │
-└─────────────────────┘                         └─────────────────────────┘
-```
+
+> 禁止在 component 內直接 `fetch(任意 URL)`；一律走 `useFetcher(path)` 或 `app/shared/api`（契約路徑）。
 
 ---
 
