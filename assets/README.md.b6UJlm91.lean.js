@@ -1,0 +1,1 @@
+import{_ as t,o as r,c as a,ae as o}from"./chunks/framework.BX6FPmO9.js";const g=JSON.parse('{"title":"Docs 目錄說明","description":"","frontmatter":{},"headers":[],"relativePath":"README.md","filePath":"README.md"}'),n={name:"README.md"};function i(c,e,l,s,d,h){return r(),a("div",null,[...e[0]||(e[0]=[o("",19)])])}const u=t(n,[["render",i]]);export{g as __pageData,u as default};
