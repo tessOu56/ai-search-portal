@@ -2,14 +2,14 @@ import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   MetaFunction,
-} from "@remix-run/node";
-import { json } from "@remix-run/node";
+} from "react-router";
 import {
+  data,
   Link,
   useActionData,
   useLoaderData,
   useNavigation,
-} from "@remix-run/react";
+} from "react-router";
 
 import { ProductPageShell } from "~/components/shared/product/ProductPageShell";
 import { Button } from "~/components/ui/Button";
@@ -42,24 +42,24 @@ export async function action({ request }: ActionFunctionArgs) {
     const id = String(form.get("requestId") ?? "");
     const updated = submitDraftAccessApplication(id);
     if (!updated.ok) {
-      return json(
+      return data(
         { ok: false as const, text: "Draft not found or already submitted" },
         { status: updated.reason === "invalid_transition" ? 409 : 404 }
       );
     }
-    return json({
+    return data({
       ok: true as const,
       text: `${updated.data.assetName} → ${updated.data.status}`,
     });
   }
   if (intent === "expire-stale") {
     const expired = expireStaleAccessApplications(0);
-    return json({
+    return data({
       ok: true as const,
       text: `Expired ${expired.length} application(s)`,
     });
   }
-  return json({ ok: false as const, text: "Unknown intent" }, { status: 400 });
+  return data({ ok: false as const, text: "Unknown intent" }, { status: 400 });
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -72,7 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const locale = await getLocale(request);
   const translations = getTranslations(locale);
   const canonical = getCanonicalUrl(request);
-  return json({
+  return data({
     sessionRole,
     applications,
     highlightId,

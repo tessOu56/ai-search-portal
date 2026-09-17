@@ -1,11 +1,10 @@
+import { useState } from "react";
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   MetaFunction,
-} from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+} from "react-router";
+import { data, Form, Link, useActionData, useLoaderData } from "react-router";
 
 import {
   ProductPageHeader,
@@ -43,15 +42,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const apiId = params.apiId ?? "";
   const api = getDeveloperApi(apiId);
   if (!api) {
-    return json({ error: "API not found" }, { status: 404 });
+    return data({ error: "API not found" }, { status: 404 });
   }
   const form = await request.formData();
   const operationId = String(form.get("operationId") ?? "");
   const operation = api.operations.find((op) => op.id === operationId);
   if (!operation) {
-    return json({ error: "Unknown operation" }, { status: 400 });
+    return data({ error: "Unknown operation" }, { status: 400 });
   }
-  return json({
+  return data({
     sandbox: true,
     method: operation.method,
     path: operation.path,

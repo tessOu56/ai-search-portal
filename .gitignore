@@ -4,6 +4,7 @@ node_modules/
 # Production
 /build
 /.cache
+.react-router/
 /backend/dist
 /packages/shared-contracts/dist
 /packages/governance-domain/dist

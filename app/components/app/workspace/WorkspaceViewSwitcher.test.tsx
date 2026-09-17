@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { LAST_OVERVIEW_STORAGE_KEY } from "~/lib/workspace-mode";
@@ -12,7 +13,7 @@ const CATALOG_PATH = "/catalog-search";
 const ARIA_CURRENT = "aria-current";
 const nav = vi.hoisted(() => ({ pathname: "/", search: "" }));
 
-vi.mock("@remix-run/react", () => ({
+vi.mock("react-router", () => ({
   Link: ({
     to,
     children,
@@ -20,7 +21,7 @@ vi.mock("@remix-run/react", () => ({
     ...props
   }: {
     to: string;
-    children: React.ReactNode;
+    children: ReactNode;
     onClick?: () => void;
   }) => (
     <a href={to} onClick={onClick} {...props}>

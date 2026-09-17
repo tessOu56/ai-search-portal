@@ -1,5 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 
 import { parsePackIdFromRequest } from "~/services/context-pack.server";
 import { listMetadataAssets } from "~/services/metadata.server";
@@ -18,5 +17,5 @@ export function loader({ request }: LoaderFunctionArgs) {
     packId,
   });
   const body = listMetadataResponseSchema.parse(result);
-  return json(body);
+  return Response.json(body);
 }

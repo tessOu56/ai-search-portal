@@ -1,5 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 
 import {
   parsePackIdFromRequest,
@@ -30,7 +29,10 @@ function parseOptionalEnum<T extends string>(
 }
 
 function invalid(message: string, status = 400) {
-  return { ok: false as const, response: json({ error: message }, { status }) };
+  return {
+    ok: false as const,
+    response: Response.json({ error: message }, { status }),
+  };
 }
 
 function parseEnumOrInvalid<T extends string>(
@@ -157,8 +159,8 @@ export function loader({ request }: LoaderFunctionArgs) {
       auctionEligible: parsedParams.data.auctionEligible,
       limit: parsedParams.data.limit,
     });
-    return json(body);
+    return Response.json(body);
   } catch {
-    return json({ error: "Knowledge search failed" }, { status: 500 });
+    return Response.json({ error: "Knowledge search failed" }, { status: 500 });
   }
 }

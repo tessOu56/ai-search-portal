@@ -1,8 +1,7 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 
 import { getMcpDiscover } from "~/services/mcp-gateway.server";
 
 export function loader(_args: LoaderFunctionArgs) {
-  return json(getMcpDiscover());
+  return Response.json(getMcpDiscover());
 }

@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { WorkspaceSessionProvider } from "./WorkspaceSession";
@@ -7,15 +8,8 @@ import { WorkspaceTopbar } from "./WorkspaceTopbar";
 const APP_TITLE = "Portal";
 const nav = vi.hoisted(() => ({ pathname: "/", search: "" }));
 
-vi.mock("@remix-run/react", () => ({
-  Link: ({
-    to,
-    children,
-    ...props
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => (
+vi.mock("react-router", () => ({
+  Link: ({ to, children, ...props }: { to: string; children: ReactNode }) => (
     <a href={to} {...props}>
       {children}
     </a>

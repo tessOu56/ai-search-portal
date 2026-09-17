@@ -1,5 +1,5 @@
-import type { MetaFunction } from "@remix-run/node";
-import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
+import type { MetaFunction } from "react-router";
+import { isRouteErrorResponse, useRouteError } from "react-router";
 
 import {
   ProductPageHeader,

@@ -1,5 +1,5 @@
-import { Link } from "@remix-run/react";
 import { Compass, Sparkles } from "lucide-react";
+import { Link } from "react-router";
 
 import { SegmentedNav, SegmentedNavItem } from "~/components/ui/SegmentedNav";
 import { ASK_HOME } from "~/lib/workspace-mode";

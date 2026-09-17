@@ -2,17 +2,16 @@ import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   MetaFunction,
-  TypedResponse,
-} from "@remix-run/node";
-import { json } from "@remix-run/node";
+} from "react-router";
 import {
+  data,
   isRouteErrorResponse,
   Link,
   useActionData,
   useLoaderData,
   useNavigation,
   useRouteError,
-} from "@remix-run/react";
+} from "react-router";
 import { z } from "zod";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
@@ -206,7 +205,7 @@ export function loader({ params, request }: LoaderFunctionArgs) {
     buildJsonLdFaqPage(canonical, faqItems),
   ];
 
-  return json({
+  return data({
     asset,
     genUiDocument,
     policyDecision,
@@ -239,24 +238,19 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   ];
 };
 
-type MetadataAccessActionData = {
-  ok: boolean;
-  message: string;
-  status?: AccessRequestLifecycleStatus;
-  requestId?: string;
-};
-
-function actionError(
-  message: string,
-  status: number
-): TypedResponse<MetadataAccessActionData> {
-  return json({ ok: false, message }, { status });
+function actionError(message: string, httpStatus: number) {
+  return data(
+    {
+      ok: false,
+      message,
+      status: undefined as AccessRequestLifecycleStatus | undefined,
+      requestId: undefined as string | undefined,
+    },
+    { status: httpStatus }
+  );
 }
 
-export async function action({
-  params,
-  request,
-}: ActionFunctionArgs): Promise<TypedResponse<MetadataAccessActionData>> {
+export async function action({ params, request }: ActionFunctionArgs) {
   const assetId = params.assetId;
   if (!assetId) {
     return actionError("Missing assetId", 400);
@@ -298,7 +292,7 @@ export async function action({
     return actionError(result.error, result.status);
   }
 
-  return json({
+  return data({
     ok: true,
     message: `Request ${result.data.status} (audit: ${result.data.auditLogged})`,
     status: result.data.status,

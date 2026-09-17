@@ -1,6 +1,6 @@
-import { useNavigation } from "@remix-run/react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
+import { useNavigation } from "react-router";
 
 /**
  * Top navigation progress — transform-based for smooth enter/exit (not jump width).

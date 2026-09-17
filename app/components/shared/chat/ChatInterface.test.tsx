@@ -1,18 +1,11 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { StrictMode } from "react";
+import { type ReactNode, StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ChatInterface } from "./ChatInterface";
 
-vi.mock("@remix-run/react", () => ({
-  Link: ({
-    to,
-    children,
-    ...props
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => (
+vi.mock("react-router", () => ({
+  Link: ({ to, children, ...props }: { to: string; children: ReactNode }) => (
     <a href={to} {...props}>
       {children}
     </a>

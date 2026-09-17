@@ -1,5 +1,4 @@
-import { isRouteErrorResponse } from "@remix-run/react";
-
+import { isRouteErrorResponse } from "react-router";
 /**
  * 統一的錯誤處理工具
  *

@@ -1,5 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 
 import { listPublicIndexPages } from "~/shared/public-index.server";
 import { getOrigin } from "~/shared/seo";
@@ -26,7 +25,7 @@ export function loader({ request }: LoaderFunctionArgs) {
     locale: ["zh-TW", "en"] as const,
   };
 
-  return json(
+  return Response.json(
     { site, pages },
     {
       headers: {

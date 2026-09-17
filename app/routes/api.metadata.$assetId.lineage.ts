@@ -1,5 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 
 import { resolveMetadataLineage } from "~/services/metadata.server";
 import { metadataLineageResponseSchema } from "~/shared/contracts";
@@ -11,7 +10,7 @@ import { resolveActivePackId } from "~/shared/services/context-pack-loader.serve
 export function loader({ request, params }: LoaderFunctionArgs) {
   const assetId = params.assetId;
   if (!assetId || assetId === "access-requests") {
-    return json({ error: "Asset not found" }, { status: 404 });
+    return Response.json({ error: "Asset not found" }, { status: 404 });
   }
 
   const url = new URL(request.url);
@@ -23,7 +22,7 @@ export function loader({ request, params }: LoaderFunctionArgs) {
 
   const lineage = resolveMetadataLineage(assetId, packId);
   if (!lineage) {
-    return json({ error: "Asset not found" }, { status: 404 });
+    return Response.json({ error: "Asset not found" }, { status: 404 });
   }
 
   const body = metadataLineageResponseSchema.parse({
@@ -39,5 +38,5 @@ export function loader({ request, params }: LoaderFunctionArgs) {
       ...(lineage.cycleError ? { cycleError: lineage.cycleError } : {}),
     },
   });
-  return json(body);
+  return Response.json(body);
 }

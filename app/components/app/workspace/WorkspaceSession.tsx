@@ -1,4 +1,3 @@
-import { useLocation, useSearchParams } from "@remix-run/react";
 import {
   createContext,
   type ReactNode,
@@ -8,6 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useLocation, useSearchParams } from "react-router";
 
 import {
   nextLastOverviewHref,

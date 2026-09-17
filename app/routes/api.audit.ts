@@ -1,5 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 
 import { listAuditEvents } from "~/services/audit-log.server";
 import { listAuditEventsResponseSchema } from "~/shared/contracts";
@@ -11,5 +10,5 @@ export function loader({ request }: LoaderFunctionArgs) {
   const limit = Number.isNaN(rawLimit) ? 50 : rawLimit;
 
   const body = listAuditEventsResponseSchema.parse(listAuditEvents(limit));
-  return json(body);
+  return Response.json(body);
 }

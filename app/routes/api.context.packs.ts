@@ -1,5 +1,3 @@
-import { json } from "@remix-run/node";
-
 import {
   listContextPacks,
   resolveContentRoot,
@@ -10,5 +8,5 @@ export function loader() {
   const body = listContextPacksResponseSchema.parse({
     data: listContextPacks(resolveContentRoot()),
   });
-  return json(body);
+  return Response.json(body);
 }

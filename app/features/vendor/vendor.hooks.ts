@@ -1,5 +1,5 @@
-import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
+import { useFetcher } from "react-router";
 
 import {
   API_DISH_VENDORS,
@@ -37,7 +37,7 @@ export function useVendor(id: string | null) {
     isLoading,
     refetch: () => {
       if (id) {
-        fetcher.load(apiVendor(id));
+        void fetcher.load(apiVendor(id));
       }
     },
   };
@@ -59,7 +59,7 @@ export function useVendors() {
     vendors,
     isLoading,
     refetch: () => {
-      fetcher.load(API_VENDORS);
+      void fetcher.load(API_VENDORS);
     },
   };
 }
@@ -78,7 +78,7 @@ export function useVendorsByDishId(dishId: string | null) {
 
   const refetch = () => {
     if (dishId) {
-      fetcher.load(apiDishVendors(dishId));
+      void fetcher.load(apiDishVendors(dishId));
     }
   };
 

@@ -1,5 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 
 import { submitMetadataAccessRequest } from "~/services/access-policy.server";
 import {
@@ -24,12 +23,12 @@ export function loader({ request }: LoaderFunctionArgs) {
     pendingOnly,
   });
   const body = listAccessApplicationsResponseSchema.parse({ data: rows });
-  return json(body);
+  return Response.json(body);
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") {
-    return json({ error: "Method not allowed" }, { status: 405 });
+    return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
   const idempotencyKey = request.headers.get("Idempotency-Key")?.trim();
@@ -44,7 +43,9 @@ export async function action({ request }: ActionFunctionArgs) {
           auditLogged: existing.decision.require_audit,
         },
       });
-      return json(body, { status: existing.status === "draft" ? 201 : 202 });
+      return Response.json(body, {
+        status: existing.status === "draft" ? 201 : 202,
+      });
     }
   }
 
@@ -52,27 +53,30 @@ export async function action({ request }: ActionFunctionArgs) {
   try {
     raw = await request.json();
   } catch {
-    return json({ error: "Invalid JSON payload" }, { status: 400 });
+    return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
   const parsed = metadataAccessRequestSchema.safeParse(raw);
   if (!parsed.success) {
-    return json({ error: "Invalid request body" }, { status: 400 });
+    return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   const result = submitMetadataAccessRequest(parsed.data);
   if (!result.ok) {
     if (result.status === 422) {
-      return json(governanceHitlError(result.error, result.decision), {
+      return Response.json(governanceHitlError(result.error, result.decision), {
         status: 422,
       });
     }
     if (result.status === 403) {
-      return json(governanceDeniedError(result.error, result.decision), {
-        status: 403,
-      });
+      return Response.json(
+        governanceDeniedError(result.error, result.decision),
+        {
+          status: 403,
+        }
+      );
     }
-    return json(
+    return Response.json(
       { error: result.error, decision: result.decision },
       { status: result.status }
     );
@@ -83,5 +87,5 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const body = submitAccessResponseSchema.parse({ data: result.data });
-  return json(body, { status: result.status });
+  return Response.json(body, { status: result.status });
 }

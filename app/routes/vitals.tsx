@@ -1,6 +1,6 @@
 import type { WebVitalName } from "@ai-search-portal/contracts";
-import type { MetaFunction } from "@remix-run/node";
 import { useEffect, useState } from "react";
+import type { MetaFunction } from "react-router";
 
 import {
   ProductPageHeader,

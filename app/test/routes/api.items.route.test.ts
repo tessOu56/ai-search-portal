@@ -1,3 +1,4 @@
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -24,7 +25,7 @@ describe("api.items route — contract enforcement", () => {
         request: new Request(ITEMS_URL),
         params: {},
         context: {},
-      }) as Response
+      } as LoaderFunctionArgs)
     );
     expect(response.status).toBe(200);
     const body = (await response.json()) as { data: unknown[] };
@@ -40,7 +41,7 @@ describe("api.items route — contract enforcement", () => {
       }),
       params: {},
       context: {},
-    });
+    } as ActionFunctionArgs);
     expect(response.status).toBe(405);
   });
 });
@@ -52,7 +53,7 @@ describe("api.items.$itemId route — contract enforcement", () => {
         request: new Request(`${ITEMS_URL}/missing`),
         params: { itemId: "missing" },
         context: {},
-      }) as Response
+      } as unknown as LoaderFunctionArgs)
     );
     expect(response.status).toBe(404);
   });
@@ -64,9 +65,7 @@ describe("api.items.$itemId route — contract enforcement", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: "Nope" }),
       }),
-      params: { itemId: "1" },
-      context: {},
-    });
+    } as unknown as ActionFunctionArgs);
     expect(response.status).toBe(405);
   });
 });
