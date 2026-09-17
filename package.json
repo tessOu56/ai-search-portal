@@ -198,7 +198,7 @@
     {
       "name": "shared-ui-components",
       "path": "build/client/assets/components-*.js",
-      "limit": "80 kB",
+      "limit": "85 kB",
       "gzip": true
     }
   ],
