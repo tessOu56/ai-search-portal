@@ -1,5 +1,5 @@
 {
-  "framework": "remix",
+  "framework": "react-router",
   "regions": ["hkg1"],
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm run build",

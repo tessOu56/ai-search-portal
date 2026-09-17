@@ -37,7 +37,7 @@
 - [doc-todo-governance](conventions/doc-todo-governance.md) — 文件同步與 CR TODO 治理流程 【spec／1】
 - [doc-naming](conventions/doc-naming.md) — 文件命名與權重定義 【reference／2】
 - [git-version-control](conventions/git-version-control.md) — Commit、git rm、空資料夾 【spec／1】
-- [packages-react](conventions/packages-react.md) — React 18 基準、套件 peer 對照 【reference／2】
+- [packages-react](conventions/packages-react.md) — React 19 基準、套件 peer 對照 【reference／2】
 - [mock-dataset-versioning](conventions/mock-dataset-versioning.md) — Mock dataset v1/v2、MIGRATION 【reference／2】
 - [error-handling](conventions/error-handling.md) — 錯誤與邊界處理、契約 error schema 【reference／2】
 - [eslint-remix-deprecation](conventions/eslint-remix-deprecation.md) — Remix ESLint 棄用說明與遷移建議 【reference／3】

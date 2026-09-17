@@ -1,6 +1,6 @@
-import { Link } from "@remix-run/react";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router";
 
 import { ChatInterface } from "~/components/shared/chat/ChatInterface";
 import { Button } from "~/components/ui/Button";

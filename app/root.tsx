@@ -3,8 +3,8 @@ import "./tailwind.css";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { type ReactNode, useEffect } from "react";
+import type { LinksFunction, LoaderFunctionArgs } from "react-router";
 import {
   Links,
   Meta,
@@ -13,8 +13,7 @@ import {
   ScrollRestoration,
   useRouteError,
   useRouteLoaderData,
-} from "@remix-run/react";
-import { useEffect } from "react";
+} from "react-router";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { AppChrome } from "~/components/app/workspace";
@@ -65,7 +64,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   } catch {
     // package.json 讀取失敗時使用預設版號，不中斷啟動
   }
-  return json({ locale, translations, version });
+  return { locale, translations, version };
 }
 
 type RootData = {
@@ -74,7 +73,7 @@ type RootData = {
   version: string;
 };
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: { children: ReactNode }) {
   const data = useRouteLoaderData("root") as RootData | undefined;
   const locale = data?.locale ?? "zh-TW";
 

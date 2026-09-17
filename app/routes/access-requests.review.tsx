@@ -2,14 +2,14 @@ import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   MetaFunction,
-} from "@remix-run/node";
-import { json } from "@remix-run/node";
+} from "react-router";
 import {
+  data,
   Link,
   useActionData,
   useLoaderData,
   useNavigation,
-} from "@remix-run/react";
+} from "react-router";
 
 import { ProductPageShell } from "~/components/shared/product/ProductPageShell";
 import { Button } from "~/components/ui/Button";
@@ -76,7 +76,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const locale = await getLocale(request);
   const translations = getTranslations(locale);
   const canonical = getCanonicalUrl(request);
-  return json({
+  return data({
     sessionRole,
     pending,
     title: t(translations, ACCESS_REVIEW_TITLE_KEY),
@@ -101,7 +101,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const form = await request.formData();
   const { requestId, parsed } = parseReviewForm(form);
   if (!requestId || !parsed.success) {
-    return json(
+    return data(
       { ok: false as const, text: "Invalid review payload" },
       { status: 400 }
     );
@@ -120,7 +120,7 @@ export async function action({ request }: ActionFunctionArgs) {
         });
 
   if (!updated.ok) {
-    return json(
+    return data(
       {
         ok: false as const,
         text:
@@ -150,7 +150,7 @@ export async function action({ request }: ActionFunctionArgs) {
     reasons: [`review:${parsed.data.decision}`],
   });
 
-  return json({
+  return data({
     ok: true as const,
     text:
       parsed.data.decision === "edited"

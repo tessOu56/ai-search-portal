@@ -1,5 +1,5 @@
 import { chatQueryParamsSchema } from "@ai-search-portal/contracts";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 import { eventStream } from "remix-utils/sse/server";
 
 import {

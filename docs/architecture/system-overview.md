@@ -55,7 +55,7 @@ flowchart TB
 
 ## Tech Stack
 
-- Remix v2 + React 18
+- React Router 7 Framework Mode + React 19
 - TypeScript
 - Vite
 - Tailwind CSS

@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { Button } from "~/components/ui/Button";

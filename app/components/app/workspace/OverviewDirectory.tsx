@@ -1,4 +1,4 @@
-import { Link, useLocation, useSearchParams } from "@remix-run/react";
+import { Link, useLocation, useSearchParams } from "react-router";
 
 import { SideNav, SideNavItem, SideNavSection } from "~/components/ui/SideNav";
 import {

@@ -1,17 +1,11 @@
 import { render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { HomeIntro } from "./HomeIntro";
 
-vi.mock("@remix-run/react", () => ({
-  Link: ({
-    to,
-    children,
-    ...props
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => (
+vi.mock("react-router", () => ({
+  Link: ({ to, children, ...props }: { to: string; children: ReactNode }) => (
     <a href={to} {...props}>
       {children}
     </a>

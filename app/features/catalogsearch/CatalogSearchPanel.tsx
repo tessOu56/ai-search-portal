@@ -2,8 +2,8 @@ import {
   INDUSTRY_STANDARD_REGISTRY,
   listIndustryStandards,
 } from "@ai-search-portal/contracts";
-import { Link, useNavigation } from "@remix-run/react";
 import type { ReactNode } from "react";
+import { Link, useNavigation } from "react-router";
 
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";

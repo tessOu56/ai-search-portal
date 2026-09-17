@@ -1,5 +1,5 @@
-import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
+import { useFetcher } from "react-router";
 
 import { API_INGREDIENTS, apiIngredient } from "~/shared/api/paths";
 import { submitFormPayload } from "~/shared/api/submitPayload";
@@ -31,7 +31,7 @@ export function useIngredient(id: string | null) {
     isLoading,
     refetch: () => {
       if (id) {
-        fetcher.load(apiIngredient(id));
+        void fetcher.load(apiIngredient(id));
       }
     },
   };
@@ -53,7 +53,7 @@ export function useIngredients() {
     ingredients,
     isLoading,
     refetch: () => {
-      fetcher.load(API_INGREDIENTS);
+      void fetcher.load(API_INGREDIENTS);
     },
   };
 }

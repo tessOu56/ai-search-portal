@@ -17,7 +17,7 @@
 
 ## 技術棧與架構要點
 
-- **框架**：Remix v2 (Vite) + React 18 + TypeScript
+- **框架**：React Router 7 Framework Mode (Vite 5) + React 19 + TypeScript
 - **UI**：Tailwind CSS、Radix（Shadcn 風格元件）、Lucide
 - **資料層**：目前以 **in-memory mock** 與 **檔案型資料**（如 `content/release-notes.json`）為主，無需連線外部 API 即可運行
 - **跨模組**：`app/shared/services/domain.server.ts` 為唯一跨 feature 查詢層（Dish / Ingredient / Recipe / Vendor）

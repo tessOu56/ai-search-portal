@@ -1,5 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 
 import {
   getReleaseNoteByVersion,
@@ -18,9 +17,9 @@ export function loader({ request }: LoaderFunctionArgs) {
   if (version) {
     const note = getReleaseNoteByVersion(version);
     if (!note) {
-      return json({ error: "Not found", version }, { status: 404 });
+      return Response.json({ error: "Not found", version }, { status: 404 });
     }
-    return json(note, {
+    return Response.json(note, {
       headers: {
         "Cache-Control": "public, max-age=300",
       },
@@ -28,7 +27,7 @@ export function loader({ request }: LoaderFunctionArgs) {
   }
 
   const notes = getReleaseNotes();
-  return json(
+  return Response.json(
     { releases: notes },
     {
       headers: {

@@ -4,14 +4,14 @@ import { describe, expect, it, vi } from "vitest";
 
 import { HomeLanding } from "./HomeLanding";
 
-vi.mock("@remix-run/react", () => ({
+vi.mock("react-router", () => ({
   Link: ({
     to,
     children,
     ...props
   }: {
     to: string;
-    children: React.ReactNode;
+    children: ReactNode;
     className?: string;
   }) => (
     <a href={to} {...props}>

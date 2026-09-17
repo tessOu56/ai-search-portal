@@ -1,29 +1,14 @@
-import { vitePlugin as remix } from "@remix-run/dev";
-import { installGlobals } from "@remix-run/node";
-import { vercelPreset } from "@vercel/remix/vite";
+import { reactRouter } from "@react-router/dev/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-
-installGlobals({ nativeFetch: true });
 
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test" || process.env.VITEST;
   return {
     plugins: [
-      // Remix plugin 在 test 時不啟用，避免 app/test/setup.ts 引用 msw/server 觸發 server-only 檢查
-      ...(isTest
-        ? []
-        : [
-            remix({
-              presets: process.env.VERCEL ? [vercelPreset()] : [],
-              ignoredRouteFiles: ["**/.*", "**/*.test.*", "**/*.spec.*"],
-              future: {
-                v3_fetcherPersist: true,
-                v3_relativeSplatPath: true,
-                v3_throwAbortReason: true,
-              },
-            }),
-          ]),
+      // React Router plugin is disabled in test so app/test/setup.ts can import
+      // msw/server without triggering the framework server-only check.
+      ...(isTest ? [] : [reactRouter()]),
       tsconfigPaths(),
     ],
     // @is_tess/components dist uses extensionless `./ux` re-exports that Node ESM
@@ -51,5 +36,3 @@ export default defineConfig(({ mode }) => {
     },
   };
 });
-
-

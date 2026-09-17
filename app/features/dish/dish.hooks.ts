@@ -1,5 +1,5 @@
-import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
+import { useFetcher } from "react-router";
 
 import { API_DISHES, apiDish, apiDishSearch } from "~/shared/api/paths";
 import { submitFormPayload } from "~/shared/api/submitPayload";
@@ -27,7 +27,7 @@ export function useDish(id: string | null) {
     isLoading,
     refetch: () => {
       if (id) {
-        fetcher.load(apiDish(id));
+        void fetcher.load(apiDish(id));
       }
     },
   };
@@ -49,7 +49,7 @@ export function useDishes() {
     dishes,
     isLoading,
     refetch: () => {
-      fetcher.load(API_DISHES);
+      void fetcher.load(API_DISHES);
     },
   };
 }
@@ -123,7 +123,7 @@ export function useSearchDishes() {
   const fetcher = useFetcher<{ dishes: Dish[] }>();
 
   const searchDishes = (query: string) => {
-    fetcher.load(apiDishSearch(query));
+    void fetcher.load(apiDishSearch(query));
   };
 
   const dishes = useMemo(() => {

@@ -1,5 +1,5 @@
-import { useFetcher } from "@remix-run/react";
 import { useMemo } from "react";
+import { useFetcher } from "react-router";
 
 import { API_RECIPES, apiDishRecipes, apiRecipe } from "~/shared/api/paths";
 import { submitFormPayload } from "~/shared/api/submitPayload";
@@ -30,7 +30,7 @@ export function useRecipe(id: string | null) {
     isLoading,
     refetch: () => {
       if (id) {
-        fetcher.load(apiRecipe(id));
+        void fetcher.load(apiRecipe(id));
       }
     },
   };
@@ -52,7 +52,7 @@ export function useRecipes() {
     recipes,
     isLoading,
     refetch: () => {
-      fetcher.load(API_RECIPES);
+      void fetcher.load(API_RECIPES);
     },
   };
 }
@@ -71,7 +71,7 @@ export function useRecipesByDishId(dishId: string | null) {
 
   const refetch = () => {
     if (dishId) {
-      fetcher.load(apiDishRecipes(dishId));
+      void fetcher.load(apiDishRecipes(dishId));
     }
   };
 

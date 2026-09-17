@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -9,14 +10,14 @@ import { listMetadataAssets } from "~/services/metadata.server";
 
 import { MetadataSearchPanel } from "./MetadataSearchPanel";
 
-vi.mock("@remix-run/react", () => ({
+vi.mock("react-router", () => ({
   Link: ({
     to,
     children,
     ...props
   }: {
     to: string;
-    children: React.ReactNode;
+    children: ReactNode;
     className?: string;
   }) => (
     <a href={to} {...props}>
@@ -27,7 +28,7 @@ vi.mock("@remix-run/react", () => ({
     children,
     ...props
   }: {
-    children: React.ReactNode;
+    children: ReactNode;
     method?: string;
     action?: string;
     className?: string;

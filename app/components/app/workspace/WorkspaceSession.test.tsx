@@ -12,7 +12,7 @@ const CATALOG_PATH = "/catalog-search";
 const RETURN_TEST_ID = "overview-return";
 const nav = vi.hoisted(() => ({ pathname: "/", search: "" }));
 
-vi.mock("@remix-run/react", () => ({
+vi.mock("react-router", () => ({
   useLocation: () => ({ pathname: nav.pathname, search: nav.search }),
   useSearchParams: () => [
     new URLSearchParams(

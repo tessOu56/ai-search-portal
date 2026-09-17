@@ -1,5 +1,4 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { ActionFunctionArgs } from "react-router";
 
 import {
   editAccessApplication,
@@ -29,29 +28,29 @@ function reviewAuditAction(decision: "edited" | "approved" | "denied") {
 
 export async function action({ request, params }: ActionFunctionArgs) {
   if (request.method !== "POST") {
-    return json({ error: "Method not allowed" }, { status: 405 });
+    return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
   const requestId = params.requestId;
   if (!requestId) {
-    return json({ error: "Missing requestId" }, { status: 400 });
+    return Response.json({ error: "Missing requestId" }, { status: 400 });
   }
 
   let raw: unknown;
   try {
     raw = await request.json();
   } catch {
-    return json({ error: "Invalid JSON payload" }, { status: 400 });
+    return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
   const parsed = reviewAccessRequestSchema.safeParse(raw);
   if (!parsed.success) {
-    return json({ error: "Invalid request body" }, { status: 400 });
+    return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   const current = getAccessApplication(requestId);
   if (!current) {
-    return json(
+    return Response.json(
       governancePolicyErrorSchema.parse({
         error: "Access request not found",
         code: "NOT_FOUND",
@@ -74,7 +73,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   if (!updated.ok) {
     if (updated.reason === "not_found") {
-      return json(
+      return Response.json(
         governancePolicyErrorSchema.parse({
           error: "Access request not found",
           code: "NOT_FOUND",
@@ -82,7 +81,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         { status: 404 }
       );
     }
-    return json(
+    return Response.json(
       governanceInvalidTransitionError(
         `Cannot ${parsed.data.decision} when status is ${current.status}`
       ),
@@ -106,7 +105,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   const body = reviewAccessResponseSchema.parse({ data: updated.data });
-  return json(body);
+  return Response.json(body);
 }
 
 /** Stable HITL error shape helper for callers. */

@@ -1,6 +1,6 @@
 import { listIndustryStandards } from "@ai-search-portal/contracts";
-import { Form, Link, useNavigation } from "@remix-run/react";
 import type { ReactNode } from "react";
+import { Form, Link, useNavigation } from "react-router";
 
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";

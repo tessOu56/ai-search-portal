@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/Alert";

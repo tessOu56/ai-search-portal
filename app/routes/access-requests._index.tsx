@@ -1,5 +1,4 @@
-import { type LoaderFunctionArgs, redirect } from "@remix-run/node";
-
+import { type LoaderFunctionArgs, redirect } from "react-router";
 /**
  * Bare `/access-requests` is not a surface. Journey C review lives at
  * `/access-requests/review`. Preserve query (e.g. sessionRole) so demo

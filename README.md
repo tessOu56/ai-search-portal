@@ -34,7 +34,7 @@ Also: `/` (golden chat with offline fixture), `/catalog-search/dictionary` (virt
 
 ## Stack
 
-- Remix v2 + React 18 + TypeScript + Vite
+- React Router 7 Framework Mode + React 19 + TypeScript + Vite 5
 - Tailwind CSS
 - Deploy: Vercel (or any Node host / Docker)
 

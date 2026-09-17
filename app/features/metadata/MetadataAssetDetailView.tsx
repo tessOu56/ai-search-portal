@@ -1,6 +1,6 @@
 import { FormField } from "@is_tess/components";
-import { Link, useFetcher, useSearchParams, useSubmit } from "@remix-run/react";
 import { useRef } from "react";
+import { Link, useFetcher, useSearchParams, useSubmit } from "react-router";
 
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { GenUiRenderer } from "~/components/shared/genui";
@@ -162,7 +162,7 @@ function AccessContextForm({
   const aiFillParam = searchParams.get("aiFill");
 
   function submitContext() {
-    if (formRef.current) submit(formRef.current, { method: "get" });
+    if (formRef.current) void submit(formRef.current, { method: "get" });
   }
 
   return (

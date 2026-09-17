@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "@remix-run/react";
+import { Outlet, useLocation } from "react-router";
 
 import { ProductPageShell } from "~/components/shared/product/ProductPageShell";
 import { OVERVIEW_HOME } from "~/lib/workspace-mode";

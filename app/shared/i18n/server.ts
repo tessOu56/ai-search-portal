@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-import { createCookie } from "@remix-run/node";
+import { createCookie } from "react-router";
 
 const LOCALE_COOKIE = "locale";
 const DEFAULT_LOCALE = "zh-TW";

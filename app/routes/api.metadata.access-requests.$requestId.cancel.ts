@@ -1,5 +1,4 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { ActionFunctionArgs } from "react-router";
 
 import {
   cancelAccessApplication,
@@ -19,12 +18,12 @@ import {
  */
 export async function action({ request, params }: ActionFunctionArgs) {
   if (request.method !== "POST") {
-    return json({ error: "Method not allowed" }, { status: 405 });
+    return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
   const requestId = params.requestId;
   if (!requestId) {
-    return json({ error: "Missing requestId" }, { status: 400 });
+    return Response.json({ error: "Missing requestId" }, { status: 400 });
   }
 
   let raw: unknown = {};
@@ -33,18 +32,18 @@ export async function action({ request, params }: ActionFunctionArgs) {
     try {
       raw = await request.json();
     } catch {
-      return json({ error: "Invalid JSON payload" }, { status: 400 });
+      return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
     }
   }
 
   const parsed = cancelAccessRequestSchema.safeParse(raw);
   if (!parsed.success) {
-    return json({ error: "Invalid request body" }, { status: 400 });
+    return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   const current = getAccessApplication(requestId);
   if (!current) {
-    return json(
+    return Response.json(
       governancePolicyErrorSchema.parse({
         error: "Access request not found",
         code: "NOT_FOUND",
@@ -55,7 +54,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const updated = cancelAccessApplication({ id: requestId });
   if (!updated.ok) {
-    return json(
+    return Response.json(
       governanceInvalidTransitionError(
         `Cannot cancel when status is ${current.status}`
       ),
@@ -74,5 +73,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     reasons: [parsed.data.reason ?? "requester_cancelled"],
   });
 
-  return json(cancelAccessResponseSchema.parse({ data: updated.data }));
+  return Response.json(
+    cancelAccessResponseSchema.parse({ data: updated.data })
+  );
 }

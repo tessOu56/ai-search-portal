@@ -8,7 +8,7 @@
 
 ## 1. 「v7」指的是什麼？
 
-- **現況**：專案使用 **Remix v2**（`@remix-run/*` ^2.17.2），底層是 React Router v6。
+- **現況（T-2026-287 spike, 2026-09-17）**：專案改為 **React Router v7 Framework Mode**（Remix 3 改名）+ **React 19.2**。RSC 仍不是生產路徑。Vite 5 / Tailwind 3 不在本票。
 - **v7**：**React Router v7** = Remix 團隊將 Remix 併入 React Router 後的下一版；路由、data loading、actions 等概念延續，但套件與部分 API 會變。
 - 因此「升級到 v7」= 從 **Remix v2 遷移到 React Router v7**（即「Remix 作為 React Router 的完整版」）。
 

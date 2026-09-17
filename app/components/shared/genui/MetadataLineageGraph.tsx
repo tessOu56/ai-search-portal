@@ -1,5 +1,4 @@
-import { Link } from "@remix-run/react";
-
+import { Link } from "react-router";
 export type MetadataLineageGraphProps = {
   nodes: { id: string; label: string; type: string }[];
   edges: { source: string; target: string }[];

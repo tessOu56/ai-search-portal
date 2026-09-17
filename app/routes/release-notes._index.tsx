@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Link, useLoaderData, useRouteLoaderData } from "@remix-run/react";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
+import { Link, useLoaderData, useRouteLoaderData } from "react-router";
 
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { EmptyState } from "~/components/ui/EmptyState";

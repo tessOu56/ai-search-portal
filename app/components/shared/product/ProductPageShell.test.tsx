@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { OVERVIEW_HOME } from "~/lib/workspace-mode";
@@ -18,15 +19,8 @@ vi.mock("~/lib/workspace-mode", async (importOriginal) => {
   };
 });
 
-vi.mock("@remix-run/react", () => ({
-  Link: ({
-    to,
-    children,
-    ...props
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => (
+vi.mock("react-router", () => ({
+  Link: ({ to, children, ...props }: { to: string; children: ReactNode }) => (
     <a href={to} {...props}>
       {children}
     </a>

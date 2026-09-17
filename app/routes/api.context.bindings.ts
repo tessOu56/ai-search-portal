@@ -1,5 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 
 import { parsePackIdFromRequest } from "~/services/context-pack.server";
 import { resolveBindingsForPack } from "~/services/domain-binding.server";
@@ -11,5 +10,5 @@ export function loader({ request }: LoaderFunctionArgs) {
   const packId = parsePackIdFromRequest(request);
   const data = resolveBindingsForPack(packId, contextRef);
   const body = getContextBindingsResponseSchema.parse({ data });
-  return json(body);
+  return Response.json(body);
 }

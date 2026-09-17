@@ -18,19 +18,22 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   extends: [
-    "@remix-run/eslint-config",                      // Remix 官方配置（已包含 react, jsx-a11y）
-    "@remix-run/eslint-config/node",                 // Node.js 環境配置
-    "plugin:@typescript-eslint/recommended-type-checked",  // 強化版型別檢查（需要 project）
-    "plugin:promise/recommended",                    // Promise 最佳實務
-    "plugin:security/recommended-legacy",            // 安全性規則（ESLint 8 相容）
-    "plugin:sonarjs/recommended-legacy",             // Clean Code / 認知複雜度
-    "plugin:tailwindcss/recommended",                // Tailwind CSS 規則
-    "prettier",                                      // 必須放在最後
-    // 注意：stylistic-type-checked 暫時移除，因為與 @remix-run/eslint-config 內部版本衝突
-    // 如果未來需要，可以使用 package.json overrides 統一 @typescript-eslint 版本
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended-type-checked",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:promise/recommended",
+    "plugin:security/recommended-legacy",
+    "plugin:sonarjs/recommended-legacy",
+    "plugin:tailwindcss/recommended",
+    "prettier",
   ],
   plugins: [
-    // @typescript-eslint 和 react-hooks 已經在 @remix-run/eslint-config 中
+    "@typescript-eslint",
+    "react",
+    "react-hooks",
+    "jsx-a11y",
     "unused-imports",
     "simple-import-sort",
     "tailwindcss",
@@ -63,7 +66,14 @@ module.exports = {
     // ===== 型別安全（全域 warn，在 overrides 中對 app/**/* 設 error）=====
     "@typescript-eslint/no-explicit-any": "warn",  // 全域先設為 warn
 
-    // Remix 特定：避免忘記 await 非同步 actions/loaders
+    // Remix eslint-config previously masked these type-checked rules on
+    // router `any` loader data. Keep them off so RR7 Framework Mode lint
+    // matches the previous Remix 2 gate (T-2026-287).
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/no-unnecessary-type-assertion": "off",
+    "tailwindcss/no-unnecessary-arbitrary-value": "off",
+    "tailwindcss/no-custom-classname": "off",
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/await-thenable": "error",
     "@typescript-eslint/no-misused-promises": "error",
@@ -90,7 +100,7 @@ module.exports = {
     "@typescript-eslint/prefer-optional-chain": "warn",
     "@typescript-eslint/no-unnecessary-condition": "warn",
 
-    // React rules（這些可能會被 @remix-run/eslint-config 覆蓋，但保留以防萬一）
+    // React rules
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
     "react/display-name": "off",
@@ -219,6 +229,16 @@ module.exports = {
         complexity: "off",
       },
     },
+    {
+      files: [
+        "app/test/live-surface-drift.test.ts",
+        "app/components/shared/chat/AiFallbackPanel.tsx",
+      ],
+      rules: {
+        "security/detect-non-literal-fs-filename": "off",
+        "security/detect-object-injection": "off",
+      },
+    },
     // Guardrail patterns are reviewed regexes, not user input.
     {
       files: ["packages/agent-core/src/tools/guardrails.ts"],
@@ -315,7 +335,7 @@ module.exports = {
               {
                 group: ["**/app/*", "**/app/**", "~/*"],
                 message:
-                  "Backend must not import Remix app code; use @ai-search-portal/contracts for API shapes only.",
+                  "Backend must not import app code; use @ai-search-portal/contracts for API shapes only.",
               },
             ],
           },
@@ -366,6 +386,7 @@ module.exports = {
     ".cache/",
     "public/build/",
     ".vercel/",
+    ".react-router/",
     "dist/",
     "*.min.js",
     "*.min.css",

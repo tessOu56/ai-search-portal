@@ -1,3 +1,4 @@
+import type { LoaderFunctionArgs } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { loader as knowledgeSearchLoader } from "~/routes/api.knowledge.search";
@@ -10,8 +11,8 @@ async function callLoader(url: string): Promise<Response> {
     request: new Request(url),
     params: {},
     context: {},
-  });
-  return Promise.resolve(result as Response);
+  } as LoaderFunctionArgs);
+  return Promise.resolve(result);
 }
 
 describe("api.knowledge.search — non-success paths", () => {

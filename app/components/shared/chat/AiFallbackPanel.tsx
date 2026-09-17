@@ -2,7 +2,7 @@ import {
   inferIndustryFacetsFromText,
   listIndustryStandards,
 } from "@ai-search-portal/contracts";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
 import { Button } from "~/components/ui/Button";
 import { Panel } from "~/components/ui/Panel";

@@ -1,11 +1,11 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { useCallback, useEffect, useState } from "react";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 import {
   Link,
   useLoaderData,
   useRouteError,
   useSearchParams,
-} from "@remix-run/react";
-import { useCallback, useEffect, useState } from "react";
+} from "react-router";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { HomeIntro } from "~/components/app/home/HomeIntro";

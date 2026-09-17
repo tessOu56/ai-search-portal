@@ -1,24 +1,17 @@
 import { render, screen } from "@testing-library/react";
-import { forwardRef } from "react";
+import { forwardRef, type ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { DashboardView } from "./DashboardView";
 import { WorkspaceSessionProvider } from "./WorkspaceSession";
 
-vi.mock("@remix-run/react", () => ({
-  Link: ({
-    to,
-    children,
-    ...props
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => (
+vi.mock("react-router", () => ({
+  Link: ({ to, children, ...props }: { to: string; children: ReactNode }) => (
     <a href={to} {...props}>
       {children}
     </a>
   ),
-  Form: forwardRef<HTMLFormElement, { children: React.ReactNode }>(
+  Form: forwardRef<HTMLFormElement, { children: ReactNode }>(
     ({ children }, ref) => <form ref={ref}>{children}</form>
   ),
   useRouteLoaderData: () => ({ locale: "en", version: "0.0.0" }),

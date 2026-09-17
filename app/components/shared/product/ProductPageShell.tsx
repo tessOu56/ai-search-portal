@@ -1,6 +1,6 @@
-import { Link, useNavigate } from "@remix-run/react";
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
+import { Link, useNavigate } from "react-router";
 
 import { Button } from "~/components/ui/Button";
 import { Container } from "~/components/ui/Container";
@@ -56,10 +56,10 @@ export function ProductPageShell({
               className="gap-inline px-space-8"
               onClick={() => {
                 if (canGoBackFromHistory()) {
-                  navigate(-1);
+                  void navigate(-1);
                   return;
                 }
-                navigate(fallback);
+                void navigate(fallback);
               }}
             >
               <ArrowLeft className="size-4" aria-hidden />
