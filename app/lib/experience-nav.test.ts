@@ -10,6 +10,10 @@ describe("experience nav", () => {
     expect(hrefs.some((href) => href.includes("/new"))).toBe(false);
     expect(hrefs.some((href) => href.includes(":"))).toBe(false);
     expect(hrefs.some((href) => href.includes("site-map"))).toBe(false);
+    expect(hrefs.some((href) => href === "/access-requests")).toBe(false);
+    expect(
+      hrefs.some((href) => href.startsWith("/access-requests/review"))
+    ).toBe(true);
   });
 
   it("highlights the longest matching list destination for a detail URL", () => {

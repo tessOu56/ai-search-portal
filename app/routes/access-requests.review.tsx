@@ -26,15 +26,13 @@ import {
   governanceSessionRoleSchema,
   reviewAccessRequestSchema,
 } from "~/shared/contracts";
+import { getLocale, getTranslations } from "~/shared/i18n";
 import { useI18n } from "~/shared/i18n/context";
+import { t } from "~/shared/i18n/server";
+import { buildSeoMeta, getCanonicalUrl, getSeoFromLoader } from "~/shared/seo";
 
-export const meta: MetaFunction = () => [
-  { title: "Access review · Portal" },
-  {
-    name: "description",
-    content: "Owner and admin pending access request queue.",
-  },
-];
+const ACCESS_REVIEW_TITLE_KEY = "nav.access-review";
+const ACCESS_REVIEW_DESCRIPTION_KEY = "access-review.page.description";
 
 function resolveSessionRole(raw: string | null): GovernanceSessionRole {
   const parsed = governanceSessionRoleSchema.safeParse(raw);
@@ -70,13 +68,34 @@ function auditActionFor(decision: "edited" | "approved" | "denied") {
     : ("access_request.deny" as const);
 }
 
-export function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   expireStaleAccessApplications();
   const url = new URL(request.url);
   const sessionRole = resolveSessionRole(url.searchParams.get("sessionRole"));
   const pending = listAccessApplications({ pendingOnly: true });
-  return json({ sessionRole, pending });
+  const locale = await getLocale(request);
+  const translations = getTranslations(locale);
+  const canonical = getCanonicalUrl(request);
+  return json({
+    sessionRole,
+    pending,
+    title: t(translations, ACCESS_REVIEW_TITLE_KEY),
+    description: t(translations, ACCESS_REVIEW_DESCRIPTION_KEY),
+    canonical,
+    locale: locale.replace("-", "_"),
+  });
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  const seo = getSeoFromLoader(data);
+  return buildSeoMeta({
+    title: seo.title,
+    description: seo.description,
+    canonical: seo.canonical,
+    locale: seo.locale,
+    type: "website",
+  });
+};
 
 export async function action({ request }: ActionFunctionArgs) {
   const form = await request.formData();
@@ -148,7 +167,7 @@ export default function AccessRequestsReviewRoute() {
   const actionMessage = useActionData<typeof action>();
   const navigation = useNavigation();
   return (
-    <ProductPageShell current={t("nav.access-review")}>
+    <ProductPageShell current={t(ACCESS_REVIEW_TITLE_KEY)}>
       <AccessRequestReviewPanel
         pending={pending}
         sessionRole={sessionRole}
@@ -163,18 +182,17 @@ export default function AccessRequestsReviewRoute() {
 export function ErrorBoundary() {
   const { t } = useI18n();
   return (
-    <ProductPageShell current={t("nav.access-review")}>
+    <ProductPageShell current={t(ACCESS_REVIEW_TITLE_KEY)}>
       <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
         <h1 className="text-lg font-semibold text-destructive">
           {t("access-review.error.title")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Something went wrong while loading the pending queue. Reloading
-          usually recovers.
+          {t("access-review.error.body")}
         </p>
         <Button asChild>
           <Link to="/access-requests/review?sessionRole=owner">
-            Reset and retry
+            {t("access-review.error.retry")}
           </Link>
         </Button>
       </div>

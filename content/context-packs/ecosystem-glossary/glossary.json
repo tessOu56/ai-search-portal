@@ -367,7 +367,7 @@
   {
     "id": "eco-milestone-gate",
     "term": "Milestone gate (phase gate, 過門)",
-    "definition": "進入下一階段前必須通過的檢核點。 Ecosystem mapping (mapped): staff-showcase-masterplan Gate 0/1…；「過門判定」.",
+    "definition": "進入下一階段前必須通過的檢核點。 Ecosystem mapping (mapped): planning/milestones/current.yaml；staff-showcase-masterplan Gate 0/1…；「過門判定」.",
     "relatedAssetIds": [
       "eco-definition-of-done",
       "eco-retrospective",
@@ -388,10 +388,10 @@
   {
     "id": "eco-mirror",
     "term": "Mirror repo (鏡像)",
-    "definition": "Read-only copy synced from a source for display/backup; do not edit the copy as SSOT. (Private orchestration notes may track sync jobs; do not name employer mirrors in public docs.)",
+    "definition": "由源頭同步產生的唯讀展示/備份副本，不直接修改。 Ecosystem mapping (mapped): able mirrors（nightly sync）、nx → vue/angular sandbox（sync 腳本）.",
     "relatedAssetIds": ["eco-promote", "eco-ssot"],
     "tags": ["ecosystem", "engineering", "鏡像"],
-    "source": "local:engineering#mirror",
+    "source": "platform-command:specs/domain/engineering.yaml#mirror",
     "facets": {
       "materials": [],
       "techniques": [],

@@ -49,10 +49,18 @@ const STANDARD_CHIP_CODES = listIndustryStandards()
   .filter((e) => ["925", "999", "14K", "18K", "950"].includes(e.code))
   .map((e) => e.code);
 
-function buildResultsDescription(model: CatalogSearchViewModel): string {
+type Translate = (key: string, vars?: Record<string, string>) => string;
+
+function buildResultsDescription(
+  model: CatalogSearchViewModel,
+  t: Translate
+): string {
   const { pagination } = model;
-  const parts = [`${pagination.total} row(s)`];
-  if (model.query) parts.push(`matching “${model.query}”`);
+  const parts = [
+    t("catalog.results.rows", { count: String(pagination.total) }),
+  ];
+  if (model.query)
+    parts.push(t("catalog.results.matching", { query: model.query }));
   if (model.activeType) parts.push(`type=${model.activeType}`);
   if (model.activeMaterial) parts.push(`material=${model.activeMaterial}`);
   if (model.activeStandard) parts.push(`standard=${model.activeStandard}`);
@@ -61,11 +69,20 @@ function buildResultsDescription(model: CatalogSearchViewModel): string {
   if (model.activeAuctionEligible) parts.push("auctionEligible");
   if (model.sourceCounts && model.phase === "hybrid") {
     parts.push(
-      `${model.sourceCounts.knowledge} knowledge · ${model.sourceCounts.metadata} metadata · ${model.sourceCounts.catalog} catalog`
+      t("catalog.results.sources", {
+        knowledge: String(model.sourceCounts.knowledge),
+        metadata: String(model.sourceCounts.metadata),
+        catalog: String(model.sourceCounts.catalog),
+      })
     );
   }
   if (pagination.totalPages > 1) {
-    parts.push(`page ${pagination.page}/${pagination.totalPages}`);
+    parts.push(
+      t("catalog.results.pageOf", {
+        page: String(pagination.page),
+        total: String(pagination.totalPages),
+      })
+    );
   }
   return parts.join(" · ");
 }
@@ -99,13 +116,17 @@ function CatalogFacetFilters({
   base: CatalogSearchUrlParams;
   standardLabels: Map<string, string>;
 }) {
+  const { t } = useI18n();
+  const allLabel = t("catalog.filters.all");
   return (
-    <div className="space-y-stack-dense" aria-label="Filters">
-      <h2 className="text-type-16 font-medium text-foreground">Filters</h2>
+    <div className="space-y-stack-dense" aria-label={t("catalog.filters")}>
+      <h2 className="text-type-16 font-medium text-foreground">
+        {t("catalog.filters")}
+      </h2>
       <div className="flex flex-wrap gap-stack">
         <div className="space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
-            Type
+            {t("catalog.filters.type")}
           </span>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
@@ -115,7 +136,7 @@ function CatalogFacetFilters({
               })}
               active={!model.activeType}
             >
-              All
+              {allLabel}
             </FacetChip>
             {model.filters[0]?.options.map((opt) => (
               <FacetChip
@@ -134,7 +155,7 @@ function CatalogFacetFilters({
 
         <div className="space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
-            Material
+            {t("catalog.filters.material")}
           </span>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
@@ -144,7 +165,7 @@ function CatalogFacetFilters({
               })}
               active={!model.activeMaterial}
             >
-              All
+              {allLabel}
             </FacetChip>
             {MATERIAL_OPTIONS.map((opt) => (
               <FacetChip
@@ -163,7 +184,7 @@ function CatalogFacetFilters({
 
         <div className="space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
-            Industry code
+            {t("catalog.filters.standard")}
           </span>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
@@ -173,7 +194,7 @@ function CatalogFacetFilters({
               })}
               active={!model.activeStandard}
             >
-              All
+              {allLabel}
             </FacetChip>
             {STANDARD_CHIP_CODES.map((code) => (
               <FacetChip
@@ -193,7 +214,7 @@ function CatalogFacetFilters({
 
         <div className="space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
-            Product type
+            {t("catalog.filters.productType")}
           </span>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
@@ -203,7 +224,7 @@ function CatalogFacetFilters({
               })}
               active={!model.activeProductType}
             >
-              All
+              {allLabel}
             </FacetChip>
             {PRODUCT_TYPE_OPTIONS.map((opt) => (
               <FacetChip
@@ -222,7 +243,7 @@ function CatalogFacetFilters({
 
         <div className="space-y-space-4">
           <span className="text-xs font-medium text-muted-foreground">
-            Auction
+            {t("catalog.filters.auction")}
           </span>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
@@ -232,7 +253,7 @@ function CatalogFacetFilters({
               })}
               active={!model.activeAuctionEligible}
             >
-              All
+              {allLabel}
             </FacetChip>
             <FacetChip
               to={buildCatalogSearchUrl({
@@ -241,7 +262,7 @@ function CatalogFacetFilters({
               })}
               active={Boolean(model.activeAuctionEligible)}
             >
-              Auction eligible
+              {t("catalog.filters.auctionEligible")}
             </FacetChip>
           </div>
         </div>
@@ -279,6 +300,7 @@ function CatalogKnowledgeHits({
   model: CatalogSearchViewModel;
   base: CatalogSearchUrlParams;
 }) {
+  const { t } = useI18n();
   if ((model.sourceCounts?.knowledge ?? 0) === 0) return null;
   return (
     <section
@@ -286,11 +308,10 @@ function CatalogKnowledgeHits({
       data-testid="catalog-knowledge-section"
     >
       <h2 className="mb-space-4 text-type-16 font-medium text-foreground">
-        Domain knowledge
+        {t("catalog.knowledge.title")}
       </h2>
       <p className="mb-space-8 text-type-14 text-muted-foreground">
-        Glossary and domain notes matching the active filters. Asset rows below
-        are not filtered by hallmark.
+        {t("catalog.knowledge.desc")}
       </p>
       <div className="space-y-space-8">
         {model.results
@@ -351,11 +372,12 @@ function CatalogPagination({
   pagination: CatalogSearchViewModel["pagination"];
   base: CatalogSearchUrlParams;
 }) {
+  const { t } = useI18n();
   if (pagination.totalPages <= 1) return null;
   return (
     <nav
       className="flex items-center justify-between gap-space-8"
-      aria-label="Results pagination"
+      aria-label={t("catalog.results.pagination")}
     >
       {pagination.page > 1 ? (
         <Link
@@ -365,13 +387,18 @@ function CatalogPagination({
           })}
           className="text-sm font-medium text-primary hover:underline"
         >
-          Previous
+          {t("catalog.results.prev")}
         </Link>
       ) : (
-        <span className="text-sm text-muted-foreground">Previous</span>
+        <span className="text-sm text-muted-foreground">
+          {t("catalog.results.prev")}
+        </span>
       )}
       <span className="text-xs text-muted-foreground">
-        Page {pagination.page} of {pagination.totalPages}
+        {t("catalog.results.pageOf", {
+          page: String(pagination.page),
+          total: String(pagination.totalPages),
+        })}
       </span>
       {pagination.page < pagination.totalPages ? (
         <Link
@@ -381,10 +408,12 @@ function CatalogPagination({
           })}
           className="text-sm font-medium text-primary hover:underline"
         >
-          Next
+          {t("catalog.results.next")}
         </Link>
       ) : (
-        <span className="text-sm text-muted-foreground">Next</span>
+        <span className="text-sm text-muted-foreground">
+          {t("catalog.results.next")}
+        </span>
       )}
     </nav>
   );
@@ -423,7 +452,7 @@ function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
         <Input
           name="q"
           defaultValue={model.query}
-          placeholder="Filter APIs, tables, 925, 鍛造…"
+          placeholder={t("catalog.search.placeholder")}
           aria-label={t("catalog-search.page.title")}
           className="flex-1"
         />
@@ -451,7 +480,7 @@ function CatalogEmptyAction({ model }: { model: CatalogSearchViewModel }) {
           })}
           className="text-sm font-medium text-primary hover:underline"
         >
-          Clear industry filters
+          {t("catalog.results.clearFacets")}
         </Link>
       ) : null}
       <Link
@@ -501,19 +530,21 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         title={t("catalog-search.page.title")}
         extra={
           model.intent === "ai-fallback" ? (
-            <StatusChip status="warning">AI fallback</StatusChip>
+            <StatusChip status="warning">
+              {t("catalog.badge.fallback")}
+            </StatusChip>
           ) : null
         }
         description={
           <>
             {model.phase === "hybrid"
-              ? "Filter APIs and tables, then open an asset to request access. Domain knowledge appears first; assets are not filtered by hallmark."
-              : "Search and filter catalog rows, then open an asset to request access."}{" "}
+              ? t("catalog.page.leadHybrid")
+              : t("catalog.page.lead")}{" "}
             <Link
               to="/catalog-search/dictionary"
               className="text-primary hover:underline"
             >
-              Browse the full dictionary →
+              {t("catalog.page.dictionaryLink")}
             </Link>
           </>
         }
@@ -536,18 +567,18 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
       <ProductResultsShell
         title={
           (model.sourceCounts?.knowledge ?? 0) > 0
-            ? "Assets & catalog"
-            : "Results"
+            ? t("catalog.results.assets")
+            : t("catalog.results")
         }
         description={
           (model.sourceCounts?.knowledge ?? 0) > 0
-            ? `${buildResultsDescription(model)} · assets not filtered by hallmark`
-            : buildResultsDescription(model)
+            ? `${buildResultsDescription(model, t)} · ${t("catalog.results.assetsUnfiltered")}`
+            : buildResultsDescription(model, t)
         }
         isLoading={isLoading}
         isEmpty={assetRows.length === 0}
         skeletonRows={3}
-        emptyMessage="No asset or catalog rows match your query."
+        emptyMessage={t("catalog.results.empty")}
         emptyAction={<CatalogEmptyAction model={model} />}
         pagination={<CatalogPagination pagination={pagination} base={base} />}
       >
@@ -555,7 +586,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
           columns={[
             {
               key: "name",
-              header: "Name",
+              header: t("catalog.col.name"),
               accessor: (row) => (
                 <div className="space-y-space-4">
                   {row.detailHref ? (
@@ -607,7 +638,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
             },
             {
               key: "description",
-              header: "Description",
+              header: t("catalog.col.description"),
               accessor: (row) => (
                 <span className="line-clamp-2 text-muted-foreground">
                   {row.description}
@@ -616,7 +647,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
             },
             {
               key: "owner",
-              header: "Owner",
+              header: t("catalog.col.owner"),
               accessor: (row) => (
                 <span className="text-muted-foreground">
                   {row.owner ? row.owner : "—"}
@@ -625,7 +656,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
             },
             {
               key: "classification",
-              header: "Class / PII",
+              header: t("catalog.col.class"),
               accessor: (row) =>
                 row.classification ? (
                   <StatusChip
@@ -644,7 +675,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
             },
             {
               key: "updatedAt",
-              header: "Updated",
+              header: t("catalog.col.updated"),
               accessor: (row) => (
                 <span className="font-mono text-type-12 text-muted-foreground">
                   {row.updatedAt ? row.updatedAt.slice(0, 10) : "—"}
@@ -653,7 +684,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
             },
             {
               key: "source",
-              header: "Source",
+              header: t("catalog.col.source"),
               align: "right",
               accessor: (row) => (
                 <StatusChip status="neutral" className="capitalize">
@@ -663,7 +694,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
             },
             {
               key: "type",
-              header: "Type",
+              header: t("catalog.col.type"),
               align: "right",
               accessor: (row) => (
                 <StatusChip status="info">{row.itemType}</StatusChip>

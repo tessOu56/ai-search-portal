@@ -39,6 +39,16 @@ test.describe("surface smoke", () => {
     }
   });
 
+  test("bare /access-requests hops to the review queue", async ({ page }) => {
+    const response = await page.goto("/access-requests?sessionRole=owner", {
+      waitUntil: WAIT,
+    });
+    expect(response?.status()).toBe(200);
+    expect(new URL(page.url()).pathname).toBe("/access-requests/review");
+    expect(new URL(page.url()).searchParams.get("sessionRole")).toBe("owner");
+    await assertHealthy(page);
+  });
+
   test("experience destinations and details render without the error shell", async ({
     page,
   }) => {

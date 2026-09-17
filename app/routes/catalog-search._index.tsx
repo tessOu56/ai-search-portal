@@ -7,6 +7,7 @@ import { getCatalogSearchViewModel } from "~/features/catalogsearch/catalog-sear
 import type { CatalogSearchIntent } from "~/features/catalogsearch/catalog-search.types";
 import { parsePackIdFromRequest } from "~/services/context-pack.server";
 import { getLocale, getTranslations } from "~/shared/i18n";
+import { useI18n } from "~/shared/i18n/context";
 import { t } from "~/shared/i18n/server";
 import {
   buildJsonLdBreadcrumbList,
@@ -92,17 +93,15 @@ export default function CatalogSearchPage() {
  * Manual path stays available: reset link returns to the bare URL contract.
  */
 export function ErrorBoundary() {
+  const { t } = useI18n();
   return (
     <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
       <h1 className="text-lg font-semibold text-destructive">
-        Catalog search hit an error
+        {t("catalog.error.title")}
       </h1>
-      <p className="text-sm text-muted-foreground">
-        Something went wrong while loading results. Your filters live in the URL
-        — resetting them usually recovers.
-      </p>
+      <p className="text-sm text-muted-foreground">{t("catalog.error.body")}</p>
       <Button asChild>
-        <Link to="/catalog-search">Reset filters and retry</Link>
+        <Link to="/catalog-search">{t("catalog.error.retry")}</Link>
       </Button>
     </div>
   );

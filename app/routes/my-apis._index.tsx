@@ -23,15 +23,12 @@ import {
   type GovernanceSessionRole,
   governanceSessionRoleSchema,
 } from "~/shared/contracts";
+import { getLocale, getTranslations } from "~/shared/i18n";
 import { useI18n } from "~/shared/i18n/context";
+import { t } from "~/shared/i18n/server";
+import { buildSeoMeta, getCanonicalUrl, getSeoFromLoader } from "~/shared/seo";
 
-export const meta: MetaFunction = () => [
-  { title: "My requests · Portal" },
-  {
-    name: "description",
-    content: "Track metadata access applications and permission status.",
-  },
-];
+const MY_REQUESTS_TITLE_KEY = "nav.my-requests";
 
 function resolveSessionRole(raw: string | null): GovernanceSessionRole {
   const parsed = governanceSessionRoleSchema.safeParse(raw);
@@ -65,15 +62,37 @@ export async function action({ request }: ActionFunctionArgs) {
   return json({ ok: false as const, text: "Unknown intent" }, { status: 400 });
 }
 
-export function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   expireStaleAccessApplications();
   const url = new URL(request.url);
   const sessionRole = resolveSessionRole(url.searchParams.get("sessionRole"));
   const applications =
     sessionRole === "requester" ? listAccessApplications() : [];
   const highlightId = url.searchParams.get("highlight") ?? undefined;
-  return json({ sessionRole, applications, highlightId });
+  const locale = await getLocale(request);
+  const translations = getTranslations(locale);
+  const canonical = getCanonicalUrl(request);
+  return json({
+    sessionRole,
+    applications,
+    highlightId,
+    title: t(translations, MY_REQUESTS_TITLE_KEY),
+    description: t(translations, "my-apis.page.description"),
+    canonical,
+    locale: locale.replace("-", "_"),
+  });
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  const seo = getSeoFromLoader(data);
+  return buildSeoMeta({
+    title: seo.title,
+    description: seo.description,
+    canonical: seo.canonical,
+    locale: seo.locale,
+    type: "website",
+  });
+};
 
 export default function MyApisRoute() {
   const { t } = useI18n();
@@ -83,7 +102,7 @@ export default function MyApisRoute() {
   const navigation = useNavigation();
   const loading = navigation.state !== "idle";
   return (
-    <ProductPageShell current={t("nav.my-requests")}>
+    <ProductPageShell current={t(MY_REQUESTS_TITLE_KEY)}>
       <MyApisPanel
         applications={applications}
         sessionRole={sessionRole}
@@ -99,17 +118,18 @@ export default function MyApisRoute() {
 export function ErrorBoundary() {
   const { t } = useI18n();
   return (
-    <ProductPageShell current={t("nav.my-requests")}>
+    <ProductPageShell current={t(MY_REQUESTS_TITLE_KEY)}>
       <div className="border-destructive/30 bg-destructive/5 space-y-3 rounded-lg border p-6">
         <h1 className="text-lg font-semibold text-destructive">
           {t("my-apis.error.title")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Something went wrong while loading your applications. Reloading
-          usually recovers.
+          {t("my-apis.error.body")}
         </p>
         <Button asChild>
-          <Link to="/my-apis?sessionRole=requester">Reset and retry</Link>
+          <Link to="/my-apis?sessionRole=requester">
+            {t("my-apis.error.retry")}
+          </Link>
         </Button>
       </div>
     </ProductPageShell>

@@ -61,21 +61,24 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
         title={t("nav.catalog-dictionary")}
         extra={
           <StatusChip status={model.virtual ? "info" : "neutral"}>
-            {model.virtual ? "Fast list" : "Full list"}
+            {model.virtual
+              ? t("dictionary.chip.fast")
+              : t("dictionary.chip.full")}
           </StatusChip>
         }
         description={
           <>
-            Browse {model.totalUnfiltered.toLocaleString()} catalog entries.
-            Virtual scrolling keeps the list fast.{" "}
+            {t("dictionary.lead", {
+              count: model.totalUnfiltered.toLocaleString(),
+            })}{" "}
             <Link
               to={toggleVirtualUrl(model)}
               className={PRODUCT_TABLE_LINK_CLASS}
               data-testid="virtual-toggle"
             >
               {model.virtual
-                ? "Compare with the full list"
-                : "Back to the fast list"}
+                ? t("dictionary.compareFull")
+                : t("dictionary.backFast")}
             </Link>
             .
           </>
@@ -99,8 +102,8 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
           <Input
             name="q"
             defaultValue={model.query}
-            placeholder="Filter catalog entries…"
-            aria-label="Dictionary search query"
+            placeholder={t("dictionary.search.placeholder")}
+            aria-label={t("dictionary.search.aria")}
             className="flex-1"
           />
           <Button type="submit">{t("catalog.search.submit")}</Button>
@@ -112,7 +115,7 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
             variant={!model.activeType ? "default" : "outline"}
           >
             <Link to={buildCatalogSearchUrl({ q: model.query }, BASE_PATH)}>
-              All
+              {t("catalog.filters.all")}
             </Link>
           </Button>
           {TYPES.map((type) => (
@@ -132,23 +135,28 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
         </div>
       </Toolbar>
 
-      <section className="space-y-stack-dense" aria-label="Dictionary results">
+      <section
+        className="space-y-stack-dense"
+        aria-label={t("dictionary.results")}
+      >
         <p
           className="text-type-14 text-muted-foreground"
           data-testid="dictionary-count"
         >
-          {model.total.toLocaleString()} row(s)
-          {model.query ? ` matching “${model.query}”` : ""}
+          {t("dictionary.rows", { count: model.total.toLocaleString() })}
+          {model.query
+            ? ` ${t("catalog.results.matching", { query: model.query })}`
+            : ""}
           {model.activeType ? ` · type=${model.activeType}` : ""}
         </p>
         {model.total === 0 ? (
-          <EmptyState title="No rows match your query." />
+          <EmptyState title={t("dictionary.empty")} />
         ) : (
           <div className="overflow-hidden rounded-2xl border border-border">
             <div className="grid grid-cols-[1fr_2fr_auto] border-b border-border bg-card px-space-16 py-stack-dense text-xs font-medium tracking-wide text-muted-foreground">
-              <span>Name</span>
-              <span>Description</span>
-              <span className="text-right">Type</span>
+              <span>{t("catalog.col.name")}</span>
+              <span>{t("catalog.col.description")}</span>
+              <span className="text-right">{t("catalog.col.type")}</span>
             </div>
             {model.virtual ? (
               <VirtualList
