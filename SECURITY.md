@@ -19,7 +19,7 @@ We will acknowledge and work on a fix or mitigation as reasonably possible.
 ## Secrets and credentials
 
 - Never commit `.env`, API keys, tokens, private keys, or connection strings.
-- Use example files (e.g. `.env.*.example`) with **placeholders only**.
+- Use [`.env.example`](.env.example) (placeholders only) as the local template; copy to `.env` / `.env.local`.
 - Optional LLM: `OPENAI_API_KEY` must be set **server-side** only; the public demo defaults to offline fixtures.
 - Host deploy secrets (e.g. Vercel) belong in CI secret stores, not in git.
 - Optional Sentry source-map upload uses `SENTRY_AUTH_TOKEN` (build-time only). The public `SENTRY_DSN` / `VITE_SENTRY_DSN` is not a secret; never commit the auth token.
