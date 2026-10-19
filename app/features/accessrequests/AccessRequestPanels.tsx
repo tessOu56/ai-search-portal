@@ -425,6 +425,7 @@ function AccessReviewRequestCard({
                 name="purpose"
                 defaultValue={app.purpose}
                 aria-label={t("metadata.access.purpose")}
+                data-testid="review-edit-purpose"
                 className={REVIEW_SELECT_CLASS}
               >
                 <option value="analytics">analytics</option>
@@ -435,6 +436,7 @@ function AccessReviewRequestCard({
                 name="role"
                 defaultValue={app.role}
                 aria-label={t("metadata.access.role")}
+                data-testid="review-edit-role"
                 className={REVIEW_SELECT_CLASS}
               >
                 <option value="analyst">analyst</option>

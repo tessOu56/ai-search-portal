@@ -98,8 +98,8 @@ test.describe("access review center (T-068)", () => {
       .getByTestId("access-review-card")
       .filter({ hasText: PENDING })
       .first();
-    await card.getByLabel("Edit purpose").selectOption("operations");
-    await card.getByLabel("Edit role").selectOption("engineer");
+    await card.getByTestId("review-edit-purpose").selectOption("operations");
+    await card.getByTestId("review-edit-role").selectOption("engineer");
     await card.getByRole("button", { name: "Edit", exact: true }).click();
 
     await expect(
