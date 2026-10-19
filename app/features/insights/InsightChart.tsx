@@ -26,8 +26,8 @@ type InsightChartProps = {
 };
 
 /**
- * Lazy-loaded recharts surface. Parent must provide a fixed-height box so
- * ResponsiveContainer does not mount at width 0 on first SPA paint.
+ * Recharts surface. Parent must provide a fixed-height box so
+ * ResponsiveContainer does not mount at width 0 on first paint.
  */
 export function InsightChart({ type, data }: InsightChartProps) {
   if (type === "pie") {
