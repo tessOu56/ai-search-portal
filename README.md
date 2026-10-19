@@ -43,10 +43,11 @@ Also: `/` (golden chat with offline fixture), `/catalog-search/dictionary` (virt
 ```bash
 corepack enable   # pnpm from packageManager field
 pnpm install
+cp .env.example .env   # optional; leave empty for offline fixtures
 pnpm run dev
 ```
 
-Optional: set **server-side only** `OPENAI_API_KEY` for live LLM; without it the app stays on offline fixtures. Never commit `.env` or secret values — see [SECURITY.md](SECURITY.md).
+Copy [`.env.example`](.env.example) to `.env` (or `.env.local`) and fill only what you need. Optional live LLM is **server-side only** (`OPENAI_API_KEY` + `AGENT_LLM_MODE=openai`); omit both to stay on offline fixtures. Never commit `.env` or secret values — see [SECURITY.md](SECURITY.md). Host deploy keys belong in **Vercel / GitHub Actions secrets**, not in git.
 
 Quality: `pnpm run lint` · `pnpm run typecheck` · `pnpm run test` · CI runs `lint:strict` + typecheck + knip + E2E.
 
