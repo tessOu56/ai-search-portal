@@ -1,5 +1,4 @@
-import { lazy, Suspense, useState } from "react";
-import { ClientOnly } from "remix-utils/client-only";
+import { lazy, Suspense, useEffect, useState } from "react";
 
 import { Button } from "~/components/ui/Button";
 import { Panel } from "~/components/ui/Panel";
@@ -10,12 +9,34 @@ import { Toolbar } from "~/components/ui/Toolbar";
 import {
   catalogDistribution,
   type ChartType,
+  type InsightDatum,
   searchTrend,
 } from "./insights.mock";
 
 const InsightChart = lazy(() =>
   import("./InsightChart").then((mod) => ({ default: mod.InsightChart }))
 );
+
+function ClientChart({
+  type,
+  data,
+}: {
+  type: ChartType;
+  data: InsightDatum[];
+}) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    setReady(true);
+  }, []);
+  if (!ready) {
+    return <Skeleton className="size-full rounded-lg" />;
+  }
+  return (
+    <Suspense fallback={<Skeleton className="size-full rounded-lg" />}>
+      <InsightChart type={type} data={data} />
+    </Suspense>
+  );
+}
 
 const chartOptions: { type: ChartType; label: string }[] = [
   { type: "bar", label: "長條圖" },
@@ -54,15 +75,7 @@ export function InsightsPanel() {
           {heading}
         </h2>
         <div className="h-[320px] w-full min-w-0" data-testid="insights-chart">
-          <ClientOnly fallback={<Skeleton className="size-full rounded-lg" />}>
-            {() => (
-              <Suspense
-                fallback={<Skeleton className="size-full rounded-lg" />}
-              >
-                <InsightChart type={chartType} data={data} />
-              </Suspense>
-            )}
-          </ClientOnly>
+          <ClientChart type={chartType} data={data} />
         </div>
       </Panel>
     </Stack>

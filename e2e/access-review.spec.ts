@@ -94,11 +94,14 @@ test.describe("access review center (T-068)", () => {
       timeout: 30_000,
     });
 
-    const card = page.locator("li").filter({ hasText: PENDING }).first();
+    const card = page
+      .getByTestId("access-review-card")
+      .filter({ hasText: PENDING })
+      .first();
     await card.getByRole("button", { name: "Edit purpose" }).click();
-    await card.getByRole("option", { name: "operations" }).click();
+    await page.getByRole("option", { name: "operations" }).click();
     await card.getByRole("button", { name: "Edit role" }).click();
-    await card.getByRole("option", { name: "engineer" }).click();
+    await page.getByRole("option", { name: "engineer" }).click();
     await card.getByRole("button", { name: "Edit", exact: true }).click();
 
     await expect(
