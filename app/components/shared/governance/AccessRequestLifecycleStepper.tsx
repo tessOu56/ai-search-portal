@@ -1,4 +1,5 @@
 import type { AccessRequestLifecycleStatus } from "~/shared/contracts";
+import { useI18n } from "~/shared/i18n/context";
 import { cn } from "~/shared/utils/cn";
 
 /**
@@ -7,18 +8,20 @@ import { cn } from "~/shared/utils/cn";
  * the pending step (T-186 tool-density polish, Journey C).
  */
 
-type StepDef = { key: AccessRequestLifecycleStatus; label: string };
+type StepDef = { key: AccessRequestLifecycleStatus; labelKey: string };
 
 const HAPPY_PATH: StepDef[] = [
-  { key: "draft", label: "Draft" },
-  { key: "pending_approval", label: "Pending review" },
-  { key: "approved", label: "Approved" },
+  { key: "draft", labelKey: "lifecycle.draft" },
+  { key: "pending_approval", labelKey: "lifecycle.pending" },
+  { key: "approved", labelKey: "lifecycle.approved" },
 ];
 
-const TERMINAL_LABEL: Partial<Record<AccessRequestLifecycleStatus, string>> = {
-  denied: "Denied",
-  cancelled: "Cancelled",
-  expired: "Expired",
+const TERMINAL_LABEL_KEY: Partial<
+  Record<AccessRequestLifecycleStatus, string>
+> = {
+  denied: "lifecycle.denied",
+  cancelled: "lifecycle.cancelled",
+  expired: "lifecycle.expired",
 };
 
 const NEGATIVE_STATUSES = new Set<AccessRequestLifecycleStatus>([
@@ -45,7 +48,7 @@ function stepState(
 const CIRCLE_CLASS: Record<StepVisualState, string> = {
   done: "border-primary bg-primary text-primary-foreground",
   active: "border-primary bg-primary/10 text-primary",
-  success: "border-green-600 bg-green-600 text-white",
+  success: "border-primary bg-primary text-primary-foreground",
   negative: "border-destructive bg-destructive text-destructive-foreground",
   upcoming: "border-border bg-muted text-muted-foreground",
 };
@@ -61,7 +64,7 @@ const LABEL_CLASS: Record<StepVisualState, string> = {
 const LINE_CLASS: Record<StepVisualState, string> = {
   done: "bg-primary",
   active: "bg-border",
-  success: "bg-green-600",
+  success: "bg-primary",
   negative: "bg-destructive",
   upcoming: "bg-border",
 };
@@ -78,6 +81,7 @@ export function AccessRequestLifecycleStepper({
   className,
   compact = false,
 }: AccessRequestLifecycleStepperProps) {
+  const { t } = useI18n();
   const isNegative = NEGATIVE_STATUSES.has(status);
   const currentIndex = isNegative
     ? 2
@@ -92,15 +96,18 @@ export function AccessRequestLifecycleStepper({
         {
           key: status,
           // eslint-disable-next-line security/detect-object-injection -- status is a typed AccessRequestLifecycleStatus
-          label: TERMINAL_LABEL[status] ?? status,
+          labelKey: TERMINAL_LABEL_KEY[status] ?? "lifecycle.pending",
         },
       ]
     : HAPPY_PATH;
 
   return (
     <ol
-      className={cn("flex items-center gap-1.5 text-xs", className)}
-      aria-label="Application lifecycle status"
+      className={cn(
+        "flex flex-wrap items-center gap-1.5 text-type-12",
+        className
+      )}
+      aria-label={t("lifecycle.aria")}
       data-testid="access-request-stepper"
       data-status={status}
     >
@@ -131,10 +138,10 @@ export function AccessRequestLifecycleStepper({
                   LABEL_CLASS[state]
                 )}
               >
-                {step.label}
+                {t(step.labelKey)}
               </span>
             ) : (
-              <span className="sr-only">{step.label}</span>
+              <span className="sr-only">{t(step.labelKey)}</span>
             )}
             {!isLast ? (
               <span

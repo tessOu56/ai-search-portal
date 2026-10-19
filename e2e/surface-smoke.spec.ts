@@ -1,7 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
 const WAIT = "domcontentloaded";
-const ERROR_COPY = "出了點問題";
 const DEPTH = "Maximum update depth";
 
 const NAV_HREFS = [
@@ -27,7 +26,7 @@ const DETAIL_HREFS = [
 ];
 
 async function assertHealthy(page: Page) {
-  await expect(page.getByText(ERROR_COPY)).toHaveCount(0);
+  await expect(page.getByTestId("route-error-shell")).toHaveCount(0);
   await expect(page.getByText(DEPTH)).toHaveCount(0);
 }
 

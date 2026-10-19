@@ -22,7 +22,7 @@ import { cn } from "~/shared/utils/cn";
 
 export { myApisHighlightHref };
 
-const STATUS_OK_CLASS = "text-sm text-green-700";
+const STATUS_OK_CLASS = "text-sm font-medium text-foreground";
 const STATUS_ERROR_CLASS = "text-sm text-destructive";
 const REVIEW_SELECT_CLASS =
   "h-9 rounded-[var(--radius)] border border-input bg-background px-3 text-sm text-foreground";
@@ -84,11 +84,12 @@ function ApplicationCardSkeleton() {
 }
 
 function ApplicationCardSkeletonGrid({ rows = 2 }: { rows?: number }) {
+  const { t } = useI18n();
   return (
     <div
       className="grid gap-stack sm:grid-cols-2"
       role="status"
-      aria-label="Loading applications"
+      aria-label={t("applications.loading")}
     >
       {Array.from({ length: rows }, (_, index) => (
         <ApplicationCardSkeleton key={index} />
@@ -469,8 +470,6 @@ export function AccessRequestReviewPanel({
 }) {
   const { t } = useI18n();
   const canReview = sessionRole === "owner" || sessionRole === "admin";
-  const navigation = useNavigation();
-  const busy = loading || navigation.state !== "idle";
   const approvedRequestId =
     actionMessage?.ok && actionMessage.status === "approved"
       ? actionMessage.requestId
@@ -518,13 +517,25 @@ export function AccessRequestReviewPanel({
         </p>
       ) : null}
 
-      {busy ? (
+      {loading ? (
         <ApplicationCardSkeletonGrid rows={1} />
       ) : pending.length === 0 ? (
         <div data-testid="access-review-empty-state">
           <EmptyState
             title={t("access-review.empty.title")}
             description={t("access-review.empty.desc")}
+            action={
+              <div className="flex flex-wrap justify-center gap-space-8">
+                <Button asChild>
+                  <Link to="/metadata">{t("access-review.empty.action")}</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to="/my-apis?sessionRole=requester">
+                    {t("access-review.empty.track")}
+                  </Link>
+                </Button>
+              </div>
+            }
           />
         </div>
       ) : (

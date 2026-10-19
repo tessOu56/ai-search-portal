@@ -5,6 +5,13 @@ import { localeCookie } from "~/shared/i18n";
 
 const SUPPORTED = ["zh-TW", "en"] as const;
 
+function safeNextPath(raw: string): string {
+  if (!raw.startsWith("/") || raw.startsWith("//") || raw.includes("://")) {
+    return "/";
+  }
+  return raw;
+}
+
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") {
     return redirect("/");
@@ -16,9 +23,17 @@ export async function action({ request }: ActionFunctionArgs) {
     (typeof nextRaw === "string" ? nextRaw : null) ??
     request.headers.get("Referer") ??
     "/";
-  const path = nextUrl.startsWith("/")
-    ? nextUrl
-    : new URL(nextUrl).pathname || "/";
+  let path = "/";
+  if (nextUrl.startsWith("/")) {
+    path = safeNextPath(nextUrl);
+  } else {
+    try {
+      const parsed = new URL(nextUrl);
+      path = safeNextPath(`${parsed.pathname}${parsed.search}`);
+    } catch {
+      path = "/";
+    }
+  }
 
   if (
     typeof locale === "string" &&

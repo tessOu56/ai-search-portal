@@ -100,7 +100,10 @@ export default function MyApisRoute() {
     useLoaderData<typeof loader>();
   const actionMessage = useActionData<typeof action>();
   const navigation = useNavigation();
-  const loading = navigation.state !== "idle";
+  const loading =
+    navigation.state === "loading" &&
+    navigation.formMethod == null &&
+    navigation.location?.pathname === "/my-apis";
   return (
     <ProductPageShell current={t(MY_REQUESTS_TITLE_KEY)}>
       <MyApisPanel

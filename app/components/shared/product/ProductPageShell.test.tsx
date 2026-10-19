@@ -34,6 +34,7 @@ vi.mock("~/shared/i18n/context", () => ({
       const labels = new Map([
         ["app.title", APP_TITLE],
         ["nav.back", "Back"],
+        ["nav.breadcrumb", "Breadcrumb"],
       ]);
       return labels.get(key) ?? key;
     },
@@ -55,6 +56,10 @@ describe("ProductPageShell", () => {
     expect(screen.getByRole("link", { name: APP_TITLE })).toHaveAttribute(
       "href",
       OVERVIEW_HOME
+    );
+    expect(screen.getByText("Catalog search")).toHaveAttribute(
+      "aria-current",
+      "page"
     );
     await user.click(screen.getByRole("button", { name: "Back" }));
     expect(navigate).toHaveBeenCalledWith(OVERVIEW_HOME);

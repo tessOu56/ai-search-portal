@@ -14,7 +14,7 @@ export function MetadataColumnsTable({
 
   return (
     <div className="overflow-hidden rounded-lg border border-border">
-      <div className="bg-muted px-4 py-2 text-xs font-medium text-muted-foreground">
+      <div className="bg-muted px-space-16 py-space-8 text-type-12 font-medium text-muted-foreground">
         Columns
       </div>
       <div className="divide-y divide-border text-sm">
@@ -23,7 +23,7 @@ export function MetadataColumnsTable({
           return (
             <div
               key={col.name}
-              className="grid grid-cols-[1fr_1fr_2fr_auto] gap-space-8 px-space-16 py-space-8"
+              className="grid grid-cols-1 gap-space-4 px-space-16 py-space-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,2fr)_auto] sm:gap-space-8"
             >
               <span className="font-medium">
                 {masked ? "••••••" : col.name}
@@ -34,12 +34,12 @@ export function MetadataColumnsTable({
               </span>
               <div className="flex flex-wrap justify-end gap-1">
                 {col.sensitive ? (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-type-12">
                     sensitive
                   </Badge>
                 ) : null}
                 {masked ? (
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-type-12">
                     masked
                   </Badge>
                 ) : null}

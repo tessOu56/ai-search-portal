@@ -287,10 +287,10 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         <h2 className="text-type-16 font-medium text-foreground">
           {t("catalog.filters")}
         </h2>
-        <div className="mb-space-16 space-y-space-4">
-          <span className="text-xs font-medium text-muted-foreground">
+        <fieldset className="mb-space-16 space-y-space-4">
+          <legend className="text-type-12 font-medium text-muted-foreground">
             {t("catalog.filters.type")}
-          </span>
+          </legend>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildMetadataSearchUrl({
@@ -321,12 +321,12 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               </FacetChip>
             ))}
           </div>
-        </div>
+        </fieldset>
         <div className="flex flex-wrap gap-stack">
-          <div className="space-y-space-4">
-            <span className="text-xs font-medium text-muted-foreground">
+          <fieldset className="space-y-space-4">
+            <legend className="text-type-12 font-medium text-muted-foreground">
               {t("catalog.filters.material")}
-            </span>
+            </legend>
             <div className="flex flex-wrap gap-space-4">
               <FacetChip
                 to={buildMetadataSearchUrl({
@@ -357,11 +357,11 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                 </FacetChip>
               ))}
             </div>
-          </div>
-          <div className="space-y-space-4">
-            <span className="text-xs font-medium text-muted-foreground">
+          </fieldset>
+          <fieldset className="space-y-space-4">
+            <legend className="text-type-12 font-medium text-muted-foreground">
               {t("catalog.filters.standard")}
-            </span>
+            </legend>
             <div className="flex flex-wrap gap-space-4">
               <FacetChip
                 to={buildMetadataSearchUrl({
@@ -392,7 +392,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
                 </FacetChip>
               ))}
             </div>
-          </div>
+          </fieldset>
           <div className="flex w-full items-center">
             <Link
               to={buildCatalogSearchUrl({
@@ -461,6 +461,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         description={buildResultsDescription(model, t)}
         isLoading={isLoading}
         isEmpty={model.results.length === 0}
+        loadingLabel={t("results.loading")}
         skeletonRows={3}
         emptyMessage={t("metadata.empty")}
         emptyAction={

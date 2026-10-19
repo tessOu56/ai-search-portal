@@ -47,7 +47,7 @@ export function ProductPageShell({
         <Stack gap="lg">
           <nav
             className="flex flex-wrap items-center gap-space-8 text-type-14 text-muted-foreground"
-            aria-label="Breadcrumb"
+            aria-label={t("nav.breadcrumb")}
           >
             <Button
               type="button"
@@ -81,7 +81,9 @@ export function ProductPageShell({
             <span className="mx-space-8" aria-hidden>
               /
             </span>
-            <span className="text-foreground">{current}</span>
+            <span className="text-foreground" aria-current="page">
+              {current}
+            </span>
           </nav>
           {children}
         </Stack>

@@ -124,10 +124,10 @@ function CatalogFacetFilters({
         {t("catalog.filters")}
       </h2>
       <div className="flex flex-wrap gap-stack">
-        <div className="space-y-space-4">
-          <span className="text-xs font-medium text-muted-foreground">
+        <fieldset className="space-y-space-4">
+          <legend className="text-type-12 font-medium text-muted-foreground">
             {t("catalog.filters.type")}
-          </span>
+          </legend>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildCatalogSearchUrl({
@@ -151,12 +151,12 @@ function CatalogFacetFilters({
               </FacetChip>
             ))}
           </div>
-        </div>
+        </fieldset>
 
-        <div className="space-y-space-4">
-          <span className="text-xs font-medium text-muted-foreground">
+        <fieldset className="space-y-space-4">
+          <legend className="text-type-12 font-medium text-muted-foreground">
             {t("catalog.filters.material")}
-          </span>
+          </legend>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildCatalogSearchUrl({
@@ -180,12 +180,12 @@ function CatalogFacetFilters({
               </FacetChip>
             ))}
           </div>
-        </div>
+        </fieldset>
 
-        <div className="space-y-space-4">
-          <span className="text-xs font-medium text-muted-foreground">
+        <fieldset className="space-y-space-4">
+          <legend className="text-type-12 font-medium text-muted-foreground">
             {t("catalog.filters.standard")}
-          </span>
+          </legend>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildCatalogSearchUrl({
@@ -210,12 +210,12 @@ function CatalogFacetFilters({
               </FacetChip>
             ))}
           </div>
-        </div>
+        </fieldset>
 
-        <div className="space-y-space-4">
-          <span className="text-xs font-medium text-muted-foreground">
+        <fieldset className="space-y-space-4">
+          <legend className="text-type-12 font-medium text-muted-foreground">
             {t("catalog.filters.productType")}
-          </span>
+          </legend>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildCatalogSearchUrl({
@@ -239,12 +239,12 @@ function CatalogFacetFilters({
               </FacetChip>
             ))}
           </div>
-        </div>
+        </fieldset>
 
-        <div className="space-y-space-4">
-          <span className="text-xs font-medium text-muted-foreground">
+        <fieldset className="space-y-space-4">
+          <legend className="text-type-12 font-medium text-muted-foreground">
             {t("catalog.filters.auction")}
-          </span>
+          </legend>
           <div className="flex flex-wrap gap-space-4">
             <FacetChip
               to={buildCatalogSearchUrl({
@@ -265,29 +265,7 @@ function CatalogFacetFilters({
               {t("catalog.filters.auctionEligible")}
             </FacetChip>
           </div>
-        </div>
-
-        {model.filters.slice(1).map((filter) => (
-          <fieldset key={filter.id} className="space-y-space-4">
-            <legend className="text-xs font-medium text-muted-foreground">
-              {filter.label}
-            </legend>
-            <div className="flex flex-wrap gap-space-4">
-              {filter.options.map((opt) => (
-                <Button
-                  key={`${filter.id}-${opt.value}`}
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled
-                  title="Access filter — post-MVP"
-                >
-                  {opt.label}
-                </Button>
-              ))}
-            </div>
-          </fieldset>
-        ))}
+        </fieldset>
       </div>
     </div>
   );
@@ -332,7 +310,7 @@ function CatalogKnowledgeHits({
                 ) : (
                   <p className="text-sm font-medium">{row.name}</p>
                 )}
-                <p className="line-clamp-2 text-xs text-muted-foreground">
+                <p className="line-clamp-2 text-type-12 text-muted-foreground">
                   {row.description}
                 </p>
                 {row.facets &&
@@ -394,7 +372,7 @@ function CatalogPagination({
           {t("catalog.results.prev")}
         </span>
       )}
-      <span className="text-xs text-muted-foreground">
+      <span className="text-type-12 text-muted-foreground">
         {t("catalog.results.pageOf", {
           page: String(pagination.page),
           total: String(pagination.totalPages),
@@ -453,7 +431,7 @@ function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
           name="q"
           defaultValue={model.query}
           placeholder={t("catalog.search.placeholder")}
-          aria-label={t("catalog-search.page.title")}
+          aria-label={t("catalog.search.aria")}
           className="flex-1"
         />
         <Button type="submit">{t("catalog.search.submit")}</Button>
@@ -577,6 +555,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         }
         isLoading={isLoading}
         isEmpty={assetRows.length === 0}
+        loadingLabel={t("results.loading")}
         skeletonRows={3}
         emptyMessage={t("catalog.results.empty")}
         emptyAction={<CatalogEmptyAction model={model} />}

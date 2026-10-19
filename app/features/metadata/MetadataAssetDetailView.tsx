@@ -20,6 +20,8 @@ import { useI18n } from "~/shared/i18n/context";
 import { myApisHighlightHref } from "~/shared/navigation";
 import { cn } from "~/shared/utils/cn";
 
+const AI_BADGE_KEY = "metadata.access.ai.badge";
+
 const PURPOSE_OPTIONS = [
   { value: "analytics", label: "analytics" },
   { value: "marketing", label: "marketing" },
@@ -81,14 +83,13 @@ function buildConfirmHref(
   return `?${sp.toString()}`;
 }
 
-function humanPolicySummary(decision: PolicyDecisionContract): string {
-  if (decision.need_approval) {
-    return "This request needs sign-off from the data owner before access is granted.";
-  }
-  if (decision.allow) {
-    return "You meet the requirements for this purpose and role — access can be granted right away.";
-  }
-  return "Access isn't allowed for this purpose and role.";
+function humanPolicySummary(
+  decision: PolicyDecisionContract,
+  t: (key: string) => string
+): string {
+  if (decision.need_approval) return t("metadata.access.policy.needApproval");
+  if (decision.allow) return t("metadata.access.policy.allow");
+  return t("metadata.access.policy.deny");
 }
 
 /** Approve-outcome deep link into My APIs (requester view) — T-186 #5. */
@@ -117,7 +118,9 @@ function SubmitResultBanner({
     <div className="space-y-2">
       <p
         className={
-          result.ok ? "text-sm text-green-700" : "text-sm text-destructive"
+          result.ok
+            ? "text-sm font-medium text-foreground"
+            : "text-sm text-destructive"
         }
         role="status"
       >
@@ -136,7 +139,7 @@ function SubmitResultBanner({
             to="/access-requests/review?sessionRole=owner"
             className={PRODUCT_TABLE_LINK_CLASS}
           >
-            Owner review queue
+            {t("my-apis.reviewQueue")}
           </Link>
         </p>
       ) : null}
@@ -155,6 +158,7 @@ function AccessContextForm({
   purpose: string;
   role: string;
 }) {
+  const { t } = useI18n();
   const submit = useSubmit();
   const formRef = useRef<HTMLFormElement>(null);
   const [searchParams] = useSearchParams();
@@ -169,11 +173,10 @@ function AccessContextForm({
     <Panel>
       <div className="mb-3 space-y-1">
         <h2 className="text-type-16 font-semibold text-foreground">
-          Access context
+          {t("metadata.access.context.title")}
         </h2>
         <p className="text-type-14 text-muted-foreground">
-          Purpose and role drive the policy decision below — changing them
-          updates this page&apos;s URL so the exact scenario stays shareable.
+          {t("metadata.access.context.desc")}
         </p>
       </div>
       <div>
@@ -181,7 +184,7 @@ function AccessContextForm({
           ref={formRef}
           method="get"
           className="flex flex-wrap items-end gap-space-16"
-          aria-label="Access context"
+          aria-label={t("metadata.access.context.title")}
         >
           {packParam ? (
             <input type="hidden" name="pack" value={packParam} />
@@ -191,9 +194,9 @@ function AccessContextForm({
           ) : null}
           <FormField
             id="access-context-purpose"
-            label="Purpose"
+            label={t("metadata.access.purpose")}
             aiFilled={Boolean(aiFillParam)}
-            aiBadgeLabel="AI suggested"
+            aiBadgeLabel={t(AI_BADGE_KEY)}
           >
             <Select
               id="access-context-purpose"
@@ -206,9 +209,9 @@ function AccessContextForm({
           </FormField>
           <FormField
             id="access-context-role"
-            label="Role"
+            label={t("metadata.access.role")}
             aiFilled={Boolean(aiFillParam)}
-            aiBadgeLabel="AI suggested"
+            aiBadgeLabel={t(AI_BADGE_KEY)}
           >
             <Select
               id="access-context-role"
@@ -221,7 +224,7 @@ function AccessContextForm({
           </FormField>
           <noscript>
             <Button type="submit" size="sm" variant="outline">
-              Update
+              {t("metadata.access.update")}
             </Button>
           </noscript>
         </form>
@@ -242,44 +245,50 @@ function AccessRequestPanel({
   submitResult?: MetadataAssetSubmitResult;
 }) {
   // URL-driven HITL step (not useState) so E2E / dual-path work without waiting on hydration.
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
   const showConfirm = searchParams.get("confirm") === "1";
   const canRequest = policyDecision.allow || policyDecision.need_approval;
   const fetcher = useFetcher<MetadataAssetSubmitResult>();
   const effectiveResult = fetcher.data ?? submitResult;
   const busy = fetcher.state !== "idle";
+  const submitted = Boolean(effectiveResult?.ok);
+  const phase = submitted ? "done" : showConfirm ? "confirm" : "cta";
+  const requestLabel = t("metadata.access.request");
 
   return (
     <Panel>
       <div className="mb-3 space-y-1">
         <h2 className="text-type-16 font-semibold text-foreground">
-          Request access
+          {t("metadata.access.request.title")}
         </h2>
         <p className="text-type-14 text-muted-foreground">
-          Role: {role} · Purpose: {purpose}
+          {t("metadata.access.request.meta", { role, purpose })}
         </p>
       </div>
       <div className="space-y-4">
         <SubmitResultBanner result={effectiveResult} />
 
-        {!showConfirm ? (
+        {phase === "cta" ? (
           canRequest ? (
             <Button asChild>
               <Link to={buildConfirmHref(purpose, role, true)}>
-                Request access
+                {requestLabel}
               </Link>
             </Button>
           ) : (
             <Button type="button" disabled>
-              Request access
+              {requestLabel}
             </Button>
           )
-        ) : (
+        ) : null}
+
+        {phase === "confirm" ? (
           <div className="space-y-3 rounded-lg border border-border p-4">
             <p className="text-sm font-medium">
               {policyDecision.need_approval
-                ? "Human confirmation required (HITL)"
-                : "Confirm access request"}
+                ? t("metadata.access.confirmHitl")
+                : t("metadata.access.confirmGeneric")}
             </p>
             {policyDecision.need_approval ? (
               <ul className="list-inside list-disc text-sm text-muted-foreground">
@@ -294,7 +303,9 @@ function AccessRequestPanel({
               <input type="hidden" name="role" value={role} />
               <input type="hidden" name="approved" value="true" />
               <Button type="submit" disabled={busy}>
-                {busy ? "Submitting…" : "Confirm"}
+                {busy
+                  ? t("metadata.access.submitting")
+                  : t("metadata.access.confirm")}
               </Button>
               <Button
                 type="submit"
@@ -303,14 +314,16 @@ function AccessRequestPanel({
                 variant="outline"
                 disabled={busy}
               >
-                Save draft
+                {t("metadata.access.saveDraft")}
               </Button>
               <Button asChild variant="ghost">
-                <Link to={buildConfirmHref(purpose, role, false)}>Cancel</Link>
+                <Link to={buildConfirmHref(purpose, role, false)}>
+                  {t("metadata.access.cancel")}
+                </Link>
               </Button>
             </fetcher.Form>
           </div>
-        )}
+        ) : null}
       </div>
     </Panel>
   );
@@ -325,11 +338,13 @@ function AiAccessRequestPanel({
   policyDecision: PolicyDecisionContract;
   submitResult?: MetadataAssetSubmitResult;
 }) {
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
   const showConfirm = searchParams.get("confirm") === "1";
   const fetcher = useFetcher<MetadataAssetSubmitResult>();
   const effectiveResult = fetcher.data ?? submitResult;
   const busy = fetcher.state !== "idle";
+  const submitted = Boolean(effectiveResult?.ok);
 
   if (aiAccessRequest.status === "invalid") {
     return (
@@ -349,11 +364,10 @@ function AiAccessRequestPanel({
     <Panel>
       <div className="mb-3 space-y-1">
         <h2 className="text-type-16 font-semibold text-foreground">
-          AI-assisted access request
+          {t("metadata.access.ai.title")}
         </h2>
         <p className="text-type-14 text-muted-foreground">
-          Validated by Zod before render. Human confirmation is required before
-          submit.
+          {t("metadata.access.ai.desc")}
         </p>
       </div>
       <div className="space-y-4">
@@ -373,7 +387,7 @@ function AiAccessRequestPanel({
           <Badge variant="outline">role: {requestRole}</Badge>
         </div>
 
-        {!showConfirm ? (
+        {submitted ? null : !showConfirm ? (
           canRequest ? (
             <Button asChild>
               <Link
@@ -384,18 +398,18 @@ function AiAccessRequestPanel({
                   { aiFill: true }
                 )}
               >
-                Review AI request
+                {t("metadata.access.ai.review")}
               </Link>
             </Button>
           ) : (
             <Button type="button" disabled>
-              Review AI request
+              {t("metadata.access.ai.review")}
             </Button>
           )
         ) : (
           <div className="space-y-3 rounded-lg border border-border p-4">
             <p className="text-sm font-medium">
-              Review AI-generated request before submit (HITL)
+              {t("metadata.access.ai.confirmTitle")}
             </p>
             {policyDecision.need_approval ? (
               <ul className="list-inside list-disc text-sm text-muted-foreground">
@@ -410,9 +424,9 @@ function AiAccessRequestPanel({
               <div className="flex flex-wrap gap-space-16">
                 <FormField
                   id="ai-request-purpose"
-                  label="Purpose"
+                  label={t("metadata.access.purpose")}
                   aiFilled
-                  aiBadgeLabel="AI suggested"
+                  aiBadgeLabel={t(AI_BADGE_KEY)}
                   className="w-40"
                 >
                   <Select
@@ -425,9 +439,9 @@ function AiAccessRequestPanel({
                 </FormField>
                 <FormField
                   id="ai-request-role"
-                  label="Role"
+                  label={t("metadata.access.role")}
                   aiFilled
-                  aiBadgeLabel="AI suggested"
+                  aiBadgeLabel={t(AI_BADGE_KEY)}
                   className="w-40"
                 >
                   <Select
@@ -439,9 +453,11 @@ function AiAccessRequestPanel({
                   />
                 </FormField>
               </div>
-              <div className="flex gap-space-8">
+              <div className="flex flex-wrap gap-space-8">
                 <Button type="submit" disabled={busy}>
-                  {busy ? "Submitting…" : "Confirm AI request"}
+                  {busy
+                    ? t("metadata.access.submitting")
+                    : t("metadata.access.ai.confirm")}
                 </Button>
                 <Button asChild variant="outline">
                   <Link
@@ -452,7 +468,7 @@ function AiAccessRequestPanel({
                       { aiFill: true }
                     )}
                   >
-                    Cancel
+                    {t("metadata.access.cancel")}
                   </Link>
                 </Button>
               </div>
@@ -465,14 +481,15 @@ function AiAccessRequestPanel({
 }
 
 function DataContractCard({ asset }: { asset: MetadataAssetDetailContract }) {
+  const { t } = useI18n();
   return (
     <Panel>
       <div className="mb-3 space-y-1">
         <h2 className="text-type-16 font-semibold text-foreground">
-          Data contract
+          {t("metadata.contract.title")}
         </h2>
         <p className="text-type-14 text-muted-foreground">
-          Owner, classification, PII fields, and terms of use
+          {t("metadata.contract.desc")}
         </p>
       </div>
       <div className="space-y-3 text-sm">
@@ -541,26 +558,39 @@ function AccessPolicyCard({
 }: {
   policyDecision: PolicyDecisionContract;
 }) {
+  const { t } = useI18n();
   return (
     <Panel>
       <div className="mb-3 space-y-1">
         <h2 className="text-type-16 font-semibold text-foreground">
-          Access policy
+          {t("metadata.access.policy.title")}
         </h2>
         <p className="text-type-14 text-muted-foreground">
-          Policy-driven evaluation (OPA Rego / in-process fallback)
+          {t("metadata.access.policy.desc")}
         </p>
       </div>
       <div className="space-y-4 text-sm">
-        <p>{humanPolicySummary(policyDecision)}</p>
+        <p>{humanPolicySummary(policyDecision, t)}</p>
+        <div className="flex flex-wrap gap-space-8">
+          <Badge variant={policyDecision.allow ? "default" : "outline"}>
+            allow: {String(policyDecision.allow)}
+          </Badge>
+          <Badge
+            variant={policyDecision.need_approval ? "secondary" : "outline"}
+          >
+            need_approval: {String(policyDecision.need_approval)}
+          </Badge>
+          {policyDecision.require_audit ? (
+            <Badge variant="outline">audit required</Badge>
+          ) : null}
+        </div>
         {policyDecision.require_audit ? (
           <p className="text-muted-foreground">
-            Accessing this asset is recorded in the audit log.
+            {t("metadata.access.policy.audit")}
           </p>
         ) : null}
 
         <details
-          open
           className={cn(
             "rounded-lg border border-border p-3",
             "[&_summary]:cursor-pointer [&_summary]:select-none"
@@ -568,27 +598,14 @@ function AccessPolicyCard({
           data-testid="policy-debug-drawer"
         >
           <summary className="text-sm font-medium text-muted-foreground">
-            Technical decision details
+            {t("metadata.access.policy.debug")}
           </summary>
           <div className="mt-3 space-y-3">
-            <div className="flex flex-wrap gap-space-8">
-              <Badge variant={policyDecision.allow ? "default" : "outline"}>
-                allow: {String(policyDecision.allow)}
-              </Badge>
-              <Badge
-                variant={policyDecision.need_approval ? "secondary" : "outline"}
-              >
-                need_approval: {String(policyDecision.need_approval)}
-              </Badge>
-              {policyDecision.require_audit ? (
-                <Badge variant="outline">audit required</Badge>
-              ) : null}
-            </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-type-12 text-muted-foreground">
               decision_id: {policyDecision.decision_id}
             </p>
             {policyDecision.mask_fields.length > 0 ? (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-type-12 text-muted-foreground">
                 masked fields: {policyDecision.mask_fields.join(", ")}
               </p>
             ) : null}
@@ -708,17 +725,8 @@ export function MetadataAssetDetailView({
   existingApplication,
   submitResult,
 }: MetadataAssetDetailProps) {
-  const { t } = useI18n();
   return (
     <div className="space-y-6">
-      <nav className="text-sm text-muted-foreground">
-        <Link to="/metadata" className="hover:text-foreground hover:underline">
-          {t("nav.metadata")}
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">{asset.name}</span>
-      </nav>
-
       <GenUiRenderer document={genUiDocument} />
 
       <DataContractCard asset={asset} />

@@ -4,6 +4,7 @@ import { Button } from "~/components/ui/Button";
 import { Panel } from "~/components/ui/Panel";
 import { Stack } from "~/components/ui/Stack";
 import { Toolbar } from "~/components/ui/Toolbar";
+import { useI18n } from "~/shared/i18n/context";
 
 import { InsightChart } from "./InsightChart";
 import {
@@ -12,21 +13,23 @@ import {
   searchTrend,
 } from "./insights.mock";
 
-const chartOptions: { type: ChartType; label: string }[] = [
-  { type: "bar", label: "長條圖" },
-  { type: "line", label: "折線圖" },
-  { type: "pie", label: "圓餅圖" },
-];
-
 /**
  * 資料視覺化面板（Phase 1 POC，mock 資料）。
  * 圖表類型可切換；Phase 2 將切換狀態收斂到 URL searchParam。
  */
 export function InsightsPanel() {
+  const { t } = useI18n();
   const [chartType, setChartType] = useState<ChartType>("bar");
   const data = chartType === "line" ? searchTrend : catalogDistribution;
   const heading =
-    chartType === "line" ? "每月搜尋次數趨勢" : "Catalog 項目類型分布";
+    chartType === "line"
+      ? t("insights.heading.trend")
+      : t("insights.heading.distribution");
+  const chartOptions: { type: ChartType; labelKey: string }[] = [
+    { type: "bar", labelKey: "insights.chart.bar" },
+    { type: "line", labelKey: "insights.chart.line" },
+    { type: "pie", labelKey: "insights.chart.pie" },
+  ];
 
   return (
     <Stack gap="lg">
@@ -39,7 +42,7 @@ export function InsightsPanel() {
               variant={chartType === option.type ? "default" : "outline"}
               onClick={() => setChartType(option.type)}
             >
-              {option.label}
+              {t(option.labelKey)}
             </Button>
           ))}
         </div>

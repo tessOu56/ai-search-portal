@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { LoaderFunctionArgs, MetaFunction } from "react-router";
-import {
-  Link,
-  useLoaderData,
-  useRouteError,
-  useSearchParams,
-} from "react-router";
+import { useLoaderData, useRouteError, useSearchParams } from "react-router";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { HomeIntro } from "~/components/app/home/HomeIntro";
@@ -15,11 +10,11 @@ import {
   WorkspaceChatView,
   WorkspaceFooter,
 } from "~/components/app/workspace";
-import { Button } from "~/components/ui/Button";
 import { ASK_HOME_RESET_EVENT } from "~/lib/workspace-mode";
 import { listAccessApplications } from "~/services/access-request-store.server";
 import { listMetadataAssets } from "~/services/metadata.server";
 import { getLocale, getTranslations } from "~/shared/i18n";
+import { useI18n } from "~/shared/i18n/context";
 import { t } from "~/shared/i18n/server";
 import {
   buildJsonLdWebPage,
@@ -184,16 +179,13 @@ export default function Index() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  const { title, message, statusCode } = getRouteErrorDisplay(error);
+  const { locale } = useI18n();
+  const { title, message, statusCode } = getRouteErrorDisplay(error, locale);
   return (
     <ErrorBoundaryFallback
       title={title}
       message={message}
       statusCode={statusCode}
-    >
-      <Button asChild>
-        <Link to="/">返回首頁</Link>
-      </Button>
-    </ErrorBoundaryFallback>
+    />
   );
 }
