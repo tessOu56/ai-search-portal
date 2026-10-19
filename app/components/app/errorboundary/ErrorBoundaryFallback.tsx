@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/Button";
 import { Container } from "~/components/ui/Container";
 
 type RootData = {
+  locale?: string;
   translations?: Record<string, string>;
 };
 
@@ -18,6 +19,12 @@ type ErrorBoundaryFallbackProps = {
   children?: ReactNode;
 };
 
+function fallbackCopy(locale?: string) {
+  return locale === "en"
+    ? { reload: "Reload", home: "Back to home" }
+    : { reload: "重新整理", home: "返回首頁" };
+}
+
 export function ErrorBoundaryFallback({
   title,
   message,
@@ -25,6 +32,7 @@ export function ErrorBoundaryFallback({
   children,
 }: ErrorBoundaryFallbackProps) {
   const data = useRouteLoaderData("root") as RootData | undefined;
+  const copy = fallbackCopy(data?.locale);
   const t = (key: string, fallback: string) => {
     const translations = data?.translations;
     if (!translations) return fallback;
@@ -56,10 +64,10 @@ export function ErrorBoundaryFallback({
         {children ?? (
           <div className="flex flex-wrap justify-center gap-stack-dense">
             <Button variant="default" onClick={() => window.location.reload()}>
-              {t("error.reload", "Reload")}
+              {t("error.reload", copy.reload)}
             </Button>
             <Button asChild variant="outline">
-              <Link to="/">{t("error.home", "Back to home")}</Link>
+              <Link to="/">{t("error.home", copy.home)}</Link>
             </Button>
           </div>
         )}
