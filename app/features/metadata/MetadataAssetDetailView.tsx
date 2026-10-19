@@ -277,9 +277,14 @@ function AccessRequestPanel({
               </Link>
             </Button>
           ) : (
-            <Button type="button" disabled>
-              {requestLabel}
-            </Button>
+            <div className="space-y-space-8">
+              <Button type="button" disabled>
+                {requestLabel}
+              </Button>
+              <p className="text-type-14 text-muted-foreground">
+                {t("metadata.access.policy.deny")}
+              </p>
+            </div>
           )
         ) : null}
 
@@ -664,11 +669,14 @@ function ExistingApplicationCard({
     <Panel data-testid="existing-application-card">
       <div className="mb-3 space-y-2">
         <h2 className="text-type-16 font-semibold text-foreground">
-          Your application
+          {t("metadata.access.existing.title")}
         </h2>
         <p className="text-type-14 text-muted-foreground">
-          {application.purpose} · {application.role} · submitted{" "}
-          {new Date(application.createdAt).toLocaleDateString()}
+          {t("metadata.access.existing.meta", {
+            purpose: application.purpose,
+            role: application.role,
+            date: new Date(application.createdAt).toLocaleDateString(),
+          })}
         </p>
         <AccessRequestLifecycleStepper status={application.status} />
       </div>

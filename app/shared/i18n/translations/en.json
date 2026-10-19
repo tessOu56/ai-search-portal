@@ -311,6 +311,8 @@
   "metadata.access.policy.deny": "Access isn't allowed for this purpose and role.",
   "metadata.access.policy.audit": "Accessing this asset is recorded in the audit log.",
   "metadata.access.policy.debug": "Technical decision details",
+  "metadata.access.existing.title": "Your application",
+  "metadata.access.existing.meta": "{purpose} · {role} · submitted {date}",
   "metadata.contract.title": "Data contract",
   "metadata.contract.desc": "Owner, classification, PII fields, and terms of use",
   "metadata.asset.loading": "Loading asset",

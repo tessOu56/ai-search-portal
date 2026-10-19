@@ -311,6 +311,8 @@
   "metadata.access.policy.deny": "此用途與角色不允許存取。",
   "metadata.access.policy.audit": "存取此資產會寫入稽核紀錄。",
   "metadata.access.policy.debug": "技術決策細節",
+  "metadata.access.existing.title": "你的申請",
+  "metadata.access.existing.meta": "{purpose} · {role} · {date} 送出",
   "metadata.contract.title": "資料契約",
   "metadata.contract.desc": "擁有者、分級、個資欄位與使用條款",
   "metadata.asset.loading": "載入資產中",

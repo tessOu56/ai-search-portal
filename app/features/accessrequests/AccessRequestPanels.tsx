@@ -424,7 +424,7 @@ function AccessReviewRequestCard({
               <select
                 name="purpose"
                 defaultValue={app.purpose}
-                aria-label="Edit purpose"
+                aria-label={t("metadata.access.purpose")}
                 className={REVIEW_SELECT_CLASS}
               >
                 <option value="analytics">analytics</option>
@@ -434,7 +434,7 @@ function AccessReviewRequestCard({
               <select
                 name="role"
                 defaultValue={app.role}
-                aria-label="Edit role"
+                aria-label={t("metadata.access.role")}
                 className={REVIEW_SELECT_CLASS}
               >
                 <option value="analyst">analyst</option>

@@ -2,11 +2,12 @@ import { expect, type Page, test } from "@playwright/test";
 
 const WAIT = "domcontentloaded";
 const DEPTH = "Maximum update depth";
+const CATALOG_SEARCH = "/catalog-search";
 
 const NAV_HREFS = [
   "/?view=dashboard",
-  "/catalog-search",
-  "/catalog-search/dictionary",
+  CATALOG_SEARCH,
+  `${CATALOG_SEARCH}/dictionary`,
   "/metadata",
   "/access-requests/review?sessionRole=owner",
   "/my-apis?sessionRole=requester",
@@ -35,7 +36,18 @@ test.describe("surface smoke", () => {
     for (const path of ["/site-map", "/items/new"]) {
       const response = await page.goto(path, { waitUntil: WAIT });
       expect(response?.status(), path).toBe(404);
+      await expect(page.getByTestId("route-error-shell")).toBeVisible();
     }
+  });
+
+  test("locale POST keeps catalog-search path and query", async ({ page }) => {
+    const response = await page.request.post("/api/locale", {
+      form: { locale: "en", next: `${CATALOG_SEARCH}?q=pii` },
+    });
+    expect(response.ok()).toBeTruthy();
+    const landed = new URL(response.url());
+    expect(landed.pathname).toBe(CATALOG_SEARCH);
+    expect(landed.searchParams.get("q")).toBe("pii");
   });
 
   test("bare /access-requests hops to the review queue", async ({ page }) => {
@@ -69,7 +81,7 @@ test.describe("surface smoke", () => {
   test("deep routes mark Overview current and omit create/detail nav rows", async ({
     page,
   }) => {
-    await page.goto("/catalog-search", { waitUntil: WAIT });
+    await page.goto(CATALOG_SEARCH, { waitUntil: WAIT });
     const topbar = page.getByTestId("workspace-topbar");
     await expect(
       topbar.getByRole("link", { name: /Overview|總覽/ })
