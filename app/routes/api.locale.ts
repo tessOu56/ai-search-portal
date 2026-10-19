@@ -2,6 +2,7 @@ import type { ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 
 import { localeCookie } from "~/shared/i18n";
+import { safeInternalRedirectPath } from "~/shared/utils/safe-url";
 
 const SUPPORTED = ["zh-TW", "en"] as const;
 
@@ -13,12 +14,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const locale = form.get("locale");
   const nextRaw = form.get("next");
   const nextUrl =
-    (typeof nextRaw === "string" ? nextRaw : null) ??
-    request.headers.get("Referer") ??
-    "/";
-  const path = nextUrl.startsWith("/")
-    ? nextUrl
-    : new URL(nextUrl).pathname || "/";
+    typeof nextRaw === "string" ? nextRaw : request.headers.get("Referer");
+  const path = safeInternalRedirectPath(nextUrl, new URL(request.url).origin);
 
   if (
     typeof locale === "string" &&

@@ -117,7 +117,7 @@
 
 ## 開發環境（2026-07 統一）
 
-- Node 22（`.nvmrc`，CI 對齊；注意 Dockerfile 仍為 node:20）· pnpm 10.34.3（`packageManager`）
+- Node 22（`.nvmrc`，CI 與 Dockerfile 對齊）· pnpm 10.34.3（`packageManager`）
 - 生態環境／沙箱限制：見 [docs/runbooks/local-dev.md](docs/runbooks/local-dev.md)
 
 ---

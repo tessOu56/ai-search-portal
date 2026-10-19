@@ -2,6 +2,7 @@ import type { ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 
 import { CONTEXT_PACK_COOKIE } from "~/services/context-pack.server";
+import { safeInternalRedirectPath } from "~/shared/utils/safe-url";
 
 const PACK_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 
@@ -12,12 +13,17 @@ export async function action({ request }: ActionFunctionArgs) {
     throw new Response("Missing packId", { status: 400 });
   }
   const redirectTo = form.get("redirectTo");
-  const safeRedirect =
-    typeof redirectTo === "string" && redirectTo.startsWith("/metadata")
-      ? redirectTo
-      : "/metadata";
+  const requestedPath = safeInternalRedirectPath(
+    typeof redirectTo === "string" ? redirectTo : null
+  );
+  const onMetadata =
+    requestedPath === "/metadata" ||
+    requestedPath.startsWith("/metadata/") ||
+    requestedPath.startsWith("/metadata?") ||
+    requestedPath.startsWith("/metadata#");
+  const safeRedirect = onMetadata ? requestedPath : "/metadata";
 
-  const url = new URL(safeRedirect, "http://localhost");
+  const url = new URL(safeRedirect, "https://portal.invalid");
   url.searchParams.set("pack", packId.trim());
 
   return redirect(`${url.pathname}${url.search}`, {
