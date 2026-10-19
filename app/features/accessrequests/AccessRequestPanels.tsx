@@ -423,6 +423,7 @@ function AccessReviewRequestCard({
                 name="purpose"
                 defaultValue={app.purpose}
                 aria-label="Edit purpose"
+                side="top"
                 options={[
                   { value: "analytics", label: "analytics" },
                   { value: "marketing", label: "marketing" },
@@ -433,6 +434,7 @@ function AccessReviewRequestCard({
                 name="role"
                 defaultValue={app.role}
                 aria-label="Edit role"
+                side="top"
                 options={[
                   { value: "analyst", label: "analyst" },
                   { value: "engineer", label: "engineer" },
