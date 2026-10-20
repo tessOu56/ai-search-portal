@@ -116,6 +116,10 @@ export default function Index() {
     setConversationActive(true);
   }, []);
 
+  const onPendingQueryConsumed = useCallback(() => {
+    setPendingQuery(null);
+  }, []);
+
   const onNewConversation = useCallback(() => {
     setConversationActive(false);
     setPendingQuery(null);
@@ -170,7 +174,7 @@ export default function Index() {
       <Atmosphere />
       <WorkspaceChatView
         pendingQuery={pendingQuery}
-        onPendingQueryConsumed={() => setPendingQuery(null)}
+        onPendingQueryConsumed={onPendingQueryConsumed}
         onNewConversation={onNewConversation}
       />
     </div>

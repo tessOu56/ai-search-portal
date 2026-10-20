@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { buildCatalogSearchUrl } from "./catalog-search-url";
 
 const CATALOG_PATH = "/catalog-search";
+const DICTIONARY_PATH = "/catalog-search/dictionary";
 
 /**
  * URL contract tests — /catalog-search ?q= ?type= ?page=
@@ -74,5 +75,14 @@ describe("buildCatalogSearchUrl (URL contract)", () => {
     expect(sp.get("q")).toBe("台北 天氣");
     expect(sp.get("type")).toBe("Dataset");
     expect(sp.get("page")).toBe("3");
+  });
+
+  it("honors dictionary basePath without leaking page=1", () => {
+    expect(buildCatalogSearchUrl({ q: "silver" }, DICTIONARY_PATH)).toBe(
+      `${DICTIONARY_PATH}?q=silver`
+    );
+    expect(buildCatalogSearchUrl({ page: 1 }, DICTIONARY_PATH)).toBe(
+      DICTIONARY_PATH
+    );
   });
 });

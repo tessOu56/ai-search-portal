@@ -33,6 +33,19 @@ export default defineConfig(({ mode }) => {
               ["junit", { outputFile: "reports/junit.xml" }],
             ]
           : ["default"],
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "text-summary", "json-summary"],
+        reportsDirectory: "./coverage",
+        all: true,
+        include: ["app/**/*.{ts,tsx}"],
+        exclude: [
+          "app/**/*.{test,spec}.{ts,tsx}",
+          "app/test/**",
+          "app/entry.client.tsx",
+          "app/entry.server.tsx",
+        ],
+      },
     },
   };
 });

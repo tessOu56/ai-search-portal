@@ -226,18 +226,20 @@ export function ChatInterface({
   };
 
   submitQueryRef.current = submitQuery;
+  const onPendingQueryConsumedRef = useRef(onPendingQueryConsumed);
+  onPendingQueryConsumedRef.current = onPendingQueryConsumed;
 
   useEffect(() => {
     const trimmed = pendingQuery?.trim();
     if (!trimmed) return;
     if (consumedPendingQueryRef.current === trimmed) {
-      onPendingQueryConsumed?.();
+      onPendingQueryConsumedRef.current?.();
       return;
     }
     consumedPendingQueryRef.current = trimmed;
     submitQueryRef.current(trimmed);
-    onPendingQueryConsumed?.();
-  }, [pendingQuery, onPendingQueryConsumed]);
+    onPendingQueryConsumedRef.current?.();
+  }, [pendingQuery]);
 
   const liveAnnouncement = (() => {
     const last = messages[messages.length - 1];
@@ -267,7 +269,11 @@ export function ChatInterface({
         >
           {messages.map((message) =>
             message.role === "user" ? (
-              <ChatBubble key={message.id} variant="user">
+              <ChatBubble
+                key={message.id}
+                variant="user"
+                data-testid="user-turn"
+              >
                 {message.content}
               </ChatBubble>
             ) : (

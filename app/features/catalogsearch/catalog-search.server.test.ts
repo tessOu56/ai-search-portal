@@ -38,4 +38,51 @@ describe("getCatalogSearchPlaceholder (legacy placeholder)", () => {
     expect(model.results.length).toBeGreaterThan(0);
     expect(model.pagination.total).toBeGreaterThan(0);
   });
+
+  it("filters placeholder rows by type and clamps overflow pages", () => {
+    const filtered = getCatalogSearchPlaceholder("", { type: "Dataset" });
+    expect(filtered.results.every((row) => row.itemType === "Dataset")).toBe(
+      true
+    );
+
+    const overflow = getCatalogSearchPlaceholder("", { page: 99 });
+    expect(overflow.pagination.page).toBe(overflow.pagination.totalPages);
+    expect(overflow.pagination.page).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("getCatalogSearchViewModel (facets and paging)", () => {
+  it("keeps Table metadata matches ahead of catalog placeholders", () => {
+    const model = getCatalogSearchViewModel("customer", { type: "Table" });
+    expect(model.activeType).toBe("Table");
+    expect(model.sourceCounts?.metadata).toBeGreaterThan(0);
+    expect(
+      model.results
+        .filter((row) => row.source === "metadata")
+        .every((row) => row.itemType === "Table")
+    ).toBe(true);
+    expect(
+      model.results.some((row) => row.detailHref?.includes("/metadata/"))
+    ).toBe(true);
+  });
+
+  it("drops catalog placeholders when a commerce facet is active", () => {
+    const model = getCatalogSearchViewModel("", {
+      packId: "metalcraft-studio",
+      productType: "experience",
+    });
+    expect(model.sourceCounts?.catalog).toBe(0);
+    expect(model.sourceCounts?.knowledge).toBeGreaterThan(0);
+    expect(model.results.every((row) => row.source !== "catalog")).toBe(true);
+  });
+
+  it("pages hybrid results past page 1", () => {
+    const pageOne = getCatalogSearchViewModel("");
+    expect(pageOne.pagination.total).toBeGreaterThan(
+      pageOne.pagination.pageSize
+    );
+    const pageTwo = getCatalogSearchViewModel("", { page: 2 });
+    expect(pageTwo.pagination.page).toBe(2);
+    expect(pageTwo.results[0]?.id).not.toBe(pageOne.results[0]?.id);
+  });
 });
