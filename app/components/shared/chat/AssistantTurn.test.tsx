@@ -54,6 +54,7 @@ vi.mock("~/shared/i18n/context", () => {
 describe("AssistantTurn (LUI conversation)", () => {
   const CONTINUE = "chat-continue-facets";
   const WAITING = "Waiting for reply...";
+  const NEXT_ACTION = "chat-next-action";
   const REQUEST_HREF = "/metadata/tbl-customers?purpose=marketing&role=analyst";
   it("empty: omits waiting copy, sources, next steps, and continue chips", () => {
     render(<AssistantTurn content="" />);
@@ -115,7 +116,7 @@ describe("AssistantTurn (LUI conversation)", () => {
     expect(
       screen.getByText("Open tbl-customers and request")
     ).toBeInTheDocument();
-    expect(screen.getByTestId("chat-next-action")).toHaveAttribute(
+    expect(screen.getByTestId(NEXT_ACTION)).toHaveAttribute(
       "href",
       REQUEST_HREF
     );
@@ -133,6 +134,32 @@ describe("AssistantTurn (LUI conversation)", () => {
     );
   });
 
+  it("drops javascript and protocol-relative nextActions as non-links", () => {
+    render(
+      <AssistantTurn
+        content="Unsafe action must not be clickable."
+        summary="Guard href schemes from LUI payloads."
+        nextActions={[
+          {
+            label: "Do not execute",
+            href: "javascript:alert(1)",
+          },
+          {
+            label: "Do not leave origin",
+            href: "//evil.com/phish",
+          },
+        ]}
+        query="unsafe href"
+      />
+    );
+    const actions = screen.getAllByTestId(NEXT_ACTION);
+    expect(actions).toHaveLength(2);
+    for (const action of actions) {
+      expect(action.tagName).toBe("SPAN");
+      expect(action).not.toHaveAttribute("href");
+    }
+  });
+
   it("external LIVE nextActions open in a new tab", () => {
     render(
       <AssistantTurn
@@ -147,7 +174,7 @@ describe("AssistantTurn (LUI conversation)", () => {
         query="拍賣拍品在哪裡出價？"
       />
     );
-    const action = screen.getByTestId("chat-next-action");
+    const action = screen.getByTestId(NEXT_ACTION);
     expect(action).toHaveAttribute(
       "href",
       "https://metalcraft-storefront-eta.vercel.app/en/lots/lot-1"

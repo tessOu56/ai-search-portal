@@ -8,6 +8,7 @@ import {
   buildCatalogSearchUrl,
   buildMetadataSearchUrl,
 } from "~/shared/navigation";
+import { classifySafeHref } from "~/shared/utils/safe-url";
 
 export type AssistantSource = {
   title: string;
@@ -161,11 +162,11 @@ function NextSteps({
       {actions.length > 0 ? (
         <ul className="space-y-space-8 text-type-14">
           {actions.map((action) => {
-            const internal = action.href.startsWith("/");
+            const kind = classifySafeHref(action.href);
             return (
               <li key={action.href} className="flex items-start gap-space-8">
                 <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                {internal ? (
+                {kind === "internal" ? (
                   <Link
                     to={action.href}
                     className={SOURCE_LINK_CLASS}
@@ -173,7 +174,7 @@ function NextSteps({
                   >
                     {action.label}
                   </Link>
-                ) : (
+                ) : kind === "external" ? (
                   <a
                     href={action.href}
                     className={SOURCE_LINK_CLASS}
@@ -183,6 +184,8 @@ function NextSteps({
                   >
                     {action.label}
                   </a>
+                ) : (
+                  <span data-testid="chat-next-action">{action.label}</span>
                 )}
               </li>
             );
@@ -205,24 +208,26 @@ function NextSteps({
 function SourceLink({ source }: { source: AssistantSource }) {
   const { t } = useI18n();
   const sourcesLabel = t(KEY_SOURCES_TITLE);
-  const internal = source.url.startsWith("/");
+  const kind = classifySafeHref(source.url);
   const label = `${source.title} (${sourcesLabel})`;
   return (
     <li className="space-y-0.5">
-      {internal ? (
+      {kind === "internal" ? (
         <Link to={source.url} className={SOURCE_LINK_CLASS} aria-label={label}>
           {source.title}
         </Link>
-      ) : (
+      ) : kind === "external" ? (
         <a
           href={source.url}
           className={SOURCE_LINK_CLASS}
-          rel="noreferrer"
+          rel="noreferrer noopener"
           target="_blank"
           aria-label={label}
         >
           {source.title}
         </a>
+      ) : (
+        <span aria-label={label}>{source.title}</span>
       )}
       {source.source ? (
         <p className="text-type-12 text-muted-foreground">{source.source}</p>
