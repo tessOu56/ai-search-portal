@@ -241,7 +241,7 @@ export function ChatInterface({
 
   const liveAnnouncement = (() => {
     const last = messages[messages.length - 1];
-    if (!last || last.role !== "assistant") return "";
+    if (last?.role !== "assistant") return "";
     if (isStreaming) return t(KEY_SUMMARY_WAITING);
     if (last.summary) return last.summary;
     return last.content || "";

@@ -71,8 +71,7 @@ export function recordVital(vital: StoredVital): void {
   ensureHydrated();
   const previous = memoryStore.get(vital.name);
   if (
-    previous &&
-    previous.value === vital.value &&
+    previous?.value === vital.value &&
     previous.rating === vital.rating &&
     previous.route === vital.route
   ) {

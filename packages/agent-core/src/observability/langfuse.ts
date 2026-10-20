@@ -20,13 +20,11 @@ function getLangfuseClient(): Langfuse | null {
   if (!isLangfuseEnabled()) {
     return null;
   }
-  if (!langfuseClient) {
-    langfuseClient = new Langfuse({
-      publicKey: process.env.LANGFUSE_PUBLIC_KEY,
-      secretKey: process.env.LANGFUSE_SECRET_KEY,
-      baseUrl: process.env.LANGFUSE_HOST?.replace(/\/$/, ""),
-    });
-  }
+  langfuseClient ??= new Langfuse({
+    publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+    secretKey: process.env.LANGFUSE_SECRET_KEY,
+    baseUrl: process.env.LANGFUSE_HOST?.replace(/\/$/, ""),
+  });
   return langfuseClient;
 }
 
@@ -68,12 +66,10 @@ function createSession(
   return {
     traceId,
     recordRagStep(step) {
-      if (!ragPipelineSpan) {
-        ragPipelineSpan = trace.span({
-          name: "rag.pipeline",
-          input: { steps: [] },
-        });
-      }
+      ragPipelineSpan ??= trace.span({
+        name: "rag.pipeline",
+        input: { steps: [] },
+      });
       ragPipelineSpan.span({
         name: `rag.${step.step}`,
         input: { detail: step.detail },

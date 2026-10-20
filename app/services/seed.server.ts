@@ -3,8 +3,6 @@
  * 僅在 Map 為空時執行一次。詳見 docs/product/mock-data.md
  */
 
-/* eslint-disable sonarjs/no-duplicate-string -- fixture ids and labels repeat by design */
-
 import { putDish } from "~/features/dish/dish.server";
 import {
   getAllIngredients,

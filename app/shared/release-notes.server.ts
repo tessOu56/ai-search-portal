@@ -36,9 +36,7 @@ function loadReleaseNotes(): ReleaseNote[] {
 let cached: ReleaseNote[] | null = null;
 
 export function getReleaseNotes(): ReleaseNote[] {
-  if (cached === null) {
-    cached = loadReleaseNotes();
-  }
+  cached ??= loadReleaseNotes();
   return [...cached];
 }
 

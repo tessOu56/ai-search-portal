@@ -62,9 +62,7 @@ function buildRow(i: number): CatalogApiRow {
 let cache: CatalogApiRow[] | null = null;
 
 export function getDictionaryRows(): CatalogApiRow[] {
-  if (!cache) {
-    cache = Array.from({ length: DICTIONARY_TOTAL }, (_, i) => buildRow(i));
-  }
+  cache ??= Array.from({ length: DICTIONARY_TOTAL }, (_, i) => buildRow(i));
   return cache;
 }
 
