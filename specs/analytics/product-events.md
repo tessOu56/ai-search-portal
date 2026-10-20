@@ -1,7 +1,5 @@
 # Product analytics events
 
-**Type:** spec · **Weight:** 2
-
 Closed Zod schemas in `packages/shared-contracts/src/analytics.contract.ts`.
 No query text, URLs, or free-form property bags.
 
