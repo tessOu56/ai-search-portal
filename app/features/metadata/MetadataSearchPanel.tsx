@@ -56,6 +56,8 @@ export type MetadataSearchPanelProps = {
   model: MetadataSearchViewModel;
 };
 
+type Translate = (key: string, vars?: Record<string, string>) => string;
+
 const TYPE_OPTIONS = ["Database", "Table", "API", "Dashboard"] as const;
 
 const STANDARD_CHIP_CODES = listIndustryStandards()
@@ -95,6 +97,173 @@ function buildResultsDescription(
     );
   }
   return parts.join(" · ");
+}
+
+function HiddenFacetInputs({ model }: { model: MetadataSearchViewModel }) {
+  return (
+    <>
+      {model.intent ? (
+        <input type="hidden" name="intent" value={model.intent} />
+      ) : null}
+      {model.activeType ? (
+        <input type="hidden" name="type" value={model.activeType} />
+      ) : null}
+      {model.activeMaterial ? (
+        <input type="hidden" name="material" value={model.activeMaterial} />
+      ) : null}
+      {model.activeStandard ? (
+        <input type="hidden" name="standard" value={model.activeStandard} />
+      ) : null}
+      {model.activeProductType ? (
+        <input
+          type="hidden"
+          name="productType"
+          value={model.activeProductType}
+        />
+      ) : null}
+      {model.activeAuctionEligible ? (
+        <input type="hidden" name="auctionEligible" value="true" />
+      ) : null}
+    </>
+  );
+}
+
+function MetadataFacetFilters({
+  model,
+  allLabel,
+  t,
+}: {
+  model: MetadataSearchViewModel;
+  allLabel: string;
+  t: Translate;
+}) {
+  return (
+    <div className="space-y-stack-dense" aria-label={t("catalog.filters")}>
+      <h2 className="text-type-16 font-medium text-foreground">
+        {t("catalog.filters")}
+      </h2>
+      <fieldset className="mb-space-16 space-y-space-4">
+        <legend className="text-type-12 font-medium text-muted-foreground">
+          {t("catalog.filters.type")}
+        </legend>
+        <div className="flex flex-wrap gap-space-4">
+          <FacetChip
+            to={buildMetadataSearchUrl({
+              q: model.query,
+              pack: model.activePackId,
+              intent: model.intent,
+              material: model.activeMaterial,
+              standard: model.activeStandard,
+            })}
+            active={!model.activeType}
+          >
+            {allLabel}
+          </FacetChip>
+          {TYPE_OPTIONS.map((opt) => (
+            <FacetChip
+              key={opt}
+              to={buildMetadataSearchUrl({
+                q: model.query,
+                type: opt,
+                pack: model.activePackId,
+                intent: model.intent,
+                material: model.activeMaterial,
+                standard: model.activeStandard,
+              })}
+              active={model.activeType === opt}
+            >
+              {opt}
+            </FacetChip>
+          ))}
+        </div>
+      </fieldset>
+      <div className="flex flex-wrap gap-stack">
+        <fieldset className="space-y-space-4">
+          <legend className="text-type-12 font-medium text-muted-foreground">
+            {t("catalog.filters.material")}
+          </legend>
+          <div className="flex flex-wrap gap-space-4">
+            <FacetChip
+              to={buildMetadataSearchUrl({
+                q: model.query,
+                type: model.activeType,
+                pack: model.activePackId,
+                intent: model.intent,
+                standard: model.activeStandard,
+              })}
+              active={!model.activeMaterial}
+            >
+              {allLabel}
+            </FacetChip>
+            {MATERIAL_VALUES.map((value) => (
+              <FacetChip
+                key={value}
+                to={buildMetadataSearchUrl({
+                  q: model.query,
+                  type: model.activeType,
+                  pack: model.activePackId,
+                  intent: model.intent,
+                  material: value,
+                  standard: model.activeStandard,
+                })}
+                active={model.activeMaterial === value}
+              >
+                {t(`catalog.filters.material.${value}`)}
+              </FacetChip>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset className="space-y-space-4">
+          <legend className="text-type-12 font-medium text-muted-foreground">
+            {t("catalog.filters.standard")}
+          </legend>
+          <div className="flex flex-wrap gap-space-4">
+            <FacetChip
+              to={buildMetadataSearchUrl({
+                q: model.query,
+                type: model.activeType,
+                pack: model.activePackId,
+                intent: model.intent,
+                material: model.activeMaterial,
+              })}
+              active={!model.activeStandard}
+            >
+              {allLabel}
+            </FacetChip>
+            {STANDARD_CHIP_CODES.map((code) => (
+              <FacetChip
+                key={code}
+                to={buildMetadataSearchUrl({
+                  q: model.query,
+                  type: model.activeType,
+                  pack: model.activePackId,
+                  intent: model.intent,
+                  material: model.activeMaterial,
+                  standard: code,
+                })}
+                active={model.activeStandard === code}
+              >
+                {code}
+              </FacetChip>
+            ))}
+          </div>
+        </fieldset>
+        <div className="flex w-full items-center">
+          <Link
+            to={buildCatalogSearchUrl({
+              q: model.query,
+              intent: model.intent,
+              material: model.activeMaterial,
+              standard: model.activeStandard,
+            })}
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            {t("metadata.openCatalog")}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
@@ -176,28 +345,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
           className="flex w-full flex-col gap-stack-dense sm:flex-row"
         >
           <input type="hidden" name="pack" value={model.activePackId} />
-          {model.intent ? (
-            <input type="hidden" name="intent" value={model.intent} />
-          ) : null}
-          {model.activeType ? (
-            <input type="hidden" name="type" value={model.activeType} />
-          ) : null}
-          {model.activeMaterial ? (
-            <input type="hidden" name="material" value={model.activeMaterial} />
-          ) : null}
-          {model.activeStandard ? (
-            <input type="hidden" name="standard" value={model.activeStandard} />
-          ) : null}
-          {model.activeProductType ? (
-            <input
-              type="hidden"
-              name="productType"
-              value={model.activeProductType}
-            />
-          ) : null}
-          {model.activeAuctionEligible ? (
-            <input type="hidden" name="auctionEligible" value="true" />
-          ) : null}
+          <HiddenFacetInputs model={model} />
           <Input
             name="q"
             defaultValue={model.query}
@@ -209,131 +357,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
         </form>
       </Toolbar>
 
-      <div className="space-y-stack-dense" aria-label={t("catalog.filters")}>
-        <h2 className="text-type-16 font-medium text-foreground">
-          {t("catalog.filters")}
-        </h2>
-        <fieldset className="mb-space-16 space-y-space-4">
-          <legend className="text-type-12 font-medium text-muted-foreground">
-            {t("catalog.filters.type")}
-          </legend>
-          <div className="flex flex-wrap gap-space-4">
-            <FacetChip
-              to={buildMetadataSearchUrl({
-                q: model.query,
-                pack: model.activePackId,
-                intent: model.intent,
-                material: model.activeMaterial,
-                standard: model.activeStandard,
-              })}
-              active={!model.activeType}
-            >
-              {allLabel}
-            </FacetChip>
-            {TYPE_OPTIONS.map((opt) => (
-              <FacetChip
-                key={opt}
-                to={buildMetadataSearchUrl({
-                  q: model.query,
-                  type: opt,
-                  pack: model.activePackId,
-                  intent: model.intent,
-                  material: model.activeMaterial,
-                  standard: model.activeStandard,
-                })}
-                active={model.activeType === opt}
-              >
-                {opt}
-              </FacetChip>
-            ))}
-          </div>
-        </fieldset>
-        <div className="flex flex-wrap gap-stack">
-          <fieldset className="space-y-space-4">
-            <legend className="text-type-12 font-medium text-muted-foreground">
-              {t("catalog.filters.material")}
-            </legend>
-            <div className="flex flex-wrap gap-space-4">
-              <FacetChip
-                to={buildMetadataSearchUrl({
-                  q: model.query,
-                  type: model.activeType,
-                  pack: model.activePackId,
-                  intent: model.intent,
-                  standard: model.activeStandard,
-                })}
-                active={!model.activeMaterial}
-              >
-                {allLabel}
-              </FacetChip>
-              {MATERIAL_VALUES.map((value) => (
-                <FacetChip
-                  key={value}
-                  to={buildMetadataSearchUrl({
-                    q: model.query,
-                    type: model.activeType,
-                    pack: model.activePackId,
-                    intent: model.intent,
-                    material: value,
-                    standard: model.activeStandard,
-                  })}
-                  active={model.activeMaterial === value}
-                >
-                  {t(`catalog.filters.material.${value}`)}
-                </FacetChip>
-              ))}
-            </div>
-          </fieldset>
-          <fieldset className="space-y-space-4">
-            <legend className="text-type-12 font-medium text-muted-foreground">
-              {t("catalog.filters.standard")}
-            </legend>
-            <div className="flex flex-wrap gap-space-4">
-              <FacetChip
-                to={buildMetadataSearchUrl({
-                  q: model.query,
-                  type: model.activeType,
-                  pack: model.activePackId,
-                  intent: model.intent,
-                  material: model.activeMaterial,
-                })}
-                active={!model.activeStandard}
-              >
-                {allLabel}
-              </FacetChip>
-              {STANDARD_CHIP_CODES.map((code) => (
-                <FacetChip
-                  key={code}
-                  to={buildMetadataSearchUrl({
-                    q: model.query,
-                    type: model.activeType,
-                    pack: model.activePackId,
-                    intent: model.intent,
-                    material: model.activeMaterial,
-                    standard: code,
-                  })}
-                  active={model.activeStandard === code}
-                >
-                  {code}
-                </FacetChip>
-              ))}
-            </div>
-          </fieldset>
-          <div className="flex w-full items-center">
-            <Link
-              to={buildCatalogSearchUrl({
-                q: model.query,
-                intent: model.intent,
-                material: model.activeMaterial,
-                standard: model.activeStandard,
-              })}
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              {t("metadata.openCatalog")}
-            </Link>
-          </div>
-        </div>
-      </div>
+      <MetadataFacetFilters model={model} allLabel={allLabel} t={t} />
 
       {knowledgeHits.length > 0 ? (
         <section className="space-y-stack-dense">

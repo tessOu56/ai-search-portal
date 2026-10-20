@@ -36,6 +36,8 @@
   "workspaces": {
     ".": {
       "entry": [
+        "app/entry.client.tsx",
+        "app/entry.server.tsx",
         "app/routes.ts",
         "app/routes/**/*.tsx",
         "app/routes/**/*.ts",

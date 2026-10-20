@@ -24,6 +24,54 @@ type ComposerProps = {
 const CHIP_CLASS =
   "h-auto min-h-8 max-w-full whitespace-normal break-words py-1.5 text-left";
 
+function useTypewriterHint(
+  showTypewriter: boolean,
+  hints: string[],
+  reduceMotion: boolean
+) {
+  const [typed, setTyped] = useState("");
+  const [hintIndex, setHintIndex] = useState(0);
+  const hintCount = hints.length;
+  const activeHint = hintCount > 0 ? (hints[hintIndex % hintCount] ?? "") : "";
+
+  useEffect(() => {
+    if (!showTypewriter || hintCount === 0) return;
+
+    if (reduceMotion) {
+      setTyped(activeHint);
+      const timer = window.setTimeout(() => {
+        setHintIndex((i) => (i + 1) % hintCount);
+      }, 3200);
+      return () => window.clearTimeout(timer);
+    }
+
+    let cancelled = false;
+    let char = 0;
+    setTyped("");
+
+    const typeTimer = window.setInterval(() => {
+      if (cancelled) return;
+      char += 1;
+      setTyped(activeHint.slice(0, char));
+      if (char >= activeHint.length) {
+        window.clearInterval(typeTimer);
+        window.setTimeout(() => {
+          if (cancelled) return;
+          setTyped("");
+          setHintIndex((i) => (i + 1) % hintCount);
+        }, 1600);
+      }
+    }, 38);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(typeTimer);
+    };
+  }, [showTypewriter, reduceMotion, activeHint, hintCount]);
+
+  return { typed, hintIndex, activeHint };
+}
+
 function joinDescribedBy(
   describedBy: string | undefined,
   hintId: string,
@@ -31,6 +79,118 @@ function joinDescribedBy(
 ): string | undefined {
   const ids = [describedBy, includeHint ? hintId : null].filter(Boolean);
   return ids.length > 0 ? ids.join(" ") : undefined;
+}
+
+function resolveSubmitValue(
+  typedQuery: string,
+  showTypewriter: boolean,
+  suggestions: string[],
+  hintIndex: number,
+  activeHint: string
+): string | null {
+  if (typedQuery) return typedQuery;
+  if (!showTypewriter) return null;
+  if (suggestions.length === 0) return activeHint;
+  return suggestions[hintIndex % suggestions.length] ?? activeHint;
+}
+
+function TypewriterOverlay({ typed }: { typed: string }) {
+  return (
+    <span
+      className="pointer-events-none absolute inset-y-0 left-0 flex items-center whitespace-nowrap px-6 text-base text-muted-foreground"
+      aria-hidden
+      data-testid="composer-hint"
+    >
+      <span className="min-w-0 truncate">{typed}</span>
+      <span className="bg-muted-foreground/70 ml-0.5 inline-block h-[1.1em] w-px shrink-0 animate-pulse motion-reduce:animate-none" />
+    </span>
+  );
+}
+
+function ComposerInput({
+  inputId,
+  hintId,
+  value,
+  disabled,
+  showTypewriter,
+  activeHint,
+  typed,
+  describedBy,
+  placeholder,
+  onChange,
+  onFocus,
+  onBlur,
+}: {
+  inputId: string;
+  hintId: string;
+  value: string;
+  disabled: boolean;
+  showTypewriter: boolean;
+  activeHint: string;
+  typed: string;
+  describedBy?: string;
+  placeholder: string;
+  onChange: (value: string) => void;
+  onFocus: () => void;
+  onBlur: () => void;
+}) {
+  return (
+    <div className="relative min-w-0 flex-1">
+      <Input
+        id={inputId}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        autoComplete="off"
+        disabled={disabled}
+        className="pr-4"
+        placeholder={showTypewriter ? "" : placeholder}
+        aria-describedby={joinDescribedBy(
+          describedBy,
+          hintId,
+          Boolean(showTypewriter && activeHint)
+        )}
+      />
+      {showTypewriter && activeHint ? (
+        <span id={hintId} className="sr-only">
+          {activeHint}
+        </span>
+      ) : null}
+      {showTypewriter ? <TypewriterOverlay typed={typed} /> : null}
+    </div>
+  );
+}
+
+function SuggestionChips({
+  suggestions,
+  disabled,
+  onPick,
+}: {
+  suggestions: string[];
+  disabled: boolean;
+  onPick: (question: string) => void;
+}) {
+  if (suggestions.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-space-8">
+      {suggestions.map((question) => (
+        <Button
+          key={question}
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={disabled}
+          onClick={() => onPick(question)}
+          className={CHIP_CLASS}
+          data-testid="golden-question"
+        >
+          {question}
+        </Button>
+      ))}
+    </div>
+  );
 }
 
 function VoiceButton({
@@ -118,8 +278,6 @@ export function Composer({
   const hintId = `${inputId}-hint`;
   const [value, setValue] = useState("");
   const [focused, setFocused] = useState(false);
-  const [typed, setTyped] = useState("");
-  const [hintIndex, setHintIndex] = useState(0);
   const {
     supported: voiceSupported,
     status: voiceStatus,
@@ -130,44 +288,12 @@ export function Composer({
     onTranscript: setValue,
   });
 
-  const hintCount = hints.length;
-  const activeHint = hintCount > 0 ? (hints[hintIndex % hintCount] ?? "") : "";
   const showTypewriter = typewriter && !value && !focused && !disabled;
-
-  useEffect(() => {
-    if (!showTypewriter || hintCount === 0) return;
-
-    if (reduceMotion) {
-      setTyped(activeHint);
-      const timer = window.setTimeout(() => {
-        setHintIndex((i) => (i + 1) % hintCount);
-      }, 3200);
-      return () => window.clearTimeout(timer);
-    }
-
-    let cancelled = false;
-    let char = 0;
-    setTyped("");
-
-    const typeTimer = window.setInterval(() => {
-      if (cancelled) return;
-      char += 1;
-      setTyped(activeHint.slice(0, char));
-      if (char >= activeHint.length) {
-        window.clearInterval(typeTimer);
-        window.setTimeout(() => {
-          if (cancelled) return;
-          setTyped("");
-          setHintIndex((i) => (i + 1) % hintCount);
-        }, 1600);
-      }
-    }, 38);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(typeTimer);
-    };
-  }, [showTypewriter, reduceMotion, activeHint, hintCount]);
+  const { typed, hintIndex, activeHint } = useTypewriterHint(
+    showTypewriter,
+    hints,
+    reduceMotion
+  );
 
   const submitQuery = (raw: string) => {
     const query = raw.trim();
@@ -178,17 +304,14 @@ export function Composer({
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    const typedQuery = value.trim();
-    if (typedQuery) {
-      submitQuery(typedQuery);
-      return;
-    }
-    if (!showTypewriter) return;
-    const mapped =
-      suggestions.length > 0
-        ? (suggestions[hintIndex % suggestions.length] ?? activeHint)
-        : activeHint;
-    submitQuery(mapped);
+    const next = resolveSubmitValue(
+      value.trim(),
+      showTypewriter,
+      suggestions,
+      hintIndex,
+      activeHint
+    );
+    if (next) submitQuery(next);
   };
 
   return (
@@ -202,40 +325,20 @@ export function Composer({
         <label htmlFor={inputId} className="sr-only">
           {t("home.composer.label")}
         </label>
-        <div className="relative min-w-0 flex-1">
-          <Input
-            id={inputId}
-            type="text"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            autoComplete="off"
-            disabled={disabled}
-            className="pr-4"
-            placeholder={showTypewriter ? "" : t("chat.placeholder")}
-            aria-describedby={joinDescribedBy(
-              describedBy,
-              hintId,
-              Boolean(showTypewriter && activeHint)
-            )}
-          />
-          {showTypewriter && activeHint ? (
-            <span id={hintId} className="sr-only">
-              {activeHint}
-            </span>
-          ) : null}
-          {showTypewriter && (
-            <span
-              className="pointer-events-none absolute inset-y-0 left-0 flex items-center whitespace-nowrap px-6 text-base text-muted-foreground"
-              aria-hidden
-              data-testid="composer-hint"
-            >
-              <span className="min-w-0 truncate">{typed}</span>
-              <span className="bg-muted-foreground/70 ml-0.5 inline-block h-[1.1em] w-px shrink-0 animate-pulse motion-reduce:animate-none" />
-            </span>
-          )}
-        </div>
+        <ComposerInput
+          inputId={inputId}
+          hintId={hintId}
+          value={value}
+          disabled={disabled}
+          showTypewriter={showTypewriter}
+          activeHint={activeHint}
+          typed={typed}
+          describedBy={describedBy}
+          placeholder={t("chat.placeholder")}
+          onChange={setValue}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+        />
         {voiceSupported ? (
           <VoiceButton
             disabled={disabled}
@@ -262,24 +365,11 @@ export function Composer({
         </p>
       ) : null}
       {voiceSupported ? <VoiceStatus status={voiceStatus} t={t} /> : null}
-      {suggestions.length > 0 && (
-        <div className="flex flex-wrap gap-space-8">
-          {suggestions.map((question) => (
-            <Button
-              key={question}
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={disabled}
-              onClick={() => submitQuery(question)}
-              className={CHIP_CLASS}
-              data-testid="golden-question"
-            >
-              {question}
-            </Button>
-          ))}
-        </div>
-      )}
+      <SuggestionChips
+        suggestions={suggestions}
+        disabled={disabled}
+        onPick={submitQuery}
+      />
     </div>
   );
 }
