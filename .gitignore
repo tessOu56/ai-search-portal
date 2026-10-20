@@ -16,10 +16,11 @@ node_modules/
 .DS_Store
 *.log
 
-# Env
+# Env — never commit secrets; keep committed example files
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
+!labs/observability/.env.langfuse.example
 
 # IDE
 .vscode/
@@ -45,8 +46,6 @@ node_modules/.cache/
 
 # VitePress build output
 docs/.vitepress/dist/
-
-.env*
 
 # Local orchestration inbox (do not commit — public repo hygiene)
 docs/platform-inbox/
