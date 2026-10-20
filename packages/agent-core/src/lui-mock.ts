@@ -107,8 +107,15 @@ function detectTopic(query: string): FixtureTopic {
   const q = query.toLowerCase();
   if (/pii|個資|敏感|權限|access|分類/.test(q)) return "pii";
   if (/lineage|血緣|upstream|customer_profile|譜系/.test(q)) return "lineage";
-  if (/order|訂單|api/.test(q)) return "orders";
+  // Word-boundary only: a bare "api" used to mis-route "什麼是 API gateway？"
+  // into the orders fixture and drop the LUI 結論/依據/下一步 frame.
+  if (/訂單|\borders\b/.test(q)) return "orders";
   return "generic";
+}
+
+/** Product LUI frame required by docs/product/overview.md and the golden eval. */
+function framedSummary(query: string, topicLine: string): string {
+  return `已理解你的問題：「${query}」。我會先給你結論，再補上依據與下一步。${topicLine}`;
 }
 
 function uniqueByUrl(sources: LuiSource[]): LuiSource[] {
@@ -123,7 +130,10 @@ function buildEcosystemLuiResponse(
 ): LuiResponse {
   if (topic === "food") {
     return {
-      summary: "示範領域 · 菜餚／食譜仍是 Portal loader 頁，沒有 REST。",
+      summary: framedSummary(
+        query,
+        "示範領域 · 菜餚／食譜仍是 Portal loader 頁，沒有 REST。"
+      ),
       answer: [
         `關於「${query}」：Portal 的 /dishes 與 /recipes 是 Remix loader seed（誠實示範殼），`,
         "不是 Nest／公開 REST。Vue lab 另有 mock JSON gallery；此處不假裝已有食物 API。",
@@ -146,7 +156,10 @@ function buildEcosystemLuiResponse(
 
   if (topic === "auction") {
     return {
-      summary: "生態轉址 · 拍賣 kind 到 Plinth LIVE（結算不在 Portal／nx）。",
+      summary: framedSummary(
+        query,
+        "生態轉址 · 拍賣 kind 到 Plinth LIVE（結算不在 Portal／nx）。"
+      ),
       answer: [
         `關於「${query}」：活動類型 auction 的拍品與出價在 Plinth storefront；`,
         "nx event-portal 只列 kind badge 與深鏈。Portal 是目錄＋RAG 轉址，不是拍賣後台。",
@@ -167,7 +180,10 @@ function buildEcosystemLuiResponse(
 
   if (topic === "line_commerce") {
     return {
-      summary: "生態轉址 · LINE 商務／報名示範走 nx event-portal LIVE。",
+      summary: framedSummary(
+        query,
+        "生態轉址 · LINE 商務／報名示範走 nx event-portal LIVE。"
+      ),
       answer: [
         `關於「${query}」：line_commerce kind 的參加者旅程在 nx event-portal（LIFF／labelled demo）；`,
         "Portal 不合成第二個活動後台，也不假裝 LINE 真上架。",
@@ -183,7 +199,10 @@ function buildEcosystemLuiResponse(
   }
 
   return {
-    summary: "生態轉址 · 講座／報名 kind 到 nx event-portal LIVE。",
+    summary: framedSummary(
+      query,
+      "生態轉址 · 講座／報名 kind 到 nx event-portal LIVE。"
+    ),
     answer: [
       `關於「${query}」：talk／工作坊報名與票券旅程在 nx event-portal；`,
       "Portal 只做目錄＋RAG 轉址，不是 event-cms。",
@@ -208,7 +227,10 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
 
   if (topic === "pii") {
     return {
-      summary: "示範 · 含 PII 標籤的資產需 owner 核准後才能分析。",
+      summary: framedSummary(
+        query,
+        "示範 · 含 PII 標籤的資產需 owner 核准後才能分析。"
+      ),
       answer: [
         "依合成目錄，含 PII 標籤的示範資產包括 customer_profile（tbl-customers）",
         "與相關 marketing 用途資料表。分析師角色通常需要 owner 核准；這不是真實授權",
@@ -238,7 +260,10 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
 
   if (topic === "lineage") {
     return {
-      summary: "示範 · customer_profile 的上游血緣可在 metadata 詳情檢視。",
+      summary: framedSummary(
+        query,
+        "示範 · customer_profile 的上游血緣可在 metadata 詳情檢視。"
+      ),
       answer: [
         "依合成 metadata pack，customer_profile（tbl-customers）的上游通常來自",
         " analytics 與相關同意／訂單表。請從下方來源進入 metadata 詳情看 Lineage DAG；",
@@ -266,7 +291,10 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
 
   if (topic === "orders") {
     return {
-      summary: "示範 · orders 相關 API 與資料集可對照 catalog 與 metadata。",
+      summary: framedSummary(
+        query,
+        "示範 · orders 相關 API 與資料集可對照 catalog 與 metadata。"
+      ),
       answer: [
         "依合成目錄，orders 相關資產涵蓋訂單 API、事實表與金流狀態欄位。",
         "建議先用 catalog 篩選 API／Dictionary，再從 metadata 對照契約欄位。",
@@ -305,14 +333,26 @@ function buildQueryAwareFixture(query: string, packId: string): LuiResponse {
   }
 
   return {
-    summary: `示範 · 尚無直接命中，建議從目錄與 metadata 交叉驗證「${query}」。`,
+    summary: framedSummary(
+      query,
+      `示範 · 尚無直接命中，建議從目錄與 metadata 交叉驗證「${query}」。`
+    ),
     answer: [
       "目前知識庫沒有直接命中。建議先釐清範圍，再從 catalog 與 metadata 交叉驗證；",
       "下方按鈕可帶你進入搜尋。此為 public showcase——回覆為合成 fixture，",
       "不是企業級授權答案。",
     ].join(""),
     confidence: 0.72,
-    sources: [],
+    sources: uniqueByUrl([
+      {
+        title: "目錄交叉驗證（示範）",
+        url: catalogKeywordHref(query),
+      },
+      {
+        title: "資料資產交叉驗證（示範）",
+        url: metadataKeywordHref(query, packId),
+      },
+    ]),
     nextSteps: [
       "補充你目前的情境限制或目標",
       "用下方按鈕開啟 catalog／metadata",
@@ -360,7 +400,10 @@ function buildGroundedLuiResponse(
   const firstHref = sources[0]?.url ?? catalogKeywordHref(query);
 
   return {
-    summary: `已依知識庫找到 ${hits.length} 筆與「${query}」相關的依據。`,
+    summary: framedSummary(
+      query,
+      `已依知識庫找到 ${hits.length} 筆與「${query}」相關的依據。`
+    ),
     answer: groundedAnswer,
     confidence: Math.min(0.92, 0.7 + hits.length * 0.05),
     sources,

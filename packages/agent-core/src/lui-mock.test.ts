@@ -103,6 +103,24 @@ describe("buildLuiResponse source citation (T-2026-071)", () => {
     ).toBe(true);
   });
 
+  it("keeps the LUI 結論/依據/下一步 frame on a generic API question", () => {
+    const response = buildLuiResponse("什麼是 API gateway？", {
+      packId: PACK_ID,
+    });
+    expect(response.summary).toContain("理解你的問題");
+    expect(response.summary).toContain("結論");
+    expect(response.summary).toContain("依據");
+    expect(response.summary).toContain("下一步");
+    expect(response.answer).not.toMatch(/orders 相關資產/);
+    expect(response.sources.length).toBeGreaterThan(0);
+  });
+
+  it("still routes explicit orders questions to the orders fixture", () => {
+    const response = buildLuiResponse("orders 訂單狀態", { packId: PACK_ID });
+    expect(response.answer).toMatch(/orders 相關資產/);
+    expect(response.summary).toContain("結論");
+  });
+
   it("keeps food queries on loader dishes/recipes without fake REST", () => {
     const response = buildLuiResponse("有沒有食譜 API？", { packId: PACK_ID });
     expect(response.answer).toMatch(/loader|沒有 REST|honest|示範殼/i);

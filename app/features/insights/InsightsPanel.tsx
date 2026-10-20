@@ -1,21 +1,16 @@
-import { lazy, Suspense, useState } from "react";
-import { ClientOnly } from "remix-utils/client-only";
+import { useState } from "react";
 
 import { Button } from "~/components/ui/Button";
 import { Panel } from "~/components/ui/Panel";
-import { Skeleton } from "~/components/ui/Skeleton";
 import { Stack } from "~/components/ui/Stack";
 import { Toolbar } from "~/components/ui/Toolbar";
 
+import { InsightChart } from "./InsightChart";
 import {
   catalogDistribution,
   type ChartType,
   searchTrend,
 } from "./insights.mock";
-
-const InsightChart = lazy(() =>
-  import("./InsightChart").then((mod) => ({ default: mod.InsightChart }))
-);
 
 const chartOptions: { type: ChartType; label: string }[] = [
   { type: "bar", label: "長條圖" },
@@ -54,15 +49,7 @@ export function InsightsPanel() {
           {heading}
         </h2>
         <div className="h-[320px] w-full min-w-0" data-testid="insights-chart">
-          <ClientOnly fallback={<Skeleton className="size-full rounded-lg" />}>
-            {() => (
-              <Suspense
-                fallback={<Skeleton className="size-full rounded-lg" />}
-              >
-                <InsightChart type={chartType} data={data} />
-              </Suspense>
-            )}
-          </ClientOnly>
+          <InsightChart type={chartType} data={data} />
         </div>
       </Panel>
     </Stack>

@@ -8,7 +8,6 @@ import { Callout } from "~/components/ui/Callout";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { Panel } from "~/components/ui/Panel";
 import { SegmentedNav, SegmentedNavItem } from "~/components/ui/SegmentedNav";
-import { Select } from "~/components/ui/Select";
 import { Skeleton } from "~/components/ui/Skeleton";
 import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { apiMetadataAccessRequestCancel } from "~/shared/api/paths";
@@ -25,6 +24,8 @@ export { myApisHighlightHref };
 
 const STATUS_OK_CLASS = "text-sm text-green-700";
 const STATUS_ERROR_CLASS = "text-sm text-destructive";
+const REVIEW_SELECT_CLASS =
+  "h-9 rounded-[var(--radius)] border border-input bg-background px-3 text-sm text-foreground";
 
 function StatusMessage({ ok, text }: { ok: boolean; text: string }) {
   return (
@@ -419,26 +420,26 @@ function AccessReviewRequestCard({
             >
               <input type="hidden" name="requestId" value={app.id} />
               <input type="hidden" name="decision" value="edited" />
-              <Select
+              <select
                 name="purpose"
                 defaultValue={app.purpose}
                 aria-label="Edit purpose"
-                options={[
-                  { value: "analytics", label: "analytics" },
-                  { value: "marketing", label: "marketing" },
-                  { value: "operations", label: "operations" },
-                ]}
-              />
-              <Select
+                className={REVIEW_SELECT_CLASS}
+              >
+                <option value="analytics">analytics</option>
+                <option value="marketing">marketing</option>
+                <option value="operations">operations</option>
+              </select>
+              <select
                 name="role"
                 defaultValue={app.role}
                 aria-label="Edit role"
-                options={[
-                  { value: "analyst", label: "analyst" },
-                  { value: "engineer", label: "engineer" },
-                  { value: "data_admin", label: "data_admin" },
-                ]}
-              />
+                className={REVIEW_SELECT_CLASS}
+              >
+                <option value="analyst">analyst</option>
+                <option value="engineer">engineer</option>
+                <option value="data_admin">data_admin</option>
+              </select>
               <Button
                 type="submit"
                 size="sm"

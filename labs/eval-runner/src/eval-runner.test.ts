@@ -29,7 +29,7 @@ describe("offline eval golden set", () => {
     expect(cases.length).toBeGreaterThan(0);
     for (const c of cases) {
       const result = await runGoldenCase(c);
-      expect(result.pass, result.reasons.join("; ")).toBe(true);
+      expect(result.pass, `${c.id}: ${result.reasons.join("; ")}`).toBe(true);
     }
   });
 });
