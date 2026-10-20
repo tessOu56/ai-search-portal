@@ -1,7 +1,15 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
+import { E2E_REQUESTER_TOKEN, signIn } from "./auth";
+
 const WAIT = "domcontentloaded";
+
+async function waitForHydration(page: Page) {
+  await expect(page.locator("html[data-hydrated='true']")).toBeAttached({
+    timeout: 30_000,
+  });
+}
 
 const ROUTES = [
   { name: "home", path: "/" },
@@ -44,12 +52,14 @@ test.describe("axe-core a11y", () => {
   test("chat after a turn stays keyboard-labelled and axe-clean", async ({
     page,
   }) => {
+    await signIn(page, E2E_REQUESTER_TOKEN);
     await page.goto(
       `/?q=${encodeURIComponent(
         "Which datasets contain PII and what access do I need?"
       )}`,
       { waitUntil: WAIT }
     );
+    await waitForHydration(page);
     await expect(page.getByTestId("conversation-workspace")).toBeVisible({
       timeout: 30_000,
     });
