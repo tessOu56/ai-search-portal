@@ -18,6 +18,7 @@ import {
   listAccessApplicationsResponseSchema,
   listMetadataResponseSchema,
   mcpToolsCallResponseSchema,
+  metadataLineageResponseSchema,
   reviewAccessResponseSchema,
   submitAccessResponseSchema,
 } from "~/shared/contracts";
@@ -151,6 +152,17 @@ describe("POST access policy", () => {
     const reviewed = reviewAccessResponseSchema.parse(await reviewRes.json());
     expect(reviewed.data.status).toBe("approved");
     expect(reviewed.data.permissionStatus).toBe("granted");
+  });
+});
+
+describe("GET /api/metadata/:assetId/lineage", () => {
+  it("returns contract-shaped lineage for customer_profile", async () => {
+    const res = await fetch(`${apiMetadataAsset(ASSET_CUSTOMERS)}/lineage`);
+    expect(res.ok).toBe(true);
+    const body = metadataLineageResponseSchema.parse(await res.json());
+    expect(body.data.assetId).toBe(ASSET_CUSTOMERS);
+    expect(Array.isArray(body.data.upstream)).toBe(true);
+    expect(Array.isArray(body.data.nodes)).toBe(true);
   });
 });
 
