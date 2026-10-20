@@ -141,7 +141,11 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  const { title, message, statusCode } = getRouteErrorDisplay(error);
+  const data = useRouteLoaderData("root") as RootData | undefined;
+  const { title, message, statusCode } = getRouteErrorDisplay(
+    error,
+    data?.locale
+  );
   return (
     <ErrorBoundaryFallback
       title={title}

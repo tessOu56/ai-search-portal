@@ -27,6 +27,7 @@ vi.mock("~/shared/i18n/context", () => ({
     t: (key: string) => {
       const labels = new Map([
         ["catalog-search.page.title", "Catalog search"],
+        ["catalog.search.aria", "Catalog search query"],
         ["catalog.search.submit", "Search"],
         ["nav.metadata", "Data assets"],
         ["nav.catalog-dictionary", "Dictionary"],

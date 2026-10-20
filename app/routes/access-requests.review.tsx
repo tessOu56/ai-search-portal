@@ -166,13 +166,17 @@ export default function AccessRequestsReviewRoute() {
   const { sessionRole, pending } = useLoaderData<typeof loader>();
   const actionMessage = useActionData<typeof action>();
   const navigation = useNavigation();
+  const loading =
+    navigation.state === "loading" &&
+    navigation.formMethod == null &&
+    navigation.location?.pathname === "/access-requests/review";
   return (
     <ProductPageShell current={t(ACCESS_REVIEW_TITLE_KEY)}>
       <AccessRequestReviewPanel
         pending={pending}
         sessionRole={sessionRole}
         actionMessage={actionMessage}
-        loading={navigation.state !== "idle"}
+        loading={loading}
       />
     </ProductPageShell>
   );

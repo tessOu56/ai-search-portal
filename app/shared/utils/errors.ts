@@ -12,15 +12,53 @@ export type RouteErrorDisplay = {
   statusCode?: number;
 };
 
+type ErrorCopy = {
+  notFoundTitle: string;
+  notFoundBody: string;
+  statusTitle: string;
+  retry: string;
+  genericTitle: string;
+  genericBody: string;
+};
+
+const ERROR_COPY_ZH: ErrorCopy = {
+  notFoundTitle: "找不到頁面",
+  notFoundBody: "您要前往的頁面不存在，請檢查網址或返回首頁。",
+  statusTitle: "發生錯誤 ({status})",
+  retry: "請稍後再試。",
+  genericTitle: "出了點問題",
+  genericBody: "發生未預期的錯誤，請稍後再試。",
+};
+
+const ERROR_COPY_EN: ErrorCopy = {
+  notFoundTitle: "Page not found",
+  notFoundBody: "This page does not exist. Check the URL or go back home.",
+  statusTitle: "Error ({status})",
+  retry: "Please try again in a moment.",
+  genericTitle: "Something went wrong",
+  genericBody: "An unexpected error occurred. Please try again.",
+};
+
+function errorCopyFor(locale?: string): ErrorCopy {
+  return locale === "en" ? ERROR_COPY_EN : ERROR_COPY_ZH;
+}
+
 /**
  * 將 ErrorBoundary 收到的 error 正規化為標題與訊息，供 root 與 route ErrorBoundary 共用。
  * @param error - useRouteError() 回傳值
+ * @param locale - optional UI locale; defaults to zh-TW copy
  * @returns title、message，若為 RouteErrorResponse 則含 statusCode
  */
-export function getRouteErrorDisplay(error: unknown): RouteErrorDisplay {
+export function getRouteErrorDisplay(
+  error: unknown,
+  locale?: string
+): RouteErrorDisplay {
+  const copy = errorCopyFor(locale);
   if (isRouteErrorResponse(error)) {
     const title =
-      error.status === 404 ? "找不到頁面" : `發生錯誤 (${error.status})`;
+      error.status === 404
+        ? copy.notFoundTitle
+        : copy.statusTitle.replace("{status}", String(error.status));
     const dataMessage =
       error.data &&
       typeof (error.data as { message?: unknown }).message === "string"
@@ -28,13 +66,12 @@ export function getRouteErrorDisplay(error: unknown): RouteErrorDisplay {
         : null;
     const message =
       error.status === 404
-        ? "您要前往的頁面不存在，請檢查網址或返回首頁。"
-        : (dataMessage ?? error.statusText ?? "請稍後再試。");
+        ? copy.notFoundBody
+        : (dataMessage ?? error.statusText ?? copy.retry);
     return { title, message, statusCode: error.status };
   }
-  const message =
-    error instanceof Error ? error.message : "發生未預期的錯誤，請稍後再試。";
-  return { title: "出了點問題", message };
+  const message = error instanceof Error ? error.message : copy.genericBody;
+  return { title: copy.genericTitle, message };
 }
 
 /**

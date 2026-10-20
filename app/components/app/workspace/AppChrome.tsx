@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/Button";
 import { useI18n } from "~/shared/i18n/context";
 
 import { OverviewDirectory } from "./OverviewDirectory";
+import { WorkspaceFooter } from "./WorkspaceFooter";
 import {
   useWorkspaceSession,
   WorkspaceSessionProvider,
@@ -37,6 +38,7 @@ function AppChromeFrame({ children }: { children: ReactNode }) {
               className="gap-space-8 md:hidden"
               aria-expanded={directoryOpen}
               aria-controls="overview-directory"
+              aria-haspopup="dialog"
               onClick={() => setDirectoryOpen((open) => !open)}
             >
               <PanelLeft className="size-4" aria-hidden />
@@ -53,6 +55,7 @@ function AppChromeFrame({ children }: { children: ReactNode }) {
           />
           <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto bg-background">
             {children}
+            <WorkspaceFooter />
           </div>
         </div>
       ) : (

@@ -34,6 +34,7 @@ import {
   genUiDocumentSchema,
   metadataAccessRequestSchema,
 } from "~/shared/contracts";
+import { useI18n } from "~/shared/i18n/context";
 import {
   buildJsonLdDataset,
   buildJsonLdFaqPage,
@@ -300,9 +301,9 @@ export async function action({ params, request }: ActionFunctionArgs) {
   });
 }
 
-function MetadataAssetDetailSkeleton() {
+function MetadataAssetDetailSkeleton({ label }: { label: string }) {
   return (
-    <div className="space-y-6" role="status" aria-label="Loading asset">
+    <div className="space-y-6" role="status" aria-label={label}>
       <Skeleton className="h-4 w-48" />
       <Skeleton className="h-40 w-full rounded-2xl" />
       <Skeleton className="h-56 w-full rounded-2xl" />
@@ -324,6 +325,7 @@ export default function MetadataAssetPage() {
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
+  const { t } = useI18n();
   // Only show the skeleton when navigating to a *different* asset — same-page
   // context (purpose/role, confirm=1) changes stay fully interactive.
   const isLoadingDifferentAsset =
@@ -332,7 +334,7 @@ export default function MetadataAssetPage() {
     navigation.location.pathname !== `/metadata/${asset.id}`;
 
   if (isLoadingDifferentAsset) {
-    return <MetadataAssetDetailSkeleton />;
+    return <MetadataAssetDetailSkeleton label={t("metadata.asset.loading")} />;
   }
 
   return (
@@ -360,21 +362,18 @@ export default function MetadataAssetPage() {
 
 /** Route-level error state — asset not found / unexpected errors (T-186 #3). */
 export function ErrorBoundary() {
+  const { t, locale } = useI18n();
   const error = useRouteError();
-  const { title, message, statusCode } = getRouteErrorDisplay(error);
+  const { title, message, statusCode } = getRouteErrorDisplay(error, locale);
   const notFound = isRouteErrorResponse(error) && error.status === 404;
   return (
     <ErrorBoundaryFallback
-      title={notFound ? "Asset not found" : title}
-      message={
-        notFound
-          ? "This metadata asset doesn't exist or was removed. Try the catalog instead."
-          : message
-      }
+      title={notFound ? t("metadata.asset.notFound.title") : title}
+      message={notFound ? t("metadata.asset.notFound.body") : message}
       statusCode={statusCode}
     >
       <Button asChild>
-        <Link to="/metadata">Back to metadata catalog</Link>
+        <Link to="/metadata">{t("metadata.asset.notFound.action")}</Link>
       </Button>
     </ErrorBoundaryFallback>
   );

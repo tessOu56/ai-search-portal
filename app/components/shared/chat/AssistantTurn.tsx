@@ -87,7 +87,8 @@ function EvidenceHeader({
       ) : null}
       {confidence !== undefined ? (
         <span className="font-mono text-type-12 text-muted-foreground">
-          {t("chat.confidence")} {Math.round(confidence * 100)}%
+          {t("chat.confidence")} {Math.round(confidence * 100)}%{" "}
+          {t("chat.confidence.demo")}
         </span>
       ) : null}
     </header>
@@ -229,7 +230,7 @@ function SourceLink({ source }: { source: AssistantSource }) {
         <span aria-label={label}>{source.title}</span>
       )}
       {source.source ? (
-        <p className="text-muted-foreground/80 text-xs">{source.source}</p>
+        <p className="text-type-12 text-muted-foreground">{source.source}</p>
       ) : null}
     </li>
   );

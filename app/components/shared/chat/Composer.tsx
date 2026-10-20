@@ -184,7 +184,7 @@ export function Composer({
     >
       <form
         onSubmit={handleSubmit}
-        className="flex w-full items-center gap-space-8"
+        className="flex w-full min-w-0 items-center gap-space-8"
       >
         <label htmlFor={inputId} className="sr-only">
           {t("home.composer.label")}

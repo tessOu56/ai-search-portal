@@ -33,7 +33,7 @@ export function HomeLanding({
   return (
     <section
       className={cn(
-        "relative isolate flex min-h-[calc(100dvh-4rem)] flex-1 flex-col justify-center overflow-hidden",
+        "relative isolate flex min-h-[calc(100dvh-var(--chrome-topbar,4rem))] flex-1 flex-col justify-center overflow-hidden",
         className
       )}
       id="home-chat"

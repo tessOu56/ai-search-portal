@@ -9,7 +9,6 @@ import {
 } from "~/shared/ecosystem-live";
 import { useI18n } from "~/shared/i18n/context";
 
-import { WorkspaceFooter } from "./WorkspaceFooter";
 import { useWorkspaceSession } from "./WorkspaceSession";
 
 const QUERIES = [
@@ -177,7 +176,6 @@ export function DashboardView() {
           </div>
         </section>
       </main>
-      <WorkspaceFooter />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Form, Link, useRouteLoaderData } from "react-router";
+import { Form, Link, useLocation, useRouteLoaderData } from "react-router";
 
 import { ThemeSwitcher } from "~/components/theme/ThemeSwitcher";
 import { Container } from "~/components/ui/Container";
@@ -18,11 +18,13 @@ type WorkspaceFooterProps = {
 
 export function WorkspaceFooter({ agentMode }: WorkspaceFooterProps) {
   const { t } = useI18n();
+  const location = useLocation();
   const root = useRouteLoaderData("root") as RootData | undefined;
   const locale = root?.locale ?? "zh-TW";
   const version = root?.version ?? "0.0.0";
   const year = String(new Date().getFullYear());
   const localeFormRef = useRef<HTMLFormElement>(null);
+  const nextPath = `${location.pathname}${location.search}`;
   const modeLabel =
     agentMode === "live_llm"
       ? t("chat.badge.live_llm")
@@ -57,7 +59,7 @@ export function WorkspaceFooter({ agentMode }: WorkspaceFooterProps) {
           action={API_LOCALE}
           className="flex items-center gap-space-8"
         >
-          <input type="hidden" name="next" value="/" />
+          <input type="hidden" name="next" value={nextPath} />
           <span className="sr-only">{t("locale.switch")}</span>
           <Select
             name="locale"

@@ -9,21 +9,24 @@ import { Button } from "~/components/ui/Button";
 import { InsightsPanel } from "~/features/insights";
 import { useI18n } from "~/shared/i18n/context";
 
+const INSIGHTS_TITLE_KEY = "nav.insights";
+const INSIGHTS_DESC_KEY = "insights.page.description";
+
 export const meta: MetaFunction = () => [
   { title: "Insights (demo) | Portal" },
   {
     name: "description",
-    content: "以圖表檢視 catalog 與搜尋資料（POC）",
+    content: "Chart view of catalog mix and search trend (demo).",
   },
 ];
 
 export default function InsightsIndexRoute() {
   const { t } = useI18n();
   return (
-    <ProductPageShell current={t("nav.insights")}>
+    <ProductPageShell current={t(INSIGHTS_TITLE_KEY)}>
       <ProductPageHeader
-        title={t("nav.insights")}
-        description="資料視覺化 POC — 可切換圖表類型檢視 catalog 分布與搜尋趨勢。"
+        title={t(INSIGHTS_TITLE_KEY)}
+        description={t(INSIGHTS_DESC_KEY)}
       />
       <InsightsPanel />
     </ProductPageShell>
@@ -31,6 +34,7 @@ export default function InsightsIndexRoute() {
 }
 
 export function ErrorBoundary() {
+  const { t } = useI18n();
   const error = useRouteError();
   const message = isRouteErrorResponse(error)
     ? `${error.status} ${error.statusText}`
@@ -39,16 +43,16 @@ export function ErrorBoundary() {
       : "Insights failed to render";
 
   return (
-    <ProductPageShell current="Insights">
+    <ProductPageShell current={t(INSIGHTS_TITLE_KEY)}>
       <ProductPageHeader
-        title="Insights"
-        description="Chart surface hit an error; reload or switch chart type."
+        title={t(INSIGHTS_TITLE_KEY)}
+        description={t(INSIGHTS_DESC_KEY)}
       />
       <p className="text-type-14 text-muted-foreground" role="alert">
         {message}
       </p>
       <Button asChild variant="outline" size="sm" className="mt-space-16">
-        <a href="/insights">Reload insights</a>
+        <a href="/insights">{t("insights.error.retry")}</a>
       </Button>
     </ProductPageShell>
   );

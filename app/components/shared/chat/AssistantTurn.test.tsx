@@ -23,6 +23,7 @@ vi.mock("react-router", () => ({
 vi.mock("~/shared/i18n/context", () => {
   const labels = new Map<string, string>([
     ["chat.confidence", "Confidence"],
+    ["chat.confidence.demo", "(demo)"],
     ["chat.next.title", "Next steps"],
     ["chat.sources.title", "References"],
     ["chat.continue.catalog", "Continue in catalog"],
@@ -106,7 +107,7 @@ describe("AssistantTurn (LUI conversation)", () => {
       />
     );
     expect(screen.getByText("Three datasets include PII.")).toBeInTheDocument();
-    expect(screen.getByText("Confidence 87%")).toBeInTheDocument();
+    expect(screen.getByText("Confidence 87% (demo)")).toBeInTheDocument();
     expect(
       screen.getByText("Full answer about PII datasets.")
     ).toBeInTheDocument();

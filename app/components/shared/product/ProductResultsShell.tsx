@@ -67,7 +67,9 @@ export function ProductResultsShell({
         ) : isEmpty ? (
           <EmptyState title={emptyMessage} action={emptyAction} />
         ) : (
-          children
+          <div className="-mx-space-4 overflow-x-auto px-space-4 sm:mx-0 sm:px-0">
+            {children}
+          </div>
         )}
         {pagination}
       </div>
