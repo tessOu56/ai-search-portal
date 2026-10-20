@@ -18,7 +18,6 @@ import {
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { AppChrome } from "~/components/app/workspace/AppChrome";
 import { DeferredChrome } from "~/components/shared/chrome/DeferredChrome";
-import { FONT_PRELOADS } from "~/lib/fonts";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
@@ -29,7 +28,6 @@ export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon-16.png", type: "image/png", sizes: "16x16" },
   { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
   { rel: "apple-touch-icon", href: "/apple-touch-icon.svg" },
-  ...FONT_PRELOADS,
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {

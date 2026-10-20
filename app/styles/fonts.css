@@ -1,8 +1,8 @@
-/* Latin woff2 only. LCP files are also preloaded in root. */
+/* Latin woff2 only. Home preloads Inter 400 and Petrona 500. */
 @font-face {
   font-family: "Inter";
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
   font-weight: 400;
   src: url("@fontsource/inter/files/inter-latin-400-normal.woff2")
     format("woff2");

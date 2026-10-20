@@ -18,4 +18,5 @@ export const DISPLAY_FONT_PRELOAD = {
   href: petronaLatin500,
 };
 
-export const FONT_PRELOADS = [BODY_FONT_PRELOAD];
+/** Home only. Other routes skip font preloads so CSS stays first on Slow 4G. */
+export const HOME_FONT_PRELOADS = [BODY_FONT_PRELOAD, DISPLAY_FONT_PRELOAD];

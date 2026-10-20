@@ -11,7 +11,7 @@ import { HomeIntro } from "~/components/app/home/HomeIntro";
 import { HomeLanding } from "~/components/app/home/HomeLanding";
 import { WorkspaceChatView } from "~/components/app/workspace/WorkspaceChatView";
 import { WorkspaceFooter } from "~/components/app/workspace/WorkspaceFooter";
-import { DISPLAY_FONT_PRELOAD } from "~/lib/fonts";
+import { HOME_FONT_PRELOADS } from "~/lib/fonts";
 import { ASK_HOME_RESET_EVENT } from "~/lib/workspace-mode";
 import { listAccessApplications } from "~/services/access-request-store.server";
 import { listMetadataAssets } from "~/services/metadata.server";
@@ -33,7 +33,7 @@ const DashboardView = lazy(async () => {
   return { default: mod.DashboardView };
 });
 
-export const links: LinksFunction = () => [DISPLAY_FONT_PRELOAD];
+export const links: LinksFunction = () => [...HOME_FONT_PRELOADS];
 
 function RouteFallback({ label }: { label: string }) {
   return (
