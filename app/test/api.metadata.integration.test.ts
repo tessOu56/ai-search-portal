@@ -21,6 +21,11 @@ import {
   reviewAccessResponseSchema,
   submitAccessResponseSchema,
 } from "~/shared/contracts";
+import {
+  authHeaders,
+  TEST_REQUESTER_TOKEN,
+  TEST_REVIEWER_TOKEN,
+} from "~/test/auth-fixtures";
 
 const ASSET_CUSTOMERS = "tbl-customers";
 
@@ -66,7 +71,7 @@ describe("POST access policy", () => {
   it("evaluate returns need_approval for analyst + PII", async () => {
     const res = await fetch(API_METADATA_ACCESS_EVALUATE, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(TEST_REQUESTER_TOKEN),
       body: JSON.stringify({
         assetId: ASSET_CUSTOMERS,
         purpose: "analytics",
@@ -81,7 +86,7 @@ describe("POST access policy", () => {
   it("submit without approval returns 422", async () => {
     const res = await fetch(API_METADATA_ACCESS_REQUESTS, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(TEST_REQUESTER_TOKEN),
       body: JSON.stringify({
         assetId: ASSET_CUSTOMERS,
         purpose: "analytics",
@@ -94,7 +99,7 @@ describe("POST access policy", () => {
   it("submit with approval returns 202", async () => {
     const res = await fetch(API_METADATA_ACCESS_REQUESTS, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(TEST_REQUESTER_TOKEN),
       body: JSON.stringify({
         assetId: ASSET_CUSTOMERS,
         purpose: "analytics",
@@ -110,7 +115,7 @@ describe("POST access policy", () => {
   it("save as draft returns 201 and lists as draft", async () => {
     const res = await fetch(API_METADATA_ACCESS_REQUESTS, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(TEST_REQUESTER_TOKEN),
       body: JSON.stringify({
         assetId: ASSET_CUSTOMERS,
         purpose: "analytics",
@@ -125,7 +130,8 @@ describe("POST access policy", () => {
 
   it("lists persisted applications and supports review", async () => {
     const listRes = await fetch(
-      `${API_METADATA_ACCESS_REQUESTS}?pendingOnly=1`
+      `${API_METADATA_ACCESS_REQUESTS}?pendingOnly=1`,
+      { headers: authHeaders(TEST_REVIEWER_TOKEN) }
     );
     expect(listRes.ok).toBe(true);
     const listed = listAccessApplicationsResponseSchema.parse(
@@ -138,7 +144,7 @@ describe("POST access policy", () => {
 
     const reviewRes = await fetch(apiMetadataAccessRequestReview(pending.id), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(TEST_REVIEWER_TOKEN),
       body: JSON.stringify({ decision: "approved" }),
     });
     expect(reviewRes.ok).toBe(true);
@@ -152,7 +158,7 @@ describe("POST /api/mcp/gateway", () => {
   it("metadata.search tool returns results", async () => {
     const res = await fetch(API_MCP_GATEWAY, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(TEST_REQUESTER_TOKEN),
       body: JSON.stringify({
         method: "tools/call",
         params: { name: "metadata.search", arguments: { q: "customer" } },

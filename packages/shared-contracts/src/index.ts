@@ -66,6 +66,20 @@ export {
   listAuditEventsResponseSchema,
 } from "./audit.contract.js";
 export type {
+  AuthErrorCode,
+  AuthErrorResponse,
+  AuthRole,
+  Principal,
+  SessionResponse,
+} from "./auth.contract.js";
+export {
+  authErrorCodeSchema,
+  authErrorResponseSchema,
+  authRoleSchema,
+  principalSchema,
+  sessionResponseSchema,
+} from "./auth.contract.js";
+export type {
   ChatAgentMode,
   ChatQueryParams,
   InternalRagStepPayload,

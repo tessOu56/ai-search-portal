@@ -22,6 +22,9 @@ We will acknowledge and work on a fix or mitigation as reasonably possible.
 - Use example files (e.g. `.env.*.example`) with **placeholders only**.
 - Optional LLM: `OPENAI_API_KEY` must be set **server-side** only; the public demo defaults to offline fixtures.
 - Host deploy secrets (e.g. Vercel) belong in CI secret stores, not in git.
+- Governance writes, audit, chat, and the MCP gateway are **fail-closed** without `ADMIN_API_TOKEN`. Optional `REVIEWER_API_TOKEN` / `REQUESTER_API_TOKEN` mint extra principals. Never trust `role` / `requesterId` from the client body.
+- Review requires `authRole ∈ {reviewer, admin}` and `user.id !== application.requesterId`.
+- Rate limiting uses platform IPs (`x-real-ip` / `x-vercel-forwarded-for` on Vercel). The first `X-Forwarded-For` hop is not trusted.
 
 ## Public narrative
 

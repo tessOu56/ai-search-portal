@@ -1,5 +1,12 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import {
+  E2E_ADMIN_TOKEN,
+  E2E_REQUESTER_TOKEN,
+  E2E_REVIEWER_TOKEN,
+  signIn,
+} from "./auth";
+
 /**
  * T-2026-068 — review center approve / edit / reject (Journey C continuation).
  *
@@ -13,6 +20,7 @@ const PENDING = "pending_approval";
 const AUDIT_API = "/api/audit?limit=20";
 
 async function submitPendingApproval(page: Page) {
+  await signIn(page, E2E_REQUESTER_TOKEN);
   await page.goto(`${PII_ASSET}?purpose=marketing&role=analyst`, {
     waitUntil: WAIT_DOM,
   });
@@ -31,6 +39,7 @@ test.describe("access review center (T-068)", () => {
     page,
   }) => {
     await submitPendingApproval(page);
+    await signIn(page, E2E_REVIEWER_TOKEN);
 
     await page.goto(REVIEW_URL, { waitUntil: WAIT_DOM });
     await expect(
@@ -45,7 +54,9 @@ test.describe("access review center (T-068)", () => {
       page.getByRole("status").filter({ hasText: "approved" })
     ).toBeVisible();
 
-    const audit = await page.request.get(AUDIT_API);
+    const audit = await page.request.get(AUDIT_API, {
+      headers: { Authorization: `Bearer ${E2E_ADMIN_TOKEN}` },
+    });
     expect(audit.ok()).toBeTruthy();
     const body = (await audit.json()) as {
       data: Array<{
@@ -63,6 +74,7 @@ test.describe("access review center (T-068)", () => {
 
   test("reject path: pending → denied + audit", async ({ page }) => {
     await submitPendingApproval(page);
+    await signIn(page, E2E_REVIEWER_TOKEN);
 
     await page.goto(REVIEW_URL, { waitUntil: WAIT_DOM });
     await expect(page.getByText(PENDING).first()).toBeVisible({
@@ -74,7 +86,9 @@ test.describe("access review center (T-068)", () => {
       page.getByRole("status").filter({ hasText: "denied" })
     ).toBeVisible();
 
-    const audit = await page.request.get(AUDIT_API);
+    const audit = await page.request.get(AUDIT_API, {
+      headers: { Authorization: `Bearer ${E2E_ADMIN_TOKEN}` },
+    });
     const body = (await audit.json()) as {
       data: Array<{ action: string; outcome?: string; decisionId?: string }>;
     };
@@ -88,6 +102,7 @@ test.describe("access review center (T-068)", () => {
     page,
   }) => {
     await submitPendingApproval(page);
+    await signIn(page, E2E_REVIEWER_TOKEN);
 
     await page.goto(REVIEW_URL, { waitUntil: WAIT_DOM });
     await expect(page.getByText(PENDING).first()).toBeVisible({
@@ -108,7 +123,9 @@ test.describe("access review center (T-068)", () => {
     await expect(page.getByText("operations · engineer").first()).toBeVisible();
     await expect(page.getByText(PENDING).first()).toBeVisible();
 
-    const audit = await page.request.get(AUDIT_API);
+    const audit = await page.request.get(AUDIT_API, {
+      headers: { Authorization: `Bearer ${E2E_ADMIN_TOKEN}` },
+    });
     const body = (await audit.json()) as {
       data: Array<{ action: string; outcome?: string; decisionId?: string }>;
     };

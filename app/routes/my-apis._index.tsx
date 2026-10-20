@@ -16,12 +16,20 @@ import { Button } from "~/components/ui/Button";
 import { MyApisPanel } from "~/features/accessrequests";
 import {
   expireStaleAccessApplications,
+  getAccessApplication,
   listAccessApplications,
   submitDraftAccessApplication,
 } from "~/services/access-request-store.server";
 import {
+  assertCanMutateOwn,
+  authenticateRequest,
+  requireAuthRole,
+} from "~/services/auth.server";
+import { rejectIfRateLimited } from "~/services/route-guard.server";
+import {
   type GovernanceSessionRole,
   governanceSessionRoleSchema,
+  type Principal,
 } from "~/shared/contracts";
 import { getLocale, getTranslations } from "~/shared/i18n";
 import { useI18n } from "~/shared/i18n/context";
@@ -35,30 +43,51 @@ function resolveSessionRole(raw: string | null): GovernanceSessionRole {
   return parsed.success ? parsed.data : "requester";
 }
 
+function myApisFail(text: string, status: number) {
+  return data({ ok: false as const, text }, { status });
+}
+
+function submitDraftFromForm(user: Principal, form: FormData) {
+  const id = String(form.get("requestId") ?? "");
+  const current = getAccessApplication(id);
+  if (current) {
+    const ownGate = assertCanMutateOwn(user, current);
+    if (!ownGate.ok) return myApisFail(ownGate.error, ownGate.status);
+  }
+  const updated = submitDraftAccessApplication(id);
+  if (!updated.ok) {
+    const conflict = updated.reason === "invalid_transition";
+    return myApisFail(
+      "Draft not found or already submitted",
+      conflict ? 409 : 404
+    );
+  }
+  return data({
+    ok: true as const,
+    text: `${updated.data.assetName} → ${updated.data.status}`,
+  });
+}
+
+function expireStaleAsAdmin(user: Principal) {
+  const adminGate = requireAuthRole(user, ["admin"]);
+  if (!adminGate.ok) return myApisFail(adminGate.error, adminGate.status);
+  const expired = expireStaleAccessApplications(0);
+  return data({
+    ok: true as const,
+    text: `Expired ${expired.length} application(s)`,
+  });
+}
+
 export async function action({ request }: ActionFunctionArgs) {
+  const limited = rejectIfRateLimited(request, "governanceWrite");
+  if (limited) return myApisFail("Too many requests", 429);
+  const auth = authenticateRequest(request);
+  if (!auth.ok) return myApisFail(auth.error, auth.status);
+
   const form = await request.formData();
   const intent = String(form.get("intent") ?? "");
-  if (intent === "submit-draft") {
-    const id = String(form.get("requestId") ?? "");
-    const updated = submitDraftAccessApplication(id);
-    if (!updated.ok) {
-      return data(
-        { ok: false as const, text: "Draft not found or already submitted" },
-        { status: updated.reason === "invalid_transition" ? 409 : 404 }
-      );
-    }
-    return data({
-      ok: true as const,
-      text: `${updated.data.assetName} → ${updated.data.status}`,
-    });
-  }
-  if (intent === "expire-stale") {
-    const expired = expireStaleAccessApplications(0);
-    return data({
-      ok: true as const,
-      text: `Expired ${expired.length} application(s)`,
-    });
-  }
+  if (intent === "submit-draft") return submitDraftFromForm(auth.user, form);
+  if (intent === "expire-stale") return expireStaleAsAdmin(auth.user);
   return data({ ok: false as const, text: "Unknown intent" }, { status: 400 });
 }
 
@@ -66,8 +95,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   expireStaleAccessApplications();
   const url = new URL(request.url);
   const sessionRole = resolveSessionRole(url.searchParams.get("sessionRole"));
-  const applications =
-    sessionRole === "requester" ? listAccessApplications() : [];
+  const principal = authenticateRequest(request);
+  const applications = principal.ok
+    ? listAccessApplications(
+        principal.user.authRole === "requester"
+          ? { requesterId: principal.user.id }
+          : undefined
+      )
+    : [];
   const highlightId = url.searchParams.get("highlight") ?? undefined;
   const locale = await getLocale(request);
   const translations = getTranslations(locale);

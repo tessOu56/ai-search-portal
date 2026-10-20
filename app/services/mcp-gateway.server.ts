@@ -5,10 +5,12 @@ import {
   mcpDiscoverSchema,
   mcpToolsCallRequestSchema,
   parseMcpToolArguments,
+  type Principal,
 } from "@ai-search-portal/contracts";
 import type { z } from "zod";
 
 import { evaluateMetadataAccess } from "~/services/access-policy.server";
+import { verifyHitlConfirmToken } from "~/services/auth.server";
 import {
   getMetadataAsset,
   listMetadataAssets,
@@ -45,29 +47,60 @@ export function getMcpDiscover() {
   });
 }
 
-export function handleMcpToolsCall(body: unknown): {
-  result?: unknown;
-  taskId?: string;
-  error?: string;
-} {
+export type McpCallResult = {
+  status: number;
+  body: {
+    result?: unknown;
+    taskId?: string;
+    error?: string;
+    code?: string;
+  };
+};
+
+export function handleMcpToolsCall(
+  body: unknown,
+  context: { user: Principal }
+): McpCallResult {
   const parsed = mcpToolsCallRequestSchema.safeParse(body);
   if (!parsed.success) {
-    return { error: "Invalid MCP tools/call request" };
+    return { status: 400, body: { error: "Invalid MCP tools/call request" } };
   }
 
   const req = parsed.data;
+  const meta = MCP_TOOL_METADATA[req.params.name];
+  if (meta.requiresHitl) {
+    const token = req._meta.hitlConfirmToken;
+    if (!verifyHitlConfirmToken(token, context.user, req.params.name)) {
+      return {
+        status: 403,
+        body: {
+          error: "Human confirmation required before executing this tool",
+          code: "HITL_REQUIRED",
+        },
+      };
+    }
+  }
+
   switch (req.params.name) {
     case "metadata.search":
-      return handleMetadataSearch(req);
+      return wrapMcp(handleMetadataSearch(req));
     case "metadata.get":
-      return handleMetadataGet(req);
+      return wrapMcp(handleMetadataGet(req));
     case "metadata.lineage":
-      return handleMetadataLineage(req);
+      return wrapMcp(handleMetadataLineage(req));
     case "policy.evaluate":
-      return handlePolicyEvaluate(req);
+      return wrapMcp(handlePolicyEvaluate(req, context.user));
     default:
-      return { error: "Unknown tool" };
+      return { status: 400, body: { error: "Unknown tool" } };
   }
+}
+
+function wrapMcp(body: {
+  result?: unknown;
+  taskId?: string;
+  error?: string;
+}): McpCallResult {
+  return { status: 200, body };
 }
 
 type McpToolsCallRequest = z.infer<typeof mcpToolsCallRequestSchema>;
@@ -121,19 +154,18 @@ function handleMetadataLineage(req: McpToolsCallRequest) {
   return { result: lineage };
 }
 
-function handlePolicyEvaluate(req: McpToolsCallRequest) {
+function handlePolicyEvaluate(req: McpToolsCallRequest, user: Principal) {
   const parsed = parseMcpToolArguments("policy.evaluate", req.params.arguments);
   if (!parsed.ok) return { error: "assetId and purpose required" };
   const args = parsed.data as {
     assetId: string;
     purpose: "analytics" | "marketing" | "operations";
-    role?: "analyst" | "data_admin" | "engineer";
   };
   try {
     const decision = evaluateMetadataAccess({
       assetId: args.assetId,
       purpose: args.purpose,
-      role: args.role,
+      role: user.opaRole,
     });
     return { result: decision };
   } catch {

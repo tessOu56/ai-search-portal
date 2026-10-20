@@ -245,7 +245,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List recent audit events */
+        /** List recent audit events (admin only) */
         get: operations["listAuditEvents"];
         put?: never;
         post?: never;
@@ -282,6 +282,7 @@ export interface components {
         };
         ErrorResponse: {
             error: string;
+            code?: string;
         };
         GovernancePolicyError: {
             error: string;
@@ -382,7 +383,6 @@ export interface components {
         };
         MetadataAccessRequest: components["schemas"]["MetadataAccessEvaluateRequest"] & {
             approved?: boolean;
-            requesterId?: string;
             asDraft?: boolean;
         };
         PolicyDecision: {
@@ -430,7 +430,6 @@ export interface components {
         ReviewAccessRequest: {
             /** @enum {string} */
             decision: "approved" | "denied" | "edited";
-            reviewerId?: string;
             /** @enum {string} */
             purpose?: "analytics" | "marketing" | "operations";
             /** @enum {string} */
@@ -975,7 +974,6 @@ export interface operations {
     listMetadataAccessRequests: {
         parameters: {
             query?: {
-                requesterId?: string;
                 pendingOnly?: "0" | "1";
             };
             header?: never;
@@ -991,6 +989,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ListAccessApplicationsResponse"];
+                };
+            };
+            /** @description Authentication required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description ADMIN_API_TOKEN is not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
@@ -1026,6 +1042,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SubmitAccessResponse"];
+                };
+            };
+            /** @description Authentication required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Access denied by policy */
@@ -1070,6 +1095,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReviewAccessResponse"];
+                };
+            };
+            /** @description Authentication required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden or separation of duties */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Not found */
@@ -1231,6 +1274,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ListAuditEventsResponse"];
+                };
+            };
+            /** @description Authentication required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Admin role required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };

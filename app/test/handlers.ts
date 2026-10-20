@@ -3,8 +3,20 @@
  * 見 docs/conventions/data-test-driven.md、specs/api/handler-mapping.md
  */
 
+import {
+  type Principal,
+  sessionResponseSchema,
+} from "@ai-search-portal/contracts";
 import { http, HttpResponse } from "msw";
 
+import {
+  authenticateRequest,
+  authFailureResponse,
+  sessionClearCookie,
+  sessionCookieValue,
+  sessionSetCookie,
+} from "~/services/auth.server";
+import { API_AUTH_SESSION } from "~/shared/api/paths";
 import {
   createItemRequestSchema,
   getItemResponseSchema,
@@ -141,8 +153,44 @@ export const itemsHandlers = [
   }),
 ];
 
+function sessionBody(user: Principal) {
+  return sessionResponseSchema.parse({ data: user });
+}
+
+const authHandlers = [
+  // Literal path keeps `pnpm run lint:handlers` matched; constant used below.
+  http.get("/api/auth/session", ({ request }) => {
+    const auth = authenticateRequest(request);
+    if (!auth.ok) return authFailureResponse(auth);
+    return HttpResponse.json(sessionBody(auth.user));
+  }),
+  http.post(API_AUTH_SESSION, ({ request }) => {
+    const auth = authenticateRequest(request);
+    if (!auth.ok) return authFailureResponse(auth);
+    const cookie = sessionCookieValue(auth.user);
+    if (!cookie) {
+      return authFailureResponse({
+        ok: false,
+        status: 503,
+        error: "Admin API token is not configured",
+        code: "AUTH_NOT_CONFIGURED",
+      });
+    }
+    return HttpResponse.json(sessionBody(auth.user), {
+      headers: { "Set-Cookie": sessionSetCookie(cookie) },
+    });
+  }),
+  http.delete(API_AUTH_SESSION, () => {
+    return new HttpResponse(null, {
+      status: 204,
+      headers: { "Set-Cookie": sessionClearCookie() },
+    });
+  }),
+];
+
 // ---------- 匯總：註冊所有 API handlers ----------
 export const handlers = [
+  ...authHandlers,
   ...itemsHandlers,
   ...metadataHandlers,
   ...contextHandlers,

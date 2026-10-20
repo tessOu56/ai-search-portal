@@ -13,12 +13,19 @@ import {
   metadataAccessEvaluateRequestSchema,
   metadataAccessRequestSchema,
   metadataLineageResponseSchema,
+  type Principal,
   reviewAccessRequestSchema,
   reviewAccessResponseSchema,
   submitAccessResponseSchema,
 } from "@ai-search-portal/contracts";
 import { Hono } from "hono";
 
+import {
+  canMutateOwn,
+  canReview,
+  getUser,
+  requireBearer,
+} from "../lib/bearer-auth.js";
 import { resolveActivePackId } from "../lib/context-pack-loader.js";
 import { evaluateAccess } from "../policies/evaluate-access.js";
 import {
@@ -90,11 +97,19 @@ metadataApi.get("/:assetId", (c) => {
   return c.json(body);
 });
 
-export const accessRequestsApi = new Hono();
+type AccessRequestEnv = { Variables: { user: Principal } };
+
+export const accessRequestsApi = new Hono<AccessRequestEnv>();
+
+accessRequestsApi.use("*", requireBearer);
 
 accessRequestsApi.get("/", (c) => {
-  const requesterId = c.req.query("requesterId") ?? undefined;
+  const user = getUser(c);
   const pendingOnly = c.req.query("pendingOnly") === "1";
+  const requesterId =
+    user.authRole === "admin" || user.authRole === "reviewer"
+      ? undefined
+      : user.id;
   const body = listAccessApplicationsResponseSchema.parse({
     data: listApplications({ requesterId, pendingOnly }),
   });
@@ -113,8 +128,13 @@ accessRequestsApi.post("/evaluate", async (c) => {
     return c.json({ error: ERROR_INVALID_BODY }, 400);
   }
   try {
+    const user = getUser(c);
     const packId = resolveActivePackId(c.req.query("pack"));
-    const decision = await evaluateAccess({ ...parsed.data, packId });
+    const decision = await evaluateAccess({
+      ...parsed.data,
+      role: user.opaRole,
+      packId,
+    });
     const body = evaluateAccessResponseSchema.parse({ data: decision });
     return c.json(body);
   } catch {
@@ -181,13 +201,18 @@ async function completeAccessSubmit(
   parsed: ReturnType<typeof metadataAccessRequestSchema.safeParse> & {
     success: true;
   },
-  idempotencyKey: string | undefined
+  idempotencyKey: string | undefined,
+  user: ReturnType<typeof getUser>
 ) {
   let decision;
   let asset;
   try {
     const packId = resolveActivePackId(c.req.query("pack"));
-    decision = await evaluateAccess({ ...parsed.data, packId });
+    decision = await evaluateAccess({
+      ...parsed.data,
+      role: user.opaRole,
+      packId,
+    });
     asset = getMetadataAsset(parsed.data.assetId, packId);
   } catch {
     return c.json({ error: ERROR_ASSET_NOT_FOUND }, 404);
@@ -196,8 +221,8 @@ async function completeAccessSubmit(
     return c.json({ error: ERROR_ASSET_NOT_FOUND }, 404);
   }
 
-  const role = parsed.data.role ?? "analyst";
-  const requesterId = parsed.data.requesterId ?? `requester:${role}`;
+  const role = user.opaRole;
+  const requesterId = user.id;
 
   if (parsed.data.asDraft) {
     const body = createDraftApplication({
@@ -274,7 +299,7 @@ accessRequestsApi.post("/", async (c) => {
   if (!parsed.success) {
     return c.json({ error: ERROR_INVALID_BODY }, 400);
   }
-  return completeAccessSubmit(c, parsed, idempotencyKey);
+  return completeAccessSubmit(c, parsed, idempotencyKey, getUser(c));
 });
 
 accessRequestsApi.post("/:requestId/review", async (c) => {
@@ -297,6 +322,14 @@ accessRequestsApi.post("/:requestId/review", async (c) => {
         code: "NOT_FOUND",
       }),
       404
+    );
+  }
+
+  const reviewGate = canReview(getUser(c), current);
+  if (!reviewGate.ok) {
+    return c.json(
+      { error: reviewGate.error, code: reviewGate.code },
+      reviewGate.status
     );
   }
 
@@ -334,6 +367,16 @@ accessRequestsApi.post("/:requestId/review", async (c) => {
 
 accessRequestsApi.post("/:requestId/submit", (c) => {
   const requestId = c.req.param("requestId");
+  const current = getApplication(requestId);
+  if (current) {
+    const ownGate = canMutateOwn(getUser(c), current);
+    if (!ownGate.ok) {
+      return c.json(
+        { error: ownGate.error, code: ownGate.code },
+        ownGate.status
+      );
+    }
+  }
   const updated = submitDraft(requestId);
   if (!updated.ok) {
     if (updated.reason === "not_found") {
@@ -369,6 +412,16 @@ accessRequestsApi.post("/:requestId/submit", (c) => {
 
 accessRequestsApi.post("/:requestId/cancel", (c) => {
   const requestId = c.req.param("requestId");
+  const current = getApplication(requestId);
+  if (current) {
+    const ownGate = canMutateOwn(getUser(c), current);
+    if (!ownGate.ok) {
+      return c.json(
+        { error: ownGate.error, code: ownGate.code },
+        ownGate.status
+      );
+    }
+  }
   const updated = cancelApplication(requestId);
   if (!updated.ok) {
     if (updated.reason === "not_found") {

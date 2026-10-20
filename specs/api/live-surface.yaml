@@ -26,6 +26,7 @@ reservedRestNotLive:
 
 remixBffPaths:
   - /api/audit
+  - /api/auth/session
   - /api/chat
   - /api/context/bindings
   - /api/context/metrics/{metricId}
@@ -82,6 +83,7 @@ honoPaths:
 
 drift:
   bffNotInOpenApi:
+    - /api/auth/session
     - /api/chat
     - /api/context/pack-select
     - /api/knowledge/search

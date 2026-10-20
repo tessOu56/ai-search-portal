@@ -19,7 +19,12 @@ app.use(
   cors({
     origin,
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Idempotency-Key", "X-Request-Id"],
+    allowHeaders: [
+      "Content-Type",
+      "Idempotency-Key",
+      "X-Request-Id",
+      "Authorization",
+    ],
   })
 );
 

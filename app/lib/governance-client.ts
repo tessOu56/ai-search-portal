@@ -17,6 +17,7 @@ export type GovernanceFetchInit = {
   signal?: AbortSignal;
   requestId?: string;
   idempotencyKey?: string;
+  authorization?: string;
 };
 
 function newRequestId(): string {
@@ -40,11 +41,15 @@ export async function governanceFetch(
   if (init.idempotencyKey) {
     headers.set("Idempotency-Key", init.idempotencyKey);
   }
+  if (init.authorization) {
+    headers.set("Authorization", init.authorization);
+  }
   return fetch(path, {
     method: init.method ?? (init.body !== undefined ? "POST" : "GET"),
     headers,
     body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
     signal: init.signal,
+    credentials: "same-origin",
   });
 }
 

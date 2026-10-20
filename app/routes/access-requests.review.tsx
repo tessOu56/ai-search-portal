@@ -17,10 +17,13 @@ import { AccessRequestReviewPanel } from "~/features/accessrequests";
 import {
   editAccessApplication,
   expireStaleAccessApplications,
+  getAccessApplication,
   listAccessApplications,
   reviewAccessApplication,
 } from "~/services/access-request-store.server";
 import { appendAuditEvent } from "~/services/audit-log.server";
+import { assertCanReview, authenticateRequest } from "~/services/auth.server";
+import { rejectIfRateLimited } from "~/services/route-guard.server";
 import {
   type GovernanceSessionRole,
   governanceSessionRoleSchema,
@@ -97,65 +100,78 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   });
 };
 
+function reviewFail(text: string, status: number) {
+  return data({ ok: false as const, text }, { status });
+}
+
+function applyReviewMutation(
+  requestId: string,
+  parsed: ReturnType<typeof reviewAccessRequestSchema.parse>
+) {
+  if (parsed.decision === "edited") {
+    return editAccessApplication({
+      id: requestId,
+      purpose: parsed.purpose,
+      role: parsed.role,
+    });
+  }
+  return reviewAccessApplication({
+    id: requestId,
+    decision: parsed.decision,
+  });
+}
+
+function reviewOutcome(decision: "edited" | "approved" | "denied") {
+  if (decision === "edited") return "edited" as const;
+  if (decision === "approved") return "approved" as const;
+  return "denied" as const;
+}
+
 export async function action({ request }: ActionFunctionArgs) {
+  const limited = rejectIfRateLimited(request, "governanceWrite");
+  if (limited) return reviewFail("Too many requests", 429);
+
+  const auth = authenticateRequest(request);
+  if (!auth.ok) return reviewFail(auth.error, auth.status);
+
   const form = await request.formData();
   const { requestId, parsed } = parseReviewForm(form);
   if (!requestId || !parsed.success) {
-    return data(
-      { ok: false as const, text: "Invalid review payload" },
-      { status: 400 }
-    );
+    return reviewFail("Invalid review payload", 400);
   }
 
-  const updated =
-    parsed.data.decision === "edited"
-      ? editAccessApplication({
-          id: requestId,
-          purpose: parsed.data.purpose,
-          role: parsed.data.role,
-        })
-      : reviewAccessApplication({
-          id: requestId,
-          decision: parsed.data.decision,
-        });
+  const current = getAccessApplication(requestId);
+  if (current) {
+    const reviewGate = assertCanReview(auth.user, current);
+    if (!reviewGate.ok) return reviewFail(reviewGate.error, reviewGate.status);
+  }
 
+  const updated = applyReviewMutation(requestId, parsed.data);
   if (!updated.ok) {
-    return data(
-      {
-        ok: false as const,
-        text:
-          updated.reason === "invalid_transition"
-            ? "Invalid status transition"
-            : "Access request not found",
-      },
-      { status: updated.reason === "invalid_transition" ? 409 : 404 }
+    const conflict = updated.reason === "invalid_transition";
+    return reviewFail(
+      conflict ? "Invalid status transition" : "Access request not found",
+      conflict ? 409 : 404
     );
   }
 
-  const decisionId =
-    updated.data.decision?.decision_id ?? `review:${requestId}`;
   appendAuditEvent({
     action: auditActionFor(parsed.data.decision),
-    actor: { role: updated.data.role },
+    actor: { role: auth.user.opaRole, id: auth.user.id },
     resource: { type: "metadata_asset", id: updated.data.assetId },
-    decisionId,
+    decisionId: updated.data.decision?.decision_id ?? `review:${requestId}`,
     requestId: updated.data.id,
-    outcome:
-      parsed.data.decision === "edited"
-        ? "edited"
-        : parsed.data.decision === "approved"
-          ? "approved"
-          : "denied",
+    outcome: reviewOutcome(parsed.data.decision),
     requireAudit: true,
     reasons: [`review:${parsed.data.decision}`],
   });
 
+  const edited = parsed.data.decision === "edited";
   return data({
     ok: true as const,
-    text:
-      parsed.data.decision === "edited"
-        ? `${updated.data.assetName} edited (still pending)`
-        : `${updated.data.assetName} → ${updated.data.status}`,
+    text: edited
+      ? `${updated.data.assetName} edited (still pending)`
+      : `${updated.data.assetName} → ${updated.data.status}`,
     requestId: updated.data.id,
     status: updated.data.status,
   });

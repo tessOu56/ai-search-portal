@@ -40,5 +40,13 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     // predev builds contracts + agent-core before the vite server boots.
     timeout: 180_000,
+    env: {
+      ...process.env,
+      ADMIN_API_TOKEN: process.env.ADMIN_API_TOKEN ?? "dev-admin-token",
+      REVIEWER_API_TOKEN:
+        process.env.REVIEWER_API_TOKEN ?? "dev-reviewer-token",
+      REQUESTER_API_TOKEN:
+        process.env.REQUESTER_API_TOKEN ?? "dev-requester-token",
+    },
   },
 });

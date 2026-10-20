@@ -295,6 +295,8 @@ paths:
     post:
       operationId: evaluateMetadataAccess
       summary: Evaluate access policy
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -325,12 +327,9 @@ paths:
     get:
       operationId: listMetadataAccessRequests
       summary: List access applications
+      security:
+        - bearerAuth: []
       parameters:
-        - name: requesterId
-          in: query
-          required: false
-          schema:
-            type: string
         - name: pendingOnly
           in: query
           required: false
@@ -344,9 +343,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ListAccessApplicationsResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: ADMIN_API_TOKEN is not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       operationId: submitMetadataAccess
       summary: Submit metadata access request
+      security:
+        - bearerAuth: []
       parameters:
         - name: Idempotency-Key
           in: header
@@ -384,11 +397,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GovernancePolicyError"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/metadata/access-requests/{requestId}/review:
     post:
       operationId: reviewMetadataAccess
       summary: Approve, deny, or edit a pending access request
+      security:
+        - bearerAuth: []
       parameters:
         - name: requestId
           in: path
@@ -420,11 +441,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GovernancePolicyError"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden or separation of duties
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /api/metadata/access-requests/{requestId}/submit:
     post:
       operationId: submitDraftMetadataAccess
       summary: Promote draft application to pending_approval
+      security:
+        - bearerAuth: []
       parameters:
         - name: requestId
           in: path
@@ -461,6 +496,8 @@ paths:
     post:
       operationId: cancelMetadataAccess
       summary: Cancel a draft or pending access request
+      security:
+        - bearerAuth: []
       parameters:
         - name: requestId
           in: path
@@ -525,7 +562,9 @@ paths:
   /api/audit:
     get:
       operationId: listAuditEvents
-      summary: List recent audit events
+      summary: List recent audit events (admin only)
+      security:
+        - bearerAuth: []
       parameters:
         - name: limit
           in: query
@@ -542,8 +581,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ListAuditEventsResponse"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API token
+      description: >
+        ADMIN_API_TOKEN (admin), optional REVIEWER_API_TOKEN / REQUESTER_API_TOKEN.
+        Fail-closed when ADMIN_API_TOKEN is unset.
   schemas:
     MockItem:
       type: object
@@ -603,6 +662,8 @@ components:
       required: [error]
       properties:
         error:
+          type: string
+        code:
           type: string
 
     GovernancePolicyError:
@@ -811,8 +872,6 @@ components:
           properties:
             approved:
               type: boolean
-            requesterId:
-              type: string
             asDraft:
               type: boolean
 
@@ -945,8 +1004,6 @@ components:
         decision:
           type: string
           enum: [approved, denied, edited]
-        reviewerId:
-          type: string
         purpose:
           type: string
           enum: [analytics, marketing, operations]
