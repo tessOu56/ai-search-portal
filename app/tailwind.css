@@ -5,6 +5,7 @@
 @import "./styles/scale.system.css";
 @import "./styles/brand-mark.css";
 @import "./styles/atmosphere.css";
+@import "./styles/a11y.portal.css";
 
 @tailwind base;
 @tailwind components;
@@ -160,27 +161,4 @@
       font-size: var(--type-22);
     }
   }
-}
-
-/*
- * WCAG 2.2 AA overrides (SDK tokens stay canonical; portal remaps use).
- * 1. `.text-primary` is shadcn `--primary` / `--accent-brand` (#bd8356),
- *    3.13:1 on cream. Unlayered so it wins Tailwind utilities.
- * 2. `--status-info` (#0284c7) + white is ~4.0:1. Sky-700 meets 4.5:1.
- *    Selectors match `[data-app][data-theme].dark` specificity.
- */
-.text-primary {
-  color: var(--accent-strong);
-}
-
-/* SDK Callout info: brand-700 gold on brand-50 cream is 3.13:1. */
-.bg-brand-50.text-brand-700 {
-  color: var(--text-primary);
-}
-
-[data-app="portal"],
-[data-app="portal"][data-theme],
-[data-app="portal"].dark,
-[data-app="portal"][data-theme].dark {
-  --status-info: #0369a1;
 }

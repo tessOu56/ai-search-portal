@@ -1,4 +1,4 @@
-/* Latin-only woff2 (no woff fallback) — LCP fonts are also preloaded in root. */
+/* Latin woff2 only. LCP files are also preloaded in root. */
 @font-face {
   font-family: "Inter";
   font-style: normal;
@@ -35,12 +35,7 @@
     format("woff2");
 }
 
-/*
- * Metric-matched fallbacks so font-display:swap does not shift the LCP
- * headline. Inter ≈ Arial; Petrona ≈ Georgia (next/font style overrides).
- * CJK still falls through to system Noto / serif — Shippori is not on the
- * critical path (it was a large Google Fonts download for unused glyphs).
- */
+/* Metric-matched fallbacks — swap must not shift the LCP headline. */
 @font-face {
   font-family: "Inter Fallback";
   src: local("Arial");

@@ -39,7 +39,7 @@
 ### 現況：chat a11y + 語音輸入已上線（T-2026-078）
 
 - **有**：`<html lang>`；skip link `a11y.skipToContent` → `#main-content`（`tabIndex={-1}` 可聚焦）；`eslint-plugin-jsx-a11y`；Radix / Alert ARIA（錯誤 `role="alert"`）；chat history 為 labelled `region` + polite live region（串流中只公告等待，完成後公告摘要／全文，避免 token 洗版）；composer 送出與麥克風皆有 `aria-label`；搜尋結果 facet 有 `aria-current`。
-- **CI**：Playwright `e2e/a11y.spec.ts` 以 `@axe-core/playwright`（WCAG 2.2 AA tags）抽檢 `/`、`/catalog-search`、`/metadata`、`/insights`、`/my-apis`、`/access-requests/review` 與有一輪對話的 chat。報告見 [a11y-report.md](./a11y-report.md)。
+- **CI**：Playwright `e2e/a11y.spec.ts`（`@axe-core/playwright`，WCAG 2.2 AA）。
 - **語音**：共用 `Composer` 在 `SpeechRecognition`／`webkitSpeechRecognition` 可用時顯示麥克風；權限拒絕或不支援不擋鍵盤；辨識結果填入輸入框，由使用者按送出。文案鍵 `composer.voice.*`。
 - **規劃**：[docs/product/a11y-voice-plan.md](./product/a11y-voice-plan.md)（Phase 3 TTS 仍未做）。
 

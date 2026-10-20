@@ -74,5 +74,5 @@
 - **code-review-report.md** — Code Review 報告入口（當期報告與議題見 [code-review/](../code-review/README.md)） 【entry／3】
 - **當期報告與議題**：根目錄 [code-review/](../code-review/README.md)（REPORT.md、issues.md、`pnpm run code-review:list`）
 - **audit-report.md** — 專案盤查報告（依 code-review-spec 與現況盤查結果與待改進項） 【report／3】
-- **perf-report.md** — Lighthouse / Core Web Vitals lab numbers + how to re-run
-- **a11y-report.md** — axe WCAG 2.2 AA gate + contrast remaps
+- **perf-report.md** — CWV lab numbers
+- **a11y-report.md** — axe gate

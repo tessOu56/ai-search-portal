@@ -1,8 +1,3 @@
-/**
- * Typed product-analytics layer. Closed schemas only — no query text.
- * No-op unless VITE_ANALYTICS_ENABLED=1 (same gate as web-vitals POST).
- */
-
 import {
   type AnalyticsEventContract,
   analyticsEventSchema,
@@ -56,7 +51,7 @@ export function isProductAnalyticsEnabled(): boolean {
   return readAnalyticsEnv().VITE_ANALYTICS_ENABLED === "1";
 }
 
-function analyticsEndpoint(): string | null {
+export function productAnalyticsEndpoint(): string | null {
   if (typeof window === "undefined" || !isProductAnalyticsEnabled()) {
     return null;
   }
@@ -87,7 +82,7 @@ function baseFields() {
 export function trackProductEvent(event: AnalyticsEventContract): void {
   const parsed = analyticsEventSchema.safeParse(event);
   if (!parsed.success) return;
-  const url = analyticsEndpoint();
+  const url = productAnalyticsEndpoint();
   if (!url) return;
   try {
     void fetch(url, {
@@ -98,7 +93,7 @@ export function trackProductEvent(event: AnalyticsEventContract): void {
       mode: "cors",
     });
   } catch {
-    // Telemetry must never break UX.
+    /* telemetry is best-effort */
   }
 }
 

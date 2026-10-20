@@ -1,9 +1,4 @@
-/**
- * Product analytics event contracts.
- *
- * Event properties are intentionally closed schemas: no arbitrary text fields
- * or free-form property bags should be accepted by the telemetry pipeline.
- */
+/** Closed analytics schemas — no query text or free-form bags. */
 
 import { z } from "zod";
 
@@ -148,13 +143,7 @@ export const analyticsEventSchema = z.discriminatedUnion("name", [
 export type AnalyticsEventName = z.infer<typeof analyticsEventNameSchema>;
 export type AnalyticsEventContract = z.infer<typeof analyticsEventSchema>;
 
-/**
- * Web Vitals telemetry (T-2026-115, Pillar 4).
- *
- * Deliberately standalone from `analyticsEventSchema` above: it is a
- * page-performance sample (no eventId/session/surface), not a product
- * interaction event. Closed schema — no free-form property bag.
- */
+/** Page-performance sample; not a product interaction event. */
 export const webVitalNameSchema = z.enum(["LCP", "INP", "CLS"]);
 
 export const webVitalRatingSchema = z.enum([

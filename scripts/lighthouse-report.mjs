@@ -1,13 +1,5 @@
 #!/usr/bin/env node
-/**
- * Production Lighthouse / Core Web Vitals capture.
- *
- * Usage (after `pnpm run build`):
- *   PORT=4173 node scripts/lighthouse-report.mjs
- *
- * Writes reports/lighthouse/<stamp>/{summary.json,*.json} and prints a table.
- * Does not start the app — point LIGHTHOUSE_URL at a running production server.
- */
+/** Lab CWV: LIGHTHOUSE_URL must already be serving `pnpm start`. */
 import { mkdir, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
