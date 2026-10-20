@@ -91,6 +91,7 @@ describe("ChatInterface pendingQuery", () => {
     const openStreams = FakeEventSource.instances.filter((s) => !s.closed);
     expect(openStreams.length).toBeLessThanOrEqual(1);
     expect(screen.getAllByText(PII_QUERY).length).toBe(1);
+    expect(screen.getByTestId("user-turn")).toHaveTextContent(PII_QUERY);
   });
 
   it("does not open a stream for a blank pendingQuery", () => {
