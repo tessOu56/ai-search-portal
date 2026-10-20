@@ -2,9 +2,8 @@ import { expect, type Page, test } from "@playwright/test";
 
 /**
  * Flagship chat journey — golden ask → offline fixture → know→act links.
- * Prefer testids and hrefs over i18n copy. Wait for client hydration before
- * clicking chips: SSR markup is visible at DOMContentLoaded, but onClick is not
- * attached until HydratedRouter has created the data router.
+ * Prefer testids and hrefs over i18n copy. SSR chips are visible at
+ * DOMContentLoaded; wait for the client effect marker before clicking.
  */
 
 const WAIT_DOM = "domcontentloaded";
@@ -12,7 +11,7 @@ const PII_QUESTION = "Which datasets contain PII and what access do I need?";
 const PII_RE = /PII/i;
 
 async function waitForHydration(page: Page) {
-  await page.waitForFunction("() => Boolean(window.__reactRouterDataRouter)", {
+  await expect(page.locator("html[data-hydrated='true']")).toBeAttached({
     timeout: 30_000,
   });
 }
@@ -24,10 +23,6 @@ test.describe("chat journey", () => {
     await page.goto("/", { waitUntil: WAIT_DOM });
     await expect(page.getByTestId("route-error-shell")).toHaveCount(0);
     await waitForHydration(page);
-    // Typewriter hint is filled in a client effect — extra proof effects ran.
-    await expect(page.getByTestId("composer-hint")).not.toHaveText("", {
-      timeout: 30_000,
-    });
 
     const chip = page
       .getByTestId("golden-question")

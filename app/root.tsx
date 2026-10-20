@@ -120,6 +120,7 @@ export function Layout({ children }: { children: ReactNode }) {
 export default function App() {
   const data = useRouteLoaderData("root") as RootData | undefined;
   useEffect(() => {
+    document.documentElement.dataset.hydrated = "true";
     startWebVitalsReporting();
   }, []);
   if (!data) {

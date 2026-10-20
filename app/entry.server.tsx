@@ -1,20 +1,55 @@
-import { renderToString } from "react-dom/server";
-import type { EntryContext } from "react-router";
+import { PassThrough } from "node:stream";
+
+import { createReadableStreamFromReadable } from "@react-router/node";
+import { isbot } from "isbot";
+import { renderToPipeableStream } from "react-dom/server";
+import type { AppLoadContext, EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
+
+const ABORT_DELAY_MS = 5_000;
+
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  routerContext: EntryContext
+  routerContext: EntryContext,
+  _loadContext: AppLoadContext
 ) {
-  const markup = renderToString(
-    <ServerRouter context={routerContext} url={request.url} />
-  );
+  const waitForAll = isbot(request.headers.get("user-agent") ?? "");
+  return new Promise((resolve, reject) => {
+    let shellRendered = false;
+    let status = responseStatusCode;
 
-  responseHeaders.set("Content-Type", "text/html");
+    const onReady = () => {
+      shellRendered = true;
+      const body = new PassThrough();
+      const stream = createReadableStreamFromReadable(body);
+      responseHeaders.set("Content-Type", "text/html");
+      resolve(
+        new Response(stream, {
+          headers: responseHeaders,
+          status,
+        })
+      );
+      pipe(body);
+    };
 
-  return new Response(`<!DOCTYPE html>${markup}`, {
-    status: responseStatusCode,
-    headers: responseHeaders,
+    const { pipe, abort } = renderToPipeableStream(
+      <ServerRouter context={routerContext} url={request.url} />,
+      {
+        onAllReady: waitForAll ? onReady : undefined,
+        onShellReady: waitForAll ? undefined : onReady,
+        onShellError(error: unknown) {
+          reject(error);
+        },
+        onError(error: unknown) {
+          status = 500;
+          if (shellRendered) {
+            console.error(error);
+          }
+        },
+      }
+    );
+    setTimeout(abort, ABORT_DELAY_MS);
   });
 }
