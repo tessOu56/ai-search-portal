@@ -161,3 +161,21 @@
     }
   }
 }
+
+/*
+ * WCAG 2.2 AA overrides (SDK tokens stay canonical; portal remaps use).
+ * 1. `.text-primary` is shadcn `--primary` / `--accent-brand` (#bd8356),
+ *    3.13:1 on cream. Unlayered so it wins Tailwind utilities.
+ * 2. `--status-info` (#0284c7) + white is ~4.0:1. Sky-700 meets 4.5:1.
+ *    Selectors match `[data-app][data-theme].dark` specificity.
+ */
+.text-primary {
+  color: var(--accent-strong);
+}
+
+[data-app="portal"],
+[data-app="portal"][data-theme],
+[data-app="portal"].dark,
+[data-app="portal"][data-theme].dark {
+  --status-info: #0369a1;
+}

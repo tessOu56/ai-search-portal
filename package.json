@@ -166,8 +166,10 @@
   "size-limit": [
     {
       "name": "remix-client-assets",
-      "path": "build/client/assets/*.js",
-      "ignore": ["build/client/assets/*sentry*"],
+      "path": [
+        "build/client/assets/*.js",
+        "!build/client/assets/sentry.client-*.js"
+      ],
       "limit": "500 kB",
       "gzip": true
     },

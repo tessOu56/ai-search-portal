@@ -6,10 +6,10 @@ import { renderToPipeableStream } from "react-dom/server";
 import type { AppLoadContext, EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
 
+import { initSentryServer } from "~/lib/monitoring/sentry.server";
+
 const ABORT_DELAY_MS = 5_000;
-const Sentry = process.env.SENTRY_DSN
-  ? (await import("~/lib/monitoring/sentry.server")).initSentryServer()
-  : null;
+const Sentry = initSentryServer();
 
 function handleRequest(
   request: Request,

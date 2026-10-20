@@ -40,11 +40,15 @@ Bottlenecks Lighthouse named:
 
 ## After (this change)
 
-| Route             |                      Perf | LCP | INP | CLS |
-| ----------------- | ------------------------: | --: | --: | --: |
-| `/`               | _(remeasure after build)_ |     |     |     |
-| `/catalog-search` |                           |     |     |     |
-| `/metadata`       |                           |     |     |     |
+| Route             | Perf |       LCP |                  INP |   CLS | Notes                                                                                  |
+| ----------------- | ---: | --------: | -------------------: | ----: | -------------------------------------------------------------------------------------- |
+| `/`               |   67 | **2.9 s** | n/a (no interaction) | 0.000 | Observed LCP **623 → 310 ms**; render delay **587 → 284 ms**. Simulated +7 vs baseline |
+| `/catalog-search` |   64 |     3.4 s |                  n/a | 0.000 | Lab noise vs baseline 67 / 3.0 s; unthrottled LCP ~150–190 ms                          |
+| `/metadata`       |   65 |     3.3 s |                  n/a | 0.000 | Same webfont path as catalog; unthrottled LCP ~150–190 ms                              |
+
+Home is the win: static LCP headline + self-hosted fonts. Catalog/metadata
+simulated scores moved within Lighthouse noise; field LCP is dominated by
+font swap, not JS. INP still has no lab Event Timing on a cold navigation.
 
 ## What changed
 

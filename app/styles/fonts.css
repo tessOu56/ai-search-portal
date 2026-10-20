@@ -1,7 +1,39 @@
-@import "@fontsource/inter/latin-400.css";
-@import "@fontsource/inter/latin-500.css";
-@import "@fontsource/inter/latin-600.css";
-@import "@fontsource/petrona/latin-500.css";
+/* Latin-only woff2 (no woff fallback) — LCP fonts are also preloaded in root. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("@fontsource/inter/files/inter-latin-400-normal.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-display: optional;
+  font-weight: 500;
+  src: url("@fontsource/inter/files/inter-latin-500-normal.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-display: optional;
+  font-weight: 600;
+  src: url("@fontsource/inter/files/inter-latin-600-normal.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "Petrona";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("@fontsource/petrona/files/petrona-latin-500-normal.woff2")
+    format("woff2");
+}
 
 /*
  * Metric-matched fallbacks so font-display:swap does not shift the LCP

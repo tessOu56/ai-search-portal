@@ -4,7 +4,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 import { sentryUploadEnabled } from "./app/lib/monitoring/env";
 
-export default defineConfig(async (config) => {
+export default defineConfig((config) => {
   const isTest = config.mode === "test" || process.env.VITEST;
   const uploadSentry = !isTest && sentryUploadEnabled();
   const sentryConfig = {
@@ -15,11 +15,6 @@ export default defineConfig(async (config) => {
       filesToDeleteAfterUpload: ["./build/**/*.map"],
     },
   };
-  const sentryPlugins = uploadSentry
-    ? await (
-        await import("@sentry/react-router/vite")
-      ).sentryReactRouter(sentryConfig, config)
-    : [];
   return {
     ...(uploadSentry ? { sentryConfig } : {}),
     build: {
@@ -30,7 +25,6 @@ export default defineConfig(async (config) => {
       // msw/server without triggering the framework server-only check.
       ...(isTest ? [] : [reactRouter()]),
       tsconfigPaths(),
-      ...sentryPlugins,
     ],
     // @is_tess/components dist uses extensionless `./ux` re-exports that Node ESM
     // rejects when left external — bundle into SSR (also pulls tokens CSS deps).

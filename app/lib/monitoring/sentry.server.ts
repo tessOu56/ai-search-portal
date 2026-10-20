@@ -13,7 +13,6 @@ export function initSentryServer(): typeof Sentry | null {
       dsn,
       environment: process.env.NODE_ENV,
       tracesSampleRate: readServerTracesSampleRate(),
-      sendDefaultPii: false,
     });
   }
   return Sentry;

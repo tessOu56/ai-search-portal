@@ -13,7 +13,6 @@ export function initSentryClient(): void {
     dsn,
     environment: import.meta.env.MODE,
     tracesSampleRate: readClientTracesSampleRate(),
-    sendDefaultPii: false,
     integrations: [Sentry.reactRouterTracingIntegration()],
   });
 }
