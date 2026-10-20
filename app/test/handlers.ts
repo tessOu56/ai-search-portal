@@ -158,7 +158,8 @@ function sessionBody(user: Principal) {
 }
 
 const authHandlers = [
-  http.get(API_AUTH_SESSION, ({ request }) => {
+  // Literal path keeps `pnpm run lint:handlers` matched; constant used below.
+  http.get("/api/auth/session", ({ request }) => {
     const auth = authenticateRequest(request);
     if (!auth.ok) return authFailureResponse(auth);
     return HttpResponse.json(sessionBody(auth.user));

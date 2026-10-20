@@ -22,7 +22,7 @@ function loaderArgs(url: string, headers?: HeadersInit): LoaderFunctionArgs {
     request: new Request(url, { headers }),
     params: {},
     context: {},
-  };
+  } as LoaderFunctionArgs;
 }
 
 function actionArgs(
@@ -34,7 +34,7 @@ function actionArgs(
     request: new Request(url, init),
     params,
     context: {},
-  };
+  } as ActionFunctionArgs;
 }
 
 const AUDIT_URL = `http://localhost${API_AUDIT}`;
