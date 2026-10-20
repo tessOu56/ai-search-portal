@@ -21,6 +21,7 @@ import { DeferredChrome } from "~/components/shared/chrome/DeferredChrome";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
+import fontFacesHref from "~/styles/fontfaces.css?url";
 
 export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico", sizes: "any" },
@@ -79,6 +80,9 @@ export function Layout({ children }: { children: ReactNode }) {
         />
         <Meta />
         <Links />
+        <noscript>
+          <link rel="stylesheet" href={fontFacesHref} />
+        </noscript>
       </head>
       <body className="bg-background font-sans antialiased">
         <a
@@ -104,6 +108,10 @@ export default function App() {
     let cancelled = false;
     let idleId: number | undefined;
     const startMonitoring = () => {
+      const fontFaces = document.createElement("link");
+      fontFaces.rel = "stylesheet";
+      fontFaces.href = fontFacesHref;
+      document.head.appendChild(fontFaces);
       void (async () => {
         const { startWebVitalsReporting } =
           await import("~/lib/analytics/web-vitals-reporter");
