@@ -148,7 +148,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
-      - name: Run E2E (Playwright + axe-core a11y, mock-first / offline)
+      - name: Run E2E (Playwright + axe-core WCAG 2.2 AA, mock-first / offline)
         run: pnpm run test:e2e
       - name: Upload E2E report on failure
         if: failure()

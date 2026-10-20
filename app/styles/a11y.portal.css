@@ -1,0 +1,15 @@
+/* Higher specificity so this wins after Vite flattens @layer utilities. */
+[data-app="portal"] .text-primary {
+  color: var(--accent-strong);
+}
+
+.bg-brand-50.text-brand-700 {
+  color: var(--text-primary);
+}
+
+[data-app="portal"],
+[data-app="portal"][data-theme],
+[data-app="portal"].dark,
+[data-app="portal"][data-theme].dark {
+  --status-info: #0369a1;
+}

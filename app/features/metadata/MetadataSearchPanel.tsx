@@ -1,4 +1,3 @@
-import { listIndustryStandards } from "@ai-search-portal/contracts";
 import { Form, Link, useNavigation } from "react-router";
 
 import { FacetChip } from "~/components/shared/product/FacetChip";
@@ -60,9 +59,7 @@ type Translate = (key: string, vars?: Record<string, string>) => string;
 
 const TYPE_OPTIONS = ["Database", "Table", "API", "Dashboard"] as const;
 
-const STANDARD_CHIP_CODES = listIndustryStandards()
-  .filter((e) => ["925", "999", "14K", "18K", "950"].includes(e.code))
-  .map((e) => e.code);
+const STANDARD_CHIP_CODES = ["925", "999", "14K", "18K", "950"] as const;
 
 const MATERIAL_VALUES = [
   "sterling_silver",

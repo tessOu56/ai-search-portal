@@ -1,8 +1,11 @@
 import { FormField } from "@is_tess/components";
-import { useRef } from "react";
+import { lazy, Suspense, useRef } from "react";
 import { Link, useFetcher, useSearchParams, useSubmit } from "react-router";
 
-import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
+const AiFallbackPanel = lazy(async () => {
+  const mod = await import("~/components/shared/chat/AiFallbackPanel");
+  return { default: mod.AiFallbackPanel };
+});
 import { GenUiRenderer } from "~/components/shared/genui";
 import { AccessRequestLifecycleStepper } from "~/components/shared/governance";
 import { Badge } from "~/components/ui/Badge";
@@ -354,7 +357,9 @@ function AiAccessRequestPanel({
   if (aiAccessRequest.status === "invalid") {
     return (
       <div className="space-y-4">
-        <AiFallbackPanel query={aiAccessRequest.query} types={["Dataset"]} />
+        <Suspense fallback={null}>
+          <AiFallbackPanel query={aiAccessRequest.query} types={["Dataset"]} />
+        </Suspense>
         <p className="text-sm text-muted-foreground" role="alert">
           {aiAccessRequest.reason}
         </p>

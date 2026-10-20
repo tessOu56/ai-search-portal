@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
-import { E2E_REQUESTER_TOKEN, signIn } from "./auth";
+import { E2E_ADMIN_TOKEN, E2E_REQUESTER_TOKEN, signIn } from "./auth";
 
 const WAIT = "domcontentloaded";
 
@@ -18,10 +18,22 @@ const ROUTES = [
   { name: "insights", path: "/insights" },
 ] as const;
 
+const SIGNED_IN_ROUTES = [
+  {
+    name: "my-apis",
+    path: "/my-apis?sessionRole=requester",
+    token: E2E_REQUESTER_TOKEN,
+  },
+  {
+    name: "access-review",
+    path: "/access-requests/review?sessionRole=owner",
+    token: E2E_ADMIN_TOKEN,
+  },
+] as const;
+
 async function assertNoCriticalViolations(page: Page, name: string) {
   const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-    .disableRules(["color-contrast"])
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();
 
   const serious = results.violations.filter(
@@ -43,6 +55,15 @@ async function assertNoCriticalViolations(page: Page, name: string) {
 test.describe("axe-core a11y", () => {
   for (const route of ROUTES) {
     test(`${route.name} has no serious axe violations`, async ({ page }) => {
+      await page.goto(route.path, { waitUntil: WAIT });
+      await expect(page.getByTestId("route-error-shell")).toHaveCount(0);
+      await assertNoCriticalViolations(page, route.name);
+    });
+  }
+
+  for (const route of SIGNED_IN_ROUTES) {
+    test(`${route.name} has no serious axe violations`, async ({ page }) => {
+      await signIn(page, route.token);
       await page.goto(route.path, { waitUntil: WAIT });
       await expect(page.getByTestId("route-error-shell")).toHaveCount(0);
       await assertNoCriticalViolations(page, route.name);

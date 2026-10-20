@@ -2,9 +2,24 @@ import { reactRouter } from "@react-router/dev/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig(({ mode }) => {
-  const isTest = mode === "test" || process.env.VITEST;
+import { sentryUploadEnabled } from "./app/lib/monitoring/env";
+
+export default defineConfig((config) => {
+  const isTest = config.mode === "test" || process.env.VITEST;
+  const uploadSentry = !isTest && sentryUploadEnabled();
+  const sentryConfig = {
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    sourcemaps: {
+      filesToDeleteAfterUpload: ["./build/**/*.map"],
+    },
+  };
   return {
+    ...(uploadSentry ? { sentryConfig } : {}),
+    build: {
+      sourcemap: uploadSentry ? ("hidden" as const) : false,
+    },
     plugins: [
       // React Router plugin is disabled in test so app/test/setup.ts can import
       // msw/server without triggering the framework server-only check.

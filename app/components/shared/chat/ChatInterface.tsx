@@ -3,6 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { AssistantTurn } from "~/components/shared/chat/AssistantTurn";
 import { Composer } from "~/components/shared/chat/Composer";
 import { ChatBubble } from "~/components/shared/lui/ChatBubble";
+import {
+  trackAnswerRendered,
+  trackSearchSubmitted,
+} from "~/lib/analytics/track";
 import { apiChatQuery } from "~/shared/api/paths";
 import {
   stableChatErrorSchema,
@@ -84,6 +88,7 @@ export function ChatInterface({
   onAgentModeChangeRef.current = onAgentModeChange;
   /** Same-instance Strict Mode effect re-run; remount gets a fresh ref. */
   const consumedPendingQueryRef = useRef<string | null>(null);
+  const evidenceRef = useRef({ hasSummary: false, sourceCount: 0 });
 
   const patchAssistant = (id: string, patch: Partial<Message>) => {
     setMessages((prev) =>
@@ -130,6 +135,9 @@ export function ChatInterface({
     lastAssistantId.current = assistantMessage.id;
     setMessages((prev) => [...prev, userMessage, assistantMessage]);
     setIsStreaming(true);
+    const startedAt = performance.now();
+    evidenceRef.current = { hasSummary: false, sourceCount: 0 };
+    trackSearchSubmitted({ surface: "chat", queryLength: query.length });
 
     const stream = new EventSource(apiChatQuery(query));
     streamRef.current = stream;
@@ -160,6 +168,7 @@ export function ChatInterface({
         const messageEvent = event as MessageEvent<string>;
         const data = parseStableMeta(messageEvent.data);
         if (!data) return;
+        evidenceRef.current.hasSummary = Boolean(data.summary);
         patchAssistant(assistantId, {
           summary: data.summary,
           confidence: data.confidence,
@@ -195,6 +204,7 @@ export function ChatInterface({
         const messageEvent = event as MessageEvent<string>;
         const data = parseStableFinal(messageEvent.data);
         if (!data) return;
+        evidenceRef.current.sourceCount = data.sources.length;
         patchAssistant(assistantId, {
           sources: data.sources,
           nextSteps: data.nextSteps,
@@ -224,6 +234,12 @@ export function ChatInterface({
       setIsStreaming(false);
       stream.close();
       clearStreamTimeout();
+      trackAnswerRendered({
+        surface: "chat",
+        hasSummary: evidenceRef.current.hasSummary,
+        sourceCount: evidenceRef.current.sourceCount,
+        durationMs: Math.round(performance.now() - startedAt),
+      });
     });
 
     stream.onerror = () => {
@@ -265,7 +281,13 @@ export function ChatInterface({
       className="flex min-h-0 flex-1 flex-col"
       data-testid="conversation-workspace"
     >
-      <div className="sr-only" aria-live="polite" aria-atomic="false">
+      <div
+        className="sr-only"
+        role="log"
+        aria-live="polite"
+        aria-atomic="false"
+        aria-relevant="additions"
+      >
         {liveAnnouncement}
       </div>
       <div

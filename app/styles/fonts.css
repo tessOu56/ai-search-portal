@@ -1,0 +1,26 @@
+/* Metric-matched fallbacks stay render-blocking so LCP does not shift. */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 90.2%;
+  descent-override: 22.48%;
+  line-gap-override: 0%;
+  size-adjust: 107.4%;
+}
+
+@font-face {
+  font-family: "Petrona Fallback";
+  src: local("Georgia");
+  ascent-override: 92%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+  size-adjust: 106%;
+}
+
+[data-app="portal"] {
+  --font-body:
+    "Inter", "Inter Fallback", "Noto Sans TC", -apple-system, "Segoe UI",
+    sans-serif;
+  --font-display:
+    "Petrona", "Petrona Fallback", "Noto Serif TC", Georgia, serif;
+}

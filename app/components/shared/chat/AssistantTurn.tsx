@@ -1,14 +1,28 @@
+import { type ComponentProps, lazy, Suspense } from "react";
 import { Link } from "react-router";
 
-import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/Alert";
 import { Button } from "~/components/ui/Button";
+import { trackCitationClicked } from "~/lib/analytics/track";
 import { useI18n } from "~/shared/i18n/context";
 import {
   buildCatalogSearchUrl,
   buildMetadataSearchUrl,
 } from "~/shared/navigation";
 import { classifySafeHref } from "~/shared/utils/safe-url";
+
+const AiFallbackPanel = lazy(async () => {
+  const mod = await import("~/components/shared/chat/AiFallbackPanel");
+  return { default: mod.AiFallbackPanel };
+});
+
+function FallbackPanel(props: ComponentProps<typeof AiFallbackPanel>) {
+  return (
+    <Suspense fallback={null}>
+      <AiFallbackPanel {...props} />
+    </Suspense>
+  );
+}
 
 export type AssistantSource = {
   title: string;
@@ -140,7 +154,7 @@ function TurnError({
         <AlertTitle>{t("chat.error.title")}</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-      <AiFallbackPanel query={query} reason={fallbackReason ?? "error"} />
+      <FallbackPanel query={query} reason={fallbackReason ?? "error"} />
     </>
   );
 }
@@ -205,15 +219,35 @@ function NextSteps({
   );
 }
 
-function SourceLink({ source }: { source: AssistantSource }) {
+function SourceLink({
+  source,
+  index,
+}: {
+  source: AssistantSource;
+  index: number;
+}) {
   const { t } = useI18n();
   const sourcesLabel = t(KEY_SOURCES_TITLE);
   const kind = classifySafeHref(source.url);
   const label = `${source.title} (${sourcesLabel})`;
+  const onCite =
+    kind === "internal" || kind === "external"
+      ? () =>
+          trackCitationClicked({
+            surface: "chat",
+            kind,
+            index,
+          })
+      : undefined;
   return (
     <li className="space-y-0.5">
       {kind === "internal" ? (
-        <Link to={source.url} className={SOURCE_LINK_CLASS} aria-label={label}>
+        <Link
+          to={source.url}
+          className={SOURCE_LINK_CLASS}
+          aria-label={label}
+          onClick={onCite}
+        >
           {source.title}
         </Link>
       ) : kind === "external" ? (
@@ -223,6 +257,7 @@ function SourceLink({ source }: { source: AssistantSource }) {
           rel="noreferrer noopener"
           target="_blank"
           aria-label={label}
+          onClick={onCite}
         >
           {source.title}
         </a>
@@ -245,8 +280,8 @@ function Sources({ sources }: { sources: AssistantSource[] }) {
         {t(KEY_SOURCES_TITLE)}
       </h3>
       <ul className="space-y-space-8 text-type-14">
-        {sources.map((source) => (
-          <SourceLink key={source.url} source={source} />
+        {sources.map((source, index) => (
+          <SourceLink key={source.url} source={source} index={index} />
         ))}
       </ul>
     </div>
@@ -332,7 +367,7 @@ export function AssistantTurn({
         />
       ) : null}
       {!error && resolvedFallback ? (
-        <AiFallbackPanel query={query} reason={resolvedFallback} />
+        <FallbackPanel query={query} reason={resolvedFallback} />
       ) : null}
       {!isStreaming ? (
         <NextSteps steps={nextSteps} actions={nextActions} />

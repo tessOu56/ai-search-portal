@@ -22,7 +22,11 @@
     "eslint-plugin-jsx-a11y",
     "eslint-plugin-react",
     "eslint-plugin-react-hooks",
-    "@is_tess/tokens"
+    "@is_tess/tokens",
+    "@fontsource/inter",
+    "@fontsource/petrona",
+    "lighthouse",
+    "chrome-launcher"
   ],
   "ignoreExportsUsedInFile": true,
   "ignoreFiles": ["app/features/**/*.hooks.ts"],

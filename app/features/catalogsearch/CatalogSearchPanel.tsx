@@ -1,7 +1,3 @@
-import {
-  INDUSTRY_STANDARD_REGISTRY,
-  listIndustryStandards,
-} from "@ai-search-portal/contracts";
 import { Link, useNavigation } from "react-router";
 
 import { FacetChip } from "~/components/shared/product/FacetChip";
@@ -16,6 +12,7 @@ import { Input } from "~/components/ui/Input";
 import { Stack } from "~/components/ui/Stack";
 import { StatusChip } from "~/components/ui/StatusChip";
 import { Toolbar } from "~/components/ui/Toolbar";
+import { trackSearchSubmitted } from "~/lib/analytics/track";
 import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { useI18n } from "~/shared/i18n/context";
 import { buildMetadataSearchUrl } from "~/shared/navigation";
@@ -46,9 +43,15 @@ const PRODUCT_TYPE_VALUES = [
   "venue_rental",
 ] as const;
 
-const STANDARD_CHIP_CODES = listIndustryStandards()
-  .filter((e) => ["925", "999", "14K", "18K", "950"].includes(e.code))
-  .map((e) => e.code);
+const STANDARD_CHIP_CODES = ["925", "999", "14K", "18K", "950"] as const;
+
+const STANDARD_LABELS: Record<(typeof STANDARD_CHIP_CODES)[number], string> = {
+  "925": "925 銀",
+  "999": "純銀 999",
+  "14K": "14K 金",
+  "18K": "18K 金",
+  "950": "鉑金 950",
+};
 
 type Translate = (key: string, vars?: Record<string, string>) => string;
 
@@ -331,6 +334,11 @@ function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
       <form
         method="get"
         className="flex w-full flex-col gap-stack-dense sm:flex-row"
+        onSubmit={(event) => {
+          const raw = new FormData(event.currentTarget).get("q");
+          const queryLength = typeof raw === "string" ? raw.trim().length : 0;
+          trackSearchSubmitted({ surface: "catalog_search", queryLength });
+        }}
       >
         {model.intent ? (
           <input type="hidden" name="intent" value={model.intent} />
@@ -423,9 +431,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
     navigation.state === "loading" &&
     navigation.location?.pathname === "/catalog-search";
 
-  const standardLabels = new Map(
-    INDUSTRY_STANDARD_REGISTRY.map((e) => [e.code, e.labelZhTw])
-  );
+  const standardLabels = new Map(Object.entries(STANDARD_LABELS));
 
   const assetRows = model.results.filter((row) => row.source !== "knowledge");
 

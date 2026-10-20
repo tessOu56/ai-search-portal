@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseIndustryFacetsFromSearchParams } from "~/shared/utils/industry-facets-url";
+import { parseIndustryFacetsFromSearchParams } from "~/shared/utils/industry-facets-url.server";
 
 import { getCatalogSearchViewModel } from "./catalog-search.server";
 

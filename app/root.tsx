@@ -16,15 +16,12 @@ import {
 } from "react-router";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
-import { AppChrome } from "~/components/app/workspace";
+import { AppChrome } from "~/components/app/workspace/AppChrome";
 import { DeferredChrome } from "~/components/shared/chrome/DeferredChrome";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
-
-/** Display (Petrona / Shippori Mincho) + body Inter. Loaded async in Layout. */
-const FONT_STYLESHEET =
-  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Petrona:wght@500&family=Shippori+Mincho:wght@500&display=swap";
+import fontFacesHref from "~/styles/fontfaces.css?url";
 
 export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico", sizes: "any" },
@@ -32,19 +29,6 @@ export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon-16.png", type: "image/png", sizes: "16x16" },
   { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
   { rel: "apple-touch-icon", href: "/apple-touch-icon.svg" },
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  { rel: "preload", href: FONT_STYLESHEET, as: "style" },
-  {
-    rel: "preload",
-    href: "/marketing/home-atmosphere.svg",
-    as: "image",
-    type: "image/svg+xml",
-  },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -96,16 +80,8 @@ export function Layout({ children }: { children: ReactNode }) {
         />
         <Meta />
         <Links />
-        <link
-          rel="stylesheet"
-          href={FONT_STYLESHEET}
-          media="print"
-          onLoad={(event) => {
-            event.currentTarget.media = "all";
-          }}
-        />
         <noscript>
-          <link rel="stylesheet" href={FONT_STYLESHEET} />
+          <link rel="stylesheet" href={fontFacesHref} />
         </noscript>
       </head>
       <body className="bg-background font-sans antialiased">
@@ -130,12 +106,46 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.hydrated = "true";
     let cancelled = false;
-    void (async () => {
-      const mod = await import("~/lib/analytics/web-vitals-reporter");
-      if (!cancelled) mod.startWebVitalsReporting();
-    })();
+    let idleId: number | undefined;
+    const startMonitoring = () => {
+      const fontFaces = document.createElement("link");
+      fontFaces.rel = "stylesheet";
+      fontFaces.href = fontFacesHref;
+      document.head.appendChild(fontFaces);
+      void (async () => {
+        const { startWebVitalsReporting } =
+          await import("~/lib/analytics/web-vitals-reporter");
+        if (cancelled) return;
+        startWebVitalsReporting();
+        const { readClientSentryDsn } = await import("~/lib/monitoring/env");
+        if (cancelled || !readClientSentryDsn()) return;
+        const { initSentryClient } =
+          await import("~/lib/monitoring/sentry.client");
+        if (!cancelled) initSentryClient();
+      })();
+    };
+    const schedule = () => {
+      if (cancelled) return;
+      if (typeof requestIdleCallback === "function") {
+        idleId = requestIdleCallback(startMonitoring, { timeout: 8_000 });
+        return;
+      }
+      idleId = window.setTimeout(startMonitoring, 4_000);
+    };
+    if (document.readyState === "complete") {
+      schedule();
+    } else {
+      window.addEventListener("load", schedule, { once: true });
+    }
     return () => {
       cancelled = true;
+      window.removeEventListener("load", schedule);
+      if (idleId == null) return;
+      if (typeof requestIdleCallback === "function") {
+        cancelIdleCallback(idleId);
+      } else {
+        window.clearTimeout(idleId);
+      }
     };
   }, []);
   if (!data) {
