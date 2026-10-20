@@ -173,6 +173,11 @@
   color: var(--accent-strong);
 }
 
+/* SDK Callout info: brand-700 gold on brand-50 cream is 3.13:1. */
+.bg-brand-50.text-brand-700 {
+  color: var(--text-primary);
+}
+
 [data-app="portal"],
 [data-app="portal"][data-theme],
 [data-app="portal"].dark,

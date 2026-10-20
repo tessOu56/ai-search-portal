@@ -38,6 +38,8 @@
   - `.text-primary` (shadcn `--accent-brand` rust `#bd8356`, 3.13:1 on
     cream) → `var(--accent-strong)` (`#8a5a33`, ≥ 4.5:1).
   - `--status-info` (`#0284c7` + white ≈ 4.0:1) → `#0369a1` (sky-700).
+  - SDK Callout info (`text-brand-700` `#b98413` on `bg-brand-50` `#fff9e8`,
+    3.13:1) → `var(--text-primary)`.
     SDK primitives are unchanged; this is a portal AA override.
 
 ## Keyboard / focus / labels
