@@ -7,8 +7,11 @@ import type { AppLoadContext, EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
 
 const ABORT_DELAY_MS = 5_000;
+const Sentry = process.env.SENTRY_DSN
+  ? (await import("~/lib/monitoring/sentry.server")).initSentryServer()
+  : null;
 
-export default function handleRequest(
+function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
@@ -53,3 +56,7 @@ export default function handleRequest(
     setTimeout(abort, ABORT_DELAY_MS);
   });
 }
+
+export default Sentry
+  ? Sentry.wrapSentryHandleRequest(handleRequest)
+  : handleRequest;

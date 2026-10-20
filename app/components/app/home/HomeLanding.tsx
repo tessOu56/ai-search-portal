@@ -40,12 +40,7 @@ export function HomeLanding({
       aria-label={t("app.title")}
     >
       <div className="mx-auto w-full max-w-5xl px-space-16 py-space-32 md:p-space-32">
-        <motion.div
-          className="mb-space-16"
-          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.02 }}
-        >
+        <div className="mb-space-16">
           <BrandMark
             size="xl"
             mode="tilt"
@@ -54,15 +49,10 @@ export function HomeLanding({
             wordmark={t("app.title")}
             className="text-foreground"
           />
-        </motion.div>
-        <motion.h1
-          className="mb-space-16 max-w-3xl font-display text-type-52 font-medium text-foreground md:text-type-72"
-          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.14 }}
-        >
+        </div>
+        <h1 className="mb-space-16 max-w-3xl font-display text-type-52 font-medium text-foreground md:text-type-72">
           {t("home.title")}
-        </motion.h1>
+        </h1>
         <motion.p
           className="mb-space-32 max-w-xl text-type-16 text-muted-foreground md:text-type-20"
           initial={reduceMotion ? false : { opacity: 0, y: 18 }}

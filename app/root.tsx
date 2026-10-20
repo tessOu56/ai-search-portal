@@ -18,13 +18,10 @@ import {
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { AppChrome } from "~/components/app/workspace";
 import { DeferredChrome } from "~/components/shared/chrome/DeferredChrome";
+import { FONT_PRELOADS } from "~/lib/fonts";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
-
-/** Display (Petrona / Shippori Mincho) + body Inter. Loaded async in Layout. */
-const FONT_STYLESHEET =
-  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Petrona:wght@500&family=Shippori+Mincho:wght@500&display=swap";
 
 export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico", sizes: "any" },
@@ -32,19 +29,7 @@ export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon-16.png", type: "image/png", sizes: "16x16" },
   { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
   { rel: "apple-touch-icon", href: "/apple-touch-icon.svg" },
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  { rel: "preload", href: FONT_STYLESHEET, as: "style" },
-  {
-    rel: "preload",
-    href: "/marketing/home-atmosphere.svg",
-    as: "image",
-    type: "image/svg+xml",
-  },
+  ...FONT_PRELOADS,
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -96,17 +81,6 @@ export function Layout({ children }: { children: ReactNode }) {
         />
         <Meta />
         <Links />
-        <link
-          rel="stylesheet"
-          href={FONT_STYLESHEET}
-          media="print"
-          onLoad={(event) => {
-            event.currentTarget.media = "all";
-          }}
-        />
-        <noscript>
-          <link rel="stylesheet" href={FONT_STYLESHEET} />
-        </noscript>
       </head>
       <body className="bg-background font-sans antialiased">
         <a

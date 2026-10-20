@@ -18,6 +18,9 @@ export const analyticsEventNameSchema = z.enum([
   "ai_fallback_taken",
   "hitl_intervened",
   "access_request_submitted",
+  "search_submitted",
+  "answer_rendered",
+  "citation_clicked",
 ]);
 
 export const analyticsSurfaceSchema = z.enum([
@@ -96,11 +99,50 @@ export const accessRequestSubmittedEventSchema = analyticsBaseEventSchema
   })
   .strict();
 
+export const searchSubmittedEventSchema = analyticsBaseEventSchema
+  .extend({
+    name: z.literal("search_submitted"),
+    properties: z
+      .object({
+        queryLength: z.number().int().nonnegative(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export const answerRenderedEventSchema = analyticsBaseEventSchema
+  .extend({
+    name: z.literal("answer_rendered"),
+    properties: z
+      .object({
+        hasSummary: z.boolean(),
+        sourceCount: z.number().int().nonnegative(),
+        durationMs: z.number().nonnegative(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export const citationClickedEventSchema = analyticsBaseEventSchema
+  .extend({
+    name: z.literal("citation_clicked"),
+    properties: z
+      .object({
+        kind: z.enum(["internal", "external"]),
+        index: z.number().int().nonnegative(),
+      })
+      .strict(),
+  })
+  .strict();
+
 export const analyticsEventSchema = z.discriminatedUnion("name", [
   taskCompletedEventSchema,
   aiFallbackTakenEventSchema,
   hitlIntervenedEventSchema,
   accessRequestSubmittedEventSchema,
+  searchSubmittedEventSchema,
+  answerRenderedEventSchema,
+  citationClickedEventSchema,
 ]);
 
 export type AnalyticsEventName = z.infer<typeof analyticsEventNameSchema>;

@@ -1,0 +1,36 @@
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-500.css";
+@import "@fontsource/inter/latin-600.css";
+@import "@fontsource/petrona/latin-500.css";
+
+/*
+ * Metric-matched fallbacks so font-display:swap does not shift the LCP
+ * headline. Inter ≈ Arial; Petrona ≈ Georgia (next/font style overrides).
+ * CJK still falls through to system Noto / serif — Shippori is not on the
+ * critical path (it was a large Google Fonts download for unused glyphs).
+ */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 90.2%;
+  descent-override: 22.48%;
+  line-gap-override: 0%;
+  size-adjust: 107.4%;
+}
+
+@font-face {
+  font-family: "Petrona Fallback";
+  src: local("Georgia");
+  ascent-override: 92%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+  size-adjust: 106%;
+}
+
+[data-app="portal"] {
+  --font-body:
+    "Inter", "Inter Fallback", "Noto Sans TC", -apple-system, "Segoe UI",
+    sans-serif;
+  --font-display:
+    "Petrona", "Petrona Fallback", "Noto Serif TC", Georgia, serif;
+}

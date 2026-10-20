@@ -34,6 +34,7 @@
 | **`specs/policies/`**      | OPA Rego 政策（`opa test`）                                                                                              |
 | **`specs/domain/`**        | 領域流程 spec（如 metadata 申請狀態機）                                                                                  |
 | **`specs/schemas/`**       | 索引與入口說明                                                                                                           |
+| **`specs/analytics/`**     | Product analytics event contracts (closed Zod; no query text)                                                            |
 
 ---
 

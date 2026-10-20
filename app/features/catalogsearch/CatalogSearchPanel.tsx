@@ -16,6 +16,7 @@ import { Input } from "~/components/ui/Input";
 import { Stack } from "~/components/ui/Stack";
 import { StatusChip } from "~/components/ui/StatusChip";
 import { Toolbar } from "~/components/ui/Toolbar";
+import { trackSearchSubmitted } from "~/lib/analytics/product-events";
 import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { useI18n } from "~/shared/i18n/context";
 import { buildMetadataSearchUrl } from "~/shared/navigation";
@@ -331,6 +332,11 @@ function CatalogSearchForm({ model }: { model: CatalogSearchViewModel }) {
       <form
         method="get"
         className="flex w-full flex-col gap-stack-dense sm:flex-row"
+        onSubmit={(event) => {
+          const raw = new FormData(event.currentTarget).get("q");
+          const queryLength = typeof raw === "string" ? raw.trim().length : 0;
+          trackSearchSubmitted({ surface: "catalog_search", queryLength });
+        }}
       >
         {model.intent ? (
           <input type="hidden" name="intent" value={model.intent} />

@@ -48,12 +48,15 @@ Do not introduce a parallel UI kit for the React 19 bump — keep consuming `@is
 
 ## 其他關鍵套件
 
-| 套件                         | 用途        | React 支援／備註                                                 |
-| ---------------------------- | ----------- | ---------------------------------------------------------------- |
-| **lucide-react**             | 圖標        | 通常支援 React 16+；升級時查 peer                                |
-| **class-variance-authority** | 樣式變體    | 無 React peer，僅型別與 runtime 工具                             |
-| **zod**                      | 契約 schema | 無 React peer；TypeScript / 任何環境皆可                         |
-| **tailwindcss**              | 樣式        | 無 React peer；**stay on Tailwind 3.x** (T-2026-281 is separate) |
+| 套件                         | 用途         | React 支援／備註                                                 |
+| ---------------------------- | ------------ | ---------------------------------------------------------------- |
+| **lucide-react**             | 圖標         | 通常支援 React 16+；升級時查 peer                                |
+| **class-variance-authority** | 樣式變體     | 無 React peer，僅型別與 runtime 工具                             |
+| **zod**                      | 契約 schema  | 無 React peer；TypeScript / 任何環境皆可                         |
+| **tailwindcss**              | 樣式         | 無 React peer；**stay on Tailwind 3.x** (T-2026-281 is separate) |
+| **@sentry/react-router**     | 錯誤／traces | peer React >=18、react-router 7.x；DSN 未設時為 no-op            |
+| **@fontsource/inter**        | 字體         | 無 React peer；latin woff2 由 Vite 打包                          |
+| **@fontsource/petrona**      | 字體         | 無 React peer；latin woff2 由 Vite 打包                          |
 
 ---
 

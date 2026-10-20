@@ -49,6 +49,17 @@ pnpm run dev
 
 Copy [`.env.example`](.env.example) to `.env` (or `.env.local`) and fill only what you need. Optional live LLM is **server-side only** (`OPENAI_API_KEY` + `AGENT_LLM_MODE=openai`); omit both to stay on offline fixtures. Never commit `.env` or secret values — see [SECURITY.md](SECURITY.md). Host deploy keys belong in **Vercel / GitHub Actions secrets**, not in git.
 
+Optional observability (all no-op when unset):
+
+| Variable                                                       | Where                | Purpose                                                                    |
+| -------------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------- |
+| `SENTRY_DSN`                                                   | server               | Error + performance traces                                                 |
+| `VITE_SENTRY_DSN`                                              | browser (public DSN) | Same project; designed to be public                                        |
+| `SENTRY_TRACES_SAMPLE_RATE` / `VITE_SENTRY_TRACES_SAMPLE_RATE` | server / browser     | Default `0.1` when a DSN is set                                            |
+| `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`            | build only           | Hidden source maps upload; omit locally                                    |
+| `VITE_ANALYTICS_ENABLED=1`                                     | browser              | Product events (`search_submitted`, `answer_rendered`, `citation_clicked`) |
+| `VITE_ANALYTICS_ENDPOINT`                                      | browser              | Event POST URL (default `http://localhost:19000`)                          |
+
 Quality: `pnpm run lint` · `pnpm run typecheck` · `pnpm run test` · CI runs `lint:strict` + typecheck + knip + E2E.
 
 ## Architecture (short)

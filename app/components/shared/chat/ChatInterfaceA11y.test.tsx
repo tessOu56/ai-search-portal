@@ -50,7 +50,9 @@ describe("ChatInterface a11y", () => {
       screen.getByRole("region", { name: "chat.history.title" })
     ).toBeInTheDocument();
     expect(screen.getByText("chat.history.empty")).toBeInTheDocument();
-    expect(document.querySelector("[aria-live='polite']")).toBeTruthy();
+    expect(
+      document.querySelector("[role='log'][aria-live='polite']")
+    ).toBeTruthy();
     expect(screen.getByLabelText("home.composer.label")).toBeInTheDocument();
   });
 });
