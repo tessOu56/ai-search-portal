@@ -16,7 +16,7 @@ import {
 } from "react-router";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
-import { AppChrome } from "~/components/app/workspace";
+import { AppChrome } from "~/components/app/workspace/AppChrome";
 import { DeferredChrome } from "~/components/shared/chrome/DeferredChrome";
 import { FONT_PRELOADS } from "~/lib/fonts";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
