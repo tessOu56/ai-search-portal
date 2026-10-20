@@ -6,6 +6,7 @@ import {
   sanitizePackId,
 } from "~/services/context-pack.server";
 import { searchKnowledge } from "~/services/knowledge-search.server";
+import { rejectIfRateLimited } from "~/services/route-guard.server";
 import {
   knowledgeChunkKindSchema,
   knowledgeClassificationSchema,
@@ -133,6 +134,9 @@ function parseKnowledgeSearchParams(url: URL) {
 }
 
 export function loader({ request }: LoaderFunctionArgs) {
+  const limited = rejectIfRateLimited(request, "knowledge");
+  if (limited) return limited;
+
   const parsedParams = parseKnowledgeSearchParams(new URL(request.url));
   if (!parsedParams.ok) return parsedParams.response;
 

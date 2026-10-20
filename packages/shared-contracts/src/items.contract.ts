@@ -43,4 +43,5 @@ export const updateItemRequestSchema = z.object({
 
 export const errorResponseSchema = z.object({
   error: z.string(),
+  code: z.string().optional(),
 });

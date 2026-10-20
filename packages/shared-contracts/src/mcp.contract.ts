@@ -37,6 +37,8 @@ export const mcpClientMetaSchema = z.object({
     version: z.string(),
   }),
   capabilities: z.record(z.string(), z.unknown()).optional(),
+  /** HMAC token from issueHitlConfirmToken — required for high-risk tools. */
+  hitlConfirmToken: z.string().min(1).optional(),
 });
 
 export const mcpToolNameSchema = z.enum(MCP_TOOL_NAMES);
@@ -54,6 +56,7 @@ export const mcpToolsCallResponseSchema = z.object({
   result: z.unknown().optional(),
   taskId: z.string().optional(),
   error: z.string().optional(),
+  code: z.string().min(1).optional(),
 });
 
 export const mcpDiscoverSchema = z.object({

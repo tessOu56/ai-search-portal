@@ -169,7 +169,7 @@ export function submitMetadataAccessRequest(args: {
   const auditLogged = decision.require_audit
     ? appendAuditEvent({
         action: "access_request.submit",
-        actor: { role },
+        actor: { role, id: requesterId },
         resource: { type: "metadata_asset", id: args.assetId },
         decisionId: decision.decision_id,
         requestId,

@@ -4,6 +4,8 @@ import { type Context, Hono } from "hono";
 import { cors } from "hono/cors";
 import { streamSSE } from "hono/streaming";
 
+import { requireAgentRuntimeToken } from "./auth.js";
+
 const corsOrigin = process.env.CORS_ORIGIN;
 
 function getTraceId(c: Context): string | undefined {
@@ -27,11 +29,19 @@ app.use(
   cors({
     origin,
     allowMethods: ["GET", "OPTIONS"],
-    allowHeaders: ["Content-Type", "traceparent", "tracestate", "x-trace-id"],
+    allowHeaders: [
+      "Content-Type",
+      "Authorization",
+      "traceparent",
+      "tracestate",
+      "x-trace-id",
+    ],
   })
 );
 
 app.get("/health", (c) => c.json({ ok: true }));
+
+app.use("/v1/chat/stream", requireAgentRuntimeToken);
 
 /**
  * Agent 對內 HTTP：**內部** SSE（internal.*）。Gateway 負責映射為對外穩定事件。

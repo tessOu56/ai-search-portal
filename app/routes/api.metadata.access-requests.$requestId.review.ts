@@ -6,6 +6,15 @@ import {
   reviewAccessApplication,
 } from "~/services/access-request-store.server";
 import { appendAuditEvent } from "~/services/audit-log.server";
+import { assertCanReview, authFailureResponse } from "~/services/auth.server";
+import {
+  jsonBodyErrorResponse,
+  readJsonBody,
+} from "~/services/request-body.server";
+import {
+  rejectIfRateLimited,
+  requirePrincipal,
+} from "~/services/route-guard.server";
 import {
   governanceInvalidTransitionError,
   governancePolicyErrorSchema,
@@ -31,19 +40,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
+  const limited = rejectIfRateLimited(request, "governanceWrite");
+  if (limited) return limited;
+
+  const auth = requirePrincipal(request);
+  if ("response" in auth) return auth.response;
+
   const requestId = params.requestId;
   if (!requestId) {
     return Response.json({ error: "Missing requestId" }, { status: 400 });
   }
 
-  let raw: unknown;
-  try {
-    raw = await request.json();
-  } catch {
-    return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
-  }
+  const raw = await readJsonBody(request);
+  if (!raw.ok) return jsonBodyErrorResponse(raw);
 
-  const parsed = reviewAccessRequestSchema.safeParse(raw);
+  const parsed = reviewAccessRequestSchema.safeParse(raw.value);
   if (!parsed.success) {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
@@ -58,6 +69,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
       { status: 404 }
     );
   }
+
+  const reviewGate = assertCanReview(auth.user, current);
+  if (!reviewGate.ok) return authFailureResponse(reviewGate);
 
   const updated =
     parsed.data.decision === "edited"
@@ -95,7 +109,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   appendAuditEvent({
     action: reviewAuditAction(parsed.data.decision),
-    actor: { role: updated.data.role },
+    actor: { role: auth.user.opaRole, id: auth.user.id },
     resource: { type: "metadata_asset", id: updated.data.assetId },
     decisionId,
     requestId: updated.data.id,

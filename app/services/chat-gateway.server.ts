@@ -44,6 +44,10 @@ export async function pipeAgentHttpToStableSse(args: {
   if (args.traceparent) headers.set("traceparent", args.traceparent);
   if (args.traceId && !args.traceparent)
     headers.set("x-trace-id", args.traceId);
+  const runtimeToken = process.env.AGENT_RUNTIME_TOKEN?.trim();
+  if (runtimeToken) {
+    headers.set("Authorization", `Bearer ${runtimeToken}`);
+  }
 
   const res = await fetch(url, { signal: args.signal, headers });
   if (!res.ok) {

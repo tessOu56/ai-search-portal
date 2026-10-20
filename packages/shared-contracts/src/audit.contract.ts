@@ -28,7 +28,10 @@ export const auditEventSchema = z.object({
   /** ISO 8601 */
   at: z.string().min(1),
   action: auditActionSchema,
-  actor: z.object({ role: userRoleSchema }),
+  actor: z.object({
+    role: userRoleSchema,
+    id: z.string().min(1).optional(),
+  }),
   resource: z.object({
     type: z.string().min(1),
     id: z.string().min(1),

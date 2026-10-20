@@ -5,14 +5,18 @@ import {
   evaluateAccessResponseSchema,
   submitAccessResponseSchema,
 } from "~/shared/contracts";
+import { bearer, TEST_REQUESTER_TOKEN } from "~/test/auth-fixtures";
 
 describe("governance-client BFF JSON (T-2026-247)", () => {
   it("evaluateAccess posts to the Remix BFF evaluate route", async () => {
-    const res = await evaluateAccess({
-      assetId: "tbl-customers",
-      purpose: "analytics",
-      role: "analyst",
-    });
+    const res = await evaluateAccess(
+      {
+        assetId: "tbl-customers",
+        purpose: "analytics",
+        role: "analyst",
+      },
+      { authorization: bearer(TEST_REQUESTER_TOKEN) }
+    );
     expect(res.ok).toBe(true);
     const parsed = evaluateAccessResponseSchema.parse(await res.json());
     expect(parsed.data.need_approval).toBe(true);
@@ -20,11 +24,14 @@ describe("governance-client BFF JSON (T-2026-247)", () => {
   });
 
   it("submitAccess without approval returns HITL 422", async () => {
-    const res = await submitAccess({
-      assetId: "tbl-customers",
-      purpose: "analytics",
-      role: "analyst",
-    });
+    const res = await submitAccess(
+      {
+        assetId: "tbl-customers",
+        purpose: "analytics",
+        role: "analyst",
+      },
+      { authorization: bearer(TEST_REQUESTER_TOKEN) }
+    );
     expect(res.status).toBe(422);
     const parsed = submitAccessResponseSchema.safeParse(await res.json());
     expect(parsed.success).toBe(false);

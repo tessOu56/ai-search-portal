@@ -24,11 +24,13 @@ import {
   submitMetadataAccessRequest,
 } from "~/services/access-policy.server";
 import { getLatestAccessApplicationForAsset } from "~/services/access-request-store.server";
+import { authenticateRequest } from "~/services/auth.server";
 import { parsePackIdFromRequest } from "~/services/context-pack.server";
 import {
   getMetadataAsset,
   resolveMetadataLineage,
 } from "~/services/metadata.server";
+import { rejectIfRateLimited } from "~/services/route-guard.server";
 import type { AccessRequestLifecycleStatus } from "~/shared/contracts";
 import {
   genUiDocumentSchema,
@@ -114,6 +116,18 @@ function buildAiAccessRequestPayload(args: {
   };
 }
 
+function latestApplicationForViewer(
+  request: Request,
+  assetId: string,
+  role: "analyst" | "data_admin" | "engineer"
+) {
+  const principal = authenticateRequest(request);
+  return getLatestAccessApplicationForAsset({
+    assetId,
+    requesterId: principal.ok ? principal.user.id : `requester:${role}`,
+  });
+}
+
 export function loader({ params, request }: LoaderFunctionArgs) {
   const assetId = params.assetId;
   if (!assetId) throw new Response("Missing assetId", { status: 400 });
@@ -164,10 +178,11 @@ export function loader({ params, request }: LoaderFunctionArgs) {
     role,
   });
 
-  const existingApplication = getLatestAccessApplicationForAsset({
+  const existingApplication = latestApplicationForViewer(
+    request,
     assetId,
-    requesterId: `requester:${role}`,
-  });
+    role
+  );
 
   const origin = getOrigin(request);
   const canonical = getCanonicalUrl(request);
@@ -252,6 +267,16 @@ function actionError(message: string, httpStatus: number) {
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
+  const limited = rejectIfRateLimited(request, "governanceWrite");
+  if (limited) {
+    return actionError("Too many requests", 429);
+  }
+
+  const auth = authenticateRequest(request);
+  if (!auth.ok) {
+    return actionError(auth.error, auth.status);
+  }
+
   const assetId = params.assetId;
   if (!assetId) {
     return actionError("Missing assetId", 400);
@@ -263,7 +288,6 @@ export async function action({ params, request }: ActionFunctionArgs) {
   }
 
   const purpose = form.get("purpose");
-  const role = form.get("role");
   const approved = form.get("approved") === "true";
   const asDraft = form.get("asDraft") === "true";
 
@@ -280,10 +304,8 @@ export async function action({ params, request }: ActionFunctionArgs) {
   const result = submitMetadataAccessRequest({
     assetId,
     purpose,
-    role:
-      role === "data_admin" || role === "engineer" || role === "analyst"
-        ? role
-        : "analyst",
+    role: auth.user.opaRole,
+    requesterId: auth.user.id,
     approved: asDraft ? false : approved,
     asDraft,
     packId,

@@ -9,35 +9,10 @@ import {
   resolveAgentRuntimeUrl,
 } from "~/services/chat-gateway.server";
 import { parsePackIdFromRequest } from "~/services/context-pack.server";
-
-/** Lightweight in-memory abuse guard for the public showcase API (not a WAF). */
-const RATE_WINDOW_MS = 60_000;
-const RATE_MAX = 40;
-const rateBuckets = new Map<string, { count: number; resetAt: number }>();
-
-function clientKey(request: Request): string {
-  const forwarded = request.headers
-    .get("x-forwarded-for")
-    ?.split(",")[0]
-    ?.trim();
-  if (forwarded) return forwarded;
-  const connectingIp = request.headers.get("cf-connecting-ip")?.trim();
-  if (connectingIp) return connectingIp;
-  return "anonymous";
-}
-
-function allowRequest(request: Request): boolean {
-  const key = clientKey(request);
-  const now = Date.now();
-  const bucket = rateBuckets.get(key);
-  if (!bucket || now >= bucket.resetAt) {
-    rateBuckets.set(key, { count: 1, resetAt: now + RATE_WINDOW_MS });
-    return true;
-  }
-  if (bucket.count >= RATE_MAX) return false;
-  bucket.count += 1;
-  return true;
-}
+import {
+  rejectIfRateLimited,
+  requirePrincipal,
+} from "~/services/route-guard.server";
 
 const STABLE_FAILURE = {
   message: "Chat temporarily unavailable. Please try again.",
@@ -45,18 +20,11 @@ const STABLE_FAILURE = {
 } as const;
 
 export function loader({ request }: LoaderFunctionArgs) {
-  if (!allowRequest(request)) {
-    return new Response(
-      JSON.stringify({
-        message: "Too many requests. Please slow down.",
-        code: "rate_limited",
-      }),
-      {
-        status: 429,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-  }
+  const limited = rejectIfRateLimited(request, "chat");
+  if (limited) return limited;
+
+  const auth = requirePrincipal(request);
+  if ("response" in auth) return auth.response;
 
   const url = new URL(request.url);
   const parsed = chatQueryParamsSchema.safeParse({

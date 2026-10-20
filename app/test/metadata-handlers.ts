@@ -2,6 +2,7 @@
  * MSW handlers for metadata + MCP + access policy APIs.
  */
 
+import type { Principal } from "@ai-search-portal/contracts";
 import { http, HttpResponse } from "msw";
 
 import {
@@ -12,6 +13,13 @@ import {
   reviewAccessApplication,
   submitDraftAccessApplication,
 } from "~/services/access-request-store.server";
+import {
+  assertCanMutateOwn,
+  assertCanReview,
+  authenticateRequest,
+  authFailureResponse,
+  listVisibleRequesterId,
+} from "~/services/auth.server";
 import {
   cancelAccessResponseSchema,
   evaluateAccessResponseSchema,
@@ -147,6 +155,14 @@ const MOCK_AUDIT_EVENTS = [
     reasons: ["policy: no owner on record — routed to admin escalation queue"],
   },
 ];
+
+function mswAuth(
+  request: Request
+): { user: Principal } | { response: Response } {
+  const auth = authenticateRequest(request);
+  if (!auth.ok) return { response: authFailureResponse(auth) };
+  return { user: auth.user };
+}
 
 function packFromRequest(request: Request): string {
   const url = new URL(request.url);
@@ -312,9 +328,11 @@ export const metadataHandlers = [
 
   // Must precede `/api/metadata/:assetId` or `access-requests` is captured as an id.
   http.get("/api/metadata/access-requests", ({ request }) => {
+    const auth = mswAuth(request);
+    if ("response" in auth) return auth.response;
     const url = new URL(request.url);
-    const requesterId = url.searchParams.get("requesterId") ?? undefined;
     const pendingOnly = url.searchParams.get("pendingOnly") === "1";
+    const requesterId = listVisibleRequesterId(auth.user);
     const rows = listAccessApplications({ requesterId, pendingOnly });
     return HttpResponse.json(
       listAccessApplicationsResponseSchema.parse({ data: rows })
@@ -341,6 +359,8 @@ export const metadataHandlers = [
   }),
 
   http.post("/api/metadata/access-requests/evaluate", async ({ request }) => {
+    const auth = mswAuth(request);
+    if ("response" in auth) return auth.response;
     const packId = packFromRequest(request);
     const raw = (await request.json()) as {
       assetId?: string;
@@ -353,7 +373,7 @@ export const metadataHandlers = [
     const decision = evaluatePolicy({
       assetId: raw.assetId,
       purpose: raw.purpose,
-      role: raw.role,
+      role: auth.user.opaRole,
       packId,
     });
     if (!decision) {
@@ -368,13 +388,14 @@ export const metadataHandlers = [
   }),
 
   http.post("/api/metadata/access-requests", async ({ request }) => {
+    const auth = mswAuth(request);
+    if ("response" in auth) return auth.response;
     const packId = packFromRequest(request);
     const raw = (await request.json()) as {
       assetId?: string;
       purpose?: string;
       role?: string;
       approved?: boolean;
-      requesterId?: string;
       asDraft?: boolean;
     };
     if (!raw.assetId || !raw.purpose) {
@@ -383,7 +404,7 @@ export const metadataHandlers = [
     const decision = evaluatePolicy({
       assetId: raw.assetId,
       purpose: raw.purpose,
-      role: raw.role,
+      role: auth.user.opaRole,
       packId,
     });
     if (!decision) {
@@ -394,10 +415,7 @@ export const metadataHandlers = [
     }
     if (raw.asDraft) {
       const asset = assetsForPack(packId).find((a) => a.id === raw.assetId);
-      const role =
-        raw.role === "data_admin" || raw.role === "engineer"
-          ? raw.role
-          : "analyst";
+      const role = auth.user.opaRole;
       const purpose =
         raw.purpose === "marketing" || raw.purpose === "operations"
           ? raw.purpose
@@ -410,7 +428,7 @@ export const metadataHandlers = [
           assetName: asset.name,
           purpose,
           role,
-          requesterId: raw.requesterId ?? `requester:${role}`,
+          requesterId: auth.user.id,
           status: "draft",
           owner: asset.owner,
           decision,
@@ -446,10 +464,7 @@ export const metadataHandlers = [
           ? "approved"
           : "denied";
     const asset = assetsForPack(packId).find((a) => a.id === raw.assetId);
-    const role =
-      raw.role === "data_admin" || raw.role === "engineer"
-        ? raw.role
-        : "analyst";
+    const role = auth.user.opaRole;
     const purpose =
       raw.purpose === "marketing" || raw.purpose === "operations"
         ? raw.purpose
@@ -462,7 +477,7 @@ export const metadataHandlers = [
         assetName: asset.name,
         purpose,
         role,
-        requesterId: raw.requesterId ?? `requester:${role}`,
+        requesterId: auth.user.id,
         status,
         owner: asset.owner,
         decision,
@@ -483,6 +498,8 @@ export const metadataHandlers = [
   http.post(
     "/api/metadata/access-requests/:requestId/review",
     async ({ params, request }) => {
+      const auth = mswAuth(request);
+      if ("response" in auth) return auth.response;
       const raw = (await request.json()) as {
         decision?: string;
         purpose?: string;
@@ -499,6 +516,11 @@ export const metadataHandlers = [
         );
       }
       const id = String(params.requestId);
+      const current = listAccessApplications().find((row) => row.id === id);
+      if (current) {
+        const reviewGate = assertCanReview(auth.user, current);
+        if (!reviewGate.ok) return authFailureResponse(reviewGate);
+      }
       const updated =
         raw.decision === "edited"
           ? editAccessApplication({
@@ -543,58 +565,80 @@ export const metadataHandlers = [
     }
   ),
 
-  http.post("/api/metadata/access-requests/:requestId/submit", ({ params }) => {
-    const id = String(params.requestId);
-    const updated = submitDraftAccessApplication(id);
-    if (!updated.ok) {
+  http.post(
+    "/api/metadata/access-requests/:requestId/submit",
+    ({ params, request }) => {
+      const auth = mswAuth(request);
+      if ("response" in auth) return auth.response;
+      const id = String(params.requestId);
+      const current = listAccessApplications().find((row) => row.id === id);
+      if (current) {
+        const ownGate = assertCanMutateOwn(auth.user, current);
+        if (!ownGate.ok) return authFailureResponse(ownGate);
+      }
+      const updated = submitDraftAccessApplication(id);
+      if (!updated.ok) {
+        return HttpResponse.json(
+          updated.reason === "not_found"
+            ? governancePolicyErrorSchema.parse({
+                error: ERROR_ACCESS_REQUEST_NOT_FOUND,
+                code: "NOT_FOUND",
+              })
+            : governanceInvalidTransitionError("Cannot submit non-draft"),
+          { status: updated.reason === "not_found" ? 404 : 409 }
+        );
+      }
+      const decision = updated.data.decision;
+      if (!decision) {
+        return HttpResponse.json(
+          { error: "Missing policy decision on draft" },
+          { status: 500 }
+        );
+      }
       return HttpResponse.json(
-        updated.reason === "not_found"
-          ? governancePolicyErrorSchema.parse({
-              error: ERROR_ACCESS_REQUEST_NOT_FOUND,
-              code: "NOT_FOUND",
-            })
-          : governanceInvalidTransitionError("Cannot submit non-draft"),
-        { status: updated.reason === "not_found" ? 404 : 409 }
+        submitAccessResponseSchema.parse({
+          data: {
+            requestId: updated.data.id,
+            status: updated.data.status,
+            decision,
+            auditLogged: decision.require_audit,
+          },
+        }),
+        { status: 202 }
       );
     }
-    const decision = updated.data.decision;
-    if (!decision) {
-      return HttpResponse.json(
-        { error: "Missing policy decision on draft" },
-        { status: 500 }
-      );
-    }
-    return HttpResponse.json(
-      submitAccessResponseSchema.parse({
-        data: {
-          requestId: updated.data.id,
-          status: updated.data.status,
-          decision,
-          auditLogged: decision.require_audit,
-        },
-      }),
-      { status: 202 }
-    );
-  }),
+  ),
 
-  http.post("/api/metadata/access-requests/:requestId/cancel", ({ params }) => {
-    const id = String(params.requestId);
-    const updated = cancelAccessApplication({ id });
-    if (!updated.ok) {
+  http.post(
+    "/api/metadata/access-requests/:requestId/cancel",
+    ({ params, request }) => {
+      const auth = mswAuth(request);
+      if ("response" in auth) return auth.response;
+      const id = String(params.requestId);
+      const current = listAccessApplications().find((row) => row.id === id);
+      if (current) {
+        const ownGate = assertCanMutateOwn(auth.user, current);
+        if (!ownGate.ok) return authFailureResponse(ownGate);
+      }
+      const updated = cancelAccessApplication({ id });
+      if (!updated.ok) {
+        return HttpResponse.json(
+          updated.reason === "not_found"
+            ? governancePolicyErrorSchema.parse({
+                error: ERROR_ACCESS_REQUEST_NOT_FOUND,
+                code: "NOT_FOUND",
+              })
+            : governanceInvalidTransitionError(
+                "Cannot cancel in current status"
+              ),
+          { status: updated.reason === "not_found" ? 404 : 409 }
+        );
+      }
       return HttpResponse.json(
-        updated.reason === "not_found"
-          ? governancePolicyErrorSchema.parse({
-              error: ERROR_ACCESS_REQUEST_NOT_FOUND,
-              code: "NOT_FOUND",
-            })
-          : governanceInvalidTransitionError("Cannot cancel in current status"),
-        { status: updated.reason === "not_found" ? 404 : 409 }
+        cancelAccessResponseSchema.parse({ data: updated.data })
       );
     }
-    return HttpResponse.json(
-      cancelAccessResponseSchema.parse({ data: updated.data })
-    );
-  }),
+  ),
 
   http.get("/api/metadata/:assetId/lineage", ({ params, request }) => {
     if (params.assetId === "access-requests") {
@@ -630,6 +674,16 @@ export const metadataHandlers = [
   }),
 
   http.get("/api/audit", ({ request }) => {
+    const auth = mswAuth(request);
+    if ("response" in auth) return auth.response;
+    if (auth.user.authRole !== "admin") {
+      return authFailureResponse({
+        ok: false,
+        status: 403,
+        error: "Insufficient role",
+        code: "FORBIDDEN",
+      });
+    }
     const url = new URL(request.url);
     const rawLimit = Number.parseInt(url.searchParams.get("limit") ?? "50", 10);
     const limit = Number.isNaN(rawLimit) ? 50 : Math.max(0, rawLimit);
@@ -642,6 +696,8 @@ export const metadataHandlers = [
   }),
 
   http.post("/api/mcp/gateway", async ({ request }) => {
+    const auth = mswAuth(request);
+    if ("response" in auth) return auth.response;
     const packId = packFromRequest(request);
     const raw = (await request.json()) as {
       method?: string;

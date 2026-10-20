@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { E2E_ADMIN_TOKEN, E2E_REQUESTER_TOKEN, signIn } from "./auth";
+
 /**
  * T-2026-015 — manual access-request baseline path (Journey C, governance).
  *
@@ -27,6 +29,7 @@ test.describe("manual access-request path", () => {
   test("HITL path: analyst + marketing on PII → need_approval → pending_approval", async ({
     page,
   }) => {
+    await signIn(page, E2E_REQUESTER_TOKEN);
     // URL contract drives policy state: marketing + PII → need_approval.
     await page.goto(`${PII_ASSET}?purpose=marketing&role=analyst`, {
       waitUntil: WAIT_DOM,
@@ -52,6 +55,7 @@ test.describe("manual access-request path", () => {
   test("auto-approve path: data_admin on PII → allow → approved", async ({
     page,
   }) => {
+    await signIn(page, E2E_ADMIN_TOKEN);
     await page.goto(`${PII_ASSET}?purpose=analytics&role=data_admin`, {
       waitUntil: WAIT_DOM,
     });
@@ -73,6 +77,7 @@ test.describe("manual access-request path", () => {
   test("audit side effect: confidential asset flags audit in the outcome", async ({
     page,
   }) => {
+    await signIn(page, E2E_ADMIN_TOKEN);
     await page.goto("/metadata/dash-orders?purpose=analytics&role=data_admin", {
       waitUntil: WAIT_DOM,
     });
@@ -112,6 +117,7 @@ test.describe("AI-assisted access-request path", () => {
   test("AI fill path validates payload, requires HITL, and submits after confirm", async ({
     page,
   }) => {
+    await signIn(page, E2E_REQUESTER_TOKEN);
     await page.goto(`${PII_ASSET}?aiFill=1`, {
       waitUntil: WAIT_DOM,
     });

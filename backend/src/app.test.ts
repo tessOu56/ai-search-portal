@@ -29,4 +29,15 @@ describe("ai-search-api", () => {
     expect(body.data.length).toBeGreaterThan(0);
     expect(body.pagination.total).toBeGreaterThan(0);
   });
+
+  it("access-request review is fail-closed without a bearer token", async () => {
+    const res = await app.request("/api/metadata/access-requests/x/review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ decision: "approved" }),
+    });
+    expect(res.status).toBe(401);
+    const json = (await res.json()) as { code?: string };
+    expect(json.code).toBe("UNAUTHENTICATED");
+  });
 });

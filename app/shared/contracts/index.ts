@@ -26,6 +26,7 @@ export type {
   AccessPurpose,
   AccessRequestLifecycleStatus,
   GovernanceSessionRole,
+  Principal,
   UserRole,
 } from "@ai-search-portal/contracts";
 export {
@@ -98,7 +99,10 @@ export {
 export {
   agentToolNameSchema,
   auditEventSchema,
+  authErrorResponseSchema,
   listAuditEventsResponseSchema,
+  principalSchema,
+  sessionResponseSchema,
   toolExecutionErrorSchema,
   toolMetadataSchema,
   toolRiskLevelSchema,

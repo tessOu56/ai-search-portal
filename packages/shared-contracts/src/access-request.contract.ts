@@ -74,10 +74,12 @@ export const metadataAccessEvaluateRequestSchema = z.object({
 export const metadataAccessRequestSchema = z.object({
   assetId: z.string().min(1),
   purpose: accessPurposeSchema,
+  /**
+   * Requested OPA role is informational; LIVE submit overwrites it with the
+   * authenticated principal's opaRole. Never used as actor identity.
+   */
   role: userRoleSchema.optional(),
   approved: z.boolean().optional(),
-  /** Optional requester label for my-apis tracking (mock). */
-  requesterId: z.string().min(1).optional(),
   /** Persist as draft without submitting for approval (G1 lifecycle). */
   asDraft: z.boolean().optional(),
 });
@@ -120,8 +122,8 @@ export const listAccessApplicationsResponseSchema = z.object({
 export const reviewAccessRequestSchema = z
   .object({
     decision: z.enum(["approved", "denied", "edited"]),
-    reviewerId: z.string().min(1).optional(),
     purpose: accessPurposeSchema.optional(),
+    /** Resource field when decision is edited — not the reviewer identity. */
     role: userRoleSchema.optional(),
   })
   .superRefine((val, ctx) => {
