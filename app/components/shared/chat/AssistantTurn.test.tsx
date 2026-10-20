@@ -199,7 +199,7 @@ describe("AssistantTurn (LUI conversation)", () => {
     expect(screen.getByText("Clarify scope")).toBeInTheDocument();
   });
 
-  it("error: shows alert and dual-path fallback, not continue chips", () => {
+  it("error: shows alert and dual-path fallback, not continue chips", async () => {
     render(
       <AssistantTurn
         content=""
@@ -211,7 +211,7 @@ describe("AssistantTurn (LUI conversation)", () => {
     expect(screen.getByRole("alert")).toHaveTextContent(
       "Connection lost. Please try again."
     );
-    expect(screen.getByTestId("ai-fallback-panel")).toBeInTheDocument();
+    expect(await screen.findByTestId("ai-fallback-panel")).toBeInTheDocument();
     expect(screen.getByTestId("ai-fallback-takeover")).toBeInTheDocument();
     expect(screen.queryByTestId(CONTINUE)).not.toBeInTheDocument();
   });

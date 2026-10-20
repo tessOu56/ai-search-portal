@@ -1,6 +1,6 @@
+import { type ComponentProps, lazy, Suspense } from "react";
 import { Link } from "react-router";
 
-import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/Alert";
 import { Button } from "~/components/ui/Button";
 import { trackCitationClicked } from "~/lib/analytics/track";
@@ -10,6 +10,19 @@ import {
   buildMetadataSearchUrl,
 } from "~/shared/navigation";
 import { classifySafeHref } from "~/shared/utils/safe-url";
+
+const AiFallbackPanel = lazy(async () => {
+  const mod = await import("~/components/shared/chat/AiFallbackPanel");
+  return { default: mod.AiFallbackPanel };
+});
+
+function FallbackPanel(props: ComponentProps<typeof AiFallbackPanel>) {
+  return (
+    <Suspense fallback={null}>
+      <AiFallbackPanel {...props} />
+    </Suspense>
+  );
+}
 
 export type AssistantSource = {
   title: string;
@@ -141,7 +154,7 @@ function TurnError({
         <AlertTitle>{t("chat.error.title")}</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-      <AiFallbackPanel query={query} reason={fallbackReason ?? "error"} />
+      <FallbackPanel query={query} reason={fallbackReason ?? "error"} />
     </>
   );
 }
@@ -354,7 +367,7 @@ export function AssistantTurn({
         />
       ) : null}
       {!error && resolvedFallback ? (
-        <AiFallbackPanel query={query} reason={resolvedFallback} />
+        <FallbackPanel query={query} reason={resolvedFallback} />
       ) : null}
       {!isStreaming ? (
         <NextSteps steps={nextSteps} actions={nextActions} />
