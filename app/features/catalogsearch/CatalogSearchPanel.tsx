@@ -447,7 +447,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
               : t("catalog.page.lead")}{" "}
             <Link
               to="/catalog-search/dictionary"
-              className="text-primary hover:underline"
+              className="text-primary underline underline-offset-4"
             >
               {t("catalog.page.dictionaryLink")}
             </Link>

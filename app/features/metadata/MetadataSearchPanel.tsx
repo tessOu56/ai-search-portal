@@ -117,6 +117,10 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
     navigation.state === "loading" &&
     navigation.location?.pathname === "/metadata";
   const knowledgeHits = model.knowledgeHits ?? [];
+  const packTitle = t("metadata.pack.title");
+  const activePackName =
+    model.packs.find((pack) => pack.id === model.activePackId)?.name ??
+    packTitle;
 
   return (
     <Stack gap="xl">
@@ -139,7 +143,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
 
       <Toolbar className="flex-col items-stretch gap-stack-dense">
         <h2 className="text-type-16 font-medium text-foreground">
-          {t("metadata.pack.title")}
+          {packTitle}
         </h2>
         <Form
           method="post"
@@ -155,7 +159,7 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               name="packId"
               defaultValue={model.activePackId}
               className="w-full"
-              aria-label={t("metadata.pack.title")}
+              aria-label={`${packTitle}: ${activePackName}`}
               options={model.packs.map((pack) => ({
                 value: pack.id,
                 label: pack.name,

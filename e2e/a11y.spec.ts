@@ -37,6 +37,11 @@ test.describe("axe-core a11y", () => {
     test(`${route.name} has no serious axe violations`, async ({ page }) => {
       await page.goto(route.path, { waitUntil: WAIT });
       await expect(page.getByTestId("route-error-shell")).toHaveCount(0);
+      if (route.name === "insights") {
+        await expect(page.getByTestId("insights-chart")).toBeVisible({
+          timeout: 15_000,
+        });
+      }
       await assertNoCriticalViolations(page, route.name);
     });
   }
@@ -44,12 +49,9 @@ test.describe("axe-core a11y", () => {
   test("chat after a turn stays keyboard-labelled and axe-clean", async ({
     page,
   }) => {
-    await page.goto(
-      `/?q=${encodeURIComponent(
-        "Which datasets contain PII and what access do I need?"
-      )}`,
-      { waitUntil: WAIT }
-    );
+    await page.goto("/", { waitUntil: WAIT });
+    await expect(page.getByTestId("golden-question").first()).toBeVisible();
+    await page.getByTestId("golden-question").first().click();
     await expect(page.getByTestId("conversation-workspace")).toBeVisible({
       timeout: 30_000,
     });
