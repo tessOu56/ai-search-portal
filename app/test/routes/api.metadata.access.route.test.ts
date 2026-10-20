@@ -14,6 +14,11 @@ import {
   listAccessApplicationsResponseSchema,
   submitAccessResponseSchema,
 } from "~/shared/contracts";
+import {
+  authHeaders,
+  TEST_REQUESTER_TOKEN,
+  TEST_REVIEWER_TOKEN,
+} from "~/test/auth-fixtures";
 
 const CUSTOMERS = "tbl-customers";
 const EVALUATE_URL = "http://localhost/api/metadata/access-requests/evaluate";
@@ -31,12 +36,17 @@ function asAction(
   } as unknown as ActionFunctionArgs;
 }
 
-function jsonPost(url: string, body: unknown, params?: Record<string, string>) {
+function jsonPost(
+  url: string,
+  body: unknown,
+  params?: Record<string, string>,
+  token: string = TEST_REQUESTER_TOKEN
+) {
   return asAction(
     url,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(token),
       body: JSON.stringify(body),
     },
     params
@@ -70,7 +80,7 @@ describe("POST /api/metadata/access-requests/evaluate", () => {
     const invalid = await evaluateAction(
       asAction(EVALUATE_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(TEST_REQUESTER_TOKEN),
         body: "{",
       })
     );
@@ -119,7 +129,7 @@ describe("POST /api/metadata/access-requests", () => {
       approved: true,
     };
     const headers = {
-      "Content-Type": "application/json",
+      ...authHeaders(TEST_REQUESTER_TOKEN),
       "Idempotency-Key": "idem-route-test-1",
     };
     const first = await submitAction(
@@ -172,7 +182,8 @@ describe("access-request draft submit, review, cancel", () => {
       jsonPost(
         `http://localhost/api/metadata/access-requests/${draftBody.data.requestId}/review`,
         { decision: "approved" },
-        { requestId: draftBody.data.requestId }
+        { requestId: draftBody.data.requestId },
+        TEST_REVIEWER_TOKEN
       )
     );
     expect(reviewed.ok).toBe(true);
@@ -191,7 +202,8 @@ describe("access-request draft submit, review, cancel", () => {
     const response = await Promise.resolve(
       listLoader({
         request: new Request(
-          "http://localhost/api/metadata/access-requests?pendingOnly=1"
+          "http://localhost/api/metadata/access-requests?pendingOnly=1",
+          { headers: authHeaders(TEST_REVIEWER_TOKEN) }
         ),
         params: {},
         context: {},

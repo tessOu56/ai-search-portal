@@ -1,5 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { E2E_REQUESTER_TOKEN, signIn } from "./auth";
+
 /**
  * Flagship chat journey — golden ask → offline fixture → know→act links.
  * Prefer testids and hrefs over i18n copy. SSR chips are visible at
@@ -20,6 +22,7 @@ test.describe("chat journey", () => {
   test("golden question chip opens a conversation and streams next actions", async ({
     page,
   }) => {
+    await signIn(page, E2E_REQUESTER_TOKEN);
     await page.goto("/", { waitUntil: WAIT_DOM });
     await expect(page.getByTestId("route-error-shell")).toHaveCount(0);
     await waitForHydration(page);
@@ -50,6 +53,7 @@ test.describe("chat journey", () => {
   });
 
   test("?q= deep-link auto-submits the pending query", async ({ page }) => {
+    await signIn(page, E2E_REQUESTER_TOKEN);
     await page.goto(`/?q=${encodeURIComponent(PII_QUESTION)}`, {
       waitUntil: WAIT_DOM,
     });

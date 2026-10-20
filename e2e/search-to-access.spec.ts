@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { E2E_REQUESTER_TOKEN, signIn } from "./auth";
+
 /**
  * Main user journey glue: catalog search → result detail → access request HITL.
  * Status-machine coverage stays in access-request.spec.ts; this file only
@@ -10,6 +12,7 @@ const WAIT_DOM = "domcontentloaded";
 
 test.describe("search to access request", () => {
   test("catalog result opens HITL confirm for PII", async ({ page }) => {
+    await signIn(page, E2E_REQUESTER_TOKEN);
     await page.goto("/catalog-search?q=customer", { waitUntil: WAIT_DOM });
     await page.getByRole("link", { name: /customer_profile/i }).click();
     await expect(page).toHaveURL(/\/metadata\/tbl-customers/);
