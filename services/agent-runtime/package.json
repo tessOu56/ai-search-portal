@@ -13,14 +13,14 @@
   "dependencies": {
     "@ai-search-portal/agent-core": "workspace:*",
     "@ai-search-portal/contracts": "workspace:*",
-    "@hono/node-server": "^1.13.0",
-    "hono": "^4.12.25"
+    "@hono/node-server": "^1.19.15",
+    "hono": "^4.13.7"
   },
   "devDependencies": {
     "@types/node": "^22",
     "tsx": "^4.23.1",
     "typescript": "^5.6.2",
-    "vitest": "^2.1.4"
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": ">=20.0.0"
