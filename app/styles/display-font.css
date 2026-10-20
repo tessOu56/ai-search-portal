@@ -1,0 +1,9 @@
+/* Loaded only on routes that preload Petrona (home display headline). */
+@font-face {
+  font-family: "Petrona";
+  font-style: normal;
+  font-display: optional;
+  font-weight: 500;
+  src: url("@fontsource/petrona/files/petrona-latin-500-normal.woff2")
+    format("woff2");
+}

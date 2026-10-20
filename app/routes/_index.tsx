@@ -27,13 +27,17 @@ import {
   getSeoFromLoader,
 } from "~/shared/seo";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
+import displayFontStylesheet from "~/styles/display-font.css?url";
 
 const DashboardView = lazy(async () => {
   const mod = await import("~/components/app/workspace/DashboardView");
   return { default: mod.DashboardView };
 });
 
-export const links: LinksFunction = () => [DISPLAY_FONT_PRELOAD];
+export const links: LinksFunction = () => [
+  DISPLAY_FONT_PRELOAD,
+  { rel: "stylesheet", href: displayFontStylesheet },
+];
 
 function RouteFallback({ label }: { label: string }) {
   return (

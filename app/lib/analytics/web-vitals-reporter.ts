@@ -1,7 +1,7 @@
 import type { WebVitalName, WebVitalRating } from "@ai-search-portal/contracts";
 import { type Metric, onCLS, onINP, onLCP } from "web-vitals";
 
-import { productAnalyticsEndpoint } from "./product-events";
+import { productAnalyticsEndpoint } from "./env";
 import { recordVital } from "./vitals-store";
 
 export type WebVitalPayload = {

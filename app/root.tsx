@@ -104,6 +104,7 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.hydrated = "true";
     let cancelled = false;
+    let idleId: number | undefined;
     const startMonitoring = () => {
       void (async () => {
         const { startWebVitalsReporting } =
@@ -117,12 +118,23 @@ export default function App() {
         if (!cancelled) initSentryClient();
       })();
     };
-    const idleId =
-      typeof requestIdleCallback === "function"
-        ? requestIdleCallback(startMonitoring, { timeout: 2500 })
-        : window.setTimeout(startMonitoring, 1);
+    const schedule = () => {
+      if (cancelled) return;
+      if (typeof requestIdleCallback === "function") {
+        idleId = requestIdleCallback(startMonitoring, { timeout: 8_000 });
+        return;
+      }
+      idleId = window.setTimeout(startMonitoring, 4_000);
+    };
+    if (document.readyState === "complete") {
+      schedule();
+    } else {
+      window.addEventListener("load", schedule, { once: true });
+    }
     return () => {
       cancelled = true;
+      window.removeEventListener("load", schedule);
+      if (idleId == null) return;
       if (typeof requestIdleCallback === "function") {
         cancelIdleCallback(idleId);
       } else {

@@ -26,15 +26,6 @@
     format("woff2");
 }
 
-@font-face {
-  font-family: "Petrona";
-  font-style: normal;
-  font-display: swap;
-  font-weight: 500;
-  src: url("@fontsource/petrona/files/petrona-latin-500-normal.woff2")
-    format("woff2");
-}
-
 /* Metric-matched fallbacks — swap must not shift the LCP headline. */
 @font-face {
   font-family: "Inter Fallback";
