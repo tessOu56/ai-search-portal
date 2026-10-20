@@ -15,15 +15,17 @@ const traceSpan = vi.fn(() => ({
 }));
 
 vi.mock("langfuse", () => ({
-  Langfuse: vi.fn(() => ({
-    trace: vi.fn(() => ({
-      id: "trace-1",
-      span: traceSpan,
-      generation: traceGeneration,
-      update: traceUpdate,
-    })),
-    flushAsync,
-  })),
+  Langfuse: vi.fn(() => {
+    return {
+      trace: vi.fn(() => ({
+        id: "trace-1",
+        span: traceSpan,
+        generation: traceGeneration,
+        update: traceUpdate,
+      })),
+      flushAsync,
+    };
+  }),
 }));
 
 describe("langfuse observability", () => {
