@@ -17,7 +17,7 @@
 
 升級 React 大版前，請依下方清單逐項確認 peer 與相容性，並跑 `pnpm run lint:ci`、`pnpm run test`。
 
-RSC / `unstable_viteEnvironmentApi` is a spike only — not the production path (T-2026-287). Vite stays 5.x; Tailwind stays 3.x.
+RSC / `unstable_viteEnvironmentApi` is a spike only — not the production path (T-2026-287). Vite is 6.4.3+ (security); TypeScript is 6.0.x; ESLint 9 flat config; Tailwind stays 3.x.
 
 ---
 
@@ -37,13 +37,13 @@ Do not introduce a parallel UI kit for the React 19 bump — keep consuming `@is
 
 ## 測試與建置（間接依賴 React）
 
-| 套件                            | 用途           | React 支援／備註                                                      |
-| ------------------------------- | -------------- | --------------------------------------------------------------------- |
-| **@testing-library/react**      | 元件測試       | v16 與 React 19 相容，需 peer @testing-library/dom                    |
-| **@testing-library/user-event** | 使用者操作模擬 | 與 RTL 搭配，無額外 React 版本限制                                    |
-| **vitest**                      | 測試執行       | 與 React 版本無直接 peer；透過 RTL 測 React 元件                      |
-| **msw**                         | API mock       | 無 React peer；Node 18+、Fetch API，與 React 版本無關                 |
-| **vite**                        | 建置           | 無 React peer；**stay on Vite 5.x** (T-2026-283 is a separate ticket) |
+| 套件                            | 用途           | React 支援／備註                                                                            |
+| ------------------------------- | -------------- | ------------------------------------------------------------------------------------------- |
+| **@testing-library/react**      | 元件測試       | v16 與 React 19 相容，需 peer @testing-library/dom                                          |
+| **@testing-library/user-event** | 使用者操作模擬 | 與 RTL 搭配，無額外 React 版本限制                                                          |
+| **vitest**                      | 測試執行       | 與 React 版本無直接 peer；**Vitest ^4.1.11**（Vite 6 peer）                                 |
+| **msw**                         | API mock       | 無 React peer；Node 18+、Fetch API，與 React 版本無關                                       |
+| **vite**                        | 建置           | 無 React peer；**Vite ^6.4.3** (patched `server.fs.deny` / esbuild; Vite 5 override lifted) |
 
 ---
 
