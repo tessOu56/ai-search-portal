@@ -47,6 +47,7 @@
     "test": "pnpm run build:contracts && pnpm run build:governance-domain && pnpm run build:agent-core && vitest run && pnpm --filter @ai-search-portal/governance-domain test && pnpm --filter @ai-search-portal/agent-core test && pnpm --filter @ai-search-portal/agent-runtime test",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:a11y": "playwright test e2e/a11y.spec.ts",
     "test:watch": "vitest",
     "sync:metalcraft-knowledge": "node scripts/sync-metalcraft-knowledge.mjs",
     "check:metalcraft-knowledge": "CHECK_ONLY=1 node scripts/sync-metalcraft-knowledge.mjs",
@@ -82,12 +83,9 @@
     "@ai-search-portal/governance-domain": "workspace:*",
     "@is_tess/components": "^0.1.14",
     "@is_tess/tokens": "^0.1.3",
-    "@radix-ui/react-scroll-area": "^1.2.10",
-    "@radix-ui/react-slot": "^1.2.4",
     "@react-router/fs-routes": "7.18.4",
     "@react-router/node": "7.18.4",
     "@react-router/serve": "7.18.4",
-    "@tanstack/react-virtual": "^3.14.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "isbot": "^5.1.0",
@@ -107,6 +105,7 @@
     "@changesets/cli": "^2.27.8",
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
+    "@axe-core/playwright": "^4.10.2",
     "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.56.0",
     "@react-router/dev": "7.18.4",
@@ -174,7 +173,7 @@
     {
       "name": "route-insights",
       "path": "build/client/assets/insights._index-*.js",
-      "limit": "180 kB",
+      "limit": "40 kB",
       "gzip": true
     },
     {

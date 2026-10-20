@@ -68,7 +68,7 @@ export function WorkspaceFooter({ agentMode }: WorkspaceFooterProps) {
               { value: "zh-TW", label: t("locale.zh-TW") },
               { value: "en", label: t("locale.en") },
             ]}
-            aria-label={t("locale.switch")}
+            aria-label={`${t("locale.switch")}: ${locale === "en" ? t("locale.en") : t("locale.zh-TW")}`}
             onValueChange={() => localeFormRef.current?.requestSubmit()}
           />
         </Form>

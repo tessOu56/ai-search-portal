@@ -15,7 +15,6 @@
   "ignoreDependencies": [
     "eslint-formatter-gha",
     "@vitest/coverage-v8",
-    "isbot",
     "lucide-react",
     "@testing-library/react",
     "@testing-library/user-event",
@@ -37,11 +36,14 @@
   "workspaces": {
     ".": {
       "entry": [
+        "app/entry.client.tsx",
+        "app/entry.server.tsx",
         "app/routes.ts",
         "app/routes/**/*.tsx",
         "app/routes/**/*.ts",
         "app/**/*.server.ts",
-        "app/shared/**/*.{ts,tsx}"
+        "app/shared/**/*.{ts,tsx}",
+        "e2e/**/*.ts"
       ],
       "project": ["app/**/*.{ts,tsx}"]
     },

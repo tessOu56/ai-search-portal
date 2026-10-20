@@ -40,7 +40,7 @@ export default function handleRequest(
         onAllReady: waitForAll ? onReady : undefined,
         onShellReady: waitForAll ? undefined : onReady,
         onShellError(error: unknown) {
-          reject(error);
+          reject(error instanceof Error ? error : new Error(String(error)));
         },
         onError(error: unknown) {
           status = 500;

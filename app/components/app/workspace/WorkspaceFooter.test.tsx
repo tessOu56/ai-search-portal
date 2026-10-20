@@ -77,6 +77,6 @@ describe("WorkspaceFooter", () => {
       'input[name="next"]'
     ) as HTMLInputElement | null;
     expect(next?.value).toBe("/catalog-search?q=pii");
-    expect(screen.getByLabelText("Language")).toBeTruthy();
+    expect(screen.getByLabelText(/Language/)).toBeTruthy();
   });
 });

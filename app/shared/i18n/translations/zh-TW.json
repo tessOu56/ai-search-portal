@@ -98,6 +98,8 @@
   "footer.version": "v{version}",
   "footer.sitemap": "網站地圖",
   "a11y.skipToContent": "跳至主內容",
+  "chat.message.user": "你的訊息",
+  "chat.workspace.loading": "載入對話中",
   "locale.switch": "語系",
   "locale.zh-TW": "繁體中文",
   "locale.en": "English",
@@ -187,6 +189,16 @@
   "catalog.filters.auction": "拍賣",
   "catalog.filters.all": "全部",
   "catalog.filters.auctionEligible": "可拍賣",
+  "catalog.filters.material.sterling_silver": "純銀",
+  "catalog.filters.material.fine_silver": "足銀",
+  "catalog.filters.material.gold": "金",
+  "catalog.filters.material.copper": "銅",
+  "catalog.filters.material.bronze": "青銅",
+  "catalog.filters.productType.experience": "體驗",
+  "catalog.filters.productType.physical": "實體",
+  "catalog.filters.productType.material": "材料",
+  "catalog.filters.productType.tool": "工具",
+  "catalog.filters.productType.venue_rental": "場地",
   "catalog.knowledge.title": "領域知識",
   "catalog.knowledge.desc": "符合目前篩選的詞彙與領域說明。下方資產列不依印記篩選。",
   "catalog.results": "結果",
@@ -332,5 +344,6 @@
   "insights.chart.pie": "圓餅圖",
   "insights.heading.distribution": "Catalog 項目類型分布",
   "insights.heading.trend": "每月搜尋次數趨勢",
-  "insights.error.retry": "重新載入洞察"
+  "insights.error.retry": "重新載入洞察",
+  "insights.chart.loading": "載入洞察圖表中"
 }

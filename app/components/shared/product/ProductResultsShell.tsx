@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useId } from "react";
 
 import { EmptyState } from "~/components/ui/EmptyState";
 import { Skeleton } from "~/components/ui/Skeleton";
@@ -34,15 +34,13 @@ export function ProductResultsShell({
   pagination,
   skeletonRows = 3,
 }: ProductResultsShellProps) {
+  const headingId = useId();
   return (
-    <section
-      className="flex flex-col gap-stack"
-      aria-labelledby="product-results-title"
-    >
+    <section className="flex flex-col gap-stack" aria-labelledby={headingId}>
       <div className="flex flex-wrap items-start justify-between gap-space-8">
         <div className="flex flex-col gap-space-4">
           <h2
-            id="product-results-title"
+            id={headingId}
             className="text-type-16 font-medium text-foreground"
           >
             {title}

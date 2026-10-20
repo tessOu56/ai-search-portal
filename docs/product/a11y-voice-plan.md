@@ -11,15 +11,15 @@
 
 ## Chat accessibility (when conversation has data)
 
-| Item              | Approach                                                                                                                         |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Skip link         | Keep / add `a11y.skipToContent` → `#home-chat` or `main`                                                                         |
-| Transcript        | `role="log"` + polite live region for assistant updates (not every token flood; prefer chunk / final, or trailing-window polite) |
-| Errors            | `role="alert"` / existing Alert (assertive)                                                                                      |
-| Focus             | After reply completes, optional focus move to summary or keep composer; document choice in PR                                    |
-| Composer          | Visible/accessible labels; icon-only arrow submit needs `aria-label` (i18n `chat.submit`)                                        |
-| Decorative chrome | StarCursor / atmosphere `aria-hidden`; respect `prefers-reduced-motion`                                                          |
-| Testing           | jsx-a11y in CI; axe DevTools smoke on home + chat with ≥1 turn                                                                   |
+| Item              | Approach                                                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Skip link         | Keep / add `a11y.skipToContent` → `#home-chat` or `main`                                                                             |
+| Transcript        | `role="log"` + polite live region for assistant updates (not every token flood; prefer chunk / final, or trailing-window polite)     |
+| Errors            | `role="alert"` / existing Alert (assertive)                                                                                          |
+| Focus             | After reply completes, optional focus move to summary or keep composer; document choice in PR                                        |
+| Composer          | Visible/accessible labels; icon-only arrow submit needs `aria-label` (i18n `chat.submit`)                                            |
+| Decorative chrome | StarCursor / atmosphere `aria-hidden`; respect `prefers-reduced-motion`                                                              |
+| Testing           | jsx-a11y in CI; Playwright `@axe-core/playwright` on home, catalog, metadata, insights, and chat with ≥1 turn (`pnpm run test:a11y`) |
 
 ## Voice input (Web Speech)
 

@@ -1,15 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 import { useLoaderData, useRouteError, useSearchParams } from "react-router";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { HomeIntro } from "~/components/app/home/HomeIntro";
 import { HomeLanding } from "~/components/app/home/HomeLanding";
-import {
-  DashboardView,
-  WorkspaceChatView,
-  WorkspaceFooter,
-} from "~/components/app/workspace";
+import { WorkspaceChatView } from "~/components/app/workspace/WorkspaceChatView";
+import { WorkspaceFooter } from "~/components/app/workspace/WorkspaceFooter";
 import { ASK_HOME_RESET_EVENT } from "~/lib/workspace-mode";
 import { listAccessApplications } from "~/services/access-request-store.server";
 import { listMetadataAssets } from "~/services/metadata.server";
@@ -25,6 +22,22 @@ import {
   getSeoFromLoader,
 } from "~/shared/seo";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
+
+const DashboardView = lazy(async () => {
+  const mod = await import("~/components/app/workspace/DashboardView");
+  return { default: mod.DashboardView };
+});
+
+function RouteFallback({ label }: { label: string }) {
+  return (
+    <div
+      className="flex min-h-0 flex-1 items-center justify-center p-space-32 text-type-14 text-muted-foreground"
+      role="status"
+    >
+      {label}
+    </div>
+  );
+}
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const locale = await getLocale(request);
@@ -91,6 +104,7 @@ function Atmosphere() {
 }
 
 export default function Index() {
+  const { t } = useI18n();
   const { pendingCount, suggestedAssets } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const viewParam = searchParams.get("view");
@@ -114,10 +128,6 @@ export default function Index() {
   const onAsk = useCallback((query: string) => {
     setPendingQuery(query);
     setConversationActive(true);
-  }, []);
-
-  const onPendingQueryConsumed = useCallback(() => {
-    setPendingQuery(null);
   }, []);
 
   const onNewConversation = useCallback(() => {
@@ -146,7 +156,9 @@ export default function Index() {
     return (
       <div className="relative flex min-h-0 flex-1 flex-col">
         <Atmosphere />
-        <DashboardView />
+        <Suspense fallback={<RouteFallback label={t("results.loading")} />}>
+          <DashboardView />
+        </Suspense>
       </div>
     );
   }
@@ -174,7 +186,6 @@ export default function Index() {
       <Atmosphere />
       <WorkspaceChatView
         pendingQuery={pendingQuery}
-        onPendingQueryConsumed={onPendingQueryConsumed}
         onNewConversation={onNewConversation}
       />
     </div>

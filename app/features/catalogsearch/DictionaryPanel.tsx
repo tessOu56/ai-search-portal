@@ -36,14 +36,19 @@ function toggleVirtualUrl(model: DictionaryModel): string {
 function Row({ row }: { row: CatalogApiRow }) {
   return (
     <div
+      role="row"
       data-row
       className="grid h-full grid-cols-[1fr_2fr_auto] items-center gap-space-8 border-b border-border bg-card px-space-16 text-sm"
     >
-      <span className="truncate font-medium text-foreground">{row.name}</span>
-      <span className="truncate text-muted-foreground">{row.description}</span>
-      <StatusChip status="info" className="justify-self-end">
-        {row.itemType}
-      </StatusChip>
+      <span role="cell" className="truncate font-medium text-foreground">
+        {row.name}
+      </span>
+      <span role="cell" className="truncate text-muted-foreground">
+        {row.description}
+      </span>
+      <span role="cell" className="justify-self-end">
+        <StatusChip status="info">{row.itemType}</StatusChip>
+      </span>
     </div>
   );
 }
@@ -114,7 +119,10 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
             size="sm"
             variant={!model.activeType ? "default" : "outline"}
           >
-            <Link to={buildCatalogSearchUrl({ q: model.query }, BASE_PATH)}>
+            <Link
+              to={buildCatalogSearchUrl({ q: model.query }, BASE_PATH)}
+              aria-current={!model.activeType ? "true" : undefined}
+            >
               {t("catalog.filters.all")}
             </Link>
           </Button>
@@ -127,6 +135,7 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
             >
               <Link
                 to={buildCatalogSearchUrl({ q: model.query, type }, BASE_PATH)}
+                aria-current={model.activeType === type ? "true" : undefined}
               >
                 {type}
               </Link>
@@ -152,11 +161,21 @@ export function DictionaryPanel({ model }: DictionaryPanelProps) {
         {model.total === 0 ? (
           <EmptyState title={t("dictionary.empty")} />
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-border">
-            <div className="grid grid-cols-[1fr_2fr_auto] border-b border-border bg-card px-space-16 py-stack-dense text-xs font-medium tracking-wide text-muted-foreground">
-              <span>{t("catalog.col.name")}</span>
-              <span>{t("catalog.col.description")}</span>
-              <span className="text-right">{t("catalog.col.type")}</span>
+          <div
+            role="table"
+            aria-label={t("dictionary.results")}
+            aria-rowcount={model.total}
+            className="overflow-hidden rounded-2xl border border-border"
+          >
+            <div
+              role="row"
+              className="grid grid-cols-[1fr_2fr_auto] border-b border-border bg-card px-space-16 py-stack-dense text-xs font-medium tracking-wide text-muted-foreground"
+            >
+              <span role="columnheader">{t("catalog.col.name")}</span>
+              <span role="columnheader">{t("catalog.col.description")}</span>
+              <span role="columnheader" className="text-right">
+                {t("catalog.col.type")}
+              </span>
             </div>
             {model.virtual ? (
               <VirtualList

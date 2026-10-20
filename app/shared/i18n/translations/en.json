@@ -98,6 +98,8 @@
   "footer.version": "v{version}",
   "footer.sitemap": "Site map",
   "a11y.skipToContent": "Skip to main content",
+  "chat.message.user": "Your message",
+  "chat.workspace.loading": "Loading conversation",
   "locale.switch": "Language",
   "locale.zh-TW": "繁體中文",
   "locale.en": "English",
@@ -187,6 +189,16 @@
   "catalog.filters.auction": "Auction",
   "catalog.filters.all": "All",
   "catalog.filters.auctionEligible": "Auction eligible",
+  "catalog.filters.material.sterling_silver": "Sterling",
+  "catalog.filters.material.fine_silver": "Fine silver",
+  "catalog.filters.material.gold": "Gold",
+  "catalog.filters.material.copper": "Copper",
+  "catalog.filters.material.bronze": "Bronze",
+  "catalog.filters.productType.experience": "Experience",
+  "catalog.filters.productType.physical": "Physical",
+  "catalog.filters.productType.material": "Material",
+  "catalog.filters.productType.tool": "Tool",
+  "catalog.filters.productType.venue_rental": "Venue",
   "catalog.knowledge.title": "Domain knowledge",
   "catalog.knowledge.desc": "Glossary and domain notes matching the active filters. Asset rows below are not filtered by hallmark.",
   "catalog.results": "Results",
@@ -332,5 +344,6 @@
   "insights.chart.pie": "Pie",
   "insights.heading.distribution": "Catalog item type mix",
   "insights.heading.trend": "Monthly search trend",
-  "insights.error.retry": "Reload insights"
+  "insights.error.retry": "Reload insights",
+  "insights.chart.loading": "Loading insights chart"
 }

@@ -38,7 +38,8 @@
 
 ### 現況：chat a11y + 語音輸入已上線（T-2026-078）
 
-- **有**：`<html lang>`；skip link `a11y.skipToContent` → `#main-content`；`eslint-plugin-jsx-a11y`；Radix / Alert ARIA（錯誤 `role="alert"`）；chat history `role="log"` + polite live region（串流中只公告等待，完成後公告摘要／全文，避免 token 洗版）；composer 送出與麥克風皆有 `aria-label`。
+- **有**：`<html lang>`；skip link `a11y.skipToContent` → `#main-content`（`tabIndex={-1}` 可聚焦）；`eslint-plugin-jsx-a11y`；Radix / Alert ARIA（錯誤 `role="alert"`）；chat history 為 labelled `region` + polite live region（串流中只公告等待，完成後公告摘要／全文，避免 token 洗版）；composer 送出與麥克風皆有 `aria-label`；搜尋結果 facet 有 `aria-current`。
+- **CI**：Playwright `e2e/a11y.spec.ts` 以 `@axe-core/playwright` 抽檢 `/`、`/catalog-search`、`/metadata`、`/insights` 與有一輪對話的 chat。
 - **語音**：共用 `Composer` 在 `SpeechRecognition`／`webkitSpeechRecognition` 可用時顯示麥克風；權限拒絕或不支援不擋鍵盤；辨識結果填入輸入框，由使用者按送出。文案鍵 `composer.voice.*`。
 - **規劃**：[docs/product/a11y-voice-plan.md](./product/a11y-voice-plan.md)（Phase 3 TTS 仍未做）。
 
@@ -46,8 +47,8 @@
 
 ## 總結
 
-| 項目       | 現況                                | 建議                     |
-| ---------- | ----------------------------------- | ------------------------ |
-| **打版號** | Changesets + footer version         | 維持                     |
-| **多語系** | 手動字典 + locale 切換              | 版權與 UI 文案皆走 i18n  |
-| **無障礙** | skip link、chat live、composer 語音 | TTS 為後續；axe 抽檢維持 |
+| 項目       | 現況                                        | 建議                    |
+| ---------- | ------------------------------------------- | ----------------------- |
+| **打版號** | Changesets + footer version                 | 維持                    |
+| **多語系** | 手動字典 + locale 切換                      | 版權與 UI 文案皆走 i18n |
+| **無障礙** | skip link、chat live、composer 語音、axe CI | TTS 為後續              |
