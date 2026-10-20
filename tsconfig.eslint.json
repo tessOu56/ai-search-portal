@@ -11,7 +11,7 @@
     "jsx": "react-jsx",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
+    "types": ["node", "vite/client"],
     "paths": {
       "~/*": ["./app/*"]
     }
@@ -28,7 +28,7 @@
     "services/agent-runtime/**/*.ts",
     "labs/**/*.ts",
     "labs/**/*.tsx",
-    ".eslintrc.cjs",
+    "eslint.config.js",
     "*.config.ts",
     "*.config.js",
     "*.config.cjs",

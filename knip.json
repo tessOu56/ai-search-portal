@@ -19,8 +19,7 @@
     "lucide-react",
     "@testing-library/react",
     "@testing-library/user-event",
-    "eslint-import-resolver-typescript",
-    "eslint-plugin-import",
+    "@eslint/js",
     "eslint-plugin-jsx-a11y",
     "eslint-plugin-react",
     "eslint-plugin-react-hooks"

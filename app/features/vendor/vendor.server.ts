@@ -152,11 +152,8 @@ export function deleteVendor(id: string): boolean {
 export async function createDishVendor(
   input: CreateDishVendorInput
 ): Promise<DishVendor> {
-  // 驗證 dishId 和 vendorId 是否存在（並行查詢以提高效能）
-  const [dish, vendor] = await Promise.all([
-    getDishById(input.dishId),
-    getVendor(input.vendorId),
-  ]);
+  const dish = await getDishById(input.dishId);
+  const vendor = getVendor(input.vendorId);
 
   if (!dish) {
     throw notFound("Dish", input.dishId);
