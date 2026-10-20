@@ -1,5 +1,5 @@
-/* Unlayered so these beat Tailwind utilities. SDK tokens stay canonical. */
-.text-primary {
+/* Higher specificity so this wins after Vite flattens @layer utilities. */
+[data-app="portal"] .text-primary {
   color: var(--accent-strong);
 }
 
