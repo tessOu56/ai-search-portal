@@ -6,10 +6,9 @@ import { renderToPipeableStream } from "react-dom/server";
 import type { AppLoadContext, EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
 
-import { initSentryServer } from "~/lib/monitoring/sentry.server";
+import { readServerSentryDsn } from "~/lib/monitoring/env";
 
 const ABORT_DELAY_MS = 5_000;
-const Sentry = initSentryServer();
 
 function handleRequest(
   request: Request,
@@ -57,6 +56,43 @@ function handleRequest(
   });
 }
 
-export default Sentry
-  ? Sentry.wrapSentryHandleRequest(handleRequest)
-  : handleRequest;
+type HandleRequest = typeof handleRequest;
+
+let sentryWrapped: HandleRequest | undefined;
+
+async function resolveHandler(): Promise<HandleRequest> {
+  if (sentryWrapped) return sentryWrapped;
+  const { initSentryServer } = await import("~/lib/monitoring/sentry.server");
+  const Sentry = initSentryServer();
+  sentryWrapped = Sentry
+    ? (Sentry.wrapSentryHandleRequest(handleRequest) as HandleRequest)
+    : handleRequest;
+  return sentryWrapped;
+}
+
+export default function defaultHandler(
+  request: Request,
+  responseStatusCode: number,
+  responseHeaders: Headers,
+  routerContext: EntryContext,
+  loadContext: AppLoadContext
+) {
+  if (!readServerSentryDsn()) {
+    return handleRequest(
+      request,
+      responseStatusCode,
+      responseHeaders,
+      routerContext,
+      loadContext
+    );
+  }
+  return resolveHandler().then((handler) =>
+    handler(
+      request,
+      responseStatusCode,
+      responseHeaders,
+      routerContext,
+      loadContext
+    )
+  );
+}

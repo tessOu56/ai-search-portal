@@ -1,5 +1,9 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
-import type { LoaderFunctionArgs, MetaFunction } from "react-router";
+import type {
+  LinksFunction,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "react-router";
 import { useLoaderData, useRouteError, useSearchParams } from "react-router";
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
@@ -7,6 +11,7 @@ import { HomeIntro } from "~/components/app/home/HomeIntro";
 import { HomeLanding } from "~/components/app/home/HomeLanding";
 import { WorkspaceChatView } from "~/components/app/workspace/WorkspaceChatView";
 import { WorkspaceFooter } from "~/components/app/workspace/WorkspaceFooter";
+import { DISPLAY_FONT_PRELOAD } from "~/lib/fonts";
 import { ASK_HOME_RESET_EVENT } from "~/lib/workspace-mode";
 import { listAccessApplications } from "~/services/access-request-store.server";
 import { listMetadataAssets } from "~/services/metadata.server";
@@ -27,6 +32,8 @@ const DashboardView = lazy(async () => {
   const mod = await import("~/components/app/workspace/DashboardView");
   return { default: mod.DashboardView };
 });
+
+export const links: LinksFunction = () => [DISPLAY_FONT_PRELOAD];
 
 function RouteFallback({ label }: { label: string }) {
   return (

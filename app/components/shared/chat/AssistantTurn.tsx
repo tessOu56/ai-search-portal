@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { AiFallbackPanel } from "~/components/shared/chat/AiFallbackPanel";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/Alert";
 import { Button } from "~/components/ui/Button";
-import { trackCitationClicked } from "~/lib/analytics/product-events";
+import { trackCitationClicked } from "~/lib/analytics/track";
 import { useI18n } from "~/shared/i18n/context";
 import {
   buildCatalogSearchUrl,

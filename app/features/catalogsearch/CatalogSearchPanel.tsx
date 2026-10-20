@@ -16,7 +16,7 @@ import { Input } from "~/components/ui/Input";
 import { Stack } from "~/components/ui/Stack";
 import { StatusChip } from "~/components/ui/StatusChip";
 import { Toolbar } from "~/components/ui/Toolbar";
-import { trackSearchSubmitted } from "~/lib/analytics/product-events";
+import { trackSearchSubmitted } from "~/lib/analytics/track";
 import { PRODUCT_TABLE_LINK_CLASS } from "~/lib/experience-nav";
 import { useI18n } from "~/shared/i18n/context";
 import { buildMetadataSearchUrl } from "~/shared/navigation";

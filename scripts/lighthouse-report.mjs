@@ -12,6 +12,10 @@ const ROUTES = (process.env.LIGHTHOUSE_ROUTES ?? "/,/catalog-search,/metadata")
   .map((route) => route.trim())
   .filter(Boolean);
 const STAMP = process.env.LIGHTHOUSE_STAMP ?? "run";
+const RUNS = Math.max(
+  1,
+  Number.parseInt(process.env.LIGHTHOUSE_RUNS ?? "5", 10) || 5
+);
 const OUT_DIR = path.join(process.cwd(), "reports", "lighthouse", STAMP);
 
 function chromePath() {
@@ -33,6 +37,24 @@ function metric(audits, id) {
     display: audit.displayValue ?? String(audit.numericValue),
     score: audit.score,
   };
+}
+
+function median(values) {
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  if (sorted.length % 2) return sorted[mid];
+  return (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function formatMs(value) {
+  if (value == null) return "—";
+  if (value >= 1000) return `${(value / 1000).toFixed(1)} s`;
+  return `${Math.round(value)} ms`;
+}
+
+function formatCls(value) {
+  if (value == null) return "—";
+  return value.toFixed(3);
 }
 
 async function runRoute(lighthouse, port, route) {
@@ -68,6 +90,31 @@ async function runRoute(lighthouse, port, route) {
     unusedPreload: audits["unused-preload"]?.details?.items ?? [],
     renderBlocking: audits["render-blocking-resources"]?.details?.items ?? [],
     lhr,
+  };
+}
+
+function medianRow(route, url, samples) {
+  const perf = Math.round(median(samples.map((row) => row.performance)));
+  const lcpValues = samples
+    .map((row) => row.lcp?.value)
+    .filter((value) => typeof value === "number");
+  const clsValues = samples
+    .map((row) => row.cls?.value)
+    .filter((value) => typeof value === "number");
+  const lcp = lcpValues.length ? median(lcpValues) : null;
+  const cls = clsValues.length ? median(clsValues) : null;
+  return {
+    route,
+    url,
+    performance: perf,
+    lcp: lcp == null ? null : { value: lcp, display: formatMs(lcp) },
+    inp: null,
+    cls: cls == null ? null : { value: cls, display: formatCls(cls) },
+    runs: samples.map((row) => ({
+      performance: row.performance,
+      lcp: row.lcp?.value ?? null,
+      cls: row.cls?.value ?? null,
+    })),
   };
 }
 
@@ -108,13 +155,20 @@ async function main() {
   const rows = [];
   try {
     for (const route of ROUTES) {
-      const row = await runRoute(lighthouse, chrome.port, route);
-      const { lhr, ...summary } = row;
-      await writeFile(
-        path.join(OUT_DIR, `${route.replaceAll("/", "_") || "home"}.json`),
-        JSON.stringify(lhr, null, 2)
-      );
-      rows.push(summary);
+      const samples = [];
+      for (let run = 1; run <= RUNS; run += 1) {
+        const row = await runRoute(lighthouse, chrome.port, route);
+        const { lhr, ...summary } = row;
+        await writeFile(
+          path.join(
+            OUT_DIR,
+            `${route.replaceAll("/", "_") || "home"}-run${run}.json`
+          ),
+          JSON.stringify(lhr, null, 2)
+        );
+        samples.push(summary);
+      }
+      rows.push(medianRow(route, samples[0]?.url ?? route, samples));
     }
   } finally {
     await chrome.kill();
@@ -125,6 +179,8 @@ async function main() {
       tool: "lighthouse",
       formFactor: "desktop",
       throttling: "simulate (Lighthouse default desktop)",
+      aggregation: "median",
+      runs: RUNS,
       base: BASE,
       stamp: STAMP,
       chrome: executablePath ?? "system",
@@ -136,7 +192,7 @@ async function main() {
     JSON.stringify(payload, null, 2)
   );
   printTable(rows);
-  console.log(`Wrote ${OUT_DIR}`);
+  console.log(`Wrote ${OUT_DIR} (median of ${RUNS})`);
 }
 
 main().catch((error) => {

@@ -104,12 +104,30 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.hydrated = "true";
     let cancelled = false;
-    void (async () => {
-      const mod = await import("~/lib/analytics/web-vitals-reporter");
-      if (!cancelled) mod.startWebVitalsReporting();
-    })();
+    const startMonitoring = () => {
+      void (async () => {
+        const { startWebVitalsReporting } =
+          await import("~/lib/analytics/web-vitals-reporter");
+        if (cancelled) return;
+        startWebVitalsReporting();
+        const { readClientSentryDsn } = await import("~/lib/monitoring/env");
+        if (cancelled || !readClientSentryDsn()) return;
+        const { initSentryClient } =
+          await import("~/lib/monitoring/sentry.client");
+        if (!cancelled) initSentryClient();
+      })();
+    };
+    const idleId =
+      typeof requestIdleCallback === "function"
+        ? requestIdleCallback(startMonitoring, { timeout: 2500 })
+        : window.setTimeout(startMonitoring, 1);
     return () => {
       cancelled = true;
+      if (typeof requestIdleCallback === "function") {
+        cancelIdleCallback(idleId);
+      } else {
+        window.clearTimeout(idleId);
+      }
     };
   }, []);
   if (!data) {

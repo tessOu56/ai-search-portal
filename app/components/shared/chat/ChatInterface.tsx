@@ -6,7 +6,7 @@ import { ChatBubble } from "~/components/shared/lui/ChatBubble";
 import {
   trackAnswerRendered,
   trackSearchSubmitted,
-} from "~/lib/analytics/product-events";
+} from "~/lib/analytics/track";
 import { apiChatQuery } from "~/shared/api/paths";
 import {
   stableChatErrorSchema,
