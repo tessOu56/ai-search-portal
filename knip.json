@@ -21,14 +21,11 @@
     "@eslint/js",
     "eslint-plugin-jsx-a11y",
     "eslint-plugin-react",
-    "eslint-plugin-react-hooks"
+    "eslint-plugin-react-hooks",
+    "@is_tess/tokens"
   ],
   "ignoreExportsUsedInFile": true,
-  "ignoreFiles": [
-    "app/features/**/*.hooks.ts",
-    "app/components/ui/Callout.tsx",
-    "app/components/ui/Input.tsx"
-  ],
+  "ignoreFiles": ["app/features/**/*.hooks.ts"],
   "ignoreIssues": {
     "app/shared/release-notes.server.ts": ["exports"],
     "app/components/shared/genui/GenUiRenderer.tsx": ["exports"]

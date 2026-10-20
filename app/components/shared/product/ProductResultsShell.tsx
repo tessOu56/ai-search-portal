@@ -74,11 +74,3 @@ export function ProductResultsShell({
     </section>
   );
 }
-
-export type ProductResultsEmptyProps = {
-  message: string;
-};
-
-export function ProductResultsEmpty({ message }: ProductResultsEmptyProps) {
-  return <EmptyState title={message} />;
-}

@@ -23,13 +23,12 @@ RSC / `unstable_viteEnvironmentApi` is a spike only — not the production path 
 
 ## 與 React 直接相關的套件
 
-| 套件                                   | 用途       | React 支援／備註                       |
-| -------------------------------------- | ---------- | -------------------------------------- |
-| **react-router**                       | 路由與資料 | RR7 Framework Mode；peer React >=18    |
-| **@radix-ui/react-scroll-area**        | UI 元件    | peer: ^16.8 \|\| ^17 \|\| ^18 \|\| ^19 |
-| **@radix-ui/react-slot**               | 元件組合   | 同上，Radix 系列皆支援 16–19           |
-| **react**, **react-dom**               | 核心       | 專案鎖定 19.2.x                        |
-| **@types/react**, **@types/react-dom** | 型別       | 應與 react 大版一致（19.x）            |
+| 套件                                   | 用途       | React 支援／備註                            |
+| -------------------------------------- | ---------- | ------------------------------------------- |
+| **react-router**                       | 路由與資料 | RR7 Framework Mode；peer React >=18         |
+| **@is_tess/components**                | UI 元件    | peer React ^18 \|\| ^19；Radix 為其內部依賴 |
+| **react**, **react-dom**               | 核心       | 專案鎖定 19.2.x                             |
+| **@types/react**, **@types/react-dom** | 型別       | 應與 react 大版一致（19.x）                 |
 
 Do not introduce a parallel UI kit for the React 19 bump — keep consuming `@is_tess/components` (peer `^18 \|\| ^19`).
 
