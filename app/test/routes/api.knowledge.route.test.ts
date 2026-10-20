@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { loader as knowledgeSearchLoader } from "~/routes/api.knowledge.search";
 import { API_KNOWLEDGE_SEARCH } from "~/shared/api/paths";
 import { knowledgeSearchResponseSchema } from "~/shared/contracts";
-import { parseIndustryFacetsFromSearchParams } from "~/shared/utils/industry-facets-url";
+import { parseIndustryFacetsFromSearchParams } from "~/shared/utils/industry-facets-url.server";
 
 async function callLoader(url: string): Promise<Response> {
   const result = knowledgeSearchLoader({

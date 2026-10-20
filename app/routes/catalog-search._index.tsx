@@ -17,7 +17,7 @@ import {
   getOrigin,
   getSeoFromLoader,
 } from "~/shared/seo";
-import { parseIndustryFacetsFromSearchParams } from "~/shared/utils/industry-facets-url";
+import { parseIndustryFacetsFromSearchParams } from "~/shared/utils/industry-facets-url.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);

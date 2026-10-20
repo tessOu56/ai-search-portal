@@ -1,7 +1,3 @@
-import {
-  INDUSTRY_STANDARD_REGISTRY,
-  listIndustryStandards,
-} from "@ai-search-portal/contracts";
 import { Link, useNavigation } from "react-router";
 
 import { FacetChip } from "~/components/shared/product/FacetChip";
@@ -47,9 +43,15 @@ const PRODUCT_TYPE_VALUES = [
   "venue_rental",
 ] as const;
 
-const STANDARD_CHIP_CODES = listIndustryStandards()
-  .filter((e) => ["925", "999", "14K", "18K", "950"].includes(e.code))
-  .map((e) => e.code);
+const STANDARD_CHIP_CODES = ["925", "999", "14K", "18K", "950"] as const;
+
+const STANDARD_LABELS: Record<(typeof STANDARD_CHIP_CODES)[number], string> = {
+  "925": "925 銀",
+  "999": "純銀 999",
+  "14K": "14K 金",
+  "18K": "18K 金",
+  "950": "鉑金 950",
+};
 
 type Translate = (key: string, vars?: Record<string, string>) => string;
 
@@ -429,9 +431,7 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
     navigation.state === "loading" &&
     navigation.location?.pathname === "/catalog-search";
 
-  const standardLabels = new Map(
-    INDUSTRY_STANDARD_REGISTRY.map((e) => [e.code, e.labelZhTw])
-  );
+  const standardLabels = new Map(Object.entries(STANDARD_LABELS));
 
   const assetRows = model.results.filter((row) => row.source !== "knowledge");
 
