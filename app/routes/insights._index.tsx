@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import type { MetaFunction } from "react-router";
 import { isRouteErrorResponse, useRouteError } from "react-router";
 
@@ -6,8 +7,25 @@ import {
   ProductPageShell,
 } from "~/components/shared/product/ProductPageShell";
 import { Button } from "~/components/ui/Button";
-import { InsightsPanel } from "~/features/insights";
+import { Skeleton } from "~/components/ui/Skeleton";
 import { useI18n } from "~/shared/i18n/context";
+
+const InsightsPanel = lazy(async () => {
+  const mod = await import("~/features/insights");
+  return { default: mod.InsightsPanel };
+});
+
+function InsightsFallback() {
+  const { t } = useI18n();
+  return (
+    <div role="status" className="space-y-space-16" aria-live="polite">
+      <p className="text-type-14 text-muted-foreground">
+        {t("insights.chart.loading")}
+      </p>
+      <Skeleton className="h-64 w-full" />
+    </div>
+  );
+}
 
 const INSIGHTS_TITLE_KEY = "nav.insights";
 const INSIGHTS_DESC_KEY = "insights.page.description";
@@ -28,7 +46,9 @@ export default function InsightsIndexRoute() {
         title={t(INSIGHTS_TITLE_KEY)}
         description={t(INSIGHTS_DESC_KEY)}
       />
-      <InsightsPanel />
+      <Suspense fallback={<InsightsFallback />}>
+        <InsightsPanel />
+      </Suspense>
     </ProductPageShell>
   );
 }

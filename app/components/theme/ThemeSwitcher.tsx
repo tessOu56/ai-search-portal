@@ -72,7 +72,7 @@ export function ThemeSwitcher({
           const found = THEMES.find((item) => item.id === next);
           if (found) applyTheme(found.id);
         }}
-        aria-label={themeLabel}
+        aria-label={`${themeLabel}: ${THEMES.find((item) => item.id === theme)?.label ?? themeLabel}`}
       />
       <span className="text-type-12 text-muted-foreground">
         {dark ? t("theme.mode.dark") : t("theme.mode.light")}

@@ -43,6 +43,7 @@ pnpm run knip
 - 僅圖示的按鈕／連結需加 `aria-label` 說明用途
 - 有意義的裝飾用元素可加 `aria-hidden="true"` 避免朗讀干擾
 - 新內容或非同步狀態可視情況使用 `aria-live`、`aria-busy`
+- CI E2E 會跑 `e2e/a11y.spec.ts`（`@axe-core/playwright`，WCAG 2 A/AA）。本機：`pnpm run test:a11y`
 
 ## Pull Request
 

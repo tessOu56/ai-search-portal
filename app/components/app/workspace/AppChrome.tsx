@@ -37,7 +37,7 @@ function AppChromeFrame({ children }: { children: ReactNode }) {
               variant="outline"
               className="gap-space-8 md:hidden"
               aria-expanded={directoryOpen}
-              aria-controls="overview-directory"
+              aria-controls={directoryOpen ? "overview-directory" : undefined}
               aria-haspopup="dialog"
               onClick={() => setDirectoryOpen((open) => !open)}
             >

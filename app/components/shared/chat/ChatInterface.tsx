@@ -79,6 +79,7 @@ export function ChatInterface({
   const streamTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const submitQueryRef = useRef<(raw: string) => void>(() => undefined);
   const logEndRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const onAgentModeChangeRef = useRef(onAgentModeChange);
   onAgentModeChangeRef.current = onAgentModeChange;
   /** Same-instance Strict Mode effect re-run; remount gets a fresh ref. */
@@ -93,7 +94,15 @@ export function ChatInterface({
   };
 
   useEffect(() => {
-    logEndRef.current?.scrollIntoView({ block: "end" });
+    const container = scrollRef.current;
+    const end = logEndRef.current;
+    if (!container || !end) return;
+    const gap =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+    // Follow new turns if the user is already near the bottom (or on the first turn).
+    if (messages.length <= 2 || gap < 160) {
+      end.scrollIntoView({ block: "end" });
+    }
   }, [messages, isStreaming]);
 
   const submitQuery = (raw: string) => {
@@ -259,14 +268,22 @@ export function ChatInterface({
       <div className="sr-only" aria-live="polite" aria-atomic="false">
         {liveAnnouncement}
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+      <div
+        ref={scrollRef}
+        className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
+      >
         <div
-          id="home-chat"
+          id="conversation-log"
           className="mx-auto flex w-full max-w-3xl flex-col gap-space-16 px-space-16 py-space-32"
-          role="log"
-          aria-relevant="additions"
+          role="region"
           aria-label={t("chat.history.title")}
+          aria-busy={isStreaming}
         >
+          {messages.length === 0 ? (
+            <p className="text-type-14 text-muted-foreground">
+              {t("chat.history.empty")}
+            </p>
+          ) : null}
           {messages.map((message) =>
             message.role === "user" ? (
               <ChatBubble
@@ -274,6 +291,7 @@ export function ChatInterface({
                 variant="user"
                 data-testid="user-turn"
               >
+                <span className="sr-only">{t("chat.message.user")}: </span>
                 {message.content}
               </ChatBubble>
             ) : (
@@ -300,8 +318,17 @@ export function ChatInterface({
       </div>
       <div className="bg-background/80 border-t border-border p-space-16 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-space-8">
-          <p className="text-type-12 text-muted-foreground">{t("chat.hint")}</p>
-          <Composer onSubmit={submitQuery} disabled={isStreaming} />
+          <p
+            id="chat-composer-hint"
+            className="text-type-12 text-muted-foreground"
+          >
+            {t("chat.hint")}
+          </p>
+          <Composer
+            onSubmit={submitQuery}
+            disabled={isStreaming}
+            describedBy="chat-composer-hint"
+          />
         </div>
       </div>
     </div>

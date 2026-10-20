@@ -17,12 +17,14 @@ import {
 
 import { ErrorBoundaryFallback } from "~/components/app/errorboundary";
 import { AppChrome } from "~/components/app/workspace";
-import { NavProgress } from "~/components/shared/chrome/NavProgress";
-import { StarCursor } from "~/components/shared/chrome/StarCursor";
-import { startWebVitalsReporting } from "~/lib/analytics/web-vitals-reporter";
+import { DeferredChrome } from "~/components/shared/chrome/DeferredChrome";
 import { getLocale, getTranslations, type Locale } from "~/shared/i18n";
 import { I18nProvider } from "~/shared/i18n/context";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
+
+/** Display (Petrona / Shippori Mincho) + body Inter. Loaded async in Layout. */
+const FONT_STYLESHEET =
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Petrona:wght@500&family=Shippori+Mincho:wght@500&display=swap";
 
 export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico", sizes: "any" },
@@ -36,11 +38,7 @@ export const links: LinksFunction = () => [
     href: "https://fonts.gstatic.com",
     crossOrigin: "anonymous",
   },
-  {
-    // 和紙編輯風 display font（Petrona 拉丁 / Shippori Mincho 漢字）+ body Inter
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Petrona:wght@400;500;600&family=Shippori+Mincho:wght@400;500;600&display=swap",
-  },
+  { rel: "preload", href: FONT_STYLESHEET, as: "style" },
   {
     rel: "preload",
     href: "/marketing/home-atmosphere.svg",
@@ -98,6 +96,17 @@ export function Layout({ children }: { children: ReactNode }) {
         />
         <Meta />
         <Links />
+        <link
+          rel="stylesheet"
+          href={FONT_STYLESHEET}
+          media="print"
+          onLoad={(event) => {
+            event.currentTarget.media = "all";
+          }}
+        />
+        <noscript>
+          <link rel="stylesheet" href={FONT_STYLESHEET} />
+        </noscript>
       </head>
       <body className="bg-background font-sans antialiased">
         <a
@@ -108,8 +117,7 @@ export function Layout({ children }: { children: ReactNode }) {
             (locale === "en" ? "Skip to main content" : "跳至主內容")}
         </a>
         {children}
-        <NavProgress />
-        <StarCursor />
+        <DeferredChrome />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -121,7 +129,14 @@ export default function App() {
   const data = useRouteLoaderData("root") as RootData | undefined;
   useEffect(() => {
     document.documentElement.dataset.hydrated = "true";
-    startWebVitalsReporting();
+    let cancelled = false;
+    void (async () => {
+      const mod = await import("~/lib/analytics/web-vitals-reporter");
+      if (!cancelled) mod.startWebVitalsReporting();
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
   if (!data) {
     return <Outlet />;
@@ -131,7 +146,8 @@ export default function App() {
       <AppChrome>
         <main
           id="main-content"
-          className="flex min-h-0 min-w-0 flex-1 flex-col"
+          tabIndex={-1}
+          className="flex min-h-0 min-w-0 flex-1 flex-col outline-none"
         >
           <Outlet />
         </main>

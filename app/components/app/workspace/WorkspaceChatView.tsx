@@ -29,6 +29,7 @@ export function WorkspaceChatView({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
+      <h1 className="sr-only">{t("chat.title")}</h1>
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-space-8 px-space-16 pt-space-8 md:px-space-32">
         <Button
           asChild

@@ -1,9 +1,10 @@
 import { listIndustryStandards } from "@ai-search-portal/contracts";
-import type { ReactNode } from "react";
 import { Form, Link, useNavigation } from "react-router";
 
+import { FacetChip } from "~/components/shared/product/FacetChip";
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";
+import { ResultsPagination } from "~/components/shared/product/ResultsPagination";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
 import { Callout } from "~/components/ui/Callout";
@@ -61,12 +62,12 @@ const STANDARD_CHIP_CODES = listIndustryStandards()
   .filter((e) => ["925", "999", "14K", "18K", "950"].includes(e.code))
   .map((e) => e.code);
 
-const MATERIAL_OPTIONS = [
-  { value: "sterling_silver", label: "Sterling" },
-  { value: "fine_silver", label: "Fine silver" },
-  { value: "gold", label: "Gold" },
-  { value: "copper", label: "Copper" },
-  { value: "bronze", label: "Bronze" },
+const MATERIAL_VALUES = [
+  "sterling_silver",
+  "fine_silver",
+  "gold",
+  "copper",
+  "bronze",
 ] as const;
 
 function buildResultsDescription(
@@ -94,85 +95,6 @@ function buildResultsDescription(
     );
   }
   return parts.join(" · ");
-}
-
-function FacetChip({
-  to,
-  active,
-  children,
-}: {
-  to: string;
-  active: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <Button asChild size="sm" variant={active ? "default" : "outline"}>
-      <Link to={to}>{children}</Link>
-    </Button>
-  );
-}
-
-function MetadataPagination({
-  pagination,
-  base,
-}: {
-  pagination: MetadataSearchViewModel["pagination"];
-  base: {
-    q: string;
-    type?: string;
-    pack: string;
-    intent?: MetadataSearchIntent;
-    material?: string;
-    standard?: string;
-    productType?: string;
-    auctionEligible?: boolean;
-  };
-}) {
-  const { t } = useI18n();
-  if (pagination.totalPages <= 1) return null;
-  return (
-    <nav
-      className="flex items-center justify-between gap-space-8"
-      aria-label={t("catalog.results.pagination")}
-    >
-      {pagination.page > 1 ? (
-        <Link
-          to={buildMetadataSearchUrl({
-            ...base,
-            page: pagination.page - 1,
-          })}
-          className="text-sm font-medium text-primary hover:underline"
-        >
-          {t("catalog.results.prev")}
-        </Link>
-      ) : (
-        <span className="text-sm text-muted-foreground">
-          {t("catalog.results.prev")}
-        </span>
-      )}
-      <span className="text-xs text-muted-foreground">
-        {t("catalog.results.pageOf", {
-          page: String(pagination.page),
-          total: String(pagination.totalPages),
-        })}
-      </span>
-      {pagination.page < pagination.totalPages ? (
-        <Link
-          to={buildMetadataSearchUrl({
-            ...base,
-            page: pagination.page + 1,
-          })}
-          className="text-sm font-medium text-primary hover:underline"
-        >
-          {t("catalog.results.next")}
-        </Link>
-      ) : (
-        <span className="text-sm text-muted-foreground">
-          {t("catalog.results.next")}
-        </span>
-      )}
-    </nav>
-  );
 }
 
 export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
@@ -340,20 +262,20 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
               >
                 {allLabel}
               </FacetChip>
-              {MATERIAL_OPTIONS.map((opt) => (
+              {MATERIAL_VALUES.map((value) => (
                 <FacetChip
-                  key={opt.value}
+                  key={value}
                   to={buildMetadataSearchUrl({
                     q: model.query,
                     type: model.activeType,
                     pack: model.activePackId,
                     intent: model.intent,
-                    material: opt.value,
+                    material: value,
                     standard: model.activeStandard,
                   })}
-                  active={model.activeMaterial === opt.value}
+                  active={model.activeMaterial === value}
                 >
-                  {opt.label}
+                  {t(`catalog.filters.material.${value}`)}
                 </FacetChip>
               ))}
             </div>
@@ -493,7 +415,20 @@ export function MetadataSearchPanel({ model }: MetadataSearchPanelProps) {
             </Link>
           </div>
         }
-        pagination={<MetadataPagination pagination={pagination} base={base} />}
+        pagination={
+          <ResultsPagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            prevHref={buildMetadataSearchUrl({
+              ...base,
+              page: pagination.page - 1,
+            })}
+            nextHref={buildMetadataSearchUrl({
+              ...base,
+              page: pagination.page + 1,
+            })}
+          />
+        }
       >
         <DataTable
           columns={[

@@ -1,5 +1,4 @@
 import { ArrowRight, Mic } from "lucide-react";
-import { useReducedMotion } from "motion/react";
 import { type FormEvent, useEffect, useId, useState } from "react";
 
 import { useVoiceInput } from "~/components/shared/chat/useVoiceInput";
@@ -7,6 +6,7 @@ import { Button } from "~/components/ui/Button";
 import { Input } from "~/components/ui/Input";
 import { useI18n } from "~/shared/i18n/context";
 import { cn } from "~/shared/utils/cn";
+import { usePrefersReducedMotion } from "~/shared/utils/prefers-reduced-motion";
 
 type ComposerProps = {
   className?: string;
@@ -17,10 +17,21 @@ type ComposerProps = {
   /** Short rotating placeholders; keep shorter than a single input line. */
   hints?: string[];
   suggestions?: string[];
+  /** Optional extra description (hint, status) associated with the field. */
+  describedBy?: string;
 };
 
 const CHIP_CLASS =
   "h-auto min-h-8 max-w-full whitespace-normal break-words py-1.5 text-left";
+
+function joinDescribedBy(
+  describedBy: string | undefined,
+  hintId: string,
+  includeHint: boolean
+): string | undefined {
+  const ids = [describedBy, includeHint ? hintId : null].filter(Boolean);
+  return ids.length > 0 ? ids.join(" ") : undefined;
+}
 
 function VoiceButton({
   disabled,
@@ -99,10 +110,12 @@ export function Composer({
   typewriter = false,
   hints = [],
   suggestions = [],
+  describedBy,
 }: ComposerProps) {
   const { t, locale } = useI18n();
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = usePrefersReducedMotion();
   const inputId = useId();
+  const hintId = `${inputId}-hint`;
   const [value, setValue] = useState("");
   const [focused, setFocused] = useState(false);
   const [typed, setTyped] = useState("");
@@ -201,8 +214,17 @@ export function Composer({
             disabled={disabled}
             className="pr-4"
             placeholder={showTypewriter ? "" : t("chat.placeholder")}
-            aria-label={t("home.composer.label")}
+            aria-describedby={joinDescribedBy(
+              describedBy,
+              hintId,
+              Boolean(showTypewriter && activeHint)
+            )}
           />
+          {showTypewriter && activeHint ? (
+            <span id={hintId} className="sr-only">
+              {activeHint}
+            </span>
+          ) : null}
           {showTypewriter && (
             <span
               className="pointer-events-none absolute inset-y-0 left-0 flex items-center whitespace-nowrap px-6 text-base text-muted-foreground"
@@ -234,6 +256,11 @@ export function Composer({
           <ArrowRight className="size-5" aria-hidden />
         </Button>
       </form>
+      {disabled ? (
+        <p className="sr-only" role="status">
+          {t("chat.submitting")}
+        </p>
+      ) : null}
       {voiceSupported ? <VoiceStatus status={voiceStatus} t={t} /> : null}
       {suggestions.length > 0 && (
         <div className="flex flex-wrap gap-space-8">

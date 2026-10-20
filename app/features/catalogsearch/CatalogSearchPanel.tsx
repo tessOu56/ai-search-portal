@@ -2,11 +2,12 @@ import {
   INDUSTRY_STANDARD_REGISTRY,
   listIndustryStandards,
 } from "@ai-search-portal/contracts";
-import type { ReactNode } from "react";
 import { Link, useNavigation } from "react-router";
 
+import { FacetChip } from "~/components/shared/product/FacetChip";
 import { ProductPageHeader } from "~/components/shared/product/ProductPageShell";
 import { ProductResultsShell } from "~/components/shared/product/ProductResultsShell";
+import { ResultsPagination } from "~/components/shared/product/ResultsPagination";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
 import { Callout } from "~/components/ui/Callout";
@@ -29,20 +30,20 @@ export type CatalogSearchPanelProps = {
   model: CatalogSearchViewModel;
 };
 
-const MATERIAL_OPTIONS = [
-  { value: "sterling_silver", label: "Sterling" },
-  { value: "fine_silver", label: "Fine silver" },
-  { value: "gold", label: "Gold" },
-  { value: "copper", label: "Copper" },
-  { value: "bronze", label: "Bronze" },
+const MATERIAL_VALUES = [
+  "sterling_silver",
+  "fine_silver",
+  "gold",
+  "copper",
+  "bronze",
 ] as const;
 
-const PRODUCT_TYPE_OPTIONS = [
-  { value: "experience", label: "Experience" },
-  { value: "physical", label: "Physical" },
-  { value: "material", label: "Material" },
-  { value: "tool", label: "Tool" },
-  { value: "venue_rental", label: "Venue" },
+const PRODUCT_TYPE_VALUES = [
+  "experience",
+  "physical",
+  "material",
+  "tool",
+  "venue_rental",
 ] as const;
 
 const STANDARD_CHIP_CODES = listIndustryStandards()
@@ -85,26 +86,6 @@ function buildResultsDescription(
     );
   }
   return parts.join(" · ");
-}
-
-function FacetChip({
-  to,
-  active,
-  children,
-  title,
-}: {
-  to: string;
-  active: boolean;
-  children: ReactNode;
-  title?: string;
-}) {
-  return (
-    <Button asChild size="sm" variant={active ? "default" : "outline"}>
-      <Link to={to} title={title}>
-        {children}
-      </Link>
-    </Button>
-  );
 }
 
 function CatalogFacetFilters({
@@ -167,16 +148,16 @@ function CatalogFacetFilters({
             >
               {allLabel}
             </FacetChip>
-            {MATERIAL_OPTIONS.map((opt) => (
+            {MATERIAL_VALUES.map((value) => (
               <FacetChip
-                key={opt.value}
+                key={value}
                 to={buildCatalogSearchUrl({
                   ...base,
-                  material: opt.value,
+                  material: value,
                 })}
-                active={model.activeMaterial === opt.value}
+                active={model.activeMaterial === value}
               >
-                {opt.label}
+                {t(`catalog.filters.material.${value}`)}
               </FacetChip>
             ))}
           </div>
@@ -226,16 +207,16 @@ function CatalogFacetFilters({
             >
               {allLabel}
             </FacetChip>
-            {PRODUCT_TYPE_OPTIONS.map((opt) => (
+            {PRODUCT_TYPE_VALUES.map((value) => (
               <FacetChip
-                key={opt.value}
+                key={value}
                 to={buildCatalogSearchUrl({
                   ...base,
-                  productType: opt.value,
+                  productType: value,
                 })}
-                active={model.activeProductType === opt.value}
+                active={model.activeProductType === value}
               >
-                {opt.label}
+                {t(`catalog.filters.productType.${value}`)}
               </FacetChip>
             ))}
           </div>
@@ -340,60 +321,6 @@ function CatalogKnowledgeHits({
           ))}
       </div>
     </section>
-  );
-}
-
-function CatalogPagination({
-  pagination,
-  base,
-}: {
-  pagination: CatalogSearchViewModel["pagination"];
-  base: CatalogSearchUrlParams;
-}) {
-  const { t } = useI18n();
-  if (pagination.totalPages <= 1) return null;
-  return (
-    <nav
-      className="flex items-center justify-between gap-space-8"
-      aria-label={t("catalog.results.pagination")}
-    >
-      {pagination.page > 1 ? (
-        <Link
-          to={buildCatalogSearchUrl({
-            ...base,
-            page: pagination.page - 1,
-          })}
-          className="text-sm font-medium text-primary hover:underline"
-        >
-          {t("catalog.results.prev")}
-        </Link>
-      ) : (
-        <span className="text-sm text-muted-foreground">
-          {t("catalog.results.prev")}
-        </span>
-      )}
-      <span className="text-type-12 text-muted-foreground">
-        {t("catalog.results.pageOf", {
-          page: String(pagination.page),
-          total: String(pagination.totalPages),
-        })}
-      </span>
-      {pagination.page < pagination.totalPages ? (
-        <Link
-          to={buildCatalogSearchUrl({
-            ...base,
-            page: pagination.page + 1,
-          })}
-          className="text-sm font-medium text-primary hover:underline"
-        >
-          {t("catalog.results.next")}
-        </Link>
-      ) : (
-        <span className="text-sm text-muted-foreground">
-          {t("catalog.results.next")}
-        </span>
-      )}
-    </nav>
   );
 }
 
@@ -559,7 +486,20 @@ export function CatalogSearchPanel({ model }: CatalogSearchPanelProps) {
         skeletonRows={3}
         emptyMessage={t("catalog.results.empty")}
         emptyAction={<CatalogEmptyAction model={model} />}
-        pagination={<CatalogPagination pagination={pagination} base={base} />}
+        pagination={
+          <ResultsPagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            prevHref={buildCatalogSearchUrl({
+              ...base,
+              page: pagination.page - 1,
+            })}
+            nextHref={buildCatalogSearchUrl({
+              ...base,
+              page: pagination.page + 1,
+            })}
+          />
+        }
       >
         <DataTable
           columns={[
