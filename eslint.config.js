@@ -33,6 +33,8 @@ export default defineConfig(
     "docs/.vitepress/**",
     ".lintstagedrc.cjs",
     "packages/shared-contracts/src/generated/**",
+    ".agents/**",
+    ".cursor/skills/**",
   ]),
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,

@@ -31,4 +31,8 @@ vite.config.ts
 tailwind.config.ts
 postcss.config.js
 
+# Synced/vendored agent skills (verbatim upstream copies)
+.agents/
+.cursor/skills/
+
 

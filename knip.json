@@ -10,7 +10,9 @@
     ".cache/**",
     "node_modules/**",
     "public/**",
-    "packages/shared-contracts/src/generated/**"
+    "packages/shared-contracts/src/generated/**",
+    ".agents/**",
+    ".cursor/skills/**"
   ],
   "ignoreDependencies": [
     "eslint-formatter-gha",
