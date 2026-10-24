@@ -117,7 +117,7 @@
 
 ## 開發環境（2026-07 統一）
 
-- Node 24（`.nvmrc`，CI 與 Dockerfile 對齊；`engines.node` 為 `>=24.22.1 <25`）· pnpm 11.28.8（`packageManager`）
+- Node 24.22.1（`.nvmrc`，CI 與 Dockerfile 對齊；`engines.node` 為 `>=24.22.1 <25`）· pnpm 11.28.8（`packageManager`）
 - 生態環境／沙箱限制：見 [docs/runbooks/local-dev.md](docs/runbooks/local-dev.md)
 
 ---
