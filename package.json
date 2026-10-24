@@ -75,6 +75,7 @@
     "pretest": "pnpm run check:node",
     "prebuild": "pnpm run check:node",
     "prod:smoke": "node scripts/prod-smoke.mjs",
+    "check:vercel-output": "node scripts/check-vercel-output.mjs",
     "observability:posthog:up": "docker compose -f labs/observability/docker-compose.posthog.yml up -d",
     "observability:posthog:down": "docker compose -f labs/observability/docker-compose.posthog.yml down"
   },

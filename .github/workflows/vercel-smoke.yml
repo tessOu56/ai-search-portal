@@ -1,0 +1,28 @@
+# Fail the PR/push when a Vercel deployment is READY but `/` is not 200.
+# Catches platform NOT_FOUND (Remix Framework Preset vs React Router output).
+name: Vercel smoke
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Smoke deployed URL
+    if: >
+      github.event.deployment_status.state == 'success' &&
+      contains(github.event.deployment_status.target_url, 'vercel.app')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout deployed SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.deployment.sha }}
+
+      - name: Smoke `/` and main routes
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: node scripts/prod-smoke.mjs "${{ github.event.deployment_status.target_url }}"
