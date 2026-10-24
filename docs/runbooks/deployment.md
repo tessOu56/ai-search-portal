@@ -47,9 +47,12 @@
 
 ## 建議 Vercel 專案設定
 
+- **Framework Preset must be React Router** (Settings → General → Framework Settings). Remix leftover after the RR7 migration ships only `public/` and every SSR route is platform `NOT_FOUND` (`x-vercel-error: NOT_FOUND`). `vercel.json` already sets `"framework": "react-router"`; the dashboard value still wins for Git deploys.
+- **Node.js Version must be 22.x** (same page). The repo `engines` / `check:node` reject 24.x once the React Router builder actually runs `pnpm run build`.
 - 保留 Vercel 與 GitHub 連線（供 metadata 與 preview 記錄）。
 - 將 production 的實際上線操作統一由 **GitHub `Deploy to Vercel` workflow** 觸發。
 - 若需完全避免「push main 自動上線」，請在 Vercel 專案設定停用 Git auto-deploy（或限制 production branch），把上線權限集中在 GitHub workflow + environment approvals。
+- Preview smoke against SSO-protected `*.vercel.app` URLs needs **Protection Bypass for Automation** copied to GitHub secret `VERCEL_AUTOMATION_BYPASS_SECRET`. Without that secret, smoke tries `VERCEL_TOKEN` + `VERCEL_ORG_ID` to mint a shareable link; if SSO still blocks, those paths are **SKIP** (not FAIL) so a login wall is not treated as a portal 404. Platform `NOT_FOUND` and non-portal 200 still fail.
 
 ## 發版流程（版控）
 
@@ -71,8 +74,9 @@
    - `pnpm install --frozen-lockfile`
    - `pnpm run lint:openapi`
    - `pnpm run verify:openapi-codegen`
-   - `vercel build`（Linux；需 `vite.config.ts` 內 `process.env.VERCEL` 時啟用 `vercelPreset`）
-5. 通過後 `vercel deploy --prebuilt`，Job Summary 顯示 deploy URL。
+   - `vercel build`（Linux；`react-router.config.ts` 在 `process.env.VERCEL` 時啟用 `vercelPreset`）
+   - `pnpm run check:vercel-output`（必須有 SSR function，否則 `/` 會平台 404）
+5. 通過後 `vercel deploy --prebuilt`，然後 `pnpm run prod:smoke <url>`（`/` 非 200 則失敗）。Job Summary 顯示 deploy URL。
 
 ### 本機注意（Windows）
 

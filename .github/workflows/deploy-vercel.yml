@@ -85,6 +85,9 @@ jobs:
       - name: Build Vercel output
         run: npx --yes vercel@54.19.0 build --token=${{ env.VERCEL_TOKEN }}
 
+      - name: Verify React Router server output
+        run: pnpm run check:vercel-output
+
       - name: Deploy preview
         if: ${{ env.DEPLOY_ENV == 'preview' }}
         id: deploy_preview
@@ -100,6 +103,25 @@ jobs:
         run: |
           URL="$(npx --yes vercel@54.19.0 deploy --prebuilt --prod --token=${{ env.VERCEL_TOKEN }})"
           echo "production_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke deployed URL
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        shell: bash
+        run: |
+          if [ "${{ env.DEPLOY_ENV }}" = "preview" ]; then
+            URL="${{ steps.deploy_preview.outputs.preview_url }}"
+          else
+            URL="${{ steps.deploy_production.outputs.production_url }}"
+          fi
+          if [ -z "$URL" ]; then
+            echo "::error::Missing deploy URL"
+            exit 1
+          fi
+          node scripts/prod-smoke.mjs "$URL"
+          if [ "${{ env.DEPLOY_ENV }}" = "production" ]; then
+            node scripts/prod-smoke.mjs "https://ai-search-portal.vercel.app"
+          fi
 
       - name: Write deployment summary
         shell: bash
