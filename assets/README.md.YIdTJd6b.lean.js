@@ -1,0 +1,1 @@
+import{_ as r,o as t,c as a,ae as o}from"./chunks/framework.vFbOv2RL.js";const g=JSON.parse('{"title":"Docs 目錄說明","description":"","frontmatter":{},"headers":[],"relativePath":"README.md","filePath":"README.md"}'),n={name:"README.md"};function i(c,e,l,s,d,h){return t(),a("div",null,[...e[0]||(e[0]=[o("",19)])])}const u=r(n,[["render",i]]);export{g as __pageData,u as default};
