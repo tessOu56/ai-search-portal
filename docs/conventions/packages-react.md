@@ -13,7 +13,7 @@
 | **React**     | 19.2.8（見 package.json）                            |
 | **React DOM** | 19.2.8                                               |
 | **Router**    | React Router 7.18.4 Framework Mode（Remix 3 rename） |
-| **Node**      | 22.x（engines）                                      |
+| **Node**      | `>=24.22.1 <25`（engines）                           |
 
 升級 React 大版前，請依下方清單逐項確認 peer 與相容性，並跑 `pnpm run lint:ci`、`pnpm run test`。
 

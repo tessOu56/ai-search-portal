@@ -4,8 +4,8 @@
 
 ## Prerequisites
 
-- Node.js 22.x（see `.nvmrc` / `package.json#engines`）
-- pnpm 9（建議透過 Corepack：`corepack enable`，會依 `package.json` 的 `packageManager` 對齊版本）
+- Node.js `>=24.22.1 <25`（see `.nvmrc` / `package.json#engines`）
+- pnpm 11（建議透過 Corepack：`corepack enable`，會依 `package.json` 的 `packageManager` 對齊版本）
 
 ## Local Setup
 
