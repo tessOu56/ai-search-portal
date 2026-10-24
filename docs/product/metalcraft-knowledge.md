@@ -117,7 +117,7 @@ Seed 讀取優先：`METALCRAFT_SEED_JSON` → `metalcraft-platform/.../seed-sna
 | 項                                        | 建議                      | 何時拉進 sprint                           |
 | ----------------------------------------- | ------------------------- | ----------------------------------------- |
 | CI 掛 `check:metalcraft-knowledge`        | **值得做的薄 P2**         | seed／narrative 常改、或雙入口開始漂移    |
-| Playwright `e2e/catalog-commerce.spec.ts` | P2（需 Node 22）          | CI 已 Node 22 且要擋 UI 回歸              |
+| Playwright `e2e/catalog-commerce.spec.ts` | P2（需 Node 24）          | CI 已 Node 24 且要擋 UI 回歸              |
 | OpenAPI 升格 knowledge search             | **暫緩**（維持 Zod-only） | 對外／第三方消費該 API 時                 |
 | Metadata commerce chips                   | 低優 P2／icebox           | catalog＋chat 不夠、metadata 也要手動篩時 |
 
@@ -149,7 +149,7 @@ pnpm --filter @ai-search-portal/agent-core exec vitest run \
 pnpm --filter @metalcraft/api-client exec vitest run test/knowledge.test.ts
 ```
 
-上線前再跑一次：`pnpm run pr-gate`（portal）／`pnpm test && pnpm typecheck`（metalcraft）。建議 **Node 22**（`.nvmrc`）。
+上線前再跑一次：`pnpm run pr-gate`（portal）／`pnpm test && pnpm typecheck`（metalcraft）。建議 **Node 24**（`.nvmrc`）。
 
 ### 出貨步驟
 

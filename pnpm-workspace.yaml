@@ -4,3 +4,38 @@ packages:
   - "packages/*"
   - "services/*"
   - "labs/*"
+
+# pnpm 11 reads project settings from this file (not package.json#pnpm / .npmrc).
+engineStrict: true
+
+# Default in pnpm 11 is 1440 (24h). Keep it explicit so CI/local stay aligned.
+minimumReleaseAge: 1440
+
+# Lifecycle scripts are denied unless listed. esbuild/msw were previously ignored
+# and are not required (optional native fallbacks); deny them explicitly.
+allowBuilds:
+  esbuild: false
+  msw: false
+  "@scarf/scarf": false
+
+overrides:
+  vite: "^6.4.4"
+  react-router: "7.18.4"
+  proxy-addr: "^2.0.8"
+  compression: "^1.8.2"
+  brace-expansion@1: "1.1.20"
+  brace-expansion@2: "2.1.7"
+  nanoid@3: "3.3.18"
+  postcss@8: "8.5.23"
+  source-map-js: "1.2.2"
+  browserslist: "^4.28.7"
+  "undici@>=7 <7.29.1": "^7.29.1"
+  fast-uri: "^3.1.8"
+  "ajv@^8": "^8.18.0"
+  qs: "^6.16.0"
+  morgan: "^1.12.1"
+  body-parser: "^1.20.6"
+  js-yaml: "^4.3.2"
+  smol-toml: "^1.9.0"
+  lodash: "^4.17.23"
+  "@vue/server-renderer": "^3.5.42"

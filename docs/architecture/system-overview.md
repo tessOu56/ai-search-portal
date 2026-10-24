@@ -59,7 +59,7 @@ flowchart TB
 - TypeScript
 - Vite
 - Tailwind CSS
-- Node.js >= 20
+- Node.js >= 24.22.1
 
 套件與 React 支援度對照見 [packages-react](../conventions/packages-react.md)；新增或升級依賴時請維護該表並確認 React 相容性。
 

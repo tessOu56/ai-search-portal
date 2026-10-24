@@ -117,17 +117,17 @@
 
 ## 開發環境（2026-07 統一）
 
-- Node 22（`.nvmrc`，CI 與 Dockerfile 對齊）· pnpm 10.34.3（`packageManager`）
+- Node 24（`.nvmrc`，CI 與 Dockerfile 對齊；`engines.node` 為 `>=24.22.1 <25`）· pnpm 11.28.8（`packageManager`）
 - 生態環境／沙箱限制：見 [docs/runbooks/local-dev.md](docs/runbooks/local-dev.md)
 
 ---
 
 ## Cursor Cloud specific instructions
 
-The startup update script already runs `pnpm install`. Node 22 and pnpm 10.34.3 are preinstalled. Commands below are the canonical ones from `package.json`; this section only records non-obvious caveats for future cloud agents.
+The startup update script already runs `pnpm install`. Node 24 LTS (`>=24.22.1 <25`) and pnpm 11.28.8 are the toolchain pin. Commands below are the canonical ones from `package.json`; this section only records non-obvious caveats for future cloud agents.
 
 - **Mock-first, fully offline**: The main React Router app runs the AI agent in-process (`@ai-search-portal/agent-core`) with mock data — no real LLM, no secrets, and no external services are required to develop, run, or E2E-test the product. All env vars (`AGENT_RUNTIME_URL`, `ITEMS_API_URL`, `LANGFUSE_*`, `OPA_URL`, …) are opt-in for the optional distributed/observability topology.
 - **Build internal libs before standalone typecheck/lint**: `packages/shared-contracts/dist` and `packages/agent-core/dist` are git-ignored and regenerated per VM. `pnpm run dev` (via `predev`) and `pnpm run test` build them automatically, but standalone `pnpm run typecheck` / `pnpm run lint:ci` assume they already exist. If either fails on a fresh VM, run `pnpm run build:contracts && pnpm run build:agent-core` first.
 - **Run the app**: `pnpm run dev` serves the main app on `http://localhost:5173/` (`predev` builds contracts + agent-core first, so cold start takes longer). Optional sibling services: `pnpm run dev:api` (backend Hono API, port 3001) and `pnpm run dev:agent` (agent-runtime SSE, port 3002) — only needed to exercise the HTTP/distributed paths.
 - **E2E**: `pnpm run test:e2e` (Playwright) auto-starts `pnpm dev` on 5173 via its `webServer` config; no manual server start or secrets needed.
-- **`pnpm install` build-script warning** (esbuild/msw ignored) is expected and harmless — dev, tests, and Playwright all work without approving those scripts.
+- **`pnpm install` lifecycle scripts**: pnpm 11 denies dependency build scripts unless listed in `pnpm-workspace.yaml#allowBuilds`. `esbuild`, `msw`, and `@scarf/scarf` are explicitly denied; they are not required for dev, tests, or Playwright.

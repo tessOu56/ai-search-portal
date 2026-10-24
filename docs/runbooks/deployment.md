@@ -48,7 +48,7 @@
 ## 建議 Vercel 專案設定
 
 - **Framework Preset must be React Router** (Settings → General → Framework Settings). Remix leftover after the RR7 migration ships only `public/` and every SSR route is platform `NOT_FOUND` (`x-vercel-error: NOT_FOUND`). `vercel.json` already sets `"framework": "react-router"`; the dashboard value still wins for Git deploys.
-- **Node.js Version must be 22.x** (same page). The repo `engines` / `check:node` reject 24.x once the React Router builder actually runs `pnpm run build`.
+- **Node.js Version must be 24.x** (same page). The repo `engines` / `check:node` require `>=24.22.1 <25`. The Vercel project is already on Node 24.x.
 - 保留 Vercel 與 GitHub 連線（供 metadata 與 preview 記錄）。
 - 將 production 的實際上線操作統一由 **GitHub `Deploy to Vercel` workflow** 觸發。
 - 若需完全避免「push main 自動上線」，請在 Vercel 專案設定停用 Git auto-deploy（或限制 production branch），把上線權限集中在 GitHub workflow + environment approvals。

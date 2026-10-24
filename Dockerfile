@@ -1,12 +1,13 @@
 # Stage 1: Build
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
 RUN corepack enable
 
-# Copy package files (pnpm-lock.yaml is the reproducible install source)
-COPY package.json pnpm-lock.yaml ./
+# Copy package files (pnpm-lock.yaml is the reproducible install source).
+# pnpm 11 reads workspace settings from pnpm-workspace.yaml, not package.json#pnpm.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 RUN pnpm install --frozen-lockfile
 
@@ -15,7 +16,7 @@ COPY . .
 RUN pnpm run build
 
 # Stage 2: Runtime
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 
 WORKDIR /app
 
@@ -24,7 +25,7 @@ RUN addgroup --system --gid 1001 nodejs && \
 
 RUN corepack enable
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 RUN pnpm install --prod --frozen-lockfile && pnpm store prune && rm -rf ~/.local/share/pnpm/store
 

@@ -30,9 +30,9 @@ jobs:
           git clone --depth 1 --branch "${GITHUB_REF_NAME}" \
             "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" .
 
-      - name: Setup Node 22 and pnpm
+      - name: Setup Node 24 and pnpm
         run: |
-          NODE_VERSION=22.16.0
+          NODE_VERSION=24.22.1
           NODE_DIR="/tmp/node-v${NODE_VERSION}-linux-x64"
           curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" -o /tmp/node.tar.xz
           tar -xJf /tmp/node.tar.xz -C /tmp
