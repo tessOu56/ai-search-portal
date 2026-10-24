@@ -52,7 +52,7 @@
 - 保留 Vercel 與 GitHub 連線（供 metadata 與 preview 記錄）。
 - 將 production 的實際上線操作統一由 **GitHub `Deploy to Vercel` workflow** 觸發。
 - 若需完全避免「push main 自動上線」，請在 Vercel 專案設定停用 Git auto-deploy（或限制 production branch），把上線權限集中在 GitHub workflow + environment approvals。
-- Preview smoke against SSO-protected `*.vercel.app` URLs needs **Protection Bypass for Automation** copied to GitHub secret `VERCEL_AUTOMATION_BYPASS_SECRET`.
+- Preview smoke against SSO-protected `*.vercel.app` URLs needs **Protection Bypass for Automation** copied to GitHub secret `VERCEL_AUTOMATION_BYPASS_SECRET`. Without that secret, smoke tries `VERCEL_TOKEN` + `VERCEL_ORG_ID` to mint a shareable link; if SSO still blocks, those paths are **SKIP** (not FAIL) so a login wall is not treated as a portal 404. Platform `NOT_FOUND` and non-portal 200 still fail.
 
 ## 發版流程（版控）
 
