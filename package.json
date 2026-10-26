@@ -147,7 +147,7 @@
     "lint-staged": "^15.2.2",
     "msw": "^2.15.0",
     "openapi-typescript": "7.6.1",
-    "postcss": "^8.4.47",
+    "postcss": "^8.5.31",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.6.8",
     "size-limit": "^12.1.0",
