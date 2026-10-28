@@ -13,6 +13,16 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  ci-node:
+    uses: tessOu56/renovate-config/.github/workflows/ci-node.yml@cac28048c136409a6a4279a00e42b8a39f2f0791 # main
+    with:
+      command: pnpm test
+      audit: true
+      audit-level: high
+
+  deps-track-guard:
+    uses: tessOu56/renovate-config/.github/workflows/deps-track-guard.yml@cac28048c136409a6a4279a00e42b8a39f2f0791 # main
+
   ci:
     name: Build, Test, Lint
     runs-on: ubuntu-latest

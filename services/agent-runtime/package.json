@@ -17,12 +17,12 @@
     "hono": "^4.13.7"
   },
   "devDependencies": {
-    "@types/node": "^22",
+    "@types/node": "^24",
     "tsx": "^4.23.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.11"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=24.22.1 <25"
   }
 }

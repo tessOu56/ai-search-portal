@@ -24,11 +24,11 @@
     "langfuse": "^3.38.0"
   },
   "devDependencies": {
-    "@types/node": "^22",
+    "@types/node": "^24",
     "typescript": "^6.0.3",
     "vitest": "^4.1.11"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=24.22.1 <25"
   }
 }
