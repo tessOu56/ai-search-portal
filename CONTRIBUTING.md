@@ -11,8 +11,11 @@
 
 ```bash
 pnpm install
+cp .env.example .env   # optional; leave empty for offline fixtures
 pnpm run dev
 ```
+
+See [`.env.example`](.env.example) for optional runtime flags. Never commit `.env` or real secrets.
 
 **編輯器**：建議安裝專案推薦的 VS Code / Cursor 擴充（開啟專案時會提示，或見 `docs/VSCODE.md`）。
 
