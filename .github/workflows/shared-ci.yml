@@ -1,0 +1,22 @@
+# Shared node/audit/smoke + deps-track guard (tessOu56/renovate-config)
+name: Shared CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ci-node:
+    uses: tessOu56/renovate-config/.github/workflows/ci-node.yml@cac28048c136409a6a4279a00e42b8a39f2f0791 # main
+    with:
+      command: pnpm test
+      audit: true
+      audit-level: high
+
+  deps-track-guard:
+    uses: tessOu56/renovate-config/.github/workflows/deps-track-guard.yml@cac28048c136409a6a4279a00e42b8a39f2f0791 # main
