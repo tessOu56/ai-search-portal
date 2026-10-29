@@ -1,8 +1,7 @@
 import { reactRouter } from "@react-router/dev/vite";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
-import { sentryUploadEnabled } from "./app/lib/monitoring/env";
+import { sentryUploadEnabled } from "./app/lib/monitoring/env.ts";
 
 export default defineConfig((config) => {
   const isTest = config.mode === "test" || process.env.VITEST;
@@ -17,6 +16,9 @@ export default defineConfig((config) => {
   };
   return {
     ...(uploadSentry ? { sentryConfig } : {}),
+    resolve: {
+      tsconfigPaths: true,
+    },
     build: {
       sourcemap: uploadSentry ? ("hidden" as const) : false,
     },
@@ -24,7 +26,6 @@ export default defineConfig((config) => {
       // React Router plugin is disabled in test so app/test/setup.ts can import
       // msw/server without triggering the framework server-only check.
       ...(isTest ? [] : [reactRouter()]),
-      tsconfigPaths(),
     ],
     // @is_tess/components dist uses extensionless `./ux` re-exports that Node ESM
     // rejects when left external — bundle into SSR (also pulls tokens CSS deps).
