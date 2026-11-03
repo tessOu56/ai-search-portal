@@ -14,7 +14,7 @@
   "dependencies": {
     "@ai-search-portal/contracts": "workspace:*",
     "@ai-search-portal/governance-domain": "workspace:*",
-    "@hono/node-server": "^1.19.15",
+    "@hono/node-server": "^2.0.0",
     "hono": "^4.13.7"
   },
 
