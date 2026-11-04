@@ -274,8 +274,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/governance-domain
       '@hono/node-server':
-        specifier: ^1.19.15
-        version: 1.19.17(hono@4.13.13)
+        specifier: ^2.0.0
+        version: 2.1.6(hono@4.13.13)
       hono:
         specifier: ^4.13.7
         version: 4.13.13
@@ -366,8 +366,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared-contracts
       '@hono/node-server':
-        specifier: ^1.19.15
-        version: 1.19.17(hono@4.13.13)
+        specifier: ^2.0.0
+        version: 2.1.6(hono@4.13.13)
       hono:
         specifier: ^4.13.7
         version: 4.13.13
@@ -1216,11 +1216,11 @@ packages:
   '@formatjs/intl-localematcher@0.6.2':
     resolution: {integrity: sha512-XOMO2Hupl0wdd172Y06h6kLpBz6Dv+J4okPLl4LPtzbr8f66WbIoy4ev98EBuZ6ZK4h5ydTN6XneT4QVpD7cdA==}
 
-  '@hono/node-server@1.19.17':
-    resolution: {integrity: sha512-dSneS5qhiauZWGDCeK4o695Xd9nUNjviSZCMQrj10eetr8Uln1ucn6bbphOM6UynAMMtNIzZNSpL9vnASJwrPQ==}
-    engines: {node: '>=18.14.1'}
+  '@hono/node-server@2.1.6':
+    resolution: {integrity: sha512-p/KH9MnfNcsm3sR6x4lNgm5j+QN4Et8srKredl9DZfXiyZ1UQ3aQ2YVpFLbqktYN5JI+DB+VZFKM2PqE5hLKjQ==}
+    engines: {node: '>=20'}
     peerDependencies:
-      hono: ^4
+      hono: ^4 || ^5.0.0-0
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -7700,7 +7700,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@hono/node-server@1.19.17(hono@4.13.13)':
+  '@hono/node-server@2.1.6(hono@4.13.13)':
     dependencies:
       hono: 4.13.13
 
