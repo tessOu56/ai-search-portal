@@ -13,7 +13,7 @@
     "@ai-search-portal/agent-core": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^24",
+    "@types/node": "^24.19.2",
     "typescript": "^6.0.3",
     "vitest": "^4.1.11"
   }
