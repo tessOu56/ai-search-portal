@@ -12,11 +12,11 @@ permissions:
 
 jobs:
   ci-node:
-    uses: tessOu56/renovate-config/.github/workflows/ci-node.yml@cac28048c136409a6a4279a00e42b8a39f2f0791 # main
+    uses: tessOu56/renovate-config/.github/workflows/ci-node.yml@525ac1d7642244a303c2b26bf3bcdfe683e684c5 # main
     with:
       command: pnpm test
       audit: true
       audit-level: high
 
   deps-track-guard:
-    uses: tessOu56/renovate-config/.github/workflows/deps-track-guard.yml@cac28048c136409a6a4279a00e42b8a39f2f0791 # main
+    uses: tessOu56/renovate-config/.github/workflows/deps-track-guard.yml@525ac1d7642244a303c2b26bf3bcdfe683e684c5 # main
