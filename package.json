@@ -4,7 +4,7 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
-  "packageManager": "pnpm@11.28.8",
+  "packageManager": "pnpm@11.28.10",
   "scripts": {
     "build": "pnpm run build:contracts && pnpm run build:governance-domain && pnpm run build:agent-core && react-router build",
     "build:agent-core": "pnpm --filter @ai-search-portal/agent-core run build",
