@@ -1,17 +1,30 @@
 #!/usr/bin/env node
 /**
  * HTTP smoke — fail if any reachable route is not a same-origin portal 200.
- * Usage: node scripts/prod-smoke.mjs [baseUrl]
+ * Usage: node scripts/prod-smoke.mjs [--strict] [baseUrl]
  *
  * Does not follow redirects (SSO 302 to vercel.com must not count as 200).
  * Optional: VERCEL_AUTOMATION_BYPASS_SECRET for SSO-protected previews.
  * Optional: VERCEL_TOKEN + VERCEL_ORG_ID to mint a shareable link when SSO blocks.
- * SSO without a bypass is SKIP (not FAIL): the app status is unobservable.
+ *
+ * Preview mode (default for hashed deploy URLs): SSO without a bypass is SKIP,
+ * because the app status is unobservable. A run where every route SKIPs still
+ * exits 0 but emits a GitHub warning so it is not mistaken for a real pass.
+ *
+ * Strict mode (`--strict`, SMOKE_STRICT=1, or the public production URL):
+ * nothing may SKIP. SSO, 404, non-portal bodies and network errors all FAIL.
+ * Production is public, so an SSO wall there is itself a breakage.
  */
-const base = (process.argv[2] || "https://ai-search-portal.vercel.app").replace(
-  /\/$/,
-  ""
-);
+const PRODUCTION_URL = "https://ai-search-portal.vercel.app";
+
+const args = process.argv.slice(2);
+const base = (
+  args.find((arg) => !arg.startsWith("--")) || PRODUCTION_URL
+).replace(/\/$/, "");
+const strict =
+  args.includes("--strict") ||
+  process.env.SMOKE_STRICT === "1" ||
+  base === PRODUCTION_URL;
 
 const paths = ["/", "/catalog-search", "/metadata", "/vitals"];
 const PORTAL_MARKER = 'data-app="portal"';
@@ -102,6 +115,11 @@ async function main() {
   const headers = requestHeaders();
   let shareSecret = null;
   let triedShare = false;
+  let skipped = 0;
+
+  console.log(
+    `Smoke ${base} (${strict ? "strict: SSO/404/unreachable FAIL" : "preview: SSO may SKIP"})`
+  );
 
   for (const path of paths) {
     const url = `${base}${path}`;
@@ -121,7 +139,9 @@ async function main() {
         triedShare = true;
         shareSecret = await mintShareSecret(base);
         if (shareSecret) {
-          console.log("Minted shareable link; retrying smoke through _vercel_share");
+          console.log(
+            "Minted shareable link; retrying smoke through _vercel_share"
+          );
           res = await fetch(withShare(url, shareSecret), {
             redirect: "manual",
             headers,
@@ -139,6 +159,14 @@ async function main() {
         .join(" ");
 
       if (res.status >= 300 && res.status < 400 && isSsoLocation(location)) {
+        if (strict) {
+          failed += 1;
+          console.log(
+            `FAIL ${res.status} ${url}${extra ? ` ${extra}` : ""} SSO on a URL that must be public`
+          );
+          continue;
+        }
+        skipped += 1;
         console.log(
           `SKIP ${res.status} ${url}${extra ? ` ${extra}` : ""} SSO (preview protection; app status unobservable)`
         );
@@ -174,8 +202,15 @@ async function main() {
       }
     } catch (err) {
       failed += 1;
-      console.log(`FAIL  ERR ${url} ${err instanceof Error ? err.message : err}`);
+      console.log(
+        `FAIL  ERR ${url} ${err instanceof Error ? err.message : err}`
+      );
     }
+  }
+  if (!strict && skipped === paths.length) {
+    console.log(
+      `::warning::All ${paths.length} routes SKIPped behind SSO on ${base}; this run did not observe the app. Production is checked separately in strict mode.`
+    );
   }
   if (failed > 0) {
     process.exitCode = 1;

@@ -120,7 +120,7 @@ jobs:
           fi
           node scripts/prod-smoke.mjs "$URL"
           if [ "${{ env.DEPLOY_ENV }}" = "production" ]; then
-            node scripts/prod-smoke.mjs "https://ai-search-portal.vercel.app"
+            node scripts/prod-smoke.mjs --strict "https://ai-search-portal.vercel.app"
           fi
 
       - name: Write deployment summary
