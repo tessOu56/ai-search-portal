@@ -2,7 +2,6 @@
  * Context pack file loader — domain-neutral; reads content/context-packs/*.
  */
 
-import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import {
@@ -24,6 +23,8 @@ import {
   type MetadataAssetDetailContract,
   metadataAssetDetailSchema,
 } from "@ai-search-portal/contracts";
+
+import { isWorkersRuntime } from "~/shared/runtime.server";
 
 const PACKS_DIR = "content/context-packs";
 const CONTEXT_PACK_COOKIE = "context_pack";
@@ -117,8 +118,18 @@ function createPackCache(): PackCache {
 
 let cache: PackCache = createPackCache();
 
+function nodeFs(): typeof import("node:fs") | null {
+  if (isWorkersRuntime()) return null;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- Node-only dev fallback
+  return require("node:fs") as typeof import("node:fs");
+}
+
 function readJsonFile(filePath: string): unknown {
-  const raw = readFileSync(filePath, "utf-8");
+  const fs = nodeFs();
+  if (!fs) {
+    throw new Error(`Filesystem read is unavailable in Workers: ${filePath}`);
+  }
+  const raw = fs.readFileSync(filePath, "utf-8");
   return JSON.parse(raw) as unknown;
 }
 
@@ -141,10 +152,11 @@ function loadJsonArray<T>(
   parseItem: (item: unknown) => T,
   bundled: unknown = undefined
 ): T[] {
+  const fs = nodeFs();
   const data =
     bundled !== undefined
       ? bundled
-      : existsSync(filePath)
+      : fs?.existsSync(filePath)
         ? readJsonFile(filePath)
         : null;
   if (data === null) return [];
@@ -153,16 +165,18 @@ function loadJsonArray<T>(
 }
 
 export function resolveContentRoot(cwd = process.cwd()): string {
+  if (isWorkersRuntime()) return cwd;
+  const fs = nodeFs();
+  if (!fs) return cwd;
   const candidates = [
     cwd,
     path.join(cwd, ".."),
     path.join(cwd, "../.."),
-    // Vercel serverless often lands under /var/task with nested build dirs.
     path.join(cwd, "build/server"),
     path.join(cwd, "..", "build/server"),
   ];
   for (const candidate of candidates) {
-    if (existsSync(path.join(candidate, PACKS_DIR))) return candidate;
+    if (fs.existsSync(path.join(candidate, PACKS_DIR))) return candidate;
   }
   return cwd;
 }
@@ -170,12 +184,15 @@ export function resolveContentRoot(cwd = process.cwd()): string {
 export function listContextPackIds(contentRoot: string): string[] {
   const fromBundle = listBundledPackIds();
   if (fromBundle.length > 0) return fromBundle;
+  const fs = nodeFs();
+  if (!fs) return fromBundle;
   const root = packsRoot(contentRoot);
-  if (!existsSync(root)) return [];
-  return readdirSync(root, { withFileTypes: true })
+  if (!fs.existsSync(root)) return [];
+  return fs
+    .readdirSync(root, { withFileTypes: true })
     .filter((d) => d.isDirectory())
     .map((d) => d.name)
-    .filter((id) => existsSync(path.join(root, id, FILE_PACK_JSON)));
+    .filter((id) => fs.existsSync(path.join(root, id, FILE_PACK_JSON)));
 }
 
 export function listContextPacks(
@@ -183,13 +200,14 @@ export function listContextPacks(
 ): ContextPackManifestContract[] {
   if (cache.manifests) return cache.manifests;
   const ids = listContextPackIds(contentRoot);
-  const manifests = ids.map((id) => {
+  const manifests = ids.flatMap((id) => {
     const bundled = bundledPackFile(id, FILE_PACK_JSON);
     if (bundled !== undefined) {
-      return contextPackManifestSchema.parse(bundled);
+      return [contextPackManifestSchema.parse(bundled)];
     }
+    if (isWorkersRuntime()) return [];
     const manifestPath = path.join(packDir(contentRoot, id), FILE_PACK_JSON);
-    return contextPackManifestSchema.parse(readJsonFile(manifestPath));
+    return [contextPackManifestSchema.parse(readJsonFile(manifestPath))];
   });
   cache.manifests = manifests;
   return manifests;
@@ -276,7 +294,8 @@ export function loadPackBindings(
     return parsed.bindings;
   }
   const filePath = path.join(packDir(contentRoot, packId), FILE_BINDINGS_JSON);
-  if (!existsSync(filePath)) {
+  const fs = nodeFs();
+  if (!fs?.existsSync(filePath)) {
     cache.bindings.set(packId, []);
     return [];
   }

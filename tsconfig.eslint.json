@@ -37,7 +37,10 @@
     "scripts/**/*.js",
     "e2e/**/*.ts",
     "playwright.config.ts",
-    "playwright.perf.config.ts"
+    "playwright.perf.config.ts",
+    "workers/**/*.ts",
+    "worker-configuration.d.ts",
+    "react-router.config.ts"
   ],
   "exclude": [
     "node_modules",

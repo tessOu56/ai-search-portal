@@ -29,6 +29,8 @@ node_modules/
 *.swo
 
 .vercel
+.wrangler/
+worker-configuration.d.ts
 
 # CI reports (generated in CI, do not commit)
 reports/

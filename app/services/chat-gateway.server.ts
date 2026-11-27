@@ -1,6 +1,7 @@
 import { streamChatInternalEvents } from "@ai-search-portal/agent-core";
 import { mapInternalSseToStable } from "@ai-search-portal/contracts";
 
+import { bundledRagRetrieveOptions } from "./rag-corpus.server";
 import { readSseMessages } from "./sse-parse.server";
 
 export type ChatGatewaySend = (args: { event: string; data: string }) => void;
@@ -78,12 +79,14 @@ export async function pipeLocalAgentCoreToStableSse(args: {
   send: ChatGatewaySend;
 }): Promise<void> {
   void args.sessionId;
+  const retrieveOptions = bundledRagRetrieveOptions(args.packId);
   for await (const part of streamChatInternalEvents({
     query: args.query,
     traceId: args.traceId,
     packId: args.packId,
     emitMockToolStatus: true,
     includeRagSteps: true,
+    ...(retrieveOptions ? { retrieveOptions } : {}),
   })) {
     mapAndSend(args.send, part.event, part.data);
   }

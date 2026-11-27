@@ -5,25 +5,31 @@
  * 耐久儲存（DB + 查詢分頁 + 檢視頁）屬階段五正式工作。
  */
 
-import { randomUUID } from "node:crypto";
-import { appendFileSync, mkdirSync } from "node:fs";
-import { dirname } from "node:path";
-
 import {
   type AuditEventContract,
   auditEventSchema,
 } from "@ai-search-portal/contracts";
 
+import { isWorkersRuntime } from "~/shared/runtime.server";
+
 const memoryStore: AuditEventContract[] = [];
 
 function tryAppendJsonl(event: AuditEventContract): void {
-  const path = process.env.AUDIT_LOG_PATH?.trim();
-  if (!path) return;
-  // AUDIT_LOG_PATH is operator-configured; not user input.
-  // eslint-disable-next-line security/detect-non-literal-fs-filename -- env path
-  mkdirSync(dirname(path), { recursive: true });
-  // eslint-disable-next-line security/detect-non-literal-fs-filename -- env path
-  appendFileSync(path, `${JSON.stringify(event)}\n`, "utf8");
+  if (isWorkersRuntime()) return;
+  const logPath = process.env.AUDIT_LOG_PATH?.trim();
+  if (!logPath) return;
+  void (async () => {
+    try {
+      const [fs, pathMod] = await Promise.all([
+        import("node:fs"),
+        import("node:path"),
+      ]);
+      fs.mkdirSync(pathMod.dirname(logPath), { recursive: true });
+      fs.appendFileSync(logPath, `${JSON.stringify(event)}\n`, "utf8");
+    } catch {
+      // Workers / read-only FS: in-memory only
+    }
+  })();
 }
 
 export type AppendAuditInput = Omit<AuditEventContract, "id" | "at">;
@@ -37,7 +43,7 @@ export function appendAuditEvent(
   try {
     const event = auditEventSchema.parse({
       ...input,
-      id: randomUUID(),
+      id: crypto.randomUUID(),
       at: new Date().toISOString(),
     });
     memoryStore.push(event);

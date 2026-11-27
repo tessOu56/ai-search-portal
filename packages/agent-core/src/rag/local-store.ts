@@ -202,26 +202,39 @@ function docFromOps(item: unknown): LocalDoc | undefined {
   };
 }
 
+/** Build LocalDoc index from in-memory pack JSON (Workers / Vite bundled corpora). */
+export function buildPackDocsFromArrays(files: {
+  glossary?: unknown[];
+  narrative?: unknown[];
+  ops?: unknown[];
+}): LocalDoc[] {
+  const docs: LocalDoc[] = [];
+  for (const item of files.glossary ?? []) {
+    const doc = docFromGlossary(item);
+    if (doc) docs.push(doc);
+  }
+  for (const item of files.narrative ?? []) {
+    const doc = docFromNarrative(item);
+    if (doc) docs.push(doc);
+  }
+  for (const item of files.ops ?? []) {
+    const doc = docFromOps(item);
+    if (doc) docs.push(doc);
+  }
+  return docs;
+}
+
 /** Build LocalDoc index from a context pack's knowledge fixtures. */
 export function loadPackDocs(
   packId: string,
   contentRoot = resolveDefaultContentRoot()
 ): LocalDoc[] {
   const dir = packDir(contentRoot, packId);
-  const docs: LocalDoc[] = [];
-  for (const item of readJsonArray(path.join(dir, "glossary.json"))) {
-    const doc = docFromGlossary(item);
-    if (doc) docs.push(doc);
-  }
-  for (const item of readJsonArray(path.join(dir, "narrative.json"))) {
-    const doc = docFromNarrative(item);
-    if (doc) docs.push(doc);
-  }
-  for (const item of readJsonArray(path.join(dir, "ops.json"))) {
-    const doc = docFromOps(item);
-    if (doc) docs.push(doc);
-  }
-  return docs;
+  return buildPackDocsFromArrays({
+    glossary: readJsonArray(path.join(dir, "glossary.json")),
+    narrative: readJsonArray(path.join(dir, "narrative.json")),
+    ops: readJsonArray(path.join(dir, "ops.json")),
+  });
 }
 
 /**

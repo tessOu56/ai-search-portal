@@ -17,6 +17,9 @@ allowBuilds:
   esbuild: false
   msw: false
   "@scarf/scarf": false
+  workerd: true
+  sharp: true
+  "@parcel/watcher": true
 
 overrides:
   vite: "^8.3.5"

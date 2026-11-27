@@ -24,9 +24,13 @@ export type { LuiResponse, LuiSource } from "./lui-mock.js";
 export { buildLuiResponse, splitToTokens } from "./lui-mock.js";
 export { beginChatTrace, isLangfuseEnabled } from "./observability/langfuse.js";
 export {
+  buildPackDocsFromArrays,
+  DEFAULT_DOCS,
   loadPackDocs,
+  type LocalDoc,
   resolveRagCorpus,
   retrieveLocal,
+  type RetrieveLocalOptions,
 } from "./rag/local-store.js";
 export { runLocalRag, runRagPipelineEvents } from "./rag/pipeline.js";
 export type { SseEventPart } from "./stream.js";

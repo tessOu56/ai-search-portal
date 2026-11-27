@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
 import { createCookie } from "react-router";
 
 const LOCALE_COOKIE = "locale";
@@ -13,7 +10,7 @@ export const localeCookie = createCookie(LOCALE_COOKIE, {
   path: "/",
   sameSite: "lax",
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: import.meta.env.PROD,
 });
 
 type RequestLike = { headers: { get(name: string): string | null } };
@@ -34,15 +31,32 @@ export async function getLocale(request: RequestLike): Promise<Locale> {
 
 type Translations = Record<string, string>;
 
-function loadTranslations(locale: Locale): Translations {
-  const base = path.join(process.cwd(), "app/shared/i18n/translations");
-  const file = path.join(base, `${locale}.json`);
-  try {
-    const raw = readFileSync(file, "utf-8");
-    return JSON.parse(raw) as Translations;
-  } catch {
-    return {};
+const TRANSLATION_MODULES = (
+  import.meta as ImportMeta & {
+    glob: (
+      pattern: string,
+      options: { eager: boolean; import: string }
+    ) => Record<string, unknown>;
   }
+).glob("./translations/*.json", {
+  eager: true,
+  import: "default",
+}) as Record<string, Translations>;
+
+function localeFromKey(key: string): Locale | null {
+  const match = /\/([a-z]{2}-[A-Z]{2})\.json$/.exec(key);
+  if (!match?.[1]) return null;
+  const code = match[1];
+  return SUPPORTED_LOCALES.includes(code as Locale) ? (code as Locale) : null;
+}
+
+function loadTranslations(locale: Locale): Translations {
+  for (const [key, mod] of Object.entries(TRANSLATION_MODULES)) {
+    if (localeFromKey(key) === locale) {
+      return mod;
+    }
+  }
+  return {};
 }
 
 export function getTranslations(locale: Locale): Translations {
