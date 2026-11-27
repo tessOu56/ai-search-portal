@@ -1,8 +1,5 @@
-import { PassThrough } from "node:stream";
-
-import { createReadableStreamFromReadable } from "@react-router/node";
 import { isbot } from "isbot";
-import { renderToPipeableStream } from "react-dom/server";
+import { renderToReadableStream } from "react-dom/server";
 import type { AppLoadContext, EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
 
@@ -10,49 +7,39 @@ import { readServerSentryDsn } from "~/lib/monitoring/env";
 
 const ABORT_DELAY_MS = 5_000;
 
-function handleRequest(
+async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
   routerContext: EntryContext,
   _loadContext: AppLoadContext
-) {
-  const waitForAll = isbot(request.headers.get("user-agent") ?? "");
-  return new Promise((resolve, reject) => {
-    let shellRendered = false;
-    let status = responseStatusCode;
+): Promise<Response> {
+  let shellRendered = false;
+  let status = responseStatusCode;
+  const userAgent = request.headers.get("user-agent");
 
-    const onReady = () => {
-      shellRendered = true;
-      const body = new PassThrough();
-      const stream = createReadableStreamFromReadable(body);
-      responseHeaders.set("Content-Type", "text/html");
-      resolve(
-        new Response(stream, {
-          headers: responseHeaders,
-          status,
-        })
-      );
-      pipe(body);
-    };
+  const body = await renderToReadableStream(
+    <ServerRouter context={routerContext} url={request.url} />,
+    {
+      signal: AbortSignal.timeout(ABORT_DELAY_MS),
+      onError(error: unknown) {
+        status = 500;
+        if (shellRendered) {
+          console.error(error);
+        }
+      },
+    }
+  );
+  shellRendered = true;
 
-    const { pipe, abort } = renderToPipeableStream(
-      <ServerRouter context={routerContext} url={request.url} />,
-      {
-        onAllReady: waitForAll ? onReady : undefined,
-        onShellReady: waitForAll ? undefined : onReady,
-        onShellError(error: unknown) {
-          reject(error instanceof Error ? error : new Error(String(error)));
-        },
-        onError(error: unknown) {
-          status = 500;
-          if (shellRendered) {
-            console.error(error);
-          }
-        },
-      }
-    );
-    setTimeout(abort, ABORT_DELAY_MS);
+  if ((userAgent && isbot(userAgent)) || routerContext.isSpaMode) {
+    await body.allReady;
+  }
+
+  responseHeaders.set("Content-Type", "text/html");
+  return new Response(body, {
+    headers: responseHeaders,
+    status,
   });
 }
 
@@ -70,7 +57,7 @@ async function resolveHandler(): Promise<HandleRequest> {
   return sentryWrapped;
 }
 
-export default function defaultHandler(
+export default async function defaultHandler(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
@@ -86,13 +73,12 @@ export default function defaultHandler(
       loadContext
     );
   }
-  return resolveHandler().then((handler) =>
-    handler(
-      request,
-      responseStatusCode,
-      responseHeaders,
-      routerContext,
-      loadContext
-    )
+  const handler = await resolveHandler();
+  return handler(
+    request,
+    responseStatusCode,
+    responseHeaders,
+    routerContext,
+    loadContext
   );
 }

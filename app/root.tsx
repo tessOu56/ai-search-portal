@@ -1,8 +1,5 @@
 import "./tailwind.css";
 
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
 import { type ReactNode, useEffect } from "react";
 import type { LinksFunction, LoaderFunctionArgs } from "react-router";
 import {
@@ -23,6 +20,8 @@ import { I18nProvider } from "~/shared/i18n/context";
 import { getRouteErrorDisplay } from "~/shared/utils/errors";
 import fontFacesHref from "~/styles/fontfaces.css?url";
 
+import appPackage from "../package.json";
+
 export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico", sizes: "any" },
   { rel: "icon", href: "/favicon-32.png", type: "image/png", sizes: "32x32" },
@@ -35,17 +34,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // Seed 不阻塞 document shell：冷啟動／無快取時先噴畫布，資料由路由級 ensureSeeded 補齊
   const locale = await getLocale(request);
   const translations = getTranslations(locale);
-  let version = "0.0.0";
-  try {
-    const pkgPath = path.join(process.cwd(), "package.json");
-    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as Record<
-      string,
-      unknown
-    >;
-    version = typeof pkg.version === "string" ? pkg.version : version;
-  } catch {
-    // package.json 讀取失敗時使用預設版號，不中斷啟動
-  }
+  const version =
+    typeof appPackage.version === "string" ? appPackage.version : "0.0.0";
   return { locale, translations, version };
 }
 

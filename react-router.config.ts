@@ -1,18 +1,20 @@
 import type { Config } from "@react-router/dev/config";
-import { vercelPreset } from "@vercel/react-router/vite";
 
 import { sentryUploadEnabled } from "./app/lib/monitoring/env";
 
+const useNodeBuild = process.env.BUILD_TARGET === "node";
+
 /**
- * vercelPreset must stay gated on VERCEL: it sets serverBundles and would
- * break `react-router-serve ./build/server/index.js` used by start/e2e.
- * On Vercel it writes `.vercel/react-router-build-result.json` for the
- * React Router builder — the dashboard Framework Preset must be
- * "react-router", not "remix", or `/` is a platform 404.
+ * Default build targets Cloudflare Workers (`@cloudflare/vite-plugin`).
+ * Docker / `react-router-serve` uses `BUILD_TARGET=node` via `pnpm run build:node`.
  */
 export default {
   ssr: true,
-  presets: process.env.VERCEL ? [vercelPreset()] : [],
+  future: useNodeBuild
+    ? {}
+    : {
+        v8_viteEnvironmentApi: true,
+      },
   buildEnd: sentryUploadEnabled()
     ? async (...args) => {
         const { sentryOnBuildEnd } = await import("@sentry/react-router/vite");

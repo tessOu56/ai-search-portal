@@ -13,7 +13,7 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN pnpm run build
+RUN pnpm run build:node
 
 # Stage 2: Runtime
 FROM node:24-alpine AS runner

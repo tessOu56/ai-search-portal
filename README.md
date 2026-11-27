@@ -36,7 +36,7 @@ Also: `/` (golden chat with offline fixture), `/catalog-search/dictionary` (virt
 
 - React Router 7 Framework Mode + React 19 + TypeScript 6 + Vite 8
 - Tailwind CSS
-- Deploy: Vercel (or any Node host / Docker)
+- Deploy: **Cloudflare Workers** (primary) or Docker (`build:node` + `react-router-serve`)
 
 ## Quickstart
 
@@ -74,7 +74,26 @@ More: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DESIGN_SYSTEM.md](docs
 
 ## Deploy notes
 
-Prefer linking the GitHub repo in your host’s dashboard. If you use GitHub Actions deploy workflows, store host tokens only in **GitHub Actions secrets / environments** — never in the repository. See [docs/runbooks/deployment.md](docs/runbooks/deployment.md) for operator detail.
+### Cloudflare Workers (recommended)
+
+Prerequisites: [Wrangler](https://developers.cloudflare.com/workers/wrangler/) logged in (`wrangler login`) or `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` in CI.
+
+```bash
+pnpm run build          # Workers SSR bundle via @cloudflare/vite-plugin
+pnpm run preview        # wrangler dev (local Workers runtime)
+pnpm run deploy         # wrangler deploy
+pnpm run smoke:workers  # after preview, optional HTTP smoke
+```
+
+Optional Worker vars / secrets (same names as local `.env` where applicable): `ADMIN_API_TOKEN`, `REVIEWER_API_TOKEN`, `REQUESTER_API_TOKEN`, `SESSION_SECRET`, `CONTEXT_PACK`, `AGENT_RAG_MODE=local`, `OPENAI_API_KEY`, `SENTRY_DSN`. Set secrets with `wrangler secret put <NAME>`.
+
+GitHub Actions: workflow [`.github/workflows/deploy-cloudflare.yml`](.github/workflows/deploy-cloudflare.yml) (`workflow_dispatch`) uses repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+
+### Docker (Node)
+
+`pnpm run build:node` then `react-router-serve ./build/server/index.js` (see `Dockerfile`).
+
+Vercel is no longer the primary target; `vercel.json` may remain for transitional hosts. See [docs/runbooks/deployment.md](docs/runbooks/deployment.md) for operator detail.
 
 ## License
 

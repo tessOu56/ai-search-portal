@@ -434,6 +434,10 @@ export default defineConfig(
     },
   },
   {
+    files: ["workers/**/*.ts"],
+    ...tseslint.configs.disableTypeChecked,
+  },
+  {
     files: ["**/*.{js,cjs,mjs}"],
     ...tseslint.configs.disableTypeChecked,
   }

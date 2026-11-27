@@ -10,6 +10,8 @@ import {
 const isLocalRagEnabled = (): boolean =>
   process.env.AGENT_RAG_MODE === "local" || process.env.AGENT_RAG_MODE === "1";
 
+export type RagPipelineRetrieveOptions = RetrieveLocalOptions;
+
 export type RagPipelineResult = {
   hits: LocalDoc[];
   packId?: string;

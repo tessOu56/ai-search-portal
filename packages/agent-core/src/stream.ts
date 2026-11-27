@@ -12,7 +12,11 @@ import {
 import { tryOptionalLlmCompose } from "./llm/optional-openai.js";
 import { buildLuiResponse, splitToTokens } from "./lui-mock.js";
 import { beginChatTrace } from "./observability/langfuse.js";
-import { runLocalRag, runRagPipelineEvents } from "./rag/pipeline.js";
+import {
+  type RagPipelineRetrieveOptions,
+  runLocalRag,
+  runRagPipelineEvents,
+} from "./rag/pipeline.js";
 import type { SseEventPart } from "./sse-types.js";
 import {
   executeItemsLookup,
@@ -85,11 +89,14 @@ export async function* streamChatInternalEvents(args: {
   executeItemsLookup?: boolean;
   /** Metadata catalog lookup */
   executeMetadataLookup?: boolean;
+  /** Optional pre-bundled corpus (e.g. Cloudflare Workers). */
+  retrieveOptions?: RagPipelineRetrieveOptions;
 }): AsyncGenerator<SseEventPart> {
   const {
     query,
     traceId,
     packId,
+    retrieveOptions,
     emitMockToolStatus = true,
     includeRagSteps = true,
     executeItemsLookup: runItemsLookup = isItemsLookupEnabled(),
@@ -113,7 +120,7 @@ export async function* streamChatInternalEvents(args: {
     throw e;
   }
 
-  const rag = runLocalRag(query, { packId });
+  const rag = runLocalRag(query, { packId, ...retrieveOptions });
   const fixture = buildLuiResponse(query, {
     ragHits: rag.hits,
     packId: rag.packId ?? packId,
@@ -157,7 +164,10 @@ export async function* streamChatInternalEvents(args: {
   }
 
   if (includeRagSteps) {
-    for await (const ev of runRagPipelineEvents(query, { packId })) {
+    for await (const ev of runRagPipelineEvents(query, {
+      packId,
+      ...retrieveOptions,
+    })) {
       if (traceSession && ev.event === "internal.rag_step") {
         const parsed = internalRagStepPayloadSchema.safeParse(
           JSON.parse(ev.data)

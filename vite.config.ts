@@ -1,3 +1,4 @@
+import { cloudflare } from "@cloudflare/vite-plugin";
 import { reactRouter } from "@react-router/dev/vite";
 import { defineConfig } from "vite";
 
@@ -5,6 +6,8 @@ import { sentryUploadEnabled } from "./app/lib/monitoring/env.ts";
 
 export default defineConfig((config) => {
   const isTest = config.mode === "test" || process.env.VITEST;
+  const useNodeBuild = process.env.BUILD_TARGET === "node";
+  const useCloudflare = !isTest && !useNodeBuild;
   const uploadSentry = !isTest && sentryUploadEnabled();
   const sentryConfig = {
     org: process.env.SENTRY_ORG,
@@ -16,6 +19,9 @@ export default defineConfig((config) => {
   };
   return {
     ...(uploadSentry ? { sentryConfig } : {}),
+    define: {
+      __WORKERS_RUNTIME__: JSON.stringify(useCloudflare),
+    },
     resolve: {
       tsconfigPaths: true,
     },
@@ -23,6 +29,9 @@ export default defineConfig((config) => {
       sourcemap: uploadSentry ? ("hidden" as const) : false,
     },
     plugins: [
+      ...(useCloudflare
+        ? [cloudflare({ viteEnvironment: { name: "ssr" } })]
+        : []),
       // React Router plugin is disabled in test so app/test/setup.ts can import
       // msw/server without triggering the framework server-only check.
       ...(isTest ? [] : [reactRouter()]),

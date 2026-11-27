@@ -1,5 +1,6 @@
-/// <reference types="@react-router/node" />
 /// <reference types="vite/client" />
+
+declare const __WORKERS_RUNTIME__: boolean;
 
 interface ImportMetaEnv {
   readonly VITE_SENTRY_DSN?: string;
